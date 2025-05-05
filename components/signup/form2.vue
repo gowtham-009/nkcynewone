@@ -26,7 +26,7 @@
        
       </div>
 
-      <div class="w-full p-1 mt-4" v-if="mobileotp" >
+      <div class="w-full  mt-4" v-if="mobileotp" >
             <p class="font-medium text-slate-800 text-2xl dark:text-gray-400">
                 OTP sent
             </p>
