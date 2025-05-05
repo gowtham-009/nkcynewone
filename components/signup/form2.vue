@@ -188,7 +188,7 @@ const mobile_signup=()=>{
     circle.remove()
     if(p_otp.value.length===4){
       console.log(emailid)
-      emit('updateDiv', 'div3', emailid);
+      emit('updateDiv', 'div3', emailid ||'');
     }
     else{
       sendmobileotp()

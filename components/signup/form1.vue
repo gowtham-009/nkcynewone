@@ -101,11 +101,12 @@ if(!response.ok){
 }
 else{
   const data=await response.json()
- if(panvalue.value==data.KYC_DATA.APP_PAN_NO){
-  emit('updateDiv', 'div2', data);
- }
- else{
-}
+  emit('updateDiv', 'div2', data||'');
+ //if(panvalue.value==data.KYC_DATA.APP_PAN_NO){
+
+ //}
+ //else{
+//}
 
 }
 } catch (error) {
