@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <label for="pan_label" class="text-gray-600 text-lg font-normal">PAN</label>
+    <label for="pan_label" class="text-gray-400 text-lg font-normal">PAN</label>
     <InputText
       id="pan_label"
       class="w-full py-2"
