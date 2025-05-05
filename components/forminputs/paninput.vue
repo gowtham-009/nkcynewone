@@ -1,13 +1,13 @@
 <template>
   <div class="w-full">
-    <label for="pan_label" class="text-gray-400 text-lg font-normal">PAN</label>
+    <label for="pan_label" class="text-gray-700 text-lg font-normal">PAN</label>
     <InputText
       id="pan_label"
-      class="w-full py-2"
+      class="w-full py-2 text-gray-500"
       v-model="pan"
       variant="filled"
       size="large"
-      placeholder="AGMLS6667Z"
+      placeholder="Enter a Pan Number"
       @input="onInput"
       inputmode="text"
       autocomplete="off"
