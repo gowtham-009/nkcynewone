@@ -79,7 +79,7 @@ import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import phoneOTP from '~/components/forminputs/otpinput.vue'
 import MobileInput from '~/components/forminputs/mobileinput.vue';
 import Checkbox from '~/components/forminputs/remembercheckbox.vue';
-import { ref, onMounted, watch, watchEffect, onUnmounted } from 'vue';
+import { ref, onMounted, watch, onUnmounted } from 'vue';
 const { ourl } = useUrl();
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
@@ -103,7 +103,7 @@ const cleanedMobile = mobilepropsdata.startsWith("91")
   ? mobilepropsdata.slice(2)
   : mobilepropsdata;
 const mobileNo = ref(cleanedMobile);
-const emailid=props?.data?.KYC_DATA?.APP_EMAIL|| ''
+const emailid=props?.data|| ''
 
 
 onMounted(() => {

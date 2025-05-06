@@ -24,35 +24,37 @@
 
 
         <div class="w-full mt-2" v-if="emailbox">
-        <p class="font-medium text-slate-800 text-2xl dark:text-gray-400">
-          OTP sent
-        </p>
-        <p class="text-sm leading-6  font-normal text-gray-500">
-          We have sent an OTP to your email {{ emailidtext }}
-        </p>
-        <div class="w-full mt-3">
-          <emailOTP v-model="e_otp" />
-          <div class="w-full h-8">
-            <p class="text-lg font-medium text-center text-gray-500" v-if="resend_sh">OTP Resend
-              Successfully ({{ emailidtext }}) </p>
-          </div>
-          <div class="w-full mt-4 flex justify-between items-center">
-            <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0')
-            }}s</h2>
+          <p class="font-medium text-slate-800 text-2xl dark:text-gray-400">
+            OTP sent
+          </p>
+          <p class="text-sm leading-6  font-normal text-gray-500">
+            We have sent an OTP to your email {{ emailidtext }}
+          </p>
+          <div class="w-full mt-3">
+            <emailOTP v-model="e_otp" />
+            <div class="w-full h-8">
+              <p class="text-lg font-medium text-center text-gray-500" v-if="resend_sh">OTP Resend
+                Successfully ({{ emailidtext }}) </p>
+            </div>
+            <div class="w-full mt-4 flex justify-between items-center">
+              <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0')
+                }}s</h2>
 
-            <button :disabled="timeLeft" type="button" @click="resendotp" disabled class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
+              <button :disabled="timeLeft" type="button" @click="resendotp" disabled
+                class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
+            </div>
           </div>
         </div>
       </div>
-      </div>
-      
+
       <div class="w-full flex gap-2">
         <Button @click="back()" ref="rippleBtnback"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" ref="rippleBtn" label="Verify OTP"
-          class="primary_color text-white w-5/6 py-4 text-xl border-0" @click="handleButtonClick()" :disabled="!isValidEmail || isSendingOtp">
+          class="primary_color text-white w-5/6 py-4 text-xl border-0" @click="handleButtonClick()"
+          :disabled="!isValidEmail || isSendingOtp">
           {{ buttonText }}
 
         </Button>
@@ -68,10 +70,10 @@
 <script setup>
 import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import emailOTP from '~/components/forminputs/otpinput.vue'
-import { ref, onMounted, watchEffect, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import EmailInput from '~/components/forminputs/emailinput.vue';
-
+import CryptoJS from 'crypto-js'
 
 const { ourl } = useUrl();
 
@@ -92,18 +94,19 @@ const props = defineProps({
   },
 });
 
+
 const randomtoken = () => {
-    let token = ''
-    for (var i = 0; i <= 30; i++) {
-        token += Math.floor(Math.random() * 10)
-    }
-    return token
+  let token = ''
+  for (var i = 0; i <= 30; i++) {
+    token += Math.floor(Math.random() * 10)
+  }
+  return token
 }
 
 const router = useRouter()
 
 const isSendingOtp = ref(false);
-const emailpropsdata = props.data || '';
+const emailpropsdata = props?.data?.KYC_DATA?.APP_EMAIL || '';
 const emailid = ref(emailpropsdata);
 
 // Function to validate email format
@@ -126,7 +129,7 @@ onMounted(() => {
   }, 1000);
 
 
-  
+
 });
 
 
@@ -156,40 +159,40 @@ const back = () => {
 
 }
 
-const sendemailotp=async()=>{
+const sendemailotp = async () => {
   isSendingOtp.value = true; // Disable button
-  const apiurl=ourl.value+'send-email-otp.php'
- 
-  const formData=new FormData()
+  const apiurl = ourl.value + 'send-email-otp.php'
+
+  const formData = new FormData()
   const email = emailid.value;
 
-function maskEmail(email) {
-  const [local, domain] = email.split("@");
-  if (!local || !domain) return ""; // Invalid email
-  const maskedLocal = local[0] + "*".repeat(Math.max(1, local.length - 2)) + local.slice(-1);
-  return maskedLocal + "@" + domain;
-}
+  function maskEmail(email) {
+    const [local, domain] = email.split("@");
+    if (!local || !domain) return ""; // Invalid email
+    const maskedLocal = local[0] + "*".repeat(Math.max(1, local.length - 2)) + local.slice(-1);
+    return maskedLocal + "@" + domain;
+  }
 
-emailidtext.value = maskEmail(email);
+  emailidtext.value = maskEmail(email);
 
 
-  formData.append('emailId',emailid.value)
-  formData.append('otpCode','789564')
+  formData.append('emailId', emailid.value)
+  formData.append('otpCode', '789564')
   try {
-    const response=await fetch(apiurl,{
-      method:'POST',
-      body:formData
-      
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      body: formData
+
     })
-    if(!response.ok){
+    if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    else{
-      const data=await response.json()
-      if(data.Message=='OK'){
+    else {
+      const data = await response.json()
+      if (data.Message == 'OK') {
         emailbox.value = true
         buttonText.value = "Verify otp"
-       // emit('updateDiv', 'div4', emailid.value)
+
       }
     }
   } catch (error) {
@@ -197,14 +200,14 @@ emailidtext.value = maskEmail(email);
   }
 }
 
-watch(e_otp,(newval)=>{
-      if(newval.length===4){
-        isSendingOtp.value = false;
-      }
-      else{
-        isSendingOtp.value = true;
-      }
-    })
+watch(e_otp, (newval) => {
+  if (newval.length === 4) {
+    isSendingOtp.value = false;
+  }
+  else {
+    isSendingOtp.value = true;
+  }
+})
 
 const handleButtonClick = () => {
   const button = rippleBtn.value
@@ -222,19 +225,31 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-    if(e_otp.value.length===4){
-      let tokenval = randomtoken()
-        let response = new Response(JSON.stringify({ value: tokenval }));
+    if (e_otp.value.length === 4) {
+      const secretKey = 'kradatas@123'; // Replace with your actual secret key
+      const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(props.data), secretKey).toString();
 
-        caches.open("my-cache").then(cache => {
-            cache.put("/my-value", response);
-        });
-        router.push('/main')
+      console.log(encryptedData);
+      let tokenval = randomtoken()
+      let response = new Response(JSON.stringify({ value: tokenval }));
+
+      caches.open("my-cache").then(cache => {
+        cache.put("/my-value", response);
+      });
+      const encodedEncryptedData = encodeURIComponent(encryptedData);
+
+      router.push({
+        path: '/main',
+        query: {
+          data: encodedEncryptedData
+        }
+      });
+
     }
-    else{
+    else {
       sendemailotp()
     }
-    
+
   }, 600)
 };
 

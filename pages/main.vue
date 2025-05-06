@@ -9,7 +9,7 @@
   </div>
  
   <div v-if="currentForm === 'ekyc'">
-    <EKYC @updateDiv="handleUpdateDiv" />
+    <EKYC :data="data" @updateDiv="handleUpdateDiv" />
   </div>
   
   <div v-if="currentForm === 'digilockdata'">
@@ -178,7 +178,7 @@ watch(() => route.query.form, (newForm) => {
 
 const handleUpdateDiv = (value, newData = {}) => {
  
-
+console.log('value', newData)
   currentForm.value = value
   data.value = newData
 

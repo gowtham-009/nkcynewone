@@ -27,6 +27,7 @@
                     <div class="w-full"><DOB v-model="dateval"/></div>
                 </div>
 
+               
                 <div class="w-full mt-2">
                     <Pancheck v-model="checkboxval" />
                 </div>
@@ -69,7 +70,7 @@ import Aadhar from '~/components/NKYC_Forms/pandetails/paninputs/aadhar.vue';
 
 import DOB from '~/components/NKYC_Forms/pandetails/paninputs/dateinput.vue'
 import Pancheck from '~/components/NKYC_Forms/pandetails/paninputs/pancheck.vue'
-
+import { parseString } from 'xml2js';
 const { url } = useUrlw3();
 const { ourl } = useUrl();
 const props = defineProps({
@@ -79,6 +80,14 @@ const props = defineProps({
     },
 });
 
+const jsonData = ref(null);
+
+const xmlfilesaadhar=props.data.metaData.result.files[0].file.xml
+const xmlfilespan=props.data.metaData.result.files[1].file.xml
+console.log('proOSPrpoasps', xmlfilesaadhar,xmlfilespan)
+
+
+
 
 const content=ref(true)
 const loading=ref(false)
@@ -86,15 +95,31 @@ const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
-const panno = ref('')
-const aadhar = ref('')
-const dateval = ref('')
+const panno = ref(props?.data?.KYC_DATA?.APP_PAN_NO ||'')
+const aadhar = ref(props?.data?.KYC_DATA?.APP_COR_ADD_REF||'')
+const dateval = ref(props?.data?.KYC_DATA?.APP_DOB_DT||'')
 const checkboxval = ref('')
 const clientname=ref('')
 const pannameshow=ref(false)
 const paninvalidshow=ref(false)
 const panerror=ref('')
+
+
+const fetchAndConvertXML = async () => {
+  const response = await fetch(xmlfilesaadhar);
+  const xmlText = await response.text(); 
+  parseString(xmlText, (err, result) => {
+    if (err) {
+      console.error('Error parsing XML:', err);
+    } else {
+      jsonData.value = result;
+      aadhar.value = jsonData.value.Certificate.CertificateData[0].KycRes[0].UidData[0].$.uid;
+    }
+  });
+}
+
 onMounted(() => {
+  fetchAndConvertXML()
 
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {

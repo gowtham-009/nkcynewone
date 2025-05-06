@@ -16,7 +16,9 @@
         "postcss-import": "^16.1.0"
     },
     "dependencies": {
+        "crypto-js": "^4.2.0",
         "face-api.js": "^0.22.2",
+        "fast-xml-parser": "^5.2.2",
         "fs-extra": "^11.3.0",
         "primeicons": "^7.0.0",
         "primevue": "^4.1.1",
@@ -24,6 +26,7 @@
         "tailwindcss-primeui": "^0.3.4",
         "vue": "^3.4.27",
         "vue-router": "^4.2.5",
-        "xlsx": "^0.18.5"
+        "xlsx": "^0.18.5",
+        "xml2js": "^0.6.2"
     }
 }

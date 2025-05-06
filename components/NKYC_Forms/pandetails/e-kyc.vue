@@ -103,7 +103,14 @@ const buttonText = ref("Start e-KYC");
 const content=ref(true)
 const loading=ref(false)
 
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+});
 
+console.log("myvaldata", props.data)
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
@@ -141,10 +148,10 @@ const back = () => {
 
 const digilocker_create = async () => {
     const apiurl = url.value + 'digilocker';
-    //  const url1 = 'http://localhost:3000/main?form=ekyc';
-    //  const url2 = 'http://localhost:3000/main??form=ekyc';
-   const url1 = 'https://nkyc-gwc.vercel.app/main?form=ekyc';
-    const url2 = 'https://nkyc-gwc.vercel.app/main??form=ekyc';
+     const url1 = 'http://localhost:3000/main?form=ekyc';
+     const url2 = 'http://localhost:3000/main??form=ekyc';
+//    const url1 = 'https://nkyc-gwc.vercel.app/main?form=ekyc';
+//     const url2 = 'https://nkyc-gwc.vercel.app/main??form=ekyc';
 
     const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
     const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
@@ -296,7 +303,7 @@ const digilockerGetFiles = async (id) => {
        else {
            const data = await response.json()
            if(data.metaData.result.files[0].file){
-            emit('updateDiv', 'pandetails', route.query.requestId);
+            emit('updateDiv', 'pandetails', data);
            }
          
        } 
@@ -326,8 +333,17 @@ const digilockerGetFiles = async (id) => {
 
         setTimeout(() => {
             circle.remove()
-         
-            digilocker_create()
+            
+            if(props?.data?.KYC_DATA?.APP_ERROR_DESC==='PAN NOT FOUND'){
+                digilocker_create()
+            }
+            else{
+               // emit('updateDiv', 'pandetails', route.query.requestId);
+               emit('updateDiv', 'pandetails', props.data);
+            }
+           
+
+          
             
         }, 600)
     };
