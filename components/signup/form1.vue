@@ -34,12 +34,16 @@
        
       </div>
       <div class="w-full">
-      
-        <Button   ref="rippleBtn"
-        :disabled="!panvalue || !dobvalue"
-         @click="handleButtonClick()" class="primary_color  w-full text-white  py-4 text-xl border-0">
-        {{ buttonText }}
-      </Button>
+        <Button
+  ref="buttonRef"
+  :disabled="!panvalue || !dobvalue"
+  @click="handleButtonClick"
+  class="primary_color w-full text-white py-4 text-xl border-0 wave-btn"
+>
+  <span class="wave" ref="waveRef"></span>
+  {{ buttonText }}
+</Button>
+
 
       </div>
 
@@ -62,8 +66,11 @@ const box1Height = ref(0);
 const box2Height = ref(0);
 const showBox2 = ref(false);
 
+const buttonRef = ref(null);
+const waveRef = ref(null);
+
 const emit = defineEmits(['updateDiv']);
-const rippleBtn = ref(null)
+
 const buttonText = ref("Continue");
 
 watch(panvalue, (newVal) => {
@@ -78,43 +85,7 @@ watch(panvalue, (newVal) => {
 });
 
 
-const kraaddresssubmission=async()=>{
-const date = new Date(dobvalue.value);
-const day = String(date.getDate()).padStart(2, '0');
-const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-const year = date.getFullYear();
-const formattedDate = `${day}/${month}/${year}`;
 
-const apiurl=ourl.value+'get-kra-data.php'
-const formData=new FormData()
-
-formData.append('pan',panvalue.value)
-formData.append('dob',formattedDate)
-try {
-const response=await fetch(apiurl,{
-  method:'POST',
-  body:formData
-  
-})
-if(!response.ok){
-  throw new Error(`HTTP error! Status: ${response.status}`);
-}
-else{
-  const data=await response.json()
-  emit('updateDiv', 'div2', data||'');
- //if(panvalue.value==data.KYC_DATA.APP_PAN_NO){
-
- //}
- //else{
-//}
-
-}
-} catch (error) {
-console.error(error.message)
-
-
-}
-}
 
 
 
@@ -147,30 +118,109 @@ onMounted(() => {
   });
 });
 
+const kraaddresssubmission = async () => {
+  const date = new Date(dobvalue.value);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  const formattedDate = `${day}/${month}/${year}`;
 
+  const apiurl = ourl.value + 'get-kra-data.php';
+  const formData = new FormData();
 
-const handleButtonClick = () => {
-  const button = rippleBtn.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
+  formData.append('pan', panvalue.value);
+  formData.append('dob', formattedDate);
 
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      body: formData
+    });
 
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
+    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-  button.$el.appendChild(circle)
+    const data = await response.json();
+    if (data) {
+      return data; // ✅ Return the data, not just true
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
 
-  setTimeout(() => {
-    circle.remove()
-    kraaddresssubmission()
-  }, 600)
+  return null;
 };
+
+
+
+const handleButtonClick = async () => {
+  // Start first half of the animation
+  if (waveRef.value) {
+    waveRef.value.className = 'wave start-half';
+  }
+
+  const data = await kraaddresssubmission();
+
+  if (data && waveRef.value) {
+    // Run second half of the animation
+    void waveRef.value.offsetWidth;
+    waveRef.value.className = 'wave finish-half';
+
+    // Wait for the animation to complete before emitting
+    setTimeout(() => {
+      emit('updateDiv', 'div2', data || '');  // ✅ Send the data here
+    }, 400);
+  }
+};
+
  
 </script>
 
 <style scoped>
+.wave-btn {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.3s ease-in-out;
+}
+
+.wave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+}
+
+.wave.start-half {
+  animation: waveHalf 0.4s ease-out forwards;
+}
+
+.wave.finish-half {
+  animation: waveFinish 0.4s ease-out forwards;
+}
+
+@keyframes waveHalf {
+  0% {
+    width: 0%;
+    opacity: 0.6;
+  }
+  100% {
+    width: 50%;
+    opacity: 0.3;
+  }
+}
+
+@keyframes waveFinish {
+  0% {
+    width: 50%;
+    opacity: 0.3;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
 
 </style>
