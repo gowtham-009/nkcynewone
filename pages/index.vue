@@ -9,9 +9,7 @@
   <div v-if="currentForm === 'div3'">
     <form3 :data="data" @updateDiv="handleUpdateDiv" />
   </div>
-  <div v-if="currentForm === 'div4'">
-    <form4 :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
+
  </div>
 </template>
 
@@ -73,7 +71,8 @@ onMounted(() => {
   });
 });
 
-
+window.history.pushState(null, null, window.location.href);
+window.addEventListener('popstate', handleBackButton);
 
 });
 

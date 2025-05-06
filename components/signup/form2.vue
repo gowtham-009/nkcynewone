@@ -207,8 +207,7 @@ watch(p_otp,(newval)=>{
 
     
 const back=()=>{
-
-    const button = rippleBtnback.value
+  const button = rippleBtnback.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
 
@@ -235,21 +234,17 @@ const resendotp = async () => {
   const formData = new FormData();
   formData.append('mobileNo', mobileNo.value);
   formData.append('otpCode', '789564');
-
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
       body: formData
     });
-
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     } else {
       const data = await response.json();
       if (data) {
         resend_sh.value = true;
-
-        // Reset and restart timer
         timeLeft.value = 60;
         clearInterval(timer);
         timer = setInterval(() => {

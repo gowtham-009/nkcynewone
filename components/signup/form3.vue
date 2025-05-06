@@ -91,6 +91,17 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+
+const randomtoken = () => {
+    let token = ''
+    for (var i = 0; i <= 30; i++) {
+        token += Math.floor(Math.random() * 10)
+    }
+    return token
+}
+
+const router = useRouter()
+
 const isSendingOtp = ref(false);
 const emailpropsdata = props.data || '';
 const emailid = ref(emailpropsdata);
@@ -212,8 +223,13 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
     if(e_otp.value.length===4){
-      alert('success')
-     // emit('updateDiv', 'div3');
+      let tokenval = randomtoken()
+        let response = new Response(JSON.stringify({ value: tokenval }));
+
+        caches.open("my-cache").then(cache => {
+            cache.put("/my-value", response);
+        });
+        router.push('/main')
     }
     else{
       sendemailotp()
