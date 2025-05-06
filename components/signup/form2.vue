@@ -131,9 +131,7 @@ onUnmounted(() => {
 
 
 
-const isOtpValid = computed(() => 
-p_otp.value.length === 6
-);
+
 
 const isSendingOtp = ref(false);
 const sendmobileotp = async () => {
@@ -200,6 +198,9 @@ const mobile_signup=()=>{
 watch(p_otp,(newval)=>{
       if(newval.length===4){
         isSendingOtp.value = false;
+      }
+      else{
+        isSendingOtp.value = true;
       }
     })
 

@@ -190,6 +190,9 @@ watch(e_otp,(newval)=>{
       if(newval.length===4){
         isSendingOtp.value = false;
       }
+      else{
+        isSendingOtp.value = true;
+      }
     })
 
 const handleButtonClick = () => {
