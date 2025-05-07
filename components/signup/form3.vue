@@ -223,34 +223,37 @@ const handleButtonClick = () => {
 
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
-    circle.remove()
+  setTimeout(async () => {
+    circle.remove();
+
     if (e_otp.value.length === 4) {
-      const secretKey = 'kradatas@123'; // Replace with your actual secret key
-      const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(props.data), secretKey).toString();
+      try {
+        const secretKey = 'kradatas@123'; // Use your secure key
+        const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(props.data), secretKey).toString();
+        const encodedEncryptedData = encodeURIComponent(encryptedData);
 
-      console.log(encryptedData);
-      let tokenval = randomtoken()
-      let response = new Response(JSON.stringify({ value: tokenval }));
+        const tokenval = randomtoken();
+        const response = new Response(JSON.stringify({ value: tokenval }));
 
-      caches.open("my-cache").then(cache => {
-        cache.put("/my-value", response);
-      });
-      const encodedEncryptedData = encodeURIComponent(encryptedData);
+        const cache = await caches.open("my-cache");
+        await cache.put("/my-value", response);
 
-      router.push({
-        path: '/main',
-        query: {
-          data: encodedEncryptedData
-        }
-      });
-
+        // Only route to /main after cache is successfully written
+        router.push({
+          path: '/main',
+          query: {
+            data: encodedEncryptedData
+          }
+        });
+      } catch (error) {
+        console.error("Failed to cache token or route:", error);
+        // Optional: Show user feedback here
+      }
+    } else {
+      sendemailotp();
     }
-    else {
-      sendemailotp()
-    }
+  }, 600);
 
-  }, 600)
 };
 
 const resend_sh = ref(false)

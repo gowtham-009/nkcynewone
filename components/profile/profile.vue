@@ -53,18 +53,23 @@ onBeforeUnmount(() => {
     document.removeEventListener('click', handleClickOutside)
 })
 
-function logout(){
-    caches.open("my-cache").then(cache => {
-  cache.delete("/my-value").then(success => {
+async function logout() {
+  try {
+    const cache = await caches.open("my-cache");
+    const success = await cache.delete("/my-value");
+
     if (success) {
-        router.push('/')
+      router.push('/');
     } else {
       console.log("Cache entry not found or couldn't be removed.");
+      // Do not redirect
     }
-  });
-});
-
+  } catch (error) {
+    console.error("An error occurred while clearing the cache:", error);
+    // Do not redirect on error
+  }
 }
+
 </script>
 
 <style scoped>
