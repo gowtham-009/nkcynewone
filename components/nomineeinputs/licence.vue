@@ -1,9 +1,10 @@
 <template>
     <div class="w-full">
       <label  class="text-gray-600 text-lg font-normal">Driving licence no</label>
+      <div class="input-wrapper dark:!bg-gray-800">
       <InputText
      
-        class="w-full py-2"
+        class="w-full prime-input"
         v-model="drivinglicence"
         variant="filled"
         size="large"
@@ -15,6 +16,8 @@
         autocapitalize="characters"
         maxlength="16"
       />
+      <span class="bottom-border"></span>
+      </div>
     </div>
   </template>
   

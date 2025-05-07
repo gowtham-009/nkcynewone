@@ -49,7 +49,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" :disabled="!panno || !aadhar || !dateval" @click="handleButtonClick"
+        <Button type="button" ref="rippleBtn" :disabled="!panno ||  panno.length !== 10 || !aadhar || !dateval || !clientname || isclient" @click="handleButtonClick"
           class=" primary_color wave-btn text-white w-5/6 py-4 text-xl border-0  ">
           {{ buttonText }}
         </Button>
@@ -85,10 +85,9 @@ const props = defineProps({
   },
 });
 
-const jsonData = ref(null);
 
 
-
+console.log(props.data, 'propsdata')
 
 
 
@@ -124,9 +123,12 @@ const statusstatement = async() => {
 
     return props?.data?.KYC_DATA?.APP_PAN_NO || ''
   }
-  else {
-    const xmlfilesaadhar = props.data.metaData.result.files[0].file.xml;
-const xmlfilespan = props.data.metaData.result.files[1].file.xml;
+  else if (props?.data?.metaData?.result?.files) {
+    const xmlfilesaadhar = props?.data?.metaData?.result?.files[0]?.file.xml;
+const xmlfilespan = props?.data?.metaData?.result?.files[1]?.file?.xml || '';
+
+
+
 
 try {
   const responses = await Promise.all([
@@ -137,28 +139,32 @@ try {
   // Read both responses as text
   const xmlTexts = await Promise.all(responses.map(response => response.text()));
 
-  parseString(xmlTexts[1], (err, panData) => {
-    if (err) {
-      console.error('Error parsing PAN XML:', err);
-    } else {
-      console.log('PAN Data:', panData);
-      
-      panno.value='ESYPR8764J'
-    }
-  });
-
-  // Parse the XML texts into JSON
   parseString(xmlTexts[0], (err, aadharData) => {
     if (err) {
       console.error('Error parsing Aadhaar XML:', err);
     } else {
-      console.log('Aadhaar Data:', aadharData);
+      
        aadhar.value = aadharData.Certificate.CertificateData[0].KycRes[0].UidData[0].$.uid;
      dateval.value = aadharData.Certificate.CertificateData[0].KycRes[0].UidData[0].Poi[0].$.dob;
 
     }
   });
 
+
+  parseString(xmlTexts[1], (err, panData) => {
+    if (err) {
+      console.error('Error parsing PAN XML:', err);
+    } else {
+   
+    const pannodata=panData.Certificate.$.number
+      panno.value=pannodata || ''
+    
+   
+    }
+  });
+
+  
+ 
 
 
 } catch (error) {
@@ -170,6 +176,62 @@ try {
 }
 
 
+
+
+
+const digilockerpull=async()=> {
+  const apiurl = url.value + 'digilocker';
+  const requestqueryvalue = props.data.metaData.essentials.requestId;
+  const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
+  const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
+
+  const redirecturl = JSON.stringify({
+    task: "pullDocumentsV2",
+    essentials: {
+      requestId: requestqueryvalue,
+      docType: "PANCR",
+      orgid: "001891",
+      consent: "Y",
+      searchParameters: { panno: panno.value, PANFullName: clientname.value }
+    }
+  });
+
+  const formData = new FormData();
+
+  formData.append('brokerCode', 'UAT-KYC');
+  formData.append('appId', '1216');
+  formData.append('clientCode', 'gow001');
+  formData.append('rawPostData', redirecturl);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': authorization,
+        'Cookie': cookies
+      },
+      body: formData
+    });
+
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    else {
+      const successdata = await response.json()
+      if(successdata.metaData.result.xml){
+        const getxmlfile = successdata.metaData.result.xml;
+      }
+     
+    }
+
+  }
+
+  catch (error) {
+    console.error('Error:', error.message);
+
+  }
+}
 
 
 
@@ -218,8 +280,6 @@ const back = () => {
 }
 
 
-
-
 const panverification = async () => {
   const apiurl = url.value + 'pan'
   const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
@@ -249,6 +309,13 @@ const panverification = async () => {
         pannameshow.value = true
         paninvalidshow.value = false
         clientname.value = data.metaData.full_name
+
+        if(data.metaData.full_name) {
+          digilockerpull()
+        }
+       
+
+
       }
 
 
@@ -272,66 +339,7 @@ watch(panno, (newval) => {
   }
 })
 
-const digilocker_Pullfile = async () => {
-  content.value = false
-  loading.value = true
 
-  const apiurl = url.value + 'digilocker';
-  const requestqueryvalue = props.data;
-
-  const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
-  const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
-
-  const redirecturl = JSON.stringify({
-    task: "pullDocumentsV2",
-    essentials: {
-      requestId: requestqueryvalue,
-      docType: "PANCR",
-      orgid: "001891",
-      consent: "Y",
-      searchParameters: { panno: panno.value, PANFullName: clientname.value }
-    }
-  });
-
-  const formData = new FormData();
-
-  formData.append('brokerCode', 'UAT-KYC');
-  formData.append('appId', '1216');
-  formData.append('clientCode', 'gow001');
-  formData.append('rawPostData', redirecturl);
-
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': authorization,
-        'Cookie': cookies
-      },
-      body: formData
-    });
-
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    else {
-      const successdata = await response.json()
-      if (successdata.metaData.result.pdf) {
-
-      //  kraaddresssubmission()
-      }
-
-
-    }
-
-  }
-
-  catch (error) {
-    console.error('Error:', error.message);
-
-  }
-
-}
 
 
 const handleButtonClick = () => {
@@ -355,7 +363,15 @@ const handleButtonClick = () => {
       alert('Please fill all required')
     }
     else {
-      digilocker_Pullfile()
+    
+ const status = props?.data?.KYC_DATA?.APP_PAN_NO||''
+      if (status) {
+        emit('updateDiv', 'parmanentaddress', props.data || '');
+      }
+      else if(props?.data?.metaData?.result?.files) {
+        emit('updateDiv', 'parmanentaddress', props?.data?.metaData?.result?.files || '');
+      }
+   
     }
 
   }, 600)

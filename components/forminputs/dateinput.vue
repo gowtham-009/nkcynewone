@@ -1,7 +1,7 @@
 <template>
   <div class="w-full">
     <label for="dob" class="text-lg text-gray-500">Birth Date</label>
-    <DatePicker v-model="date" showIcon dateFormat="dd/mm/yy" size="large" class="w-full date"  variant="filled" placeholder="DD/MM/YYYY"/>
+    <DatePicker v-model="date" showIcon dateFormat="dd/mm/yy" size="large" class="w-full "  variant="filled" placeholder="DD/MM/YYYY"/>
   </div>
 </template>
 

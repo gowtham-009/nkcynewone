@@ -73,10 +73,10 @@
     },
   });
   
-  const address = ref(props.data?.KYC_DATA?.APP_COR_ADD1 || '');
+  const address = ref('');
   const address2 = ref('');
-  const city = ref(props.data?.KYC_DATA?.APP_COR_CITY || '');
-  const pincode = ref(props.data?.KYC_DATA?.APP_COR_PINCD || '');
+  const city = ref('');
+  const pincode = ref('');
   const state = ref('');
   const deviceHeight = ref(window.innerHeight);
   
@@ -85,13 +85,23 @@
   const rippleBtnback = ref(null);
   const buttonText = ref('Continue');
   const isAnimating = ref(false);
-  
-  // Set state value from code
-  if (props.data?.KYC_DATA?.APP_COR_STATE) {
+
+
+  const parmenentaddress=()=>{
+      const status = props?.data?.KYC_DATA?.APP_COR_ADD1
+      if (status) {
+        address.value = props?.data?.KYC_DATA?.APP_COR_ADD1||'';
+        city.value = props?.data?.KYC_DATA?.APP_COR_CITY||'';
+        pincode.value = props?.data?.KYC_DATA?.APP_COR_PINCD||'';
+        if (props.data?.KYC_DATA?.APP_COR_STATE) {
     const stateCode = String(props.data.KYC_DATA.APP_COR_STATE);
     state.value = props.data.statelist[stateCode] || '';
   }
-  
+
+      }
+  }
+  parmenentaddress()
+ 
   // Resize listener
   const updateHeight = () => {
     deviceHeight.value = window.innerHeight;
