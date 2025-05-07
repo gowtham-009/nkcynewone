@@ -204,18 +204,18 @@ const handleButtonClick = async () => {
 @keyframes waveHalf {
   0% {
     width: 0%;
-    opacity: 0.6;
+    opacity: 2;
   }
   100% {
     width: 70%;
-    opacity: 0.3;
+    opacity: 2;
   }
 }
 
 @keyframes waveFinish {
   0% {
     width: 70%;
-    opacity: 0.3;
+    opacity: 2;
   }
   100% {
     width: 100%;

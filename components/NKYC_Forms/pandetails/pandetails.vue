@@ -14,7 +14,7 @@
           your Demat account.</p>
 
         <div class="w-full mt-2">
-          <Paninput v-model="panno" />
+          <Paninput v-model="panno"  />
           <div class="w-full h-8">
             <p v-if="pannameshow" class="text-gray-600 text-lg font-normal mt-1 leading-5">Pan Name: {{ clientname }}
             </p>
@@ -27,11 +27,11 @@
             <Aadhar v-model="aadhar" />
           </div>
           <div class="w-full">
-            <DOB v-model="dateval" />
+            <DOB v-model="dateval"  />
           </div>
         </div>
 
-
+        {{ myval }}
         <div class="w-full mt-2">
           <Pancheck v-model="checkboxval" />
         </div>
@@ -69,7 +69,7 @@
 </template>
 <script setup>
 
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch  } from 'vue';
 import Paninput from '~/components/NKYC_Forms/pandetails/paninputs/paninput.vue';
 import Aadhar from '~/components/NKYC_Forms/pandetails/paninputs/aadhar.vue';
 
@@ -87,8 +87,7 @@ const props = defineProps({
 
 const jsonData = ref(null);
 
-// const xmlfilesaadhar=props.data.metaData.result.files[0].file.xml
-// const xmlfilespan=props.data.metaData.result.files[1].file.xml
+
 
 
 
@@ -100,7 +99,7 @@ const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
-const panno = ref()
+const panno = ref('')
 const aadhar = ref()
 const dateval = ref()
 const checkboxval = ref('')
@@ -109,43 +108,92 @@ const pannameshow = ref(false)
 const paninvalidshow = ref(false)
 const panerror = ref('')
 
+const myval=ref('')
 
 
 
-const statusstatement = () => {
-  const status = props?.data?.KYC_DATA?.APP_ERROR_DESC||''
-  if (status === 'PAN NOT FOUND') {
-   console.log('PAN NOT FOUND')
-  }
-  else {
-    console.log(props.data,"ovjwoiejvo")
+
+const statusstatement = async() => {
+  const status = props?.data?.KYC_DATA?.APP_PAN_NO||''
+
+  if (status) {
+ 
     panno.value = props?.data?.KYC_DATA?.APP_PAN_NO || ''
     aadhar.value = props?.data?.KYC_DATA?.APP_COR_ADD_REF || ''
     dateval.value = props?.data?.KYC_DATA?.APP_DOB_DT || ''
-   // panverification()
+
+    return props?.data?.KYC_DATA?.APP_PAN_NO || ''
+  }
+  else {
+    const xmlfilesaadhar = props.data.metaData.result.files[0].file.xml;
+const xmlfilespan = props.data.metaData.result.files[1].file.xml;
+
+try {
+  const responses = await Promise.all([
+    fetch(xmlfilesaadhar),
+    fetch(xmlfilespan),
+  ]);
+
+  // Read both responses as text
+  const xmlTexts = await Promise.all(responses.map(response => response.text()));
+
+  parseString(xmlTexts[1], (err, panData) => {
+    if (err) {
+      console.error('Error parsing PAN XML:', err);
+    } else {
+      console.log('PAN Data:', panData);
+      
+      panno.value='ESYPR8764J'
+    }
+  });
+
+  // Parse the XML texts into JSON
+  parseString(xmlTexts[0], (err, aadharData) => {
+    if (err) {
+      console.error('Error parsing Aadhaar XML:', err);
+    } else {
+      console.log('Aadhaar Data:', aadharData);
+       aadhar.value = aadharData.Certificate.CertificateData[0].KycRes[0].UidData[0].$.uid;
+     dateval.value = aadharData.Certificate.CertificateData[0].KycRes[0].UidData[0].Poi[0].$.dob;
+
+    }
+  });
+
+
+
+} catch (error) {
+  console.error('Error fetching XML files:', error);
+}
+
+  
   }
 }
 
-const fetchAndConvertXML = async () => {
-  const response = await fetch(xmlfilesaadhar);
-  const xmlText = await response.text();
-  parseString(xmlText, (err, result) => {
-    if (err) {
-      console.error('Error parsing XML:', err);
-    } else {
-      jsonData.value = result;
-      aadhar.value = jsonData.value.Certificate.CertificateData[0].KycRes[0].UidData[0].$.uid;
-    }
-  });
-}
+
+
+
+
+
+await statusstatement()
+
+
 
 onMounted(() => {
 
-  statusstatement()
+  
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
+
+  const panval=statusstatement()
+  if (panval) {
+    panverification()
+  }
+  else {
+    console.log('PAN NOT FOUND')
+  }
+ 
 });
 
 const emit = defineEmits(['updateDiv']);
@@ -215,12 +263,14 @@ const panverification = async () => {
 
 
 watch(panno, (newval) => {
-  if (newval.length > 9) {
+  if (newval.length === 10) {
     panverification()
   }
+  else {
+    pannameshow.value = false
+    paninvalidshow.value = false
+  }
 })
-
-
 
 const digilocker_Pullfile = async () => {
   content.value = false

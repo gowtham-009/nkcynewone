@@ -191,7 +191,7 @@ const sendemailotp = async () => {
       const data = await response.json()
       if (data.Message == 'OK') {
         emailbox.value = true
-        buttonText.value = "Verify otp"
+        buttonText.value = "Verify OTP"
 
       }
     }

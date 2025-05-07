@@ -1,7 +1,7 @@
 <template>
   <div class="w-full">
     <label for="dob" class="text-lg text-gray-500">Birth Date</label>
-    <DatePicker v-model="date" showIcon dateFormat="dd/mm/yy" class="w-full"  variant="filled" placeholder="DD/MM/YYYY"/>
+    <DatePicker v-model="date" showIcon dateFormat="dd/mm/yy" size="large" class="w-full date"  variant="filled" placeholder="DD/MM/YYYY"/>
   </div>
 </template>
 
@@ -18,4 +18,13 @@ const props = defineProps(['modelValue']);
 
 <style >
 
+.p-datepicker-input.p-inputtext.p-variant-filled{
+  background-color: #e0e0e0 !important;
+ 
+}
+
+.p-datepicker-input.p-inputtext{
+  outline: none !important;
+  border: none !important;
+}
 </style>

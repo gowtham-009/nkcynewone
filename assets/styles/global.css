@@ -15,37 +15,6 @@
 }
 
 
-.wave-btn {
-    position: relative;
-    overflow: hidden;
- 
-    cursor: pointer;
-  
-    outline: none;
-    transition: background 0.3s ease-in-out;
-  }
-  
-  .wave {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.3);
-    animation: waveMove 0.8s ease-out forwards;
-  }
-  
- 
-  @keyframes waveMove {
-    0% {
-      width: 0%;
-      opacity: 0.6;
-    }
-    100% {
-      width: 100%;
-      opacity: 0;
-    }
-  }
 
   .ripple-button {
     position: relative;

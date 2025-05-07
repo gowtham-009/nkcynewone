@@ -1,8 +1,9 @@
 <template>
     <div>
       <span class="text-lg text-gray-500">Aadhaar Number</span>
+    <div  class="input-wrapper dark:!bg-gray-400">
       <InputText
-        class="w-full font-normal"
+        class="prime-input font-normal"
         v-model="adno"
         inputmode="numeric"
          variant="filled"
@@ -11,6 +12,8 @@
         @input="validateInput"
         maxlength="6"
       />
+      <span class="bottom-border"></span>
+    </div>
     </div>
   </template>
   
@@ -34,4 +37,50 @@
     emit('update:modelValue', newValue);
   });
   </script>
+  <style scoped>
+  .input-wrapper {
+   position: relative;
+   display: flex;
+   flex-direction: column;
+   background-color: #e0e0e0;
+   border-radius: 10px;
+   padding: -1px 10px;
+   overflow: hidden;
+  }
+  
+  
+  .prime-input {
+   border: none;
+   background: transparent;
+   outline: none;
+   font-size: 16px;
+   color: #555;
+   padding: 10px 0;
+   padding-left: 10px;
+   z-index: 1;
+   box-shadow: none !important;
+  }
+  
+  .prime-input::placeholder {
+   color: #87909b;
+  }
+  
+  .bottom-border {
+   position: absolute;
+   bottom: 0;
+   left: 50%;
+   transform: translateX(-50%);
+   height: 3px;
+   width: 0;
+   background-color: #007bff;
+   border-radius: 10px;
+   transition: width 0.4s ease-out, height 0.3s ease-in;
+   z-index: 0;
+  }
+  
+  .input-wrapper:focus-within .bottom-border {
+   width: 100%;
+   height: 4px;
+  }
+  </style>
   
