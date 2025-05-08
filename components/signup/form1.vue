@@ -18,10 +18,10 @@
     <!-- Box 2 -->
     <div
       v-show="showBox2"
-      class="w-full p-2 flex flex-col justify-between bg-white rounded-t-3xl dark:bg-black transition-all duration-300"
+      class="w-full p-1 flex flex-col justify-between bg-white rounded-t-3xl dark:bg-black transition-all duration-300"
       :style="{ height: box2Height + 'px' }"
     >
-    <div class="w-full mt-2 px-3 flex flex-col justify-between">
+    <div class="w-full mt-2 px-2 flex flex-col justify-between">
         <div class="w-full mt-4">
           <PAN v-model="panvalue"/>
           <span class="text-red-500" v-if="panerror">Please enter a valid PAN no</span>

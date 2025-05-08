@@ -5,10 +5,10 @@
           <logo style="width: 40px; height: 40px;"/>
             <ThemeSwitch/>
         </div>
-        <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black" 
+        <div class="flex justify-between  p-1 px-3 flex-col bg-white rounded-t-3xl dark:bg-black" 
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full">
-              <div class="w-full mt-2 px-3 flex flex-col justify-between" >
+              <div class="w-full mt-2  flex flex-col justify-between" >
         <div class="w-full">
           <p class="text-2xl font-medium dark:text-gray-400">Ready to get started?</p>
           <p class="leading-6 text-sm font-normal text-gray-500">Enter your number to help us set up your investment account</p>
