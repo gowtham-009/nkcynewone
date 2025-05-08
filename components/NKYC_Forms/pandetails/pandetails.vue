@@ -23,10 +23,10 @@
         </div>
 
         <div class="w-full flex mt-1 gap-3">
-          <div class="w-full">
+          <div class="w-1/2">
             <Aadhar v-model="aadhar" />
           </div>
-          <div class="w-full">
+          <div class="w-1/2">
             <DOB v-model="dateval"  />
           </div>
         </div>
