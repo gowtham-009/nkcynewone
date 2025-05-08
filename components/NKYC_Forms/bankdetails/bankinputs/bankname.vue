@@ -3,10 +3,10 @@
     <div class="input-wrapper w-full dark:!bg-gray-800">
       <InputText
         class="w-full font-normal prime-input"
-        :value="bankname"
+        v-model="bankname"
         inputmode="text"
         type="text"
-    
+        @input="validateInput"
       />
       <span class="bottom-border"></span>
     </div>
@@ -21,22 +21,23 @@ const emit = defineEmits(['update:modelValue']);
 
 const bankname = ref(props.modelValue || '');
 
-// Keep synced with parent
-watch(() => props.modelValue, (val) => {
-  if (val !== bankname.value) {
-    bankname.value = format(val);
+// Keep local ref in sync with prop
+watch(() => props.modelValue, (newVal) => {
+  if (newVal !== bankname.value) {
+    bankname.value = newVal;
   }
 });
 
-// Emit back (not necessary if readonly, but safe for reactive sync)
+// Emit updates when bankname changes
 watch(bankname, (newVal) => {
   emit('update:modelValue', newVal);
 });
 
-// Format helper
-function format(val) {
-  return (val || '').replace(/[^a-zA-Z]/g, '').toUpperCase();
-}
+// Allow only alphabets and convert to uppercase
+const validateInput = (e) => {
+  let value = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+  bankname.value = value;
+};
 </script>
 
 <style scoped>

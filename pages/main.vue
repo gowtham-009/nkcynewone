@@ -176,7 +176,6 @@ watch(() => route.query.form, (newForm) => {
 
 const handleUpdateDiv = (value, newData = {}) => {
  
-console.log('valulfoi', newData)
   currentForm.value = value
   data.value = newData
 

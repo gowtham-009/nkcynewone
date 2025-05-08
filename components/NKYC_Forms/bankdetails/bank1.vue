@@ -62,7 +62,7 @@
     </div>
 
 
-
+    
 
 
 
@@ -104,7 +104,7 @@ const bankvalidation = async (accountno, ifscno) => {
   const formData = new FormData();
   formData.append('brokerCode', 'UAT-KYC');
   formData.append('appId', '1216');
-  formData.append('clientCode', 'B8GO3');
+  formData.append('clientCode', 'C3HO3');
   formData.append('bankAccNo', accountno);
   formData.append('bankIfsc', ifscno);
   formData.append('clientName', localStorage.getItem('clientname'));
@@ -152,8 +152,12 @@ const getbankaddress = async (ifscval) => {
     const data = await response.json();
   if(data){
    
+    // micr.value = data.MICR;
+    // bankname.value = data.BANK;
+    // address.value=data.ADDRESS;
+
     micr.value = data.MICR;
-    bankname.value = data.BANK;
+    bankname.value = 'INDIAN BANK';
     address.value=data.ADDRESS;
   }
 

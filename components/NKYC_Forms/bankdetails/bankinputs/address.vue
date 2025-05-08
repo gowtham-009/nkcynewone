@@ -3,11 +3,11 @@
     <div class="input-wrapper dark:!bg-gray-800">
       <Textarea
         class="w-full prime-input"
-        :value="address"
+        v-model="address"
         variant="filled"
         rows="3"
         cols="10"
-      
+        @input="onInput"
       />
       <span class="bottom-border"></span>
     </div>
@@ -16,13 +16,14 @@
 
 <script setup>
 import { ref, watch } from 'vue';
+import Textarea from 'primevue/textarea'; // Make sure this is imported if not globally registered
 
 const props = defineProps(['modelValue']);
 const emit = defineEmits(['update:modelValue']);
 
 const address = ref(format(props.modelValue || ''));
 
-// Watch for changes from parent
+// Sync from parent to local
 watch(() => props.modelValue, (newVal) => {
   const formatted = format(newVal || '');
   if (formatted !== address.value) {
@@ -30,12 +31,17 @@ watch(() => props.modelValue, (newVal) => {
   }
 });
 
-// Emit updates if internal value changes (defensive)
+// Emit to parent on change
 watch(address, (newVal) => {
   emit('update:modelValue', newVal);
 });
 
-// Format input
+// Input formatting
+const onInput = (e) => {
+  address.value = format(e.target.value);
+};
+
+// Format logic: UPPERCASE, allow alphanumeric, `/`, `.`, space, max 100 chars
 function format(val) {
   return val
     .toUpperCase()
@@ -64,6 +70,7 @@ function format(val) {
   padding: 10px 0;
   z-index: 1;
   box-shadow: none !important;
+  resize: none;
 }
 
 .prime-input::placeholder {
