@@ -68,6 +68,8 @@ const props = defineProps({
         default: () => ({}),
     },
 });
+
+console.log(props.data)
 const { url } = useUrlw3();
 
 const deviceHeight = ref(0);
@@ -117,30 +119,31 @@ const handleButtonClick = () => {
 
     setTimeout(() => {
         circle.remove()
-        imageivp()
-     //   emit('updateDiv', 'signature');
+
+       emit('updateDiv', 'signature');
     }, 600)
 };
 
 
 
-const imageivp = async () => {
-    const apiurl =url.value+'ipv'
-    const cleanedBase64 = props.data.replace(/^data:image\/png;base64,/, '');
-    const formData = new FormData();
-    formData.append('img_data',cleanedBase64 );
+// const imageivp = async () => {
+//     const apiurl =url.value+'ipv'
+//     const cleanedBase64 = props.data.replace(/^data:image\/png;base64,/, '');
+//     const formData = new FormData();
+//     formData.append('img_data',cleanedBase64 );
+//     formData.append()
 
-    try {
-        const response = await fetch(apiurl, {
-            method: 'POST',
-            body: formData,
-        });
-        const data = await response.json();
-        console.log(data);
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
+//     try {
+//         const response = await fetch(apiurl, {
+//             method: 'POST',
+//             body: formData,
+//         });
+//         const data = await response.json();
+//         console.log(data);
+//     } catch (error) {
+//         console.error('Error:', error);
+//     }
+// }
 
 
 
