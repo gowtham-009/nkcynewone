@@ -24,7 +24,6 @@
   
 
           <div class="w-full mt-1"><Address v-model="address" /></div>
-          <div class="w-full mt-1"><Address2 v-model="address2" /></div>
           <div class="w-full mt-1"><State v-model="state" /></div>
           <div class="w-full mt-1"><City v-model="city" /></div>
           <div class="w-full mt-1"><Pincode v-model="pincode" /></div>
@@ -59,7 +58,6 @@
   <script setup>
   import { ref, onMounted, onBeforeUnmount } from 'vue';
   import Address from '~/components/NKYC_Forms/pandetails/paninputs/address.vue';
-  import Address2 from '~/components/NKYC_Forms/pandetails/paninputs/address2.vue';
   import State from '~/components/NKYC_Forms/pandetails/paninputs/state.vue';
   import City from '~/components/NKYC_Forms/pandetails/paninputs/city.vue';
   import Pincode from '~/components/NKYC_Forms/pandetails/paninputs/pincode.vue';
@@ -112,11 +110,14 @@ const setPermanentAddress = async () => {
   const kycAddress = props.data?.[0]?.file?.xml;
 
   if (kyc?.APP_COR_ADD1) {
-    address.value = kyc.APP_COR_ADD1 || '';
-    city.value = kyc.APP_COR_CITY || '';
-    pincode.value = kyc.APP_COR_PINCD || '';
+    const add1 = kyc?.APP_COR_ADD1 || '';
+    const add2 = kyc?.APP_COR_ADD2 || '';
+    const add3 = kyc?.APP_COR_ADD3 || '';
+    address.value = add1 + ' ' + add2 + ' ' + add3;
+    city.value = kyc?.APP_COR_CITY || '';
+    pincode.value = kyc?.APP_COR_PINCD || '';
 
-    const stateCode = String(kyc.APP_COR_STATE || '');
+    const stateCode = String(kyc?.APP_COR_STATE || '');
     state.value = props.data?.statelist?.[stateCode] || '';
   } else if (kycAddress) {
     try {
@@ -161,21 +162,14 @@ const setPermanentAddress = async () => {
       const isConfirmed = commAddressRef.value?.confirm;
       console.log('isConfirmed:', isConfirmed);
 
-      const addressData = {
-        address: address.value,
-        address2: address2.value ||'',
-        city: city.value,
-        pincode: pincode.value,
-        state: state.value,
-      };
-
-      console.log('Address Data:', addressData);
+      
+     
 
       if(isConfirmed) {
              emit( 'updateDiv', 'submission','1');
  
       } else {
-        emit('updateDiv', 'communicationaddress',addressData);
+        emit('updateDiv', 'communicationaddress', props.data ||'');
        
       }
 

@@ -20,9 +20,7 @@
                 <div class="w-full mt-1">
                     <Address v-model="address"/>
                 </div>
-                <div class="w-full mt-1">
-                    <Address2 v-model="address2"/>
-                </div>
+               
                 <div class="w-full mt-1">
                     <State v-model="state"/>
                 </div>
@@ -61,7 +59,6 @@
 <script setup>
 
 import Address from '~/components/NKYC_Forms/pandetails/paninputs/address.vue'
-import Address2 from '~/components/NKYC_Forms/pandetails/paninputs/address2.vue'
 import State from '~/components/NKYC_Forms/pandetails/paninputs/state.vue'
 import City from '~/components/NKYC_Forms/pandetails/paninputs/city.vue'
 import Pincode from '~/components/NKYC_Forms/pandetails/paninputs/pincode.vue'
@@ -88,11 +85,18 @@ const pincode = ref('');
 const addressreaddata=()=>{
     const data = props.data;
     if (data) {
-        address.value = data.address || '';
-        address2.value = data.address2 || '';
-        state.value = data.state || '';
-        city.value = data.city || '';
-        pincode.value = data.pincode || '';
+
+        const add1=data?.KYC_DATA?.APP_COR_ADD1 || '';
+        const add2=data?.KYC_DATA?.APP_COR_ADD2 || '';
+        const add3=data?.KYC_DATA?.APP_COR_ADD3 || '';
+         address.value = add1+' '+add2+' '+add3;
+
+         const stateCode = String(data?.KYC_DATA?.APP_COR_STATE || '');
+         state.value = props.data?.statelist?.[stateCode] || '';
+       
+    
+         city.value = data?.KYC_DATA?.APP_PER_CITY || '';
+         pincode.value = data?.KYC_DATA?.APP_PER_PINCD || ''
     }
 }
 addressreaddata()

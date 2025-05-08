@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="w-full p-1 mt-3 flex justify-center">
-                    <CMAIDENTIFY @imageCaptured="handleCapturedImage"/>
+                    <CMAIDENTIFY @captured="onImageCaptured"/>
                 </div>
             </div>
 
@@ -45,15 +45,12 @@ import useGeolocation from '~/composables/useGeolocation'
 import CMAIDENTIFY from '~/components/NKYC_Forms/photo&sign/cameraidentification/cmaidentify.vue'
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
-const capturedImageData = ref(null)
+
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
+const imageCaptured = ref(null);
 
-const handleCapturedImage = (image) => {
-  capturedImageData.value = image
- 
-}
 
 const { latitude, longitude, errorMessage } = useGeolocation()
 
@@ -64,6 +61,10 @@ onMounted(() => {
     });
 });
 
+const onImageCaptured = (imageData) => {
+    imageCaptured.value=imageData
+ 
+}
 const back = () => {
     const button = rippleBtnback.value
   const circle = document.createElement('span')
@@ -84,7 +85,7 @@ const back = () => {
    
 };
 const handleButtonClick = () => {
-  
+ 
     const button = rippleBtn.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
@@ -100,7 +101,8 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-    emit('updateDiv', 'photoproceed', capturedImageData.value);
+    
+    emit('updateDiv', 'photoproceed', imageCaptured.value);
 }, 600)
 };
 

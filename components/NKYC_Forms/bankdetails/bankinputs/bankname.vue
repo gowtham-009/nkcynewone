@@ -1,44 +1,46 @@
 <template>
-    <div class="flex gap-3">
-      <div class="input-wrapper w-full dark:!bg-gray-800">
+  <div class="flex gap-3">
+    <div class="input-wrapper w-full dark:!bg-gray-800">
       <InputText
         class="w-full font-normal prime-input"
-        v-model="bankname"
+        :value="bankname"
         inputmode="text"
         type="text"
-       readonly
-        @input="validateInput"
+    
       />
       <span class="bottom-border"></span>
-      </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, watch } from 'vue';
-  
-  const props = defineProps(['modelValue']);
-  const emit = defineEmits(['update:modelValue']);
-  
-  const bankname = ref(props.modelValue || '');
-  
-  // Allow only alphabets and convert to uppercase
-  const validateInput = (e) => {
-    let value = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
-    bankname.value = value;
-    e.target.value = value;
-  };
-  
-  watch(bankname, (newValue) => {
-    emit('update:modelValue', newValue);
-  });
-  </script>
-  <style scoped>
-  .uppercase {
-    text-transform: uppercase;
-  }
+  </div>
+</template>
 
-  .input-wrapper {
+<script setup>
+import { ref, watch } from 'vue';
+
+const props = defineProps(['modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+const bankname = ref(props.modelValue || '');
+
+// Keep synced with parent
+watch(() => props.modelValue, (val) => {
+  if (val !== bankname.value) {
+    bankname.value = format(val);
+  }
+});
+
+// Emit back (not necessary if readonly, but safe for reactive sync)
+watch(bankname, (newVal) => {
+  emit('update:modelValue', newVal);
+});
+
+// Format helper
+function format(val) {
+  return (val || '').replace(/[^a-zA-Z]/g, '').toUpperCase();
+}
+</script>
+
+<style scoped>
+.input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -46,14 +48,6 @@
   border-radius: 10px;
   padding: 0 10px;
   overflow: hidden;
-}
-
-.country-code {
-  font-size: 16px;
-  color: #333;
-  padding-right: 8px;
-  white-space: nowrap;
-  user-select: none;
 }
 
 .prime-input {
@@ -88,4 +82,4 @@
   width: 100%;
   height: 4px;
 }
-  </style>
+</style>

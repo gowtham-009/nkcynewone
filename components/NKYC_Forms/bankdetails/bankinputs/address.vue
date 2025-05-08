@@ -1,51 +1,51 @@
 <template>
-    <div class="w-full">
-    
-      <div class="input-wrapper dark:!bg-gray-800">
-
-      <Textarea v-model="address" varient="filled" rows="3" class="w-full prime-input" cols="10" readonly  @input="formatInput"
-        @keypress="allowCustomCharacters"
-        maxlength="100" />
-        <span class="bottom-border"></span>
-</div>
+  <div class="w-full">
+    <div class="input-wrapper dark:!bg-gray-800">
+      <Textarea
+        class="w-full prime-input"
+        :value="address"
+        variant="filled"
+        rows="3"
+        cols="10"
+      
+      />
+      <span class="bottom-border"></span>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, watch } from 'vue';
-  
-  const props = defineProps(['modelValue']);
-  const emit = defineEmits(['update:modelValue']);
-  
-  const address = ref(props.modelValue || '');
-  
-  // Allow only A-Z, a-z, 0-9, ., /, and space
-  const allowCustomCharacters = (event) => {
-    const char = event.key;
-    const regex = /^[a-zA-Z0-9./\s]$/;
-    if (!regex.test(char)) {
-      event.preventDefault();
-    }
-  };
-  
-  // Format input: convert to uppercase, allow only valid characters, and max 12 length
-  const formatInput = () => {
-    address.value = address.value
-      .toUpperCase()
-      .replace(/[^A-Z0-9./\s]/g, '')
-      .slice(0, 100);
-  };
-  
-  watch(address, (newValue) => {
-    emit('update:modelValue', newValue);
-  });
-  </script>
-  <style scoped>
-  .uppercase {
-    text-transform: uppercase;
-  }
+  </div>
+</template>
 
-  .input-wrapper {
+<script setup>
+import { ref, watch } from 'vue';
+
+const props = defineProps(['modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+const address = ref(format(props.modelValue || ''));
+
+// Watch for changes from parent
+watch(() => props.modelValue, (newVal) => {
+  const formatted = format(newVal || '');
+  if (formatted !== address.value) {
+    address.value = formatted;
+  }
+});
+
+// Emit updates if internal value changes (defensive)
+watch(address, (newVal) => {
+  emit('update:modelValue', newVal);
+});
+
+// Format input
+function format(val) {
+  return val
+    .toUpperCase()
+    .replace(/[^A-Z0-9./\s]/g, '')
+    .slice(0, 100);
+}
+</script>
+
+<style scoped>
+.input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -53,14 +53,6 @@
   border-radius: 10px;
   padding: 0 10px;
   overflow: hidden;
-}
-
-.country-code {
-  font-size: 16px;
-  color: #333;
-  padding-right: 8px;
-  white-space: nowrap;
-  user-select: none;
 }
 
 .prime-input {
@@ -95,4 +87,4 @@
   width: 100%;
   height: 4px;
 }
-  </style>
+</style>

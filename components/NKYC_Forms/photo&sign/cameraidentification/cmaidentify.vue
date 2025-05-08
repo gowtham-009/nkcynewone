@@ -19,6 +19,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import * as faceapi from 'face-api.js'
+const emit = defineEmits(['captured'])
 
 const video = ref(null)
 const canvas = ref(null)
@@ -131,9 +132,11 @@ const captureImage = () => {
   canvas.value.height = video.value.videoHeight
   ctx.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height)
   capturedImage.value = canvas.value.toDataURL('image/png')
+  emit('captured', capturedImage.value) // 👈 Emit to parent
   imageCaptured.value = true
   stopCamera()
 }
+
 
 // Stop the camera stream
 const stopCamera = () => {

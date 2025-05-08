@@ -50,7 +50,7 @@
                 <Button @click="back()" ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                 <i class="pi pi-angle-left text-3xl dark:text-white"></i>
             </Button>
-                <Button @click="handleButtonClick" ref="rippleBtn"   :disabled="!bankname || !accno || !ifsc || !micr || !address"
+                <Button @click="handleButtonClick" ref="rippleBtn" :disabled="!bankname || !accno || !ifsc || !micr || !address"
                  class="primary_color  w-5/6 text-white  py-4 text-xl border-0">
                     {{ buttonText }}
                 </Button>
@@ -69,7 +69,7 @@
 </template>
 <script setup>
 
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import Bankname from '~/components/NKYC_Forms/bankdetails/bankinputs/bankname.vue'
 import Accno from '~/components/NKYC_Forms/bankdetails/bankinputs/accno.vue'
 
@@ -99,19 +99,89 @@ onMounted(() => {
 });
 
 
-const bankvalidation=async()=>{
-const apiUrl=url.value+'/bank/'
+const bankvalidation = async (accountno, ifscno) => {
+  const apiUrl = url.value + '/bank';
+  const formData = new FormData();
+  formData.append('brokerCode', 'UAT-KYC');
+  formData.append('appId', '1216');
+  formData.append('clientCode', 'B8GO3');
+  formData.append('bankAccNo', accountno);
+  formData.append('bankIfsc', ifscno);
+  formData.append('clientName', localStorage.getItem('clientname'));
+  formData.append('clientMobile', localStorage.getItem('mobileNo'));
 
-}
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE'
+      }
+    });
 
-bankvalidation()
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.status);
+    }
+
+    const data = await response.json();
+    if(data.metaData.bank_status==='VALID'){
+       await getbankaddress(ifscno)
+    }
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
+
+
+const getbankaddress = async (ifscval) => {
+  const apiUrl = `https://ifsc.razorpay.com/${ifscval}`;
+ 
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+    
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.status);
+    }
+
+    const data = await response.json();
+  if(data){
+   
+    micr.value = data.MICR;
+    bankname.value = data.BANK;
+    address.value=data.ADDRESS;
+  }
+
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+
+
+watch([accno, ifsc], ([newAccno, newIfsc]) => {
+  if (newAccno && newIfsc && newIfsc.length === 11) {
+   bankvalidation(newAccno, newIfsc)
+  }
+});
+
+
+
 
 
 
 
 
 const handleButtonClick = () => {
-
+console.log(ifsc.value, micr.value, bankname.value, address.value, accno.value)
+  
+    // Perform your action here, e.g., send data to the server or navigate to another page
+    // Example: console.log('Button clicked!');
+    // You can also emit an event to update the parent component if needed
     const bankdetails=[
         {
             bankname: bankname.value,

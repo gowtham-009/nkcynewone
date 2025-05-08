@@ -1,47 +1,52 @@
 <template>
-    <div class="flex gap-3">
-      <div class="input-wrapper w-full dark:!bg-gray-800">
+  <div class="flex gap-3">
+    <div class="input-wrapper w-full dark:!bg-gray-800">
       <InputText
         class="w-full font-normal prime-input"
-        v-model="micr"
+        :value="micr"
         type="text"
-       readonly
         @input="validateInput"
         maxlength="17"
+       
       />
       <span class="bottom-border"></span>
-      </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, watch } from 'vue';
-  
-  const props = defineProps(['modelValue']);
-  const emit = defineEmits(['update:modelValue']);
-  
-  const micr = ref(props.modelValue || '');
-  
-  // Allow only alphanumeric, convert to uppercase, and limit to 17 characters
-  const validateInput = (e) => {
-    let value = e.target.value
-      .toUpperCase()            // Convert to uppercase
-      .replace(/[^A-Z0-9]/g, '') // Remove non-alphanumeric characters
-      .slice(0, 17);             // Limit to 17 characters
-    micr.value = value;
-    e.target.value = value;
-  };
-  
-  watch(micr, (newValue) => {
-    emit('update:modelValue', newValue);
-  });
-  </script>
-  <style scoped>
-  .uppercase {
-    text-transform: uppercase;
-  }
+  </div>
+</template>
 
-  .input-wrapper {
+<script setup>
+import { ref, watch } from 'vue';
+
+const props = defineProps(['modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+const micr = ref(props.modelValue || '');
+
+// Sync micr with modelValue in case it changes from parent
+watch(() => props.modelValue, (newVal) => {
+  if (newVal !== micr.value) {
+    micr.value = newVal || '';
+  }
+});
+
+// Allow only alphanumeric, convert to uppercase, and emit cleaned value
+const validateInput = (e) => {
+  let value = e.target.value
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 17);
+
+  micr.value = value;
+  emit('update:modelValue', value);
+};
+</script>
+
+<style scoped>
+.uppercase {
+  text-transform: uppercase;
+}
+
+.input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -49,14 +54,6 @@
   border-radius: 10px;
   padding: 0 10px;
   overflow: hidden;
-}
-
-.country-code {
-  font-size: 16px;
-  color: #333;
-  padding-right: 8px;
-  white-space: nowrap;
-  user-select: none;
 }
 
 .prime-input {
@@ -91,4 +88,4 @@
   width: 100%;
   height: 4px;
 }
-  </style>
+</style>
