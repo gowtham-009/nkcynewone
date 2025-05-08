@@ -4,7 +4,7 @@
       <logo style="width: 40px; height: 40px;" />
       <profile />
     </div>
-    <div v-if="content" class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
+    <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full mt-2 p-1 px-2">
         <p class="text-2xl  text-blue-950 font-medium dark:text-gray-400">
@@ -16,6 +16,9 @@
         <div class="w-full mt-2">
           <Paninput v-model="panno"  />
           <div class="w-full h-8">
+            <div v-if="loading" class="w-full flex justify-center items-center">
+              <ProgressSpinner  class="w-8 h-8"/>
+            </div>
             <p v-if="pannameshow" class="text-gray-600 text-lg font-normal mt-1 leading-5">Pan Name: {{ clientname }}
             </p>
             <span v-if="paninvalidshow" class="text-red-500 text-lg font-normal mt-1"> {{ panerror }}</span>
@@ -57,12 +60,8 @@
 
     </div>
 
-    <div v-if="loading" class="flex justify-center items-center  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
-      :style="{ height: deviceHeight * 0.92 + 'px' }">
-      <ProgressSpinner />
-    </div>
-  </div>
-
+ 
+</div>
 
 
 
@@ -92,8 +91,8 @@ console.log(props.data, 'propsdata')
 
 
 
-const content = ref(true)
-const loading = ref(false)
+
+const loading = ref(true)
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
@@ -301,6 +300,7 @@ const panverification = async () => {
     else {
       const data = await response.json()
       if (data.status == 'ok') {
+        loading.value=false
         pannameshow.value = true
         paninvalidshow.value = false
         clientname.value = data.metaData.full_name
