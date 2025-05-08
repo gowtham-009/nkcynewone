@@ -2,7 +2,7 @@
     <div class="w-full">
       <label for="pan_label" class="text-gray-500 text-lg font-normal leading-3">Address line 2 </label>
       <div class="input-wrapper dark:!bg-gray-800">
-      <Textarea v-model="address" varient="filled" rows="2"  class="w-full prime-input" cols="10" />
+      <Textarea v-model="address" varient="filled" rows="2"  class="w-full prime-input" cols="15" />
       <span class="bottom-border"></span>
     </div>
     </div>
