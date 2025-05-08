@@ -4,6 +4,13 @@
     font-family: 'Inter', sans-serif;
    
 }
+/* Disable user text selection and long-press dictionary popup globally */
+body, html, * {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -webkit-touch-callout: none;
+}
 
 .primary_color{
     background-color: #0554c8
