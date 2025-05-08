@@ -159,19 +159,11 @@ try {
     const pannodata=panData.Certificate.$.number
       panno.value=pannodata || ''
     
-   
     }
   });
-
-  
- 
-
-
 } catch (error) {
   console.error('Error fetching XML files:', error);
 }
-
-  
   }
 }
 
@@ -180,8 +172,9 @@ try {
 
 
 const digilockerpull=async()=> {
+ if(props?.data?.metaData?.essentials?.requestId){
   const apiurl = url.value + 'digilocker';
-  const requestqueryvalue = props.data.metaData.essentials.requestId;
+  const requestqueryvalue = props?.data?.metaData?.essentials?.requestId || '';
   const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
   const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
 
@@ -219,18 +212,20 @@ const digilockerpull=async()=> {
     }
     else {
       const successdata = await response.json()
-      if(successdata.metaData.result.xml){
-        const getxmlfile = successdata.metaData.result.xml;
-      }
+     
      
     }
 
   }
 
   catch (error) {
-    console.error('Error:', error.message);
+    console.log('Error:', error.message);
 
   }
+ }
+ else {
+  console.log('Request ID not found')
+ }
 }
 
 
@@ -358,7 +353,7 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-
+    localStorage.setItem('clientname', clientname.value);
     if (!panno.value || !dateval.value || !clientname.value || !aadhar.value) {
       alert('Please fill all required')
     }

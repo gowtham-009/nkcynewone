@@ -64,7 +64,9 @@
   import City from '~/components/NKYC_Forms/pandetails/paninputs/city.vue';
   import Pincode from '~/components/NKYC_Forms/pandetails/paninputs/pincode.vue';
   import Addresscheck from '~/components/NKYC_Forms/pandetails/paninputs/confirmcheckbox.vue';
+  import { parseString } from 'xml2js';
   
+  // Props and Emits
   const emit = defineEmits(['updateDiv']);
   const props = defineProps({
     data: {
@@ -73,36 +75,26 @@
     },
   });
   
+
+
+  // Form Refs
   const address = ref('');
   const address2 = ref('');
   const city = ref('');
   const pincode = ref('');
   const state = ref('');
-  const deviceHeight = ref(window.innerHeight);
-  
+
+  // DOM and UI Refs
   const commAddressRef = ref(null);
   const rippleBtn = ref(null);
   const rippleBtnback = ref(null);
   const buttonText = ref('Continue');
   const isAnimating = ref(false);
-
-
-  const parmenentaddress=()=>{
-      const status = props?.data?.KYC_DATA?.APP_COR_ADD1
-      if (status) {
-        address.value = props?.data?.KYC_DATA?.APP_COR_ADD1||'';
-        city.value = props?.data?.KYC_DATA?.APP_COR_CITY||'';
-        pincode.value = props?.data?.KYC_DATA?.APP_COR_PINCD||'';
-        if (props.data?.KYC_DATA?.APP_COR_STATE) {
-    const stateCode = String(props.data.KYC_DATA.APP_COR_STATE);
-    state.value = props.data.statelist[stateCode] || '';
-  }
-
-      }
-  }
-  parmenentaddress()
- 
-  // Resize listener
+  
+  // Device height
+  const deviceHeight = ref(window.innerHeight);
+  
+  // Handle window resize
   const updateHeight = () => {
     deviceHeight.value = window.innerHeight;
   };
@@ -113,15 +105,84 @@
     window.removeEventListener('resize', updateHeight);
   });
   
-  // Navigation handlers
+  // Load permanent address if available
+  
+const setPermanentAddress = async () => {
+  const kyc = props.data?.KYC_DATA;
+  const kycAddress = props.data?.[0]?.file?.xml;
+
+  if (kyc?.APP_COR_ADD1) {
+    address.value = kyc.APP_COR_ADD1 || '';
+    city.value = kyc.APP_COR_CITY || '';
+    pincode.value = kyc.APP_COR_PINCD || '';
+
+    const stateCode = String(kyc.APP_COR_STATE || '');
+    state.value = props.data?.statelist?.[stateCode] || '';
+  } else if (kycAddress) {
+    try {
+      const response = await fetch(kycAddress);
+      const xmlText = await response.text();
+
+      parseString(xmlText, { explicitArray: false }, (err, aadharData) => {
+        if (err) {
+          console.error('Error parsing Aadhaar XML:', err);
+        } else {
+          // Assuming UIDAI address is in aadharData.PrintLetterBarcodeData.$
+          const addr = aadharData
+
+          if (addr) {
+           
+            const adr1=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.co ||""
+            const adr2=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.street||""
+            const adr3=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.lm||""
+            const adr4=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.po||""
+            const adr5=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.subdist||""
+            const adr6=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.pc||""
+            address.value=adr1+","+" "+adr2+","+"\r"+adr3+","+" "+adr4+","+"\r"+adr5+","+" "+adr6
+            city.value = addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.subdist || '';
+            pincode.value = addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.pc || '';
+            state.value = addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.state || '';
+        
+          
+          } 
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching or parsing Aadhaar XML:', error);
+    }
+  }
+};
+ await setPermanentAddress();
+  
+  // Handle continue button click
   const handleButtonClick = (event) => {
     animateRipple(rippleBtn.value, event);
     setTimeout(() => {
       const isConfirmed = commAddressRef.value?.confirm;
-      emit('updateDiv', isConfirmed ? 'submission' : 'communicationaddress', isConfirmed ? '1' : undefined);
+      console.log('isConfirmed:', isConfirmed);
+
+      const addressData = {
+        address: address.value,
+        address2: address2.value ||'',
+        city: city.value,
+        pincode: pincode.value,
+        state: state.value,
+      };
+
+      console.log('Address Data:', addressData);
+
+      if(isConfirmed) {
+             emit( 'updateDiv', 'submission','1');
+ 
+      } else {
+        emit('updateDiv', 'communicationaddress',addressData);
+       
+      }
+
     }, 600);
   };
   
+  // Handle back button click
   const back = (event) => {
     animateRipple(rippleBtnback.value, event);
     setTimeout(() => {
@@ -129,11 +190,13 @@
     }, 600);
   };
   
-  // Ripple animation
+  // Ripple effect
   function animateRipple(buttonRef, event) {
     const button = buttonRef?.$el || buttonRef;
+    if (!button) return;
+  
     const ripple = document.createElement('span');
-    ripple.classList.add('ripple');
+    ripple.className = 'ripple';
   
     const rect = button.getBoundingClientRect();
     ripple.style.left = `${event.clientX - rect.left}px`;
@@ -143,6 +206,7 @@
     setTimeout(() => ripple.remove(), 600);
   }
   </script>
+  
   
   <style scoped>
   .ripple {

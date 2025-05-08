@@ -27,10 +27,8 @@
   </div>
 
   <div v-if="currentForm === 'communicationaddress'">
-    <COMMUNICATIONADDRESS @updateDiv="handleUpdateDiv" />
+    <COMMUNICATIONADDRESS :data="data"  @updateDiv="handleUpdateDiv" />
   </div>
-
-
 
   <div v-if="currentForm === 'submission'">
     <SUBMISSIONFORM :data="data" @updateDiv="handleUpdateDiv" />
@@ -178,7 +176,7 @@ watch(() => route.query.form, (newForm) => {
 
 const handleUpdateDiv = (value, newData = {}) => {
  
-console.log('value', newData)
+console.log('valulfoi', newData)
   currentForm.value = value
   data.value = newData
 

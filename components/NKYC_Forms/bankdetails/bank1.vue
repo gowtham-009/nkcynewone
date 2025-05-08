@@ -30,18 +30,18 @@
                    
                    <div class="mt-1">
                     <span class="text-gray-500 text-md">MICR code</span>
-                    <MICR  v-model="micr"/>
+                    <MICR  v-model="micr" />
                    </div>
 
                    <div class="mt-1">
                         <span class="text-gray-500 text-md">Bank name</span>
-                    <Bankname v-model="bankname"/>
+                    <Bankname v-model="bankname" />
                     </div>
 
 
                    <div class="mt-1">
                     <p  class="text-gray-500 text-md font-normal leading-4">Bank Address</p>
-                    <Address v-model="address" class="mt-1"/>
+                    <Address v-model="address"  class="mt-1"/>
                    </div>
                 </div>
             </div>
@@ -77,7 +77,7 @@ import IFSC from '~/components/NKYC_Forms/bankdetails/bankinputs/ifsc.vue'
 import MICR from '~/components/NKYC_Forms/bankdetails/bankinputs/micr.vue'
 import Address from '~/components/NKYC_Forms/bankdetails/bankinputs/address.vue'
 const emit = defineEmits(['updateDiv']);
-
+const { url } = useUrlw3();
 
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
@@ -97,6 +97,14 @@ onMounted(() => {
         deviceHeight.value = window.innerHeight;
     });
 });
+
+
+const bankvalidation=async()=>{
+const apiUrl=url.value+'/bank/'
+
+}
+
+bankvalidation()
 
 
 

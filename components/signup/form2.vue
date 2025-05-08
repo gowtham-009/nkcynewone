@@ -186,6 +186,7 @@ const mobile_signup=()=>{
     circle.remove()
     if(p_otp.value.length===4){
       console.log(emailid)
+      localStorage.setItem('mobileNo', mobileNo.value);
       emit('updateDiv', 'div3', emailid ||'');
     }
     else{

@@ -21,6 +21,9 @@
                     <Address v-model="address"/>
                 </div>
                 <div class="w-full mt-1">
+                    <Address2 v-model="address2"/>
+                </div>
+                <div class="w-full mt-1">
                     <State v-model="state"/>
                 </div>
                 <div class="w-full mt-1">
@@ -58,21 +61,43 @@
 <script setup>
 
 import Address from '~/components/NKYC_Forms/pandetails/paninputs/address.vue'
+import Address2 from '~/components/NKYC_Forms/pandetails/paninputs/address2.vue'
 import State from '~/components/NKYC_Forms/pandetails/paninputs/state.vue'
 import City from '~/components/NKYC_Forms/pandetails/paninputs/city.vue'
 import Pincode from '~/components/NKYC_Forms/pandetails/paninputs/pincode.vue'
 import { ref, onMounted } from 'vue';
 
 const emit = defineEmits(['updateDiv']);
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+
 const deviceHeight = ref(0);
 const buttonText = ref("Continue");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const address = ref('');
+const address2 = ref('');
 const state = ref('');
 const city = ref('');
 const pincode = ref('');
 
+const addressreaddata=()=>{
+    const data = props.data;
+    if (data) {
+        address.value = data.address || '';
+        address2.value = data.address2 || '';
+        state.value = data.state || '';
+        city.value = data.city || '';
+        pincode.value = data.pincode || '';
+    }
+}
+addressreaddata()
+
+console.log('dataioewfjvweijv0a', props.data);
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {

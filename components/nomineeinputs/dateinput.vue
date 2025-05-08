@@ -4,7 +4,6 @@
       <DatePicker v-model="date" showIcon dateFormat="dd/mm/yy" class="w-full"/>
     </div>
   </template>
-  
   <script setup>
    import { ref } from 'vue';
   const props = defineProps(['modelValue']);
@@ -18,12 +17,12 @@
   
   <style >
   .p-datepicker-input.p-inputtext.p-variant-filled{
-  background-color: #e0e0e0 !important;
+  background-color: #d6d6d6 !important;
  
 }
 
 .p-datepicker-input.p-inputtext{
   outline: none !important;
-  border: none !important;
+  border: 1px solid gray !important;
 }
   </style>
