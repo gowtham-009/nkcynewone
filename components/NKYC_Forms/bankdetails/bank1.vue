@@ -127,9 +127,16 @@ const bankvalidation = async (accountno, ifscno) => {
     if(data.metaData.bank_status==='VALID'){
        await getbankaddress(ifscno)
     }
+    else if(data.metaData.bank_status==='INVALID'){
+      alert(data.api_res_data.error.message)
+    }
+    
 
   } catch (error) {
     console.error('Error:', error);
+    alert(error)
+    
+    
   }
 };
 
@@ -152,13 +159,11 @@ const getbankaddress = async (ifscval) => {
     const data = await response.json();
   if(data){
    
-    // micr.value = data.MICR;
-    // bankname.value = data.BANK;
-    // address.value=data.ADDRESS;
-
     micr.value = data.MICR;
-    bankname.value = 'INDIAN BANK';
+    bankname.value = data.BANK;
     address.value=data.ADDRESS;
+
+    
   }
 
   } catch (error) {
@@ -181,11 +186,9 @@ watch([accno, ifsc], ([newAccno, newIfsc]) => {
 
 
 const handleButtonClick = () => {
-console.log(ifsc.value, micr.value, bankname.value, address.value, accno.value)
+
   
-    // Perform your action here, e.g., send data to the server or navigate to another page
-    // Example: console.log('Button clicked!');
-    // You can also emit an event to update the parent component if needed
+   
     const bankdetails=[
         {
             bankname: bankname.value,
