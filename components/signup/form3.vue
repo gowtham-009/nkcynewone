@@ -258,12 +258,13 @@ const handleButtonClick = () => {
 
 const resend_sh = ref(false)
 const resendotp = async () => {
+  console.log(props.data)
   if (timeLeft.value !== 0) return; // Only allow resend when timeLeft is 0
 
   const apiurl = ourl.value + 'send-email-otp.php'
   const formData = new FormData()
 
-  formData.append('emailId', props.data)
+  formData.append('emailId', emailid.value)
   formData.append('otpCode', '789564')
   try {
     const response = await fetch(apiurl, {
