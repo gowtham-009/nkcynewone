@@ -216,7 +216,7 @@ const emailchecker = async (messageId) => {
 
     if (data.MessageEvents && data.MessageEvents.length > 0 && data.MessageEvents[0].Type) {
       console.log('Email Status Type:', data.MessageEvents[0].Type);
-      alert('hello');
+
     } else {
       // Retry after 5 seconds
       setTimeout(() => {
