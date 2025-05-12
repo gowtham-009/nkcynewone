@@ -18,6 +18,7 @@
 
           <div class="w-full mt-4">
             <EmailInput v-model="emailid" />
+            <span v-if="erroremail" class="text-red-500">{{ emailerror }}</span>
 
           </div>
         </div>
@@ -86,7 +87,11 @@ const buttonText = ref("Verify");
 const emailbox = ref(false)
 const emailidtext = ref('')
 const otperror=ref(false)
+
 const errorotp=ref('')
+
+const erroremail=ref(false)
+const emailerror=ref('')
 let timer = null;
 const e_otp = ref('')
 
@@ -113,6 +118,15 @@ const emailid = ref(emailpropsdata);
 // Function to validate email format
 const isValidEmail = computed(() => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailid.value);
+});
+
+watch(isValidEmail, (newValue) => {
+  if(newValue===false){
+    erroremail.value=false
+  }else{
+    isSending.value=false
+    buttonText.value="verify"
+  }
 });
 onMounted(() => {
   deviceHeight.value = window.innerHeight;
@@ -202,7 +216,7 @@ const sendemailotp = async () => {
 
 const emailchecker = async (messageId) => {
   const apiUrl = `${ourl.value}check-email-status.php?messageId=${messageId}`;
-  
+
   try {
     const response = await fetch(apiUrl, {
       method: 'GET',
@@ -214,19 +228,34 @@ const emailchecker = async (messageId) => {
 
     const data = await response.json();
 
-    if (data.MessageEvents && data.MessageEvents.length > 0 && data.MessageEvents[0].Type) {
-      console.log('Email Status Type:', data.MessageEvents[0].Type);
-
-    } else {
-      // Retry after 5 seconds
-      setTimeout(() => {
-        emailchecker(messageId);
-      }, 5000);
+    if (
+      data.MessageEvents &&
+      data.MessageEvents.length > 0 &&
+      data.MessageEvents[0].Type === 'Bounced'
+    ) {
+      // STOP polling here — do not call emailchecker again
+      emailerror.value = 'Please enter a valid email ID';
+      erroremail.value = true;
+      isSending.value = true;
+      emailbox.value = false;
+      return; // This line ensures the function exits immediately
     }
+    
+    else if( data.MessageEvents &&
+      data.MessageEvents.length > 0 &&
+      data.MessageEvents[0].Type === 'Opened'|| data.MessageEvents[0].Type === 'Delivered' ){
+      return
+    }
+
+    // If bounce has not occurred, continue polling after 5 seconds
+    setTimeout(() => {
+      emailchecker(messageId);
+    }, 5000);
 
   } catch (error) {
     console.error('Fetch error:', error.message);
-
+    
+    // Retry on error after 5 seconds
     setTimeout(() => {
       emailchecker(messageId);
     }, 5000);
