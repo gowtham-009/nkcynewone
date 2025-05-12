@@ -64,18 +64,10 @@
   import Addresscheck from '~/components/NKYC_Forms/pandetails/paninputs/confirmcheckbox.vue';
   import { parseString } from 'xml2js';
   
-  // Props and Emits
-  const emit = defineEmits(['updateDiv']);
-  const props = defineProps({
-    data: {
-      type: Object,
-      required: true,
-    },
-  });
-  
-
+ 
 
   // Form Refs
+  const emit = defineEmits(['updateDiv']);
   const address = ref('');
 
   const city = ref('');
@@ -106,18 +98,31 @@
   
   
 const setPermanentAddress = async () => {
-  const localvalue=localStorage.getItem('krastatus')
-  
-  const localobj = localvalue ? JSON.parse(localvalue) : {};
-  const add1 = localobj.KYC_DATA.APP_COR_ADD1 || '';
-  const add2 = localobj.KYC_DATA.APP_COR_ADD2 || '';
-  const add3 = localobj.KYC_DATA.APP_COR_ADD3 || '';
-  address.value = add1 + ' ' + add2 + ' ' + add3;
-  const stateCode = String(localobj.KYC_DATA.APP_COR_STATE || '');
-  state.value = localobj.statelist[stateCode] || '';
-  city.value =localobj.KYC_DATA.APP_COR_CITY || '';
-  pincode.value = localobj.KYC_DATA.APP_COR_PINCD || '';
+  const localvalue = localStorage.getItem('krastatus');
+  const localobj = localvalue ? JSON.parse(localvalue) : null;
+
+  const localvaluedigi = localStorage.getItem('digilockerstatus');
+  const localobjdigi = localvaluedigi ? JSON.parse(localvaluedigi) : null;
+
+  if (localobjdigi && localobjdigi.status === 'digilocker') {
+   
+    address.value = localobjdigi.address || '';
+    state.value = localobjdigi.state || '';
+    city.value = localobjdigi.city || '';
+    pincode.value = localobjdigi.pincode || '';
+  } else if (localobj && localobj.KYC_DATA) {
+    const add1 = localobj.KYC_DATA.APP_COR_ADD1 || '';
+    const add2 = localobj.KYC_DATA.APP_COR_ADD2 || '';
+    const add3 = localobj.KYC_DATA.APP_COR_ADD3 || '';
+    address.value = `${add1} ${add2} ${add3}`.trim();
+
+    const stateCode = String(localobj.KYC_DATA.APP_COR_STATE || '');
+    state.value = (localobj.statelist && localobj.statelist[stateCode]) || '';
+    city.value = localobj.KYC_DATA.APP_COR_CITY || '';
+    pincode.value = localobj.KYC_DATA.APP_COR_PINCD || '';
+  }
 };
+
 setPermanentAddress();
   
   // Handle continue button click
@@ -125,7 +130,7 @@ setPermanentAddress();
     animateRipple(rippleBtn.value, event);
     setTimeout(() => {
       const isConfirmed = commAddressRef.value?.confirm;
-      console.log('isConfirmed:', isConfirmed);
+
 
       
      
@@ -134,7 +139,7 @@ setPermanentAddress();
              emit( 'updateDiv', 'submission','1');
  
       } else {
-        emit('updateDiv', 'communicationaddress', props.data ||'');
+        emit('updateDiv', 'communicationaddress');
        
       }
 

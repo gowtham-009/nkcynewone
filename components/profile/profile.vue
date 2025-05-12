@@ -63,6 +63,7 @@ async function logout() {
       localStorage.removeItem('mobileNo')
       localStorage.removeItem('clientname')
       localStorage.removeItem('krastatus')
+      localStorage.removeItem('digilockerstatus')
     } else {
       console.log("Cache entry not found or couldn't be removed.");
     

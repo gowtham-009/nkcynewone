@@ -85,7 +85,7 @@
     <div v-if="loading" class="flex justify-center items-center  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
         :style="{ height: deviceHeight * 0.92 + 'px' }">
         <ProgressSpinner />
-      
+     
     </div>
 </template>
 <script setup>
@@ -145,11 +145,11 @@ const back = () => {
 
 const digilocker_create = async () => {
     const apiurl = url.value + 'digilocker';
-    const url1 = 'http://localhost:3000/main?form=ekyc';
-    const url2 = 'http://localhost:3000/main??form=ekyc';
+    // const url1 = 'http://localhost:3000/main?form=ekyc';
+    // const url2 = 'http://localhost:3000/main??form=ekyc';
 
-    //    const url1 = 'https://nkcynewone.vercel.app/main?form=ekyc';
-    //     const url2 = 'https://nkcynewone.vercel.app/main??form=ekyc';
+       const url1 = 'https://nkcynewone.vercel.app/main?form=ekyc';
+        const url2 = 'https://nkcynewone.vercel.app/main??form=ekyc';
 
     const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
     const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
@@ -300,36 +300,76 @@ const digilockerGetFiles = async (id) => {
         }
         else {
             const data = await response.json()
-            if (data.metaData.result.files[0].file) {
-                localStorage.setItem('digilockerstatus',JSON.stringify(data))
-                const xmldata = data.metaData.result.files[1].file.xml
+      
 
-                console.log(xmldata)
+if (data.metaData.result.files[0].file && data.metaData.result.files[1].file) {
+    const xmldataaadhar = data.metaData.result.files[0].file.xml;
+    const xmldatapan = data.metaData.result.files[1].file.xml;
 
-                try {
-                    const response = await fetch(xmldata);
-                    const xmlText = await response.text();
-                    parseString(xmlText, { explicitArray: false }, (err, aadharData) => {
-                        if (err) {
-                            console.error('Error parsing Aadhaar XML:', err);
-                        } else {
-                            // Assuming UIDAI address is in aadharData.PrintLetterBarcodeData.$
-                            const addr = aadharData
-                            console.log(addr)
-                            if (addr) {
-                                
-                               const panno=addr.Certificate.$.number
-                               panverification(panno)
-                               
-                            }
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error fetching or parsing Aadhaar XML:', error);
+    try {
+        // Fetch both XMLs in parallel
+   
+        const [aadhaarResponse, panResponse] = await Promise.all([
+            fetch(xmldataaadhar),
+            fetch(xmldatapan)
+        ]);
+
+        const [aadhaarXmlText, panXmlText] = await Promise.all([
+            aadhaarResponse.text(),
+            panResponse.text()
+        ]);
+
+        // Parse Aadhaar XML
+        parseString(aadhaarXmlText, { explicitArray: false }, (err, aadharData) => {
+            if (err) {
+                console.error('Error parsing Aadhaar XML:', err);
+            } else {
+                console.log('Parsed Aadhaar:', aadharData);
+               
+
+                const add1=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.co
+                const add2=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.street
+                const add3=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.lm
+                const add4=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.subdist
+             const add5=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.pc
+                const address=add1 + ' ' + add2 + ' ' + add3+' '+add4+' '+add5
+                const city=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.subdist
+                const state=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.state
+                const pincode=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.pc
+
+                const mydatadigi={
+                    status:'digilocker',
+                    address:address,
+                    city:city,
+                    state:state,
+                    pincode:pincode
                 }
+                
+                localStorage.setItem('digilockerstatus',JSON.stringify(mydatadigi))
+            }
+        });
+
+        // Parse PAN XML
+        parseString(panXmlText, { explicitArray: false }, (err, panData) => {
+            if (err) {
+                console.error('Error parsing PAN XML:', err);
+            } else {
+                console.log('Parsed PAN:', panData);
+                const panno = panData.Certificate?.$?.number;
+                if (panno) {
+                    panverification(panno);
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error fetching or parsing XML files:', error);
+    }
+}
+
               
                
-            }
+            
 
         }
 
@@ -371,7 +411,7 @@ const panverification = async (panval) => {
         else {
             const data = await response.json()
             if (data.metaData.status == 'VALID') {
-                emit('updateDiv', 'parmanentaddress',);
+               emit('updateDiv', 'parmanentaddress',);
             }
 
 
@@ -404,6 +444,7 @@ const handleButtonClick = () => {
         console.log(localobj)
 
         if (localobj?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
+             localStorage.removeItem('krastatus')
             digilocker_create()
         }
         else {

@@ -65,12 +65,7 @@ import Pincode from '~/components/NKYC_Forms/pandetails/paninputs/pincode.vue'
 import { ref, onMounted } from 'vue';
 
 const emit = defineEmits(['updateDiv']);
-const props = defineProps({
-  data: {
-    type: Object,
-    default: () => ({}),
-  },
-});
+
 
 const deviceHeight = ref(0);
 const buttonText = ref("Continue");
@@ -82,26 +77,33 @@ const state = ref('');
 const city = ref('');
 const pincode = ref('');
 
-const addressreaddata=()=>{
-    const data = props.data;
-    if (data) {
+const setPermanentAddress = async () => {
+  const localvalue = localStorage.getItem('krastatus');
+  const localobj = localvalue ? JSON.parse(localvalue) : null;
 
-        const add1=data?.KYC_DATA?.APP_COR_ADD1 || '';
-        const add2=data?.KYC_DATA?.APP_COR_ADD2 || '';
-        const add3=data?.KYC_DATA?.APP_COR_ADD3 || '';
-         address.value = add1+' '+add2+' '+add3;
+  const localvaluedigi = localStorage.getItem('digilockerstatus');
+  const localobjdigi = localvaluedigi ? JSON.parse(localvaluedigi) : null;
 
-         const stateCode = String(data?.KYC_DATA?.APP_COR_STATE || '');
-         state.value = props.data?.statelist?.[stateCode] || '';
-       
-    
-         city.value = data?.KYC_DATA?.APP_PER_CITY || '';
-         pincode.value = data?.KYC_DATA?.APP_PER_PINCD || ''
-    }
-}
-addressreaddata()
+  if (localobjdigi && localobjdigi.status === 'digilocker') {
+    alert('hi')
+    address.value = localobjdigi.address || '';
+    state.value = localobjdigi.state || '';
+    city.value = localobjdigi.city || '';
+    pincode.value = localobjdigi.pincode || '';
+  } else if (localobj && localobj.KYC_DATA) {
+    const add1 = localobj.KYC_DATA.APP_COR_ADD1 || '';
+    const add2 = localobj.KYC_DATA.APP_COR_ADD2 || '';
+    const add3 = localobj.KYC_DATA.APP_COR_ADD3 || '';
+    address.value = `${add1} ${add2} ${add3}`.trim();
 
-console.log('dataioewfjvweijv0a', props.data);
+    const stateCode = String(localobj.KYC_DATA.APP_COR_STATE || '');
+    state.value = (localobj.statelist && localobj.statelist[stateCode]) || '';
+    city.value = localobj.KYC_DATA.APP_COR_CITY || '';
+    pincode.value = localobj.KYC_DATA.APP_COR_PINCD || '';
+  }
+};
+
+setPermanentAddress();
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
