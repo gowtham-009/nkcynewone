@@ -318,7 +318,7 @@ const digilockerGetFiles = async (id) => {
 }
 
 
-    const handleButtonClick = () => {
+ const handleButtonClick = () => {
         const button = rippleBtn.value
         const circle = document.createElement('span')
         circle.classList.add('ripple')

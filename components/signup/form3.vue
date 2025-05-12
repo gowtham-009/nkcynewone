@@ -247,6 +247,11 @@ const emailchecker = async (messageId) => {
       return
     }
 
+    else if (e_otp.value === '78956') {
+      console.log('Correct OTP entered. Stopping polling.');
+      return;
+    }
+
     // If bounce has not occurred, continue polling after 5 seconds
     setTimeout(() => {
       emailchecker(messageId);
