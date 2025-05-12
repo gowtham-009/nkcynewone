@@ -16,6 +16,7 @@
 
         <div class="w-full mt-4">
           <MobileInput v-model="mobileNo" />
+          <span v-if="errormsg" class="text-red-500">{{ errormobile }}</span>
           
         </div>
 
@@ -35,6 +36,7 @@
             </p>
             <div class="w-full mt-3">
                 <phoneOTP v-model="p_otp"/>
+                <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
                 <div class="w-full h-8">
                     <p class="text-lg font-medium text-center text-gray-500" v-if="resend_sh">OTP Resend Successfully +91 {{ phoneNumber }}</p>
                 </div>
@@ -61,7 +63,7 @@
              type="button"
               label="Verify OTP"
                class="primary_color  text-white w-5/6 py-4 text-xl border-0"
-                @click="mobile_signup()"  :disabled="!mobileNo || mobileNo.length !== 10 || isSendingOtp" >
+                @click="mobile_signup()"  :disabled="!mobileNo || mobileNo.length !== 10 || isSending" >
                 {{ buttonText }}
         </Button>
           </div>
@@ -80,7 +82,7 @@ import phoneOTP from '~/components/forminputs/otpinput.vue'
 import MobileInput from '~/components/forminputs/mobileinput.vue';
 import Checkbox from '~/components/forminputs/remembercheckbox.vue';
 import { ref, onMounted, watch, onUnmounted } from 'vue';
-const { ourl } = useUrl();
+const { otpourl } = otpurluse();
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
 const timeLeft = ref(60); // Start from 60 seconds
@@ -89,8 +91,11 @@ const mobileotp = ref(false)
 const rippleBtn = ref(null)
 const rippleBtnback = ref(null)
 const buttonText = ref("Verify");
+const otperror=ref(false)
+const errorotp=ref('')
 let timer = null;
-
+const errormsg=ref(false)
+const errormobile=ref('')
 const p_otp=ref('')
 const props = defineProps({
     data: {
@@ -131,35 +136,55 @@ onUnmounted(() => {
 
 
 
+const randomtoken = () => {
+  let token = ''
+  for (var i = 0; i <= 30; i++) {
+    token += Math.floor(Math.random() * 10)
+  }
+  return token
+}
 
-
-const isSendingOtp = ref(false);
+const isSending = ref(false);
 const sendmobileotp = async () => {
-  isSendingOtp.value = true; // Disable button
+  isSending.value = true; // Disable button
 
-  const apiurl = ourl.value + 'send-mobile-otp.php';
+  const apiurl = otpourl.value + 'sms-api/v1/send_sms';
   phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
   const formData = new FormData();
+  formData.append("clientCode", "KMCVJ1");
+  formData.append("smsTemplate", "dynamicLoginOtp");
+  formData.append("requestFrom", "NKYC");
+  formData.append("loginFor", "NKYC");
+  formData.append("validFor", "10 Minutes");
+
   formData.append('mobileNo', mobileNo.value);
-  formData.append('otpCode', '789564');
+  formData.append('otpCode', '7895');
 
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
-      body: formData
+      body: formData,
+      headers:{
+        'Authorization':'21279C8DC0753CD1A90DEBF3C1C5CEDB8B5B77E0455EE804C9CA03BB706CD02A',
+     
+      }
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     } else {
       const data = await response.json();
-      if (data) {
+     
+      if (data.apiResData.message=='Sent.') {
         mobileotp.value = true;
         buttonText.value = "Verify OTP";
       }
     }
   } catch (error) {
     console.error(error.message);
+    errormsg.value=true
+    errormobile.value='Invalid mobile number'
+   
   } finally {
    
 
@@ -182,12 +207,25 @@ const mobile_signup=()=>{
 
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
     if(p_otp.value.length===4){
-      console.log(emailid)
+     
       localStorage.setItem('mobileNo', mobileNo.value);
-      emit('updateDiv', 'div3', emailid ||'');
+      if(p_otp.value=='7895'){
+        const tokenval = randomtoken();
+        const response = new Response(JSON.stringify({ value: tokenval }));
+
+        const cache = await caches.open("my-cache");
+        await cache.put("/my-value", response);
+        emit('updateDiv', 'div3', emailid ||'');
+      }
+      else{
+        otperror.value=true
+        errorotp.value='Invalid OTP'
+      }
+
+     
     }
     else{
       sendmobileotp()
@@ -196,12 +234,19 @@ const mobile_signup=()=>{
  
   }, 600)
 } 
+
+watch(mobileNo, (newval)=>{
+  if(newval.length===10){
+    errormsg.value=false
+    isSending.value = false;
+  }
+})
 watch(p_otp,(newval)=>{
       if(newval.length===4){
-        isSendingOtp.value = false;
+        isSending.value = false;
       }
       else{
-        isSendingOtp.value = true;
+        isSending.value = true;
       }
     })
 
@@ -234,7 +279,7 @@ const resendotp = async () => {
   const apiurl = ourl.value + 'send-mobile-otp.php';
   const formData = new FormData();
   formData.append('mobileNo', mobileNo.value);
-  formData.append('otpCode', '789564');
+  formData.append('otpCode', '7895');
   try {
     const response = await fetch(apiurl, {
       method: 'POST',

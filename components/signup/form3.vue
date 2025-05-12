@@ -32,6 +32,7 @@
           </p>
           <div class="w-full mt-3">
             <emailOTP v-model="e_otp" />
+            <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
             <div class="w-full h-8">
               <p class="text-lg font-medium text-center text-gray-500" v-if="resend_sh">OTP Resend
                 Successfully ({{ emailidtext }}) </p>
@@ -54,7 +55,7 @@
         </Button>
         <Button type="button" ref="rippleBtn" label="Verify OTP"
           class="primary_color text-white w-5/6 py-4 text-xl border-0" @click="handleButtonClick()"
-          :disabled="!isValidEmail || isSendingOtp">
+          :disabled="!isValidEmail || isSending">
           {{ buttonText }}
 
         </Button>
@@ -76,7 +77,6 @@ import EmailInput from '~/components/forminputs/emailinput.vue';
 import CryptoJS from 'crypto-js'
 
 const { ourl } = useUrl();
-
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
 const timeLeft = ref(60); // Start from 60 seconds
@@ -85,8 +85,11 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Verify");
 const emailbox = ref(false)
 const emailidtext = ref('')
+const otperror=ref(false)
+const errorotp=ref('')
 let timer = null;
 const e_otp = ref('')
+
 const props = defineProps({
   data: {
     type: Object,
@@ -94,18 +97,16 @@ const props = defineProps({
   },
 });
 
-
-const randomtoken = () => {
-  let token = ''
-  for (var i = 0; i <= 30; i++) {
-    token += Math.floor(Math.random() * 10)
-  }
-  return token
-}
-
+// const randomtoken = () => {
+//   let token = ''
+//   for (var i = 0; i <= 30; i++) {
+//     token += Math.floor(Math.random() * 10)
+//   }
+//   return token
+// }
 const router = useRouter()
 
-const isSendingOtp = ref(false);
+const isSending = ref(false);
 const emailpropsdata = props?.data?.KYC_DATA?.APP_EMAIL || '';
 const emailid = ref(emailpropsdata);
 
@@ -133,12 +134,6 @@ onMounted(() => {
 });
 
 
-
-
-
-
-
-
 const back = () => {
   const button = rippleBtnback.value
   const circle = document.createElement('span')
@@ -160,7 +155,7 @@ const back = () => {
 }
 
 const sendemailotp = async () => {
-  isSendingOtp.value = true; // Disable button
+  isSending.value = true; // Disable button
   const apiurl = ourl.value + 'send-email-otp.php'
 
   const formData = new FormData()
@@ -177,7 +172,7 @@ const sendemailotp = async () => {
 
 
   formData.append('emailId', emailid.value)
-  formData.append('otpCode', '789564')
+  formData.append('otpCode', '78956')
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
@@ -190,8 +185,12 @@ const sendemailotp = async () => {
     else {
       const data = await response.json()
       if (data.Message == 'OK') {
-        emailbox.value = true
-        buttonText.value = "Verify OTP"
+         emailbox.value = true
+         buttonText.value = "Verify OTP"
+        setTimeout(() => {
+          emailchecker(data.MessageID)
+        }, 5000);
+       
 
       }
     }
@@ -200,12 +199,47 @@ const sendemailotp = async () => {
   }
 }
 
+
+const emailchecker = async (messageId) => {
+  const apiUrl = `${ourl.value}check-email-status.php?messageId=${messageId}`;
+  
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data.MessageEvents && data.MessageEvents.length > 0 && data.MessageEvents[0].Type) {
+      console.log('Email Status Type:', data.MessageEvents[0].Type);
+      alert('hello');
+    } else {
+      // Retry after 5 seconds
+      setTimeout(() => {
+        emailchecker(messageId);
+      }, 5000);
+    }
+
+  } catch (error) {
+    console.error('Fetch error:', error.message);
+    // Optionally retry on error
+    setTimeout(() => {
+      emailchecker(messageId);
+    }, 5000);
+  }
+};
+
 watch(e_otp, (newval) => {
-  if (newval.length === 4) {
-    isSendingOtp.value = false;
+  if (newval.length === 5) {
+    isSending.value = false;
+    otperror.value=false
   }
   else {
-    isSendingOtp.value = true;
+    isSending.value = true;
   }
 })
 
@@ -226,17 +260,18 @@ const handleButtonClick = () => {
   setTimeout(async () => {
     circle.remove();
 
-    if (e_otp.value.length === 4) {
+    if (e_otp.value.length === 5) {
+     if(e_otp.value=='78956'){
       try {
         const secretKey = 'kradatas@123'; // Use your secure key
         const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(props.data), secretKey).toString();
         const encodedEncryptedData = encodeURIComponent(encryptedData);
 
-        const tokenval = randomtoken();
-        const response = new Response(JSON.stringify({ value: tokenval }));
+        // const tokenval = randomtoken();
+        // const response = new Response(JSON.stringify({ value: tokenval }));
 
-        const cache = await caches.open("my-cache");
-        await cache.put("/my-value", response);
+        // const cache = await caches.open("my-cache");
+        // await cache.put("/my-value", response);
 
         // Only route to /main after cache is successfully written
         router.push({
@@ -249,6 +284,13 @@ const handleButtonClick = () => {
         console.error("Failed to cache token or route:", error);
         // Optional: Show user feedback here
       }
+     }
+     else{
+      errorotp.value='Invalid OTP'
+      otperror.value=true
+      isSending.value=true
+
+     }
     } else {
       sendemailotp();
     }
@@ -265,7 +307,7 @@ const resendotp = async () => {
   const formData = new FormData()
 
   formData.append('emailId', emailid.value)
-  formData.append('otpCode', '789564')
+  formData.append('otpCode', '78956')
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
