@@ -109,20 +109,14 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import CryptoJS from 'crypto-js'
+
 import { useRoute } from 'vue-router'
 
 const route = useRoute();
 
-const secretKey = 'kradatas@123';
-const encryptedData = route.query.data;
-let globaldata = null;
-if (encryptedData) {
-  const decryptedBytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedData), secretKey);
-  const originalData = JSON.parse(decryptedBytes.toString(CryptoJS.enc.Utf8));
-    globaldata = originalData;
-  //console.log('Decrypted Data:', originalData);
-}
+
+
+
 const emit = defineEmits(['updateDiv']);
 
 const buttonText = ref("Continue");
@@ -155,7 +149,7 @@ const handleButtonClick = () => {
 
     setTimeout(() => {
         circle.remove()
-        emit('updateDiv', 'ekyc', globaldata);
+        emit('updateDiv', 'ekyc');
     }, 600)
 };
 

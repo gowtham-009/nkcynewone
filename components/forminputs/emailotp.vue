@@ -13,6 +13,7 @@
             v-model="otp[index]"
             @input="onInput(index, $event)"
             @keydown.backspace="onBackspace(index)"
+             @paste="onPaste"
           />
         </div>
       </div>
@@ -50,6 +51,18 @@
     }
   }
   
+  function onPaste(event) {
+  const pastedData = event.clipboardData.getData('Text').replace(/\D/g, ''); // Keep only digits
+  if (pastedData.length === length) {
+    for (let i = 0; i < length; i++) {
+      otp.value[i] = pastedData[i];
+    }
+    nextTick(() => {
+      otpInputs.value[length - 1]?.blur();
+    });
+    event.preventDefault(); // Prevent default paste behavior
+  }
+}
   function onBackspace(index) {
     if (otp.value[index] === '' && index > 0) {
       nextTick(() => otpInputs.value[index - 1]?.focus());

@@ -77,7 +77,7 @@
 
   // Form Refs
   const address = ref('');
-  const address2 = ref('');
+
   const city = ref('');
   const pincode = ref('');
   const state = ref('');
@@ -103,57 +103,22 @@
     window.removeEventListener('resize', updateHeight);
   });
   
-  // Load permanent address if available
+  
   
 const setPermanentAddress = async () => {
-  const kyc = props.data?.KYC_DATA;
-  const kycAddress = props.data?.[0]?.file?.xml;
-
-  if (kyc?.APP_COR_ADD1) {
-    const add1 = kyc?.APP_COR_ADD1 || '';
-    const add2 = kyc?.APP_COR_ADD2 || '';
-    const add3 = kyc?.APP_COR_ADD3 || '';
-    address.value = add1 + ' ' + add2 + ' ' + add3;
-    city.value = kyc?.APP_COR_CITY || '';
-    pincode.value = kyc?.APP_COR_PINCD || '';
-
-    const stateCode = String(kyc?.APP_COR_STATE || '');
-    state.value = props.data?.statelist?.[stateCode] || '';
-  } else if (kycAddress) {
-    try {
-      const response = await fetch(kycAddress);
-      const xmlText = await response.text();
-
-      parseString(xmlText, { explicitArray: false }, (err, aadharData) => {
-        if (err) {
-          console.error('Error parsing Aadhaar XML:', err);
-        } else {
-          // Assuming UIDAI address is in aadharData.PrintLetterBarcodeData.$
-          const addr = aadharData
-
-          if (addr) {
-           
-            const adr1=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.co ||""
-            const adr2=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.street||""
-            const adr3=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.lm||""
-            const adr4=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.po||""
-            const adr5=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.subdist||""
-            const adr6=addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.pc||""
-            address.value=adr1+","+" "+adr2+","+"\r"+adr3+","+" "+adr4+","+"\r"+adr5+","+" "+adr6
-            city.value = addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.subdist || '';
-            pincode.value = addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.pc || '';
-            state.value = addr?.Certificate?.CertificateData?.KycRes?.UidData?.Poa?.$?.state || '';
-        
-          
-          } 
-        }
-      });
-    } catch (error) {
-      console.error('Error fetching or parsing Aadhaar XML:', error);
-    }
-  }
+  const localvalue=localStorage.getItem('krastatus')
+  
+  const localobj = localvalue ? JSON.parse(localvalue) : {};
+  const add1 = localobj.KYC_DATA.APP_COR_ADD1 || '';
+  const add2 = localobj.KYC_DATA.APP_COR_ADD2 || '';
+  const add3 = localobj.KYC_DATA.APP_COR_ADD3 || '';
+  address.value = add1 + ' ' + add2 + ' ' + add3;
+  const stateCode = String(localobj.KYC_DATA.APP_COR_STATE || '');
+  state.value = localobj.statelist[stateCode] || '';
+  city.value =localobj.KYC_DATA.APP_COR_CITY || '';
+  pincode.value = localobj.KYC_DATA.APP_COR_PINCD || '';
 };
- await setPermanentAddress();
+setPermanentAddress();
   
   // Handle continue button click
   const handleButtonClick = (event) => {
@@ -180,7 +145,7 @@ const setPermanentAddress = async () => {
   const back = (event) => {
     animateRipple(rippleBtnback.value, event);
     setTimeout(() => {
-      emit('updateDiv', 'pandetails');
+      emit('updateDiv', 'ekyc');
     }, 600);
   };
   

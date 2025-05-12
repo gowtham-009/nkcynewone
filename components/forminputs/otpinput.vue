@@ -3,17 +3,19 @@
     <div class="flex flex-col items-center py-2">
       <div class="flex w-full" style="gap: 0">
         <input
-          v-for="(digit, index) in otp"
-          :key="index"
-          ref="otpInputs"
-          type="tel"
-          inputmode="numeric"
-          maxlength="1"
-          class="custom-otp-input w-full dark:text-slate-100"
-          v-model="otp[index]"
-          @input="onInput(index, $event)"
-          @keydown.backspace="onBackspace(index)"
-        />
+  v-for="(digit, index) in otp"
+  :key="index"
+  ref="otpInputs"
+  type="tel"
+  inputmode="numeric"
+  maxlength="1"
+  class="custom-otp-input w-full dark:text-slate-100"
+  v-model="otp[index]"
+  @input="onInput(index, $event)"
+  @keydown.backspace="onBackspace(index)"
+  @paste="onPaste"
+/>
+
       </div>
     </div>
   </div>
@@ -50,6 +52,18 @@ function onInput(index, event) {
   }
 }
 
+function onPaste(event) {
+  const pastedData = event.clipboardData.getData('Text').replace(/\D/g, ''); // Keep only digits
+  if (pastedData.length === length) {
+    for (let i = 0; i < length; i++) {
+      otp.value[i] = pastedData[i];
+    }
+    nextTick(() => {
+      otpInputs.value[length - 1]?.blur();
+    });
+    event.preventDefault(); // Prevent default paste behavior
+  }
+}
 function onBackspace(index) {
   if (otp.value[index] === '' && index > 0) {
     nextTick(() => otpInputs.value[index - 1]?.focus());

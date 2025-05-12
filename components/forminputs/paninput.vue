@@ -1,97 +1,110 @@
 <template>
-   <label for="pan_label" class="text-lg text-gray-500">PAN</label>
-  <div class="input-wrapper dark:!bg-gray-800">
-   
-    <InputText
-      id="pan_label"
-      class="prime-input "
-      v-model="pan"
-      variant="filled"
-      size="large"
-      placeholder="Enter a PAN Number"
-      @input="onInput"
-      inputmode="text"
-      autocomplete="off"
-      autocorrect="off"
-      autocapitalize="characters"
-      maxlength="10"
-    />
-    <span class="bottom-border"></span>
+  <label for="PAN" class="text-lg text-gray-500">PAN</label>
+  <div class="card flex justify-center">
+
+    <div class="flex flex-col items-center ">
+      
+      <div class="flex w-full rounded-lg bg-[#e0e0e0]" style="gap: 0">
+        <input
+  v-for="(digit, index) in pan"
+  :key="index"
+  ref="panInputs"
+  type="text"
+  inputmode="text"
+  maxlength="1"
+  class="custom-pan-input w-full dark:text-slate-100"
+  v-model="pan[index]"
+  @input="onInput(index, $event)"
+  @keydown.backspace="onBackspace(index)"
+  @paste="onPaste"
+/>
+
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 
 const props = defineProps(['modelValue']);
 const emit = defineEmits(['update:modelValue']);
 
-const pan = ref((props.modelValue || '').toUpperCase());
+const length = 10;
+const pan = ref(Array(length).fill(''));
+const panInputs = ref([]);
 
-watch(pan, (newVal) => {
-  emit('update:modelValue', newVal);
+// Sync with prop
+watch(() => props.modelValue, (val) => {
+  if (val && val.length === length) {
+    pan.value = val.split('');
+  }
 });
 
-const onInput = (event) => {
-  const rawValue = event.target.value;
-  const cleaned = rawValue
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '')
-    .slice(0, 10);
-  pan.value = cleaned;
-  event.target.value = cleaned;
-};
+// Emit when pan changes
+watch(
+  pan,
+  (val) => {
+    emit('update:modelValue', val.join(''));
+  },
+  { deep: true }
+);
+
+function onInput(index, event) {
+  let value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  pan.value[index] = value;
+
+  if (value && index < length - 1) {
+    nextTick(() => panInputs.value[index + 1]?.focus());
+  }
+}
+
+function onPaste(event) {
+  const pastedData = event.clipboardData.getData('Text').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (pastedData.length === length) {
+    for (let i = 0; i < length; i++) {
+      pan.value[i] = pastedData[i];
+    }
+    nextTick(() => {
+      panInputs.value[length - 1]?.blur();
+    });
+    event.preventDefault(); // Prevent default paste
+  }
+}
+
+function onBackspace(index) {
+  if (pan.value[index] === '' && index > 0) {
+    nextTick(() => panInputs.value[index - 1]?.focus());
+  }
+}
 </script>
 
 <style scoped>
-.input-wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  background-color: #e0e0e0;
-  border-radius: 10px;
-  padding: -1px 0.10px;
-  overflow: hidden;
-}
-
-.label-text {
-  font-size: 16px;
-  color: #333;
-  margin-bottom: 0.25rem;
-  user-select: none;
-}
-
-.prime-input {
-  border: none;
+.custom-pan-input {
+  height: 48px;
+  font-size: 24px;
+  appearance: none;
+  text-align: center;
+  transition: all 0.2s;
+  border-radius: 0;
+  border: 1px solid rgb(184, 183, 183);
   background: transparent;
+  outline-offset: -2px;
+  outline-color: transparent;
+  transition: outline-color 0.3s;
+}
+
+.custom-pan-input:focus {
   outline: none;
-  font-size: 16px;
-  color: #555;
-  padding: 8px 0;
-  padding-left: 10px;
-  z-index: 1;
-  box-shadow: none !important;
 }
 
-.prime-input::placeholder {
-  color: #87909b;
+.custom-pan-input:first-child {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
 }
 
-.bottom-border {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 3px;
-  width: 0;
-  background-color: #007bff;
-  border-radius: 10px;
-  transition: width 0.4s ease-out, height 0.3s ease-in;
-  z-index: 0;
-}
-
-.input-wrapper:focus-within .bottom-border {
-  width: 100%;
-  height: 4px;
+.custom-pan-input:last-child {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 </style>

@@ -78,13 +78,14 @@
 
         </div>
 
-        
+
 
     </div>
 
     <div v-if="loading" class="flex justify-center items-center  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
-    :style="{ height: deviceHeight * 0.92 + 'px' }">
-    <ProgressSpinner />
+        :style="{ height: deviceHeight * 0.92 + 'px' }">
+        <ProgressSpinner />
+      
     </div>
 </template>
 <script setup>
@@ -92,6 +93,8 @@
 
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { parseString } from 'xml2js';
+
 const route = useRoute()
 const { url } = useUrlw3();
 
@@ -100,17 +103,11 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Start e-KYC");
 
-const content=ref(true)
-const loading=ref(false)
+const content = ref(true)
+const loading = ref(false)
 
-const props = defineProps({
-  data: {
-    type: Object,
-    default: () => ({}),
-  },
-});
 
-console.log("myvaldata", props.data)
+
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
@@ -148,11 +145,11 @@ const back = () => {
 
 const digilocker_create = async () => {
     const apiurl = url.value + 'digilocker';
-    //  const url1 = 'http://localhost:3000/main?form=ekyc';
-    //  const url2 = 'http://localhost:3000/main??form=ekyc';
-    
-   const url1 = 'https://nkcynewone.vercel.app/main?form=ekyc';
-    const url2 = 'https://nkcynewone.vercel.app/main??form=ekyc';
+    const url1 = 'http://localhost:3000/main?form=ekyc';
+    const url2 = 'http://localhost:3000/main??form=ekyc';
+
+    //    const url1 = 'https://nkcynewone.vercel.app/main?form=ekyc';
+    //     const url2 = 'https://nkcynewone.vercel.app/main??form=ekyc';
 
     const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
     const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
@@ -191,7 +188,7 @@ const digilocker_create = async () => {
 
         const data = await response.json();
         if (data.status == 'ok') {
-        
+
             const url = data.metaData.result.url
             window.location.href = url;
         }
@@ -236,123 +233,193 @@ const digilocker_requestcheck = async () => {
             body: formData
         });
 
-       
+
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         else {
             const successdata = await response.json()
 
-            if(successdata.metaData.result.files[0].doctype){
-                const files_id=[]
+            if (successdata.metaData.result.files[0].doctype) {
+                const files_id = []
                 successdata.metaData.result.files.forEach(element => {
-                  files_id.push(element.id)
+                    files_id.push(element.id)
                 });
-                
-                 digilockerGetFiles(files_id)
+
+                digilockerGetFiles(files_id)
             }
-        } 
-       
+        }
+
     }
 
     catch (error) {
-            console.error('Error:', error.message);
-            emit('updateDiv', 'ekyc');
-            content.value = true;
-            loading.value = false;
-        }
+        console.error('Error:', error.message);
+        emit('updateDiv', 'ekyc');
+        content.value = true;
+        loading.value = false;
+    }
 
 }
 
 const digilockerGetFiles = async (id) => {
-   
-   const apiurl = url.value + 'digilocker';
-   const requestqueryvalue = route.query.requestId;
 
-   const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
-   const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
+    const apiurl = url.value + 'digilocker';
+    const requestqueryvalue = route.query.requestId;
 
-   const redirecturl = JSON.stringify({
-       task: "getFiles",
-       essentials: {
-           requestId: requestqueryvalue,
-           fileIds: id
+    const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
+    const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
 
-       }
-   });
+    const redirecturl = JSON.stringify({
+        task: "getFiles",
+        essentials: {
+            requestId: requestqueryvalue,
+            fileIds: id
 
-   const formData = new FormData();
+        }
+    });
 
-   formData.append('brokerCode', 'UAT-KYC');
-   formData.append('appId', '1216');
-   formData.append('clientCode', 'gow001');
-   formData.append('rawPostData', redirecturl);
+    const formData = new FormData();
 
-   try {
-       const response = await fetch(apiurl, {
-           method: 'POST',
-           headers: {
-               'Authorization': authorization,
-               'Cookie': cookies
-           },
-           body: formData
-       });
+    formData.append('brokerCode', 'UAT-KYC');
+    formData.append('appId', '1216');
+    formData.append('clientCode', 'gow001');
+    formData.append('rawPostData', redirecturl);
 
-       if (!response.ok) {
-           throw new Error(`HTTP error! Status: ${response.status}`);
-       }
-       else {
-           const data = await response.json()
-           if(data.metaData.result.files[0].file){
-            emit('updateDiv', 'pandetails', data);
-           }
-         
-       } 
-      
-   }
+    try {
+        const response = await fetch(apiurl, {
+            method: 'POST',
+            headers: {
+                'Authorization': authorization,
+                'Cookie': cookies
+            },
+            body: formData
+        });
 
-   catch (error) {
-           console.error('Error:', error.message);
-       }
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        else {
+            const data = await response.json()
+            if (data.metaData.result.files[0].file) {
+                localStorage.setItem('digilockerstatus',JSON.stringify(data))
+                const xmldata = data.metaData.result.files[1].file.xml
+
+                console.log(xmldata)
+
+                try {
+                    const response = await fetch(xmldata);
+                    const xmlText = await response.text();
+                    parseString(xmlText, { explicitArray: false }, (err, aadharData) => {
+                        if (err) {
+                            console.error('Error parsing Aadhaar XML:', err);
+                        } else {
+                            // Assuming UIDAI address is in aadharData.PrintLetterBarcodeData.$
+                            const addr = aadharData
+                            console.log(addr)
+                            if (addr) {
+                                
+                               const panno=addr.Certificate.$.number
+                               panverification(panno)
+                               
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error fetching or parsing Aadhaar XML:', error);
+                }
+              
+               
+            }
+
+        }
+
+    }
+
+    catch (error) {
+        console.error('Error:', error.message);
+    }
 
 }
 
 
- const handleButtonClick = () => {
-        const button = rippleBtn.value
-        const circle = document.createElement('span')
-        circle.classList.add('ripple')
+const panverification = async (panval) => {
+    const apiurl = url.value + 'pan'
+    const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
 
-        const rect = button.$el.getBoundingClientRect()
-        const x = event.clientX - rect.left
-        const y = event.clientY - rect.top
+    const localvalue = localStorage.getItem('krastatus')
+    const localobj = localvalue ? JSON.parse(localvalue) : {};
 
-        circle.style.left = `${x}px`
-        circle.style.top = `${y}px`
+    const formData = new FormData()
 
-        button.$el.appendChild(circle)
+    formData.append('panNo', localobj?.KYC_DATA?.APP_PAN_NO || panval)
+    formData.append('panName', 'VIJAY')
+    formData.append('brokerCode', 'UAT-KYC')
+    formData.append('appId', '1216')
+    formData.append('clientCode', 'W3VJ1')
+    try {
+        const response = await fetch(apiurl, {
+            method: 'POST',
+            headers: {
+                'Authorization': authorization,
+            },
+            body: formData
 
-        setTimeout(() => {
-            circle.remove()
-            
-            if(props?.data?.KYC_DATA?.APP_ERROR_DESC==='PAN NOT FOUND'){
-                digilocker_create()
+        })
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        else {
+            const data = await response.json()
+            if (data.metaData.status == 'VALID') {
+                emit('updateDiv', 'parmanentaddress',);
             }
-            else{
-               // emit('updateDiv', 'pandetails', route.query.requestId);
-               emit('updateDiv', 'pandetails', props.data);
-            }
-           
-
-          
-            
-        }, 600)
-    };
 
 
+        }
+    } catch (error) {
+        console.error(error.message)
+    }
+}
 
 
-   
+const handleButtonClick = () => {
+    const button = rippleBtn.value
+    const circle = document.createElement('span')
+    circle.classList.add('ripple')
+
+    const rect = button.$el.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+
+    circle.style.left = `${x}px`
+    circle.style.top = `${y}px`
+
+    button.$el.appendChild(circle)
+
+    setTimeout(() => {
+        circle.remove()
+
+        const localvalue = localStorage.getItem('krastatus')
+        const localobj = localvalue ? JSON.parse(localvalue) : {};
+        console.log(localobj)
+
+        if (localobj?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
+            digilocker_create()
+        }
+        else {
+            panverification()
+        }
+
+
+
+
+    }, 600)
+};
+
+
+
+
+
 
 
 

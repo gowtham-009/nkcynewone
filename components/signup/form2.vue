@@ -94,21 +94,23 @@ let timer = null;
 const errormsg=ref(false)
 const errormobile=ref('')
 const p_otp=ref('')
-const props = defineProps({
-    data: {
-        type: Object,
-        default: () => ({}),
-    },
-});
-const mobilepropsdata = props?.data?.KYC_DATA?.APP_MOB_NO || '';
-const cleanedMobile = mobilepropsdata.startsWith("91")
-  ? mobilepropsdata.slice(2)
-  : mobilepropsdata;
-const mobileNo = ref(cleanedMobile);
-const emailid=props?.data|| ''
+const mobileNo=ref('')
+
+
+const localvalue=localStorage.getItem('krastatus')
+  const localobj = localvalue ? JSON.parse(localvalue) : {};
+
+  const mobilepropsdata = localobj?.KYC_DATA?.APP_MOB_NO || '';
+
+ const cleanedMobile = mobilepropsdata.startsWith("91")
+  ? mobilepropsdata.slice(2)  : mobilepropsdata;
+  console.log("lkfvmqelk",mobilepropsdata)
+ mobileNo.value = cleanedMobile;
 
 
 onMounted(() => {
+
+  
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
@@ -143,7 +145,7 @@ const randomtoken = () => {
 
 const isSending = ref(false);
 const sendmobileotp = async () => {
-  isSending.value = true; // Disable button
+  isSending.value = true; 
 
   const apiurl = otpourl.value + 'sms-api/v1/send_sms';
   phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
@@ -182,10 +184,7 @@ const sendmobileotp = async () => {
     errormsg.value=true
     errormobile.value='Invalid mobile number'
    
-  } finally {
-   
-
-  }
+  } 
 };
 
 
@@ -215,7 +214,7 @@ const mobile_signup=()=>{
 
         const cache = await caches.open("my-cache");
         await cache.put("/my-value", response);
-        emit('updateDiv', 'div3', emailid ||'');
+        emit('updateDiv', 'div3');
       }
       else{
         otperror.value=true

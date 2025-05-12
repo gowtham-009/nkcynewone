@@ -141,6 +141,8 @@ const kraaddresssubmission = async () => {
 
     const data = await response.json();
     if (data) {
+     
+      localStorage.setItem('krastatus',JSON.stringify(data))
       return data; // ✅ Return the data, not just true
     }
   } catch (error) {
@@ -167,7 +169,8 @@ const handleButtonClick = async () => {
 
     // Wait for the animation to complete before emitting
     setTimeout(() => {
-      emit('updateDiv', 'div2', data || '');  // ✅ Send the data here
+      
+      emit('updateDiv', 'div2');  // ✅ Send the data here
     }, 400);
   }
 };

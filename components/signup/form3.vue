@@ -75,7 +75,7 @@ import emailOTP from '~/components/forminputs/emailotp.vue'
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import EmailInput from '~/components/forminputs/emailinput.vue';
-import CryptoJS from 'crypto-js'
+
 
 const { ourl } = useUrl();
 const deviceHeight = ref(0);
@@ -94,26 +94,15 @@ const erroremail=ref(false)
 const emailerror=ref('')
 let timer = null;
 const e_otp = ref('')
+const localvalue=localStorage.getItem('krastatus')
+  const localobj = localvalue ? JSON.parse(localvalue) : {};
+  const emailpropsdata = localobj?.KYC_DATA?.APP_EMAIL || '';
+  const emailid = ref(emailpropsdata);
 
-const props = defineProps({
-  data: {
-    type: Object,
-    default: () => ({}),
-  },
-});
-
-// const randomtoken = () => {
-//   let token = ''
-//   for (var i = 0; i <= 30; i++) {
-//     token += Math.floor(Math.random() * 10)
-//   }
-//   return token
-// }
 const router = useRouter()
 
 const isSending = ref(false);
-const emailpropsdata = props?.data?.KYC_DATA?.APP_EMAIL || '';
-const emailid = ref(emailpropsdata);
+
 
 // Function to validate email format
 const isValidEmail = computed(() => {
@@ -297,22 +286,10 @@ const handleButtonClick = () => {
     if (e_otp.value.length === 5) {
      if(e_otp.value=='78956'){
       try {
-        const secretKey = 'kradatas@123'; // Use your secure key
-        const encryptedData = CryptoJS.AES.encrypt(JSON.stringify(props.data), secretKey).toString();
-        const encodedEncryptedData = encodeURIComponent(encryptedData);
-
-        // const tokenval = randomtoken();
-        // const response = new Response(JSON.stringify({ value: tokenval }));
-
-        // const cache = await caches.open("my-cache");
-        // await cache.put("/my-value", response);
-
-        // Only route to /main after cache is successfully written
+       
         router.push({
           path: '/main',
-          query: {
-            data: encodedEncryptedData
-          }
+         
         });
       } catch (error) {
         console.error("Failed to cache token or route:", error);
