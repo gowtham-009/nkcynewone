@@ -226,7 +226,7 @@ const emailchecker = async (messageId) => {
 
   } catch (error) {
     console.error('Fetch error:', error.message);
-    // Optionally retry on error
+
     setTimeout(() => {
       emailchecker(messageId);
     }, 5000);

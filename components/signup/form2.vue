@@ -46,9 +46,6 @@
                 </div>
             </div>
           </div>
-
-
-
             </div>
           
 
@@ -239,6 +236,11 @@ watch(mobileNo, (newval)=>{
   if(newval.length===10){
     errormsg.value=false
     isSending.value = false;
+   
+  }
+  else{
+  
+    errormsg.value=false
   }
 })
 watch(p_otp,(newval)=>{
