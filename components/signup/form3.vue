@@ -69,7 +69,7 @@
 
 <script setup>
 import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
-import emailOTP from '~/components/forminputs/otpinput.vue'
+import emailOTP from '~/components/forminputs/emailotp.vue'
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import EmailInput from '~/components/forminputs/emailinput.vue';

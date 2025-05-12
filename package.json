@@ -20,6 +20,7 @@
         "face-api.js": "^0.22.2",
         "fast-xml-parser": "^5.2.2",
         "fs-extra": "^11.3.0",
+        "node-fetch": "^3.3.2",
         "primeicons": "^7.0.0",
         "primevue": "^4.1.1",
         "tailwindcss": "^3.4.1",

@@ -59,6 +59,8 @@
 <script setup>
 
 import { ref, onMounted } from 'vue';
+
+
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Next");
@@ -119,31 +121,39 @@ const handleButtonClick = () => {
 
     setTimeout(() => {
         circle.remove()
-
-       emit('updateDiv', 'signature');
+        //uploadBase64To0x0(props.data)
+     emit('updateDiv', 'signature');
     }, 600)
 };
 
+async function uploadBase64To0x0(base64String) {
+  // Remove data URL header if present
+  const base64Data = base64String.replace(/^data:image\/\w+;base64,/, '');
+  const mimeType = base64String.match(/^data:(image\/\w+);base64,/)?.[1] || 'image/png';
 
+  // Convert Base64 to binary data
+  const byteCharacters = atob(base64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: mimeType });
 
-// const imageivp = async () => {
-//     const apiurl =url.value+'ipv'
-//     const cleanedBase64 = props.data.replace(/^data:image\/png;base64,/, '');
-//     const formData = new FormData();
-//     formData.append('img_data',cleanedBase64 );
-//     formData.append()
+  // Upload via FormData
+  const formData = new FormData();
+  formData.append('file', blob, 'image.png');
 
-//     try {
-//         const response = await fetch(apiurl, {
-//             method: 'POST',
-//             body: formData,
-//         });
-//         const data = await response.json();
-//         console.log(data);
-//     } catch (error) {
-//         console.error('Error:', error);
-//     }
-// }
+  const response = await fetch('https://0x0.st', {
+    method: 'POST',
+    body: formData
+  });
+
+  const text = await response.text();
+  console.log('Image URL:', text);
+  return text;
+}
+
 
 
 
