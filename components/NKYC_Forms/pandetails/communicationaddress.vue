@@ -85,7 +85,7 @@ const setPermanentAddress = async () => {
   const localobjdigi = localvaluedigi ? JSON.parse(localvaluedigi) : null;
 
   if (localobjdigi && localobjdigi.status === 'digilocker') {
-    alert('hi')
+   
     address.value = localobjdigi.address || '';
     state.value = localobjdigi.state || '';
     city.value = localobjdigi.city || '';
