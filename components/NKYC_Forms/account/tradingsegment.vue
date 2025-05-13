@@ -64,7 +64,10 @@ const deviceHeight = ref(0);
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
-const selected = ref([]); // Allow multiple selections
+ const localvalue = localStorage.getItem('tradingsegment');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
+
+const selected = ref(localobj||[]); 
 
 const options = [
     { label: "NSE CASH", value: "NSE CASH" },
@@ -131,6 +134,8 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+    const tradingsegment=selected.value
+    localStorage.setItem('tradingsegment', JSON.stringify(tradingsegment))
     emit('updateDiv', 'brokerage');
   }, 600)
 }; 

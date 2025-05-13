@@ -83,13 +83,15 @@ const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
+   
+ const localvalue = localStorage.getItem('bank');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
 
-
-const bankname = ref('');
-const accno = ref('');
-const ifsc = ref('');
-const micr = ref('');
-const address = ref('');
+const bankname = ref(localobj[0].bankname || "");
+const accno = ref(localobj[0].accno || "");
+const ifsc = ref(localobj[0].ifsc || "");
+const micr = ref(localobj[0].micr || "");
+const address = ref(localobj[0].address || "");
 
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
@@ -213,7 +215,9 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-    emit('updateDiv', 'bank4', bankdetails);
+    
+    localStorage.setItem('bank', JSON.stringify(bankdetails))
+    emit('updateDiv', 'bank4');
 }, 600)
 };
  

@@ -58,8 +58,10 @@ const emit=defineEmits(['updateDiv']);
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
+ const localvalue = localStorage.getItem('occupation');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
 // Marital Status
-const selected = ref(""); 
+const selected = ref(localobj.occupation || "");  
 const options = [
     { label: "Agriculturist ", value: "Agriculturist " },
     { label: "Business", value: "Business" },
@@ -123,6 +125,12 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+     const occupation={
+        occupation:selected.value,
+     
+        
+    }
+    localStorage.setItem('occupation', JSON.stringify(occupation))
     emit('updateDiv', 'income');
   }, 600)
 }; 

@@ -105,6 +105,7 @@ const activebox = ref('marriedbox');
 const emit = defineEmits(['updateDiv']);
  const localvalue = localStorage.getItem('marital');
 const localobj = localvalue ? JSON.parse(localvalue) : {};
+
 // gender status
 const selectedgender = ref(localobj.gender || ""); 
 const selectoptions = [

@@ -60,9 +60,10 @@ const deviceHeight = ref(0);
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
-
-const father = ref('');
-const mother = ref('');
+ const localvalue = localStorage.getItem('client');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
+const father = ref(localobj.father || ""); 
+const mother = ref(localobj.mother || ""); 
 
 
 
@@ -91,6 +92,12 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+      const clientinfo={
+        father:father.value,
+        mother:mother.value
+    }
+
+    localStorage.setItem('client', JSON.stringify(clientinfo))
     emit('updateDiv', 'qualification'); 
 }, 600)
 };

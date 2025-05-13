@@ -76,19 +76,17 @@
   import { ref, onMounted, defineProps } from 'vue';
   
   const emit = defineEmits(['updateDiv']);
+   const localvalue = localStorage.getItem('bank');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
+
+const bankname = ref(localobj[0].bankname || "");
+const accno = ref(localobj[0].accno || "");
+const ifsccode = ref(localobj[0].ifsc || "");
+const MICR = ref(localobj[0].micr || "");
+const address = ref(localobj[0].address || "");
   
-  const props = defineProps({
-    data: {
-      type: Array,
-      required: true,
-    },
-  });
   
-  const bankname = ref(props.data?.[0]?.bankname || '');
-  const accno = ref(props.data?.[0]?.accno || '');
-  const ifsccode = ref(props.data?.[0]?.ifsc || '');
-  const MICR = ref(props.data?.[0]?.micr || '');
-  const address = ref(props.data?.[0]?.address || '');
+ 
   const buttonText = ref('Continue');
   
   const rippleBtn = ref(null);

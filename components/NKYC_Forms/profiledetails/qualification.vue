@@ -65,10 +65,11 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const activebox = ref('marriedbox');
 const emit = defineEmits(['updateDiv']);
-
+ const localvalue = localStorage.getItem('qualification');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
 
 // qualification Status
-const selected = ref(""); 
+const selected = ref(localobj.qualification || ""); 
 const options = [
     { label: "Illiterate", value: "Illiterate" },
     { label: "Under high school", value: "Under high school" },
@@ -128,6 +129,12 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+      const qualification={
+        qualification:selected.value,
+      
+        
+    }
+    localStorage.setItem('qualification', JSON.stringify(qualification))
     emit('updateDiv', 'tradingexperience');  }, 600)
 };
     

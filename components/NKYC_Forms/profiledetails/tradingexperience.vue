@@ -64,8 +64,12 @@ const activebox = ref('marriedbox');
 const emit = defineEmits(['updateDiv']);
 const rippleBtnback = ref(null)
 
+
+ const localvalue = localStorage.getItem('trading');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
+
 // qualification Status
-const selected = ref(""); 
+const selected = ref(localobj.trading || ""); 
 const options = [
     { label: "New to trading", value: "New to trading" },
     { label: "1-2 years of experience", value: "1-2 years of experience" },
@@ -103,7 +107,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
-    emit('updateDiv', 'clientinfo');
+    emit('updateDiv', 'qualification');
   }, 600)
    
 };
@@ -124,6 +128,12 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+     const trading={
+        trading:selected.value,
+      
+        
+    }
+    localStorage.setItem('trading', JSON.stringify(trading))
     emit('updateDiv', 'occupation');
 }, 600)
 };

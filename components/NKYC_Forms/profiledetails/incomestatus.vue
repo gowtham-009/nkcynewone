@@ -59,7 +59,9 @@ const buttonText = ref("Next");
 const rippleBtn = ref(null);
 
 const rippleBtnback = ref(null)
-const selected = ref(""); 
+ const localvalue = localStorage.getItem('income');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
+const selected =ref(localobj.income || ""); 
 const options = [
     { label: "Below 1 lakh", value: "Below 1 lakh" },
     { label: "1 lakh to 5 lakhs", value: "1 lakh to 5 lakhs" },
@@ -71,9 +73,8 @@ const options = [
 
 const selectMaritalStatus = (value) => {
     selected.value = value;
-    
-   
 };
+
 const back = () => {
     const button = rippleBtnback.value
   const circle = document.createElement('span')
@@ -119,6 +120,12 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+     const income={
+        income:selected.value,
+       
+        
+    }
+    localStorage.setItem('income', JSON.stringify(income))
     emit('updateDiv', 'nominee');
   }, 600)
 };   
