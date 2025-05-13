@@ -82,9 +82,7 @@
   <div v-if="currentForm === 'uploadbank'">
     <UPLOADBANK :data="data"  @updateDiv="handleUpdateDiv" />
   </div>
-  <div v-if="currentForm === 'uploadsign'">
-    <UPLOADSIGN :data="data"  @updateDiv="handleUpdateDiv" />
-  </div>
+
 
   <div v-if="currentForm === 'photosign1'">
     <PHOTOSIGN1  @updateDiv="handleUpdateDiv" />
@@ -144,7 +142,7 @@ import BROKERAGE from '~/components/NKYC_Forms/account/brokerage.vue'
 import UPLOADPROOF from '~/components/NKYC_Forms/account/uploadpan.vue'
 import UPLOADINCOME from '~/components/NKYC_Forms/account/uploadincome.vue'
 import UPLOADBANK from '~/components/NKYC_Forms/account/uploadbank.vue'
-import UPLOADSIGN from '~/components/NKYC_Forms/account/uploadsign.vue'
+
 
 import PHOTOSIGN1 from '~/components/NKYC_Forms/photo&sign/photosign.vue'
 import TAKEPHOTO from '~/components/NKYC_Forms/photo&sign/takephoto.vue'

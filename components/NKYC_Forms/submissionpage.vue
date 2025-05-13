@@ -173,7 +173,7 @@ function back() {
         emit('updateDiv', 'bank4')
     }
     else if (props.data == 4) {
-        emit('updateDiv', 'uploadsign')
+        emit('updateDiv', 'uploadincome')
     }
     else if (props.data == 5) {
         emit('updateDiv', 'additionalinformation')

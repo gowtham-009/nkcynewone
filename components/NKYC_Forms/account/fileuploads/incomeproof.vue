@@ -1,54 +1,51 @@
 <template>
   <div class="space-y-4">
-    <!-- Custom File Input Styled with Tailwind -->
-    <div>
-      <a v-if="pdfUrl" :href="pdfUrl" target="_blank" rel="noopener noreferrer" class="text-blue-500 text-center underline">
-        Open PDF in New Tab
-      </a>
-      <input
-        type="file"
-        @change="onFileSelect"
-        accept=".pdf"
-        class="hidden"
-        ref="fileInput"
-      />
-      <Button
-        label="Select PDF"
-        icon="pi pi-plus"
-        class="p-button-outlined p-button-secondary w-full"
-        @click="triggerFileInput"
-      />
-    </div>
+    <a
+      v-if="pdfUrl"
+      :href="pdfUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-blue-500 text-center underline block mb-2"
+    >
+      Open PDF in New Tab
+    </a>
+    <input
+      type="file"
+      @change="onFileSelect"
+      accept=".pdf"
+      class="hidden"
+      ref="fileInput"
+    />
+    <Button
+      label="Select PDF"
+      icon="pi pi-plus"
+      class="p-button-outlined p-button-secondary w-full"
+      @click="triggerFileInput"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue'
+import { ref, defineEmits, defineProps, watch } from 'vue'
 
-const pdfUrl = ref(null)
+const emit = defineEmits(['update:pdfUrl'])
+const props = defineProps({ pdfUrl: String })
+
 const fileInput = ref(null)
+const pdfUrl = ref(props.pdfUrl)
 
-const emit = defineEmits()
+watch(pdfUrl, (val) => emit('update:pdfUrl', val))
 
 const onFileSelect = (event) => {
   const file = event.target.files[0]
   if (file && file.type === 'application/pdf') {
-    // Create a temporary URL for the selected PDF
     pdfUrl.value = URL.createObjectURL(file)
-    // Emit the value of pdfUrl to the parent
-    emit('update:pdfUrl', pdfUrl.value)
   } else {
     alert('Please select a valid PDF file.')
   }
 }
 
-// Trigger the file input when the button is clicked
 const triggerFileInput = () => {
   fileInput.value.click()
 }
 </script>
-<style>
-.bg{
-  background-color: rgb(246, 246, 246) !important;
-}
-</style>

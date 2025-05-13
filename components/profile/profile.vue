@@ -68,6 +68,12 @@ async function logout() {
        localStorage.removeItem('emailid')
        localStorage.removeItem('marital')
        localStorage.removeItem('client')
+       localStorage.removeItem('income')
+       localStorage.removeItem('qualification')
+       localStorage.removeItem('occupation')
+       localStorage.removeItem('bank')
+       localStorage.removeItem('trading')
+       localStorage.removeItem('tradingsegment')
     } else {
       console.log("Cache entry not found or couldn't be removed.");
     

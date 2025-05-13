@@ -114,7 +114,7 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute();
 
-
+const { url } = useUrlw3();
 
 
 const emit = defineEmits(['updateDiv']);
@@ -130,7 +130,45 @@ onMounted(() => {
     });
 });
 
+const panverification = async (panval) => {
+   
+    const apiurl = url.value + 'pan'
+    const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
 
+    const localvalue = localStorage.getItem('krastatus')
+    const localobj = localvalue ? JSON.parse(localvalue) : {};
+
+    const formData = new FormData()
+
+    formData.append('panNo', localobj?.KYC_DATA?.APP_PAN_NO )
+    formData.append('panName', 'VIJAY')
+    formData.append('brokerCode', 'UAT-KYC')
+    formData.append('appId', '1216')
+    formData.append('clientCode', 'W3VJ1')
+    try {
+        const response = await fetch(apiurl, {
+            method: 'POST',
+            headers: {
+                'Authorization': authorization,
+            },
+            body: formData
+
+        })
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        else {
+            const data = await response.json()
+            if (data.metaData.status == 'VALID') {
+               emit('updateDiv', 'parmanentaddress',);
+            }
+
+
+        }
+    } catch (error) {
+        console.error(error.message)
+    }
+}
 
 const handleButtonClick = () => {
 
@@ -149,7 +187,17 @@ const handleButtonClick = () => {
 
     setTimeout(() => {
         circle.remove()
-        emit('updateDiv', 'ekyc');
+         const localvalue = localStorage.getItem('krastatus')
+        const localobj = localvalue ? JSON.parse(localvalue) : {};
+        if (localobj?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
+             emit('updateDiv', 'ekyc');
+        }
+        else {
+            panverification()
+        }
+
+
+       
     }, 600)
 };
 
