@@ -65,12 +65,7 @@
         </Button>
           </div>
         </div>
-
-
-    </div>
-
-
-   
+    </div>   
 </template>
 
 <script setup>
@@ -104,13 +99,17 @@ const localvalue=localStorage.getItem('krastatus')
 
  const cleanedMobile = mobilepropsdata.startsWith("91")
   ? mobilepropsdata.slice(2)  : mobilepropsdata;
-  console.log("lkfvmqelk",mobilepropsdata)
- mobileNo.value = cleanedMobile;
 
+ mobileNo.value = cleanedMobile  ;
+
+
+ if(localobj?.KYC_DATA?.APP_ERROR_DESC==='PAN NOT FOUND'){
+  mobileNo.value = localStorage.getItem('mobileNo') || ''
+ }
 
 onMounted(() => {
 
-  
+ 
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
@@ -135,13 +134,7 @@ onUnmounted(() => {
 
 
 
-const randomtoken = () => {
-  let token = ''
-  for (var i = 0; i <= 30; i++) {
-    token += Math.floor(Math.random() * 10)
-  }
-  return token
-}
+
 
 const isSending = ref(false);
 const sendmobileotp = async () => {
@@ -209,11 +202,7 @@ const mobile_signup=()=>{
      
       localStorage.setItem('mobileNo', mobileNo.value);
       if(p_otp.value=='7895'){
-        const tokenval = randomtoken();
-        const response = new Response(JSON.stringify({ value: tokenval }));
-
-        const cache = await caches.open("my-cache");
-        await cache.put("/my-value", response);
+     
         emit('updateDiv', 'div3');
       }
       else{

@@ -99,6 +99,11 @@ const localvalue=localStorage.getItem('krastatus')
   const emailpropsdata = localobj?.KYC_DATA?.APP_EMAIL || '';
   const emailid = ref(emailpropsdata);
 
+   if(localobj?.KYC_DATA?.APP_ERROR_DESC==='PAN NOT FOUND'){
+  emailid.value = localStorage.getItem('emailid') || ''
+ }
+
+
 const router = useRouter()
 
 const isSending = ref(false);
@@ -203,6 +208,7 @@ const sendemailotp = async () => {
 }
 
 
+
 const emailchecker = async (messageId) => {
   const apiUrl = `${ourl.value}check-email-status.php?messageId=${messageId}`;
 
@@ -286,7 +292,9 @@ const handleButtonClick = () => {
     if (e_otp.value.length === 5) {
      if(e_otp.value=='78956'){
       try {
-       
+       localStorage.setItem('emailid', emailid.value)
+
+      
         router.push({
           path: '/main',
          

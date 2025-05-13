@@ -26,7 +26,7 @@ const currentForm = ref('div1');
 const Authenticated=ref(false)
 const formHistory = ref(['div1']); // History stack to track form flow
 const route = useRoute();
-
+const activetab=[]
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value;
   formHistory.value.push(value); // Push to history stack

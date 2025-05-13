@@ -103,8 +103,10 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const activebox = ref('marriedbox');
 const emit = defineEmits(['updateDiv']);
+ const localvalue = localStorage.getItem('marital');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
 // gender status
-const selectedgender = ref(""); 
+const selectedgender = ref(localobj.gender || ""); 
 const selectoptions = [
     { label: "Male", value: "Male" },
     { label: "Female", value: "Female" },
@@ -116,7 +118,7 @@ const selectGenderStatus = (value) => {
   
 };
 // Marital Status
-const selected = ref(""); 
+const selected =ref(localobj.marriagestatus || ""); 
 const options = [
     { label: "Unmarried", value: "unmarried" },
     { label: "Married", value: "married" },
@@ -127,7 +129,7 @@ const selectMaritalStatus = (value) => {
 
 };
 
-const clientselected = ref(""); 
+const clientselected = ref(localobj.psp || ""); 
 const clientoptions = [
     { label: "No, I am Not", value: "No, I am Not" },
     { label: "Yes, I am", value: "Yes, I am" },
@@ -181,6 +183,13 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+    const maritalobj={
+        marriagestatus:selected.value,
+        gender:selectedgender.value,
+        psp:clientselected.value
+        
+    }
+    localStorage.setItem('marital', JSON.stringify(maritalobj))
     emit('updateDiv', 'clientinfo');
 }, 600)
 };

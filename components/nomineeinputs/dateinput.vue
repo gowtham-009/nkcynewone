@@ -16,13 +16,5 @@
   </script>
   
   <style >
-  .p-datepicker-input.p-inputtext.p-variant-filled{
-  background-color: #d6d6d6 !important;
  
-}
-
-.p-datepicker-input.p-inputtext{
-  outline: none !important;
-  border: 1px solid gray !important;
-}
   </style>

@@ -22,13 +22,17 @@
       :style="{ height: box2Height + 'px' }"
     >
     <div class="w-full mt-2 px-2 flex flex-col justify-between">
+      <span class="font-medium text-gray-500 text-lg">Identity verification</span>
+      <p class="text-3xl font-semibold">Fill Your PAN Details</p>
+            <span class="font-medium text-gray-500 text-lg">This is required as mandated by regulator for verification purposes. </span>
+
         <div class="w-full mt-4">
           <PAN v-model="panvalue"/>
-          <span class="text-red-500" v-if="panerror">Please enter a valid PAN no</span>
+          <span class="text-red-500" v-if="panerror">{{ error }}</span>
         </div>
 
         <div class="w-full mt-4" v-if="dobbox">
-         <DOB v-model="dobvalue" />
+         <DOB v-model="visibleDate" />
         </div>
 
        
@@ -36,7 +40,7 @@
       <div class="w-full">
         <Button
   ref="buttonRef"
-  :disabled="!panvalue || !dobvalue"
+  :disabled="!panvalue || !visibleDate"
   @click="handleButtonClick"
   class="primary_color w-full text-white py-4 text-xl border-0 wave-btn"
 >
@@ -61,17 +65,31 @@ const { ourl } = useUrl();
 const panerror = ref(false);
 const panvalue = ref('');
 const dobbox = ref(false);
-const dobvalue = ref('');
+
 const box1Height = ref(0);
 const box2Height = ref(0);
 const showBox2 = ref(false);
+const error=ref('')
 
 const buttonRef = ref(null);
 const waveRef = ref(null);
 
 const emit = defineEmits(['updateDiv']);
 
+
+const visibleDate = ref('')
+
+
+
 const buttonText = ref("Continue");
+
+const randomtoken = () => {
+  let token = ''
+  for (var i = 0; i <= 30; i++) {
+    token += Math.floor(Math.random() * 10)
+  }
+  return token
+}
 
 watch(panvalue, (newVal) => {
   const pattern = /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/;
@@ -81,31 +99,32 @@ watch(panvalue, (newVal) => {
     dobbox.value = true;
   } else {
     panerror.value = true; 
+    error.value='Please enter a valid PAN no'
   }
 });
 
-
-
-
-
-
-
 onMounted(() => {
   const fullHeight = window.innerHeight;
+ const localvalue = localStorage.getItem('page1');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
 
-  // Initial state: full height to box 1, box 2 hidden
+panvalue.value = localobj.panno || '';
+visibleDate.value = localobj.dob || ''; // ✅ sets the visibleDate from localStorage
+
+
+
+ 
+
   box1Height.value = fullHeight;
   box2Height.value = 0;
   showBox2.value = false;
 
-  // After 2 seconds: show box 2 and animate heights
   setTimeout(() => {
     showBox2.value = true;
     box1Height.value = fullHeight * 0.3;
     box2Height.value = fullHeight * 0.7;
   }, 500);
 
-  // Optional: handle resize
   window.addEventListener('resize', () => {
     const updatedHeight = window.innerHeight;
     if (!showBox2.value) {
@@ -118,18 +137,18 @@ onMounted(() => {
   });
 });
 
+
+
 const kraaddresssubmission = async () => {
-  const date = new Date(dobvalue.value);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  const formattedDate = `${day}/${month}/${year}`;
+
 
   const apiurl = ourl.value + 'get-kra-data.php';
+
   const formData = new FormData();
 
   formData.append('pan', panvalue.value);
-  formData.append('dob', formattedDate);
+formData.append('dob', visibleDate.value);
+
 
   try {
     const response = await fetch(apiurl, {
@@ -154,8 +173,17 @@ const kraaddresssubmission = async () => {
 
 
 
+// const randomtoken = () => {
+//   let token = ''
+//   for (var i = 0; i <= 30; i++) {
+//     token += Math.floor(Math.random() * 10)
+//   }
+//   return token
+// }
+
+
+
 const handleButtonClick = async () => {
-  // Start first half of the animation
   if (waveRef.value) {
     waveRef.value.className = 'wave start-half';
   }
@@ -163,17 +191,30 @@ const handleButtonClick = async () => {
   const data = await kraaddresssubmission();
 
   if (data && waveRef.value) {
-    // Run second half of the animation
     void waveRef.value.offsetWidth;
     waveRef.value.className = 'wave finish-half';
 
-    // Wait for the animation to complete before emitting
-    setTimeout(() => {
-      
-      emit('updateDiv', 'div2');  // ✅ Send the data here
+    setTimeout(async () => {
+      const page1obj = {
+        panno: panvalue.value,
+        dob:visibleDate.value
+       
+      };
+
+      localStorage.removeItem('mobileNo');
+      localStorage.setItem('page1', JSON.stringify(page1obj));
+
+
+       const tokenval = randomtoken();
+        const response = new Response(JSON.stringify({ value: tokenval }));
+        const cache = await caches.open("my-cache");
+        await cache.put("/my-value", response);
+
+      emit('updateDiv', 'div2');
     }, 400);
   }
 };
+
 
  
 </script>
