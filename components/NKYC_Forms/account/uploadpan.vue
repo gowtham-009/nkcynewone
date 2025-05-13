@@ -38,11 +38,7 @@
                                     <PAN v-model:src="imageSrcpan" />
                                 </div>
                             </div>
-
                         </div>
-                       
-                      
-                       
                     </div>
                 </div>
 
@@ -79,10 +75,13 @@ const deviceHeight = ref(0);
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
-const imageSrcpan = ref(null)
+ const localvalue = localStorage.getItem('income');
+const localobj = localvalue ? JSON.parse(localvalue) : {};
+
+const imageSrcpan = ref(localobj.panimage || null); 
 
 
-const selectedstatement = ref();
+const selectedstatement = ref(localobj.incomeprooftype || ''); 
 const statement = ref([
     { name: 'BANK STATEMENTS' },
     { name: 'NETWORTH CERTIFICATE' },
@@ -135,6 +134,12 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+
+    const proofpan={
+        incomeprooftype:selectedstatement.value,
+        panimage:imageSrcpan.value
+    }
+     localStorage.setItem('income', JSON.stringify(proofpan))
     emit('updateDiv', 'uploadincome' );
   }, 600)
 };

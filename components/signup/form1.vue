@@ -97,7 +97,12 @@ watch(panvalue, (newVal) => {
   if (isValid) {
     panerror.value = false;
     dobbox.value = true;
-  } else {
+  }else if(newVal.length===0){
+      panerror.value = false;
+    dobbox.value = false;
+  }
+  
+  else {
     panerror.value = true; 
     error.value='Please enter a valid PAN no'
   }
@@ -110,10 +115,6 @@ const localobj = localvalue ? JSON.parse(localvalue) : {};
 
 panvalue.value = localobj.panno || '';
 visibleDate.value = localobj.dob || ''; // ✅ sets the visibleDate from localStorage
-
-
-
- 
 
   box1Height.value = fullHeight;
   box2Height.value = 0;
