@@ -87,11 +87,11 @@ const buttonText = ref("Continue");
  const localvalue = localStorage.getItem('bank');
 const localobj = localvalue ? JSON.parse(localvalue) : {};
 
-const bankname = ref(localobj[0].bankname || "");
-const accno = ref(localobj[0].accno || "");
-const ifsc = ref(localobj[0].ifsc || "");
-const micr = ref(localobj[0].micr || "");
-const address = ref(localobj[0].address || "");
+const bankname = ref(localobj[0]?.bankname || "");
+const accno = ref(localobj[0]?.accno || "");
+const ifsc = ref(localobj[0]?.ifsc || "");
+const micr = ref(localobj[0]?.micr || "");
+const address = ref(localobj[0]?.address || "");
 
 onMounted(() => {
     deviceHeight.value = window.innerHeight;

@@ -92,20 +92,25 @@ const randomtoken = () => {
 }
 
 watch(panvalue, (newVal) => {
-  const pattern = /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/;
+ if(newVal.length===10){
+   const pattern = /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/;
   const isValid = pattern.test(newVal);
   if (isValid) {
     panerror.value = false;
     dobbox.value = true;
-  }else if(newVal.length===0){
-      panerror.value = false;
-    dobbox.value = false;
   }
   
   else {
     panerror.value = true; 
     error.value='Please enter a valid PAN no'
   }
+ }
+
+  else if(newVal.length===0){
+      panerror.value = false;
+    dobbox.value = false;
+  }
+ 
 });
 
 onMounted(() => {
