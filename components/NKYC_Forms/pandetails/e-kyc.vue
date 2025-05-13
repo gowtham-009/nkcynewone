@@ -144,7 +144,7 @@ const back = () => {
 
 
 const digilocker_create = async () => {
-    alert('hhh')
+  
     const apiurl = url.value + 'digilocker';
     //  const url1 = 'http://localhost:3000/main?form=ekyc';
     //  const url2 = 'http://localhost:3000/main??form=ekyc';
@@ -384,7 +384,7 @@ if (data.metaData.result.files[0].file && data.metaData.result.files[1].file) {
 
 
 const panverification = async (panval) => {
-    alert(panval)
+   
     const apiurl = url.value + 'pan'
     const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
 
