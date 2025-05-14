@@ -150,7 +150,18 @@ setPermanentAddress();
   const back = (event) => {
     animateRipple(rippleBtnback.value, event);
     setTimeout(() => {
-      emit('updateDiv', 'ekyc');
+       const localvalue = localStorage.getItem('krastatus');
+  const local = localvalue ? JSON.parse(localvalue) : null;
+
+   if (local?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
+            
+             emit('updateDiv', 'ekyc');
+        }
+        else{
+          emit('updateDiv', 'nkyclist');
+        }
+       
+    
     }, 600);
   };
   
