@@ -22,7 +22,7 @@
       :style="{ height: box2Height + 'px' }"
     >
     <div class="w-full mt-2 px-2 flex flex-col justify-between">
-      <span class="font-medium text-gray-500 text-lg">Identity verification</span>
+      <span class="font-medium text-gray-500 text-lg">Identity Verification</span>
       <p class="text-3xl font-semibold">Fill Your PAN Details</p>
             <span class="font-medium text-gray-500 text-lg">This is required as mandated by regulator for verification purposes. </span>
 
@@ -60,8 +60,6 @@ import { ref, onMounted } from 'vue';
 import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import PAN from '~/components/forminputs/paninput.vue';
 import DOB from '~/components/forminputs/dateinput.vue';
-
-const abd="123456778998"
 
 const { ourl } = useUrl();
 const panerror = ref(false);

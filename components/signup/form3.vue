@@ -17,8 +17,13 @@
           </div>
 
           <div class="w-full mt-4">
-            <EmailInput v-model="emailid" />
-            <span v-if="erroremail" class="text-red-500">{{ emailerror }}</span>
+             <div class="w-full" :class="{ 'disabled-div': emailotp }"
+              :style="mobileotp ? { pointerEvents: 'none', opacity: 0.5 } : {}">
+              <EmailInput v-model="emailid" />
+              <span v-if="erroremail" class="text-red-500">{{ emailerror }}</span>
+            </div>
+
+          
 
           </div>
         </div>
