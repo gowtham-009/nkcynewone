@@ -7,7 +7,7 @@
         </div>
         <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
-            <div class="w-full mt-2 px-2 p-1">
+            <div class="w-full mt-2 px-2 p-1" >
                 <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">
                     Looking good, Client
                 </p>
@@ -16,10 +16,14 @@
                     Just a few more steps and you're done.
                 </p>
 
-                <div class="w-full  p-1 flex justify-center mt-3 h-64">
+                <div class="w-full  p-1 flex justify-center items-center flex-col mt-20 h-64 " >
 
-                    <img v-if="props.data" :src="props.data" class="rounded-xl w-full hei" alt="Base64 Image" />
+                    <img v-if="props.data" :src="props.data" alt="Base64 Image"
+                        class="rounded-xl w-64 h-64 object-cover" />
 
+                     <div class="w-full flex justify-center mt-2">
+                   <Chip  @click="retake" class="px-5 bg-blue-50 text-blue-500"  label="Retake" />
+             </div>
 
                 </div>
 
@@ -29,9 +33,8 @@
             </div>
 
             <div class="w-full">
-                <p @click="retake" class="text-center cursor-pointer font-medium text-blue-600 py-3 mt-1 text-xl">
-                    Retake
-                </p>
+            
+              
                 <div class="w-full flex gap-2">
                     <Button @click="retake()" ref="rippleBtnback"
                         class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
@@ -121,38 +124,12 @@ const handleButtonClick = () => {
 
     setTimeout(() => {
         circle.remove()
-        //uploadBase64To0x0(props.data)
-     emit('updateDiv', 'signature');
+
+        emit('updateDiv', 'signature');
     }, 600)
 };
 
-async function uploadBase64To0x0(base64String) {
-  // Remove data URL header if present
-  const base64Data = base64String.replace(/^data:image\/\w+;base64,/, '');
-  const mimeType = base64String.match(/^data:(image\/\w+);base64,/)?.[1] || 'image/png';
 
-  // Convert Base64 to binary data
-  const byteCharacters = atob(base64Data);
-  const byteNumbers = new Array(byteCharacters.length);
-  for (let i = 0; i < byteCharacters.length; i++) {
-    byteNumbers[i] = byteCharacters.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: mimeType });
-
-  // Upload via FormData
-  const formData = new FormData();
-  formData.append('file', blob, 'image.png');
-
-  const response = await fetch('https://0x0.st', {
-    method: 'POST',
-    body: formData
-  });
-
-  const text = await response.text();
-  console.log('Image URL:', text);
-  return text;
-}
 
 
 

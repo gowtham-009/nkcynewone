@@ -1,35 +1,46 @@
 <template>
-  <div class=" w-full">
-    <span class="text-gray-500 text-lg font-normal">Select Relationship</span>
+  <div class="w-full">
+    <span class="text-lg text-gray-500">Nominee's guardian</span>
     <div class="input-wrapper dark:!bg-gray-800">
-    <Select v-model="selectedrelation" :options="relations" optionLabel="name" class="w-full prime-input" />
+    <InputText
+      type="text"
+      v-model="guardian"
+      variant="filled"
+      class="w-full py-2 uppercase prime-input"
+      @input="formatguardian"
+      inputmode="text"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="characters"
+ 
+    />
     <span class="bottom-border"></span>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, defineProps, defineEmits } from "vue";
+import { ref, watch } from 'vue';
 
-const props = defineProps({
-  modelValue: Object // can be more specific if needed
+const props = defineProps(['modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+const guardian = ref((props.modelValue || '').toUpperCase());
+
+// Clean and format input on each change
+const formatguardian = (event) => {
+  const raw = event.target.value;
+  const cleaned = raw.toUpperCase().replace(/[^A-Z.\s]/g, '');
+  guardian.value = cleaned;
+  event.target.value = cleaned; // ensures proper display on mobile
+};
+
+// Emit value to parent
+watch(guardian, (newVal) => {
+  emit('update:modelValue', newVal);
 });
-const emit = defineEmits(["update:modelValue"]);
-
-const selectedrelation = ref(props.modelValue);
-
-watch(selectedrelation, (newVal) => {
-  emit("update:modelValue", newVal.name);
-});
-
-const relations = [
-  { name: 'Son' },
-  { name: 'Daughter' },
-  { name: 'Spouse' },
-  { name: 'Father' },
-  { name: 'Mother' }
-];
 </script>
+
 <style scoped>
   .uppercase {
     text-transform: uppercase;
@@ -85,7 +96,5 @@ const relations = [
   width: 100%;
   height: 4px;
 }
-
-
   </style>
   

@@ -79,9 +79,7 @@
             </div>
 
             <div class="w-full">
-                <p class="mb-5 text-left text-sm text-gray-500 font-normal">
-                    These details are required by SEBI to open your Demat account.
-                </p>
+               
                 <div class="w-full flex gap-2">
                     <Button @click="back()" ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                 <i class="pi pi-angle-left text-3xl dark:text-white"></i>
@@ -104,7 +102,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
-const buttonText = ref("Open camera");
+const buttonText = ref("Open Camera");
 
 onMounted(() => {
     deviceHeight.value = window.innerHeight;

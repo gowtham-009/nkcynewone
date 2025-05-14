@@ -9,7 +9,7 @@
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full mt-2 px-2 p-1">
                 <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">
-                    Add your signature
+                    Add your Signature
                 </p>
                 <p class="text-gray-500 leading-6 font-normal text-sm">
                     Upload an image or use the signature box to sign

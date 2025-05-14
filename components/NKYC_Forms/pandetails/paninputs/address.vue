@@ -1,6 +1,6 @@
 <template>
     <div class="w-full">
-      <label for="pan_label" class="text-gray-500 text-lg font-normal leading-3">Address line 1 <br><span class="text-sm text-gray-500 "></span></label>
+      <label for="pan_label" class="text-gray-500 text-lg font-normal leading-3">Address <br><span class="text-sm text-gray-500 "></span></label>
       <div class="input-wrapper dark:!bg-gray-800">
        <Textarea v-model="address" varient="filled" rows="4"  class="w-full prime-input" cols="10"  />
        <span class="bottom-border"></span>

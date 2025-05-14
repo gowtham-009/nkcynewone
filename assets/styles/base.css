@@ -59,10 +59,10 @@ body{
         --p-content-border-color: var(--p-surface-700);
         --p-content-hover-background: var(--p-surface-800);
         --p-content-hover-color: var(--p-surface-0);
-        --p-highlight-background: oklch(0.85 0.05 277.366 / 50%);
+        --p-highlight-background: var(--p-primary-700);
         --p-highlight-color: rgba(255, 255, 255, 0.87);
         --p-highlight-focus-background: oklch(0.85 0.05 277.366 / 40%);
-        --p-highlight-focus-color: rgba(255, 255, 255, 0.87);
+        --p-highlight-focus-color:  var(--p-primary-700);
         --p-text-color: var(--p-surface-0);
         --p-text-hover-color: var(--p-surface-0);
         --p-text-muted-color: var(--p-surface-400);

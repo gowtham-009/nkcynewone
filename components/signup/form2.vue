@@ -20,9 +20,7 @@
               <MobileInput v-model="mobileNo" />
               <span v-if="errormsg" class="text-red-500">{{ errormobile }}</span>
             </div>
-            <div v-if="clearotp">
-              <Button class="px-2 py-2 text-white h-14" @click="otpclear()">Edit</Button>
-            </div>
+           
 
           </div>
 
@@ -38,15 +36,15 @@
             OTP sent
           </p>
           <p class="text-sm leading-6  font-normal text-gray-500">
-            We have sent an OTP to your mobile number +91 {{ phoneNumber }}
+            We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }} <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Mobile Number" />
           </p>
           <div class="w-full mt-3">
 
             <phoneOTP v-model="p_otp" />
             <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
 
-            <div class="w-full h-8">
-              <p class="text-lg font-medium text-center text-gray-500" v-if="resend_sh">OTP Resend Successfully +91 {{
+            <div class="w-full h-12 flex justify-center gap-2">
+              <p class="text-lg font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resend Successfully <br> +91 {{
                 phoneNumber }}</p>
             </div>
             <div class="w-full flex justify-between items-center">
@@ -99,7 +97,7 @@ const errormsg = ref(false)
 const errormobile = ref('')
 const p_otp = ref('')
 const mobileNo = ref('')
-const clearotp=ref(false)
+
 
 const localvalue = localStorage.getItem('krastatus')
 const localobj = localvalue ? JSON.parse(localvalue) : {};
@@ -181,21 +179,20 @@ const sendmobileotp = async () => {
     if (data.apiResData?.message === 'Sent.') {
       mobileotp.value = true;
       buttonText.value = "Verify OTP";
-      clearotp.value=true
+     
     }
 
   } catch (error) {
     console.error("OTP Send Error:", error.message);
     errormsg.value = true;
     errormobile.value = 'Invalid mobile number';
-  } finally {
-    isSending.value = false;
-  }
+  } 
 };
 
 function otpclear(){
     mobileotp.value = false;
-     clearotp.value=false
+    isSending.value=false;
+
 }
 
 const mobile_signup = () => {
@@ -283,34 +280,52 @@ const resend_sh = ref(false)
 const resendotp = async () => {
   if (timeLeft.value !== 0) return; // Only allow resend when timeLeft is 0
 
-  const apiurl = ourl.value + 'send-mobile-otp.php';
-  const formData = new FormData();
-  formData.append('mobileNo', mobileNo.value);
-  formData.append('otpCode', '7895');
   try {
+    const apiurl = `${otpourl.value}sms-api/v1/send_sms`;
+
+    // Mask the mobile number for display (not affecting the API call)
+    phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
+
+    const formData = new FormData();
+    formData.append("clientCode", "KMCVJ1");
+    formData.append("smsTemplate", "dynamicLoginOtp");
+    formData.append("requestFrom", "NKYC");
+    formData.append("loginFor", "NKYC");
+    formData.append("validFor", "10 Minutes");
+    formData.append("mobileNo", mobileNo.value);
+    formData.append("otpCode", "7895");
+
     const response = await fetch(apiurl, {
       method: 'POST',
-      body: formData
+      headers: {
+        'Authorization': '21279C8DC0753CD1A90DEBF3C1C5CEDB8B5B77E0455EE804C9CA03BB706CD02A',
+      },
+      body: formData,
     });
+
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
-    } else {
-      const data = await response.json();
-      if (data) {
-        resend_sh.value = true;
-        timeLeft.value = 60;
+    }
+
+    const data = await response.json();
+    if (data) {
+      resend_sh.value = true;
+      timeLeft.value = 60;
+
+      if (timer) {
         clearInterval(timer);
-        timer = setInterval(() => {
-          if (timeLeft.value > 0) {
-            timeLeft.value -= 1;
-          } else {
-            clearInterval(timer);
-          }
-        }, 1000);
       }
+
+      timer = setInterval(() => {
+        if (timeLeft.value > 0) {
+          timeLeft.value -= 1;
+        } else {
+          clearInterval(timer);
+        }
+      }, 1000);
     }
   } catch (error) {
-    console.error(error.message);
+    console.error("Failed to resend OTP:", error.message);
   }
 };
 

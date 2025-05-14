@@ -17,24 +17,19 @@
           </div>
 
           <div class="w-full mt-4">
-             <div class="w-full" :class="{ 'disabled-div': emailotp }"
-              :style="mobileotp ? { pointerEvents: 'none', opacity: 0.5 } : {}">
+             <div class="w-full" :class="{ 'disabled-div': emailbox }"
+              :style="emailbox ? { pointerEvents: 'none', opacity: 0.5 } : {}">
               <EmailInput v-model="emailid" />
               <span v-if="erroremail" class="text-red-500">{{ emailerror }}</span>
             </div>
-
-          
-
           </div>
         </div>
-
-
         <div class="w-full mt-2" v-if="emailbox">
           <p class="font-medium text-slate-800 text-2xl dark:text-gray-400">
             OTP sent
           </p>
           <p class="text-sm leading-6  font-normal text-gray-500">
-            We have sent an OTP to your email {{ emailidtext }}
+            We have sent an OTP to your email {{ emailidtext }}  <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Email ID" />
           </p>
           <div class="w-full mt-3">
             <emailOTP v-model="e_otp" />
@@ -210,9 +205,13 @@ const sendemailotp = async () => {
   } catch (error) {
     console.error(error.message)
   }
+   
 }
 
-
+function otpclear(){
+     emailbox.value = false
+      isSending.value=false;
+}
 
 const emailchecker = async (messageId) => {
   const apiUrl = `${ourl.value}check-email-status.php?messageId=${messageId}`;
@@ -324,7 +323,7 @@ const handleButtonClick = () => {
 
 const resend_sh = ref(false)
 const resendotp = async () => {
-  console.log(props.data)
+ 
   if (timeLeft.value !== 0) return; // Only allow resend when timeLeft is 0
 
   const apiurl = ourl.value + 'send-email-otp.php'
@@ -363,4 +362,10 @@ const resendotp = async () => {
 }
 </script>
 
-<style></style>
+<style scoped>
+.disabled-div {
+  cursor: not-allowed;
+  background-color: #f0f0f0;
+ 
+}
+</style>
