@@ -61,6 +61,8 @@ import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import PAN from '~/components/forminputs/paninput.vue';
 import DOB from '~/components/forminputs/dateinput.vue';
 
+const abd="123456778998"
+
 const { ourl } = useUrl();
 const panerror = ref(false);
 const panvalue = ref('');

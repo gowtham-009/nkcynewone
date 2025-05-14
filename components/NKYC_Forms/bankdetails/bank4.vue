@@ -122,7 +122,7 @@ const address = ref(localobj[0].address || "");
   
   function back(event) {
     createRipple(rippleBtnBack.value, event);
-    setTimeout(() => emit('updateDiv', 'bank1'), 600);
+    setTimeout(() => emit('updateDiv', '@bank?1'), 600);
   }
   </script>
   
