@@ -60,8 +60,9 @@ import { ref, onMounted } from 'vue';
 import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import PAN from '~/components/forminputs/paninput.vue';
 import DOB from '~/components/forminputs/dateinput.vue';
+import { encryptionrequestdata } from '~/utils/globaldata.js'
 
-const { ourl } = useUrl();
+const { baseurl } = globalurl();
 const panerror = ref(false);
 const panvalue = ref('');
 const dobbox = ref(false);
@@ -145,51 +146,53 @@ visibleDate.value = localobj.dob || ''; // ✅ sets the visibleDate from localSt
 
 
 
+
+
+
 const kraaddresssubmission = async () => {
+  const apiurl = baseurl.value + 'kra_pan';
 
+  const user = encryptionrequestdata({
+    panNo: panvalue.value,
+    dob: visibleDate.value,
+  });
 
-  const apiurl = ourl.value + 'get-kra-data.php';
-
-  const formData = new FormData();
-
-  formData.append('pan', panvalue.value);
-formData.append('dob', visibleDate.value);
-
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
 
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
-      body: formData
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+      },
+      body: jsonString,
+      redirect:'follow'
     });
 
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
 
     const data = await response.json();
+
     if (data) {
-     
-      localStorage.setItem('krastatus',JSON.stringify(data))
-      return data; // ✅ Return the data, not just true
+      localStorage.setItem('krastatus', JSON.stringify(data));
+      return data; // ✅ Return the actual data
     }
+
   } catch (error) {
-    console.error(error.message);
+    console.error('Error during KRA address submission:', error.message);
   }
 
-  return null;
+  return null; 
 };
 
 
-
-// const randomtoken = () => {
-//   let token = ''
-//   for (var i = 0; i <= 30; i++) {
-//     token += Math.floor(Math.random() * 10)
-//   }
-//   return token
-// }
-
-
-
 const handleButtonClick = async () => {
+ 
+
   if (waveRef.value) {
     waveRef.value.className = 'wave start-half';
   }
@@ -222,6 +225,9 @@ const handleButtonClick = async () => {
 };
 
 
+
+
+  
  
 </script>
 

@@ -16,7 +16,6 @@
     <DIGILOCKDATA :data="data" @updateDiv="handleUpdateDiv" />
   </div>
 
-  
 
   <div v-if="currentForm === 'parmanentaddress'">
     <PARMANENTADDRESS :data="data" @updateDiv="handleUpdateDiv" />

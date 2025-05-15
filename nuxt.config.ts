@@ -1,6 +1,7 @@
 import * as path from "path";
 
 export default defineNuxtConfig({
+
     app: {
         head: {
           title: 'NKYC', // default fallback title
@@ -12,6 +13,9 @@ export default defineNuxtConfig({
           ]
         }
       },
+      imports: {
+    dirs: ['utils']
+  },
       modules: [
         '@primevue/nuxt-module'
       ],
