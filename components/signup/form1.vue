@@ -116,11 +116,8 @@ watch(panvalue, (newVal) => {
 
 onMounted(() => {
   const fullHeight = window.innerHeight;
- const localvalue = localStorage.getItem('page1');
-const localobj = localvalue ? JSON.parse(localvalue) : {};
 
-panvalue.value = localobj.panno || '';
-visibleDate.value = localobj.dob || ''; // ✅ sets the visibleDate from localStorage
+
 
   box1Height.value = fullHeight;
   box2Height.value = 0;
@@ -150,11 +147,14 @@ visibleDate.value = localobj.dob || ''; // ✅ sets the visibleDate from localSt
 
 
 const kraaddresssubmission = async () => {
-  const apiurl = baseurl.value + 'kra_pan';
-
+ // const apiurl = baseurl.value + 'kra_pan';
+  const userkey=localStorage.getItem('userkey')
+const apiurl='https://nnkyc.w3webtechnologies.co.in/api/v1/kra_pan?kra_data=true'
   const user = encryptionrequestdata({
     panNo: panvalue.value,
     dob: visibleDate.value,
+    pageCode:"panpage",
+    userToken:userkey||''
   });
 
   const payload = { payload: user };
@@ -168,7 +168,6 @@ const kraaddresssubmission = async () => {
         'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
       },
       body: jsonString,
-      redirect:'follow'
     });
 
     if (!response.ok) {
@@ -178,7 +177,8 @@ const kraaddresssubmission = async () => {
     const data = await response.json();
 
     if (data) {
-      localStorage.setItem('krastatus', JSON.stringify(data));
+
+  
       return data; // ✅ Return the actual data
     }
 
@@ -204,22 +204,15 @@ const handleButtonClick = async () => {
     waveRef.value.className = 'wave finish-half';
 
     setTimeout(async () => {
-      const page1obj = {
-        panno: panvalue.value,
-        dob:visibleDate.value
-       
-      };
+      localStorage.setItem('userkey', data.payload.userKey || '')
 
-      localStorage.removeItem('mobileNo');
-      localStorage.setItem('page1', JSON.stringify(page1obj));
-
-
+      const decryt=   decryptdatadata({decryptdata:data});
        const tokenval = randomtoken();
         const response = new Response(JSON.stringify({ value: tokenval }));
         const cache = await caches.open("my-cache");
         await cache.put("/my-value", response);
-
-      emit('updateDiv', 'div2');
+      console.log(decryt)
+      emit('updateDiv', 'mobile', decryt);
     }, 400);
   }
 };

@@ -1,9 +1,22 @@
-let data = {} 
+let data = {};
 
 export function encryptionrequestdata(newData) {
-  data = {
-    ...data,    
-    ...newData  
-  }
-  return data
+  const mergedData = {
+    ...data,
+    ...newData
+  };
+  return mergedData;
 }
+
+
+
+
+
+export function decryptdatadata(newData) {
+  const mergedData = {
+    ...data,
+    ...newData
+  };
+  return mergedData;
+}
+

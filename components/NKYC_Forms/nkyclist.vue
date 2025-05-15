@@ -231,7 +231,7 @@ function back() {
 
     router.push({
         name: 'index',
-        query: { signup: 3 }
+        query: { signup: 'email' }
     });
   }, 600)
    

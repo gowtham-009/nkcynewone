@@ -1,22 +1,53 @@
 <template>
-  <div
-    :class="{ 'disabled-container': isDisabled }"
-  >
-   Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos voluptatibus corrupti natus veniam deserunt vitae fugiat omnis nesciunt aperiam nostrum minima, excepturi aliquam aliquid nam expedita vel asperiores culpa nisi, dolorum accusantium itaque! Voluptas voluptate dolor reprehenderit enim consequatur labore eos expedita non doloremque sequi assumenda quaerat, iure nisi, ipsum eaque magnam porro cupiditate minus ab quia dolores? Itaque magni ratione harum ex quis quam, inventore accusamus autem esse quos, ducimus nostrum, laborum officiis placeat veniam tempore. Minima quae veniam ipsum placeat commodi magnam facilis deleniti odio eum explicabo vel incidunt eligendi nulla in iure, error accusantium, cupiditate necessitatibus exercitationem.
-  </div>
+  <div>
 
-   <button @click="handleClick">Click Me</button>
+  </div>
 </template>
 
 <script setup>
-const isDisabled = ref(true)
+const kraaddresssubmission = async () => {
+  const apiurl ='https://nnkyc.w3webtechnologies.co.in/api/v1/kra_pan';
+
+const jsonString = JSON.stringify({
+  payload: {
+    panNo: "BPLPV5157E",
+    dob: "15/07/1996",
+    pageCode:"panpage",
+  }
+});
 
 
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json'
+      },
+      body: jsonString,
+      redirect:'follow'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (data) {
+     
+    }
+
+  } catch (error) {
+    console.error('Error during KRA address submission:', error.message);
+  }
+
+
+};
+
+kraaddresssubmission()
 </script>
 
-<style>
-.disabled-container {
-  pointer-events: none;
-  opacity: 0.5;
-}
+<style >
+
 </style>

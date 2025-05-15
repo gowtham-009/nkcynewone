@@ -81,7 +81,10 @@ import phoneOTP from '~/components/forminputs/otpinput.vue'
 import MobileInput from '~/components/forminputs/mobileinput.vue';
 import Checkbox from '~/components/forminputs/remembercheckbox.vue';
 import { ref, onMounted, watch, onUnmounted } from 'vue';
-const { otpourl } = otpurluse();
+import { encryptionrequestdata } from '~/utils/globaldata.js'
+import { getServerData } from '~/utils/serverdata.js'
+
+const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
 const timeLeft = ref(60); // Start from 60 seconds
@@ -96,23 +99,55 @@ let timer = null;
 const errormsg = ref(false)
 const errormobile = ref('')
 const p_otp = ref('')
-const mobileNo = ref('')
 
 
-const localvalue = localStorage.getItem('krastatus')
-const localobj = localvalue ? JSON.parse(localvalue) : {};
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+console.log(props.data)
 
-const mobilepropsdata = localobj?.KYC_DATA?.APP_MOB_NO || '';
+const mobileNo = ref(''); // Assuming you're using `ref` for mobileNo
 
-const cleanedMobile = mobilepropsdata.startsWith("91")
-  ? mobilepropsdata.slice(2) : mobilepropsdata;
+const setMobileData = async () => {
+  try {
+    const mydata = await getServerData();
 
-mobileNo.value = cleanedMobile;
+    // Safely access nested values
+    const appKraMobile = props?.data?.decryptdata?.payload?.metaData?.KYC_DATA?.APP_MOB_NO;
+    const profileMobile = mydata?.payload?.metaData?.profile?.mobileNo;
+
+    let rawMobile = appKraMobile || profileMobile || '';
+
+    // Remove '91' prefix if present and the number is 12 digits long
+    if (rawMobile.startsWith('91') && rawMobile.length === 12) {
+      rawMobile = rawMobile.slice(2);
+    }
+
+    // Show OTP input if required
+    if (mydata?.payload?.metaData?.otpVerification?.mobile?.otpVerifiedStatus=='0') {
+     
+      mobileotp.value = true;
+    }
+
+    // Check for valid 10-digit mobile number
+    const isValidMobile = /^\d{10}$/.test(rawMobile);
+    mobileNo.value = isValidMobile ? rawMobile : '';
+    
+  } catch (error) {
+    console.error('Error setting mobile data:', error);
+    mobileNo.value = '';
+    mobileotp.value = false;
+  }
+};
+
+// Call the function
+await setMobileData();
 
 
-if (localobj?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
-  mobileNo.value = localStorage.getItem('mobileNo') || ''
-}
+
 
 onMounted(() => {
 
@@ -144,52 +179,120 @@ onUnmounted(() => {
 
 
 const isSending = ref(false);
+
+
 const sendmobileotp = async () => {
   isSending.value = true;
   errormsg.value = false;
   errormobile.value = '';
-
-  const apiurl = `${otpourl.value}sms-api/v1/send_sms`;
+  const apiurl = `${baseurl.value}validateMobile`;
   phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
 
-  const formData = new FormData();
-  formData.append("clientCode", "KMCVJ1");
-  formData.append("smsTemplate", "dynamicLoginOtp");
-  formData.append("requestFrom", "NKYC");
-  formData.append("loginFor", "NKYC");
-  formData.append("validFor", "10 Minutes");
-  formData.append("mobileNo", mobileNo.value);
-  formData.append("otpCode", "7895"); // Replace with dynamic OTP if needed
 
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': '21279C8DC0753CD1A90DEBF3C1C5CEDB8B5B77E0455EE804C9CA03BB706CD02A',
-      },
-      body: formData,
-    });
+    const user = encryptionrequestdata({
+    otpType:'mobile',
+    mobile: mobileNo.value,
+    resend:'false',
+    pageCode:"mobile",
+    userToken:localStorage.getItem('userkey')
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
+   
+  });
+ 
+    const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+ try {
+  const response = await fetch(apiurl, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+      'Content-Type': 'application/json',
+    },
+    body: jsonString,
+  });
 
-    const data = await response.json();
+  const data = await response.json(); // Read body regardless of status
 
-    if (data.apiResData?.message === 'Sent.') {
-      mobileotp.value = true;
-      buttonText.value = "Verify OTP";
-     
-    }
+  if (!response.ok) {
+  
+    console.error("Error:", data.message);
+    errormsg.value = data.message; // Show in UI
+    return;
+  }
 
-  } catch (error) {
-    console.error("OTP Send Error:", error.message);
-    errormsg.value = true;
-    errormobile.value = 'Invalid mobile number';
-  } 
+  if (data.payload.status === 'ok' && data.payload.otpStatus=='0') {
+    mobileotp.value=true
+    buttonText.value='Verify Otp'
+    
+  }
+  else if(data.payload.status === 'ok' && data.payload.otpStatus=='1'){
+  
+     mobileotp.value=false
+    buttonText.value='Verify Otp'
+     emit('updateDiv', 'email', props.data);
+  }
+
+} catch (error) {
+  console.error("OTP Send Error:", error.message);
+  errormsg.value = 'Something went wrong. Please try again.';
+}
+};
+
+
+
+const otpverfication = async () => {
+  isSending.value = true;
+  errormsg.value = false;
+  errormobile.value = '';
+
+  const usekey=localStorage.getItem('userkey')
+  const apiurl = `${baseurl.value}validateMobile`;
+    const user = encryptionrequestdata({
+    userToken:usekey,
+    mobile: mobileNo.value,
+    verifyotp:'false',
+    otpCode:p_otp.value,
+    pageCode:"email",
+  });
+ 
+    const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+ try {
+  const response = await fetch(apiurl, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+      'Content-Type': 'application/json',
+    },
+    body: jsonString,
+  });
+
+  const data = await response.json(); // Read body regardless of status
+
+  if (!response.ok) {
+    // Show API message even on errors like 409
+    console.error("Error:", data.message);
+    errormsg.value = data.message; // Show in UI
+    return;
+  }
+
+  if (data.payload.status === 'ok') {
+    emit('updateDiv', 'email', props.data);
+  }
+  else if(data.payload.status==='error'){
+    otperror.value = true
+     errorotp.value = 'Invalid OTP'
+  }
+
+
+} catch (error) {
+  console.error("OTP Send Error:", error.message);
+  errormsg.value = 'Something went wrong. Please try again.';
+}
 };
 
 function otpclear(){
+  p_otp.value=''
     mobileotp.value = false;
     isSending.value=false;
 
@@ -200,31 +303,25 @@ const mobile_signup = () => {
   const button = rippleBtn.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
-
   const rect = button.$el.getBoundingClientRect()
   const x = event.clientX - rect.left
   const y = event.clientY - rect.top
-
   circle.style.left = `${x}px`
   circle.style.top = `${y}px`
-
   button.$el.appendChild(circle)
-
   setTimeout(async () => {
     circle.remove()
     if (p_otp.value.length === 4) {
 
-      localStorage.setItem('mobileNo', mobileNo.value);
-      if (p_otp.value == '7895') {
+    otpverfication()
+      // if (p_otp.value == '7895') {
 
-        emit('updateDiv', 'div3');
-      }
-      else {
-        otperror.value = true
-        errorotp.value = 'Invalid OTP'
-      }
-
-
+      //   emit('updateDiv', 'div3');
+      // }
+      // else {
+      //   otperror.value = true
+      //   errorotp.value = 'Invalid OTP'
+      // }
     }
     else {
       sendmobileotp()
@@ -271,7 +368,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
-    emit('updateDiv', 'div1');
+    emit('updateDiv', 'pan');
   }, 600)
 
 }

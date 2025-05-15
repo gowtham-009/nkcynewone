@@ -76,6 +76,14 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import EmailInput from '~/components/forminputs/emailinput.vue';
 
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+console.log(props.data)
+
 
 const { ourl } = useUrl();
 const deviceHeight = ref(0);
@@ -157,7 +165,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
-    emit('updateDiv', 'div2');
+    emit('updateDiv', 'mobile');
   }, 600)
 
 }

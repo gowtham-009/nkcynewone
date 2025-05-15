@@ -1,6 +1,6 @@
 <template>
   <span class="font-semibold text-lg">Enter PAN</span>
-  <div class="pan-input-wrapper w-full">
+  <div class="pan-input-wrapper w-full dark:!bg-gray-800">
     <i class="pi pi-id-card pan-icon"></i>
     <InputText
       v-model="formattedPan"

@@ -1,12 +1,12 @@
 <template>
  <div class="w-full" v-if="Authenticated">
-  <div v-if="currentForm === 'div1'">
+  <div v-if="currentForm === 'pan'">
     <form1 @updateDiv="handleUpdateDiv" />
   </div>
-  <div v-if="currentForm === 'div2'">
+  <div v-if="currentForm === 'mobile'">
     <form2 :data="data" @updateDiv="handleUpdateDiv" />
   </div>
-  <div v-if="currentForm === 'div3'">
+  <div v-if="currentForm === 'email'">
     <form3 :data="data" @updateDiv="handleUpdateDiv" />
   </div>
 
@@ -19,13 +19,17 @@ import { useRoute, useRouter } from 'vue-router';
 import form1 from '~/components/signup/form1.vue';
 import form2 from '~/components/signup/form2.vue';
 import form3 from '~/components/signup/form3.vue';
+import { getServerData } from '~/utils/serverdata.js'
 
-
-const data = ref({});
-const currentForm = ref('div1');
-const Authenticated=ref(false)
-const formHistory = ref(['div1']); // History stack to track form flow
 const route = useRoute();
+const data = ref({});
+const currentForm = ref(route.query.form||'pan');
+const Authenticated=ref(false)
+
+const formHistory = ref(['pan']); // History stack to track form flow
+
+
+
 
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value;
@@ -40,17 +44,30 @@ const handleBackButton = () => {
     const previous = formHistory.value[formHistory.value.length - 1];
     currentForm.value = previous;
   } else {
-    // If on first form, allow default back or exit
+
     history.back();
   }
 };
 
 const router=useRouter()
-onMounted(() => {
+onMounted(async() => {
+
+  const userkey=localStorage.getItem('userkey')
+  if(userkey){
+
+    const mydata =await getServerData()
+    const activepage=mydata.payload.metaData.profile.pageStatus
+    console.log(activepage)
+    currentForm.value=activepage
+  }
+
+
+
+
   const initial = route.query.signup;
   if (initial) {
-    currentForm.value = `div${initial}`;
-    formHistory.value = [`div${initial}`];
+    currentForm.value = `email`;
+    formHistory.value = [`email`];
   }
   history.replaceState({ div: currentForm.value }, '', '');
   window.addEventListener('popstate', handleBackButton);
@@ -79,6 +96,8 @@ window.addEventListener('popstate', handleBackButton);
 onBeforeUnmount(() => {
   window.removeEventListener('popstate', handleBackButton);
 });
+
+
 </script>
 
 <style>
