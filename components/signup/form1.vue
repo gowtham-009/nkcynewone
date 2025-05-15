@@ -147,9 +147,9 @@ onMounted(() => {
 
 
 const kraaddresssubmission = async () => {
- // const apiurl = baseurl.value + 'kra_pan';
+  const apiurl = baseurl.value + 'kra_pan';
   const userkey=localStorage.getItem('userkey')
-const apiurl='https://nnkyc.w3webtechnologies.co.in/api/v1/kra_pan?kra_data=true'
+//const apiurl='https://nnkyc.w3webtechnologies.co.in/api/v1/kra_pan?kra_data=true'
   const user = encryptionrequestdata({
     panNo: panvalue.value,
     dob: visibleDate.value,
