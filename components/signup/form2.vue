@@ -49,7 +49,7 @@
             </div>
             <div class="w-full flex justify-between items-center">
               <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
-              <button :disabled="timeLeft" type="button" @click="resendotp"
+              <button :disabled="timeLeft" type="button" @click="sendmobileotp('resend')"
                 class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
             </div>
           </div>
@@ -83,6 +83,7 @@ import Checkbox from '~/components/forminputs/remembercheckbox.vue';
 import { ref, onMounted, watch, onUnmounted } from 'vue';
 import { encryptionrequestdata } from '~/utils/globaldata.js'
 import { getServerData } from '~/utils/serverdata.js'
+import { getEncryptionData } from '~/utils/kradata.js'
 
 const { baseurl } = globalurl();
 const deviceHeight = ref(0);
@@ -101,25 +102,29 @@ const errormobile = ref('')
 const p_otp = ref('')
 
 
-const props = defineProps({
-  data: {
-    type: Object,
-    default: () => ({}),
-  },
-});
-console.log(props.data)
+// const props = defineProps({
+//   data: {
+//     type: Object,
+//     default: () => ({}),
+//   },
+// });
+// console.log("88888",props.data)
 
 const mobileNo = ref(''); // Assuming you're using `ref` for mobileNo
-
 const setMobileData = async () => {
   try {
     const mydata = await getServerData();
 
+    const kraresdata=getEncryptionData()
+    console.log("this my val:",kraresdata)
+  
     // Safely access nested values
-    const appKraMobile = props?.data?.decryptdata?.payload?.metaData?.KYC_DATA?.APP_MOB_NO;
+    const appKraMobile = kraresdata?.kradata?.decryptdata?.payload?.metaData?.KYC_DATA?.APP_MOB_NO || '';
     const profileMobile = mydata?.payload?.metaData?.profile?.mobileNo;
+     const kraMobile = mydata?.payload?.metaData?.kraPan?.APP_MOB_NO;
+    let rawMobile = appKraMobile || profileMobile || kraMobile || '';
+       console.log("krares:", appKraMobile, "nkycdata1:",profileMobile, "nkycdata2:",kraMobile)
 
-    let rawMobile = appKraMobile || profileMobile || '';
 
     // Remove '91' prefix if present and the number is 12 digits long
     if (rawMobile.startsWith('91') && rawMobile.length === 12) {
@@ -165,9 +170,6 @@ onMounted(() => {
       clearInterval(timer);
     }
   }, 1000);
-
-
-
 });
 
 onUnmounted(() => {
@@ -181,7 +183,7 @@ onUnmounted(() => {
 const isSending = ref(false);
 
 
-const sendmobileotp = async () => {
+const sendmobileotp = async (resend) => {
   isSending.value = true;
   errormsg.value = false;
   errormobile.value = '';
@@ -220,16 +222,35 @@ const sendmobileotp = async () => {
     return;
   }
 
+  if(resend=='resend'){
+    if (data) {
+      resend_sh.value = true;
+      timeLeft.value = 60;
+
+      if (timer) {
+        clearInterval(timer);
+      }
+
+      timer = setInterval(() => {
+        if (timeLeft.value > 0) {
+          timeLeft.value -= 1;
+        } else {
+          clearInterval(timer);
+        }
+      }, 1000);
+    }
+  }
+
   if (data.payload.status === 'ok' && data.payload.otpStatus=='0') {
     mobileotp.value=true
     buttonText.value='Verify Otp'
     
   }
   else if(data.payload.status === 'ok' && data.payload.otpStatus=='1'){
-  
+ 
      mobileotp.value=false
     buttonText.value='Verify Otp'
-     emit('updateDiv', 'email', props.data);
+     emit('updateDiv', 'email');
   }
 
 } catch (error) {
@@ -244,7 +265,6 @@ const otpverfication = async () => {
   isSending.value = true;
   errormsg.value = false;
   errormobile.value = '';
-
   const usekey=localStorage.getItem('userkey')
   const apiurl = `${baseurl.value}validateMobile`;
     const user = encryptionrequestdata({
@@ -277,7 +297,8 @@ const otpverfication = async () => {
   }
 
   if (data.payload.status === 'ok') {
-    emit('updateDiv', 'email', props.data);
+     
+    emit('updateDiv', 'email');
   }
   else if(data.payload.status==='error'){
     otperror.value = true
@@ -374,57 +395,7 @@ const back = () => {
 }
 
 const resend_sh = ref(false)
-const resendotp = async () => {
-  if (timeLeft.value !== 0) return; // Only allow resend when timeLeft is 0
 
-  try {
-    const apiurl = `${otpourl.value}sms-api/v1/send_sms`;
-
-    // Mask the mobile number for display (not affecting the API call)
-    phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
-
-    const formData = new FormData();
-    formData.append("clientCode", "KMCVJ1");
-    formData.append("smsTemplate", "dynamicLoginOtp");
-    formData.append("requestFrom", "NKYC");
-    formData.append("loginFor", "NKYC");
-    formData.append("validFor", "10 Minutes");
-    formData.append("mobileNo", mobileNo.value);
-    formData.append("otpCode", "7895");
-
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': '21279C8DC0753CD1A90DEBF3C1C5CEDB8B5B77E0455EE804C9CA03BB706CD02A',
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data) {
-      resend_sh.value = true;
-      timeLeft.value = 60;
-
-      if (timer) {
-        clearInterval(timer);
-      }
-
-      timer = setInterval(() => {
-        if (timeLeft.value > 0) {
-          timeLeft.value -= 1;
-        } else {
-          clearInterval(timer);
-        }
-      }, 1000);
-    }
-  } catch (error) {
-    console.error("Failed to resend OTP:", error.message);
-  }
-};
 
 </script>
 

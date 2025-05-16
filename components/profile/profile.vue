@@ -60,20 +60,8 @@ async function logout() {
 
     if (success) {
       router.push('/');
-      localStorage.removeItem('mobileNo')
-      localStorage.removeItem('clientname')
-      localStorage.removeItem('krastatus')
-      localStorage.removeItem('digilockerstatus')
-       localStorage.removeItem('page1')
-       localStorage.removeItem('emailid')
-       localStorage.removeItem('marital')
-       localStorage.removeItem('client')
-       localStorage.removeItem('income')
-       localStorage.removeItem('qualification')
-       localStorage.removeItem('occupation')
-       localStorage.removeItem('bank')
-       localStorage.removeItem('trading')
-       localStorage.removeItem('tradingsegment')
+      localStorage.removeItem('userkey')
+    
     } else {
       console.log("Cache entry not found or couldn't be removed.");
     

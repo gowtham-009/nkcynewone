@@ -1,6 +1,6 @@
 <template>
  
-   <div class="w-full" v-if='Authenticated'>
+   <!-- <div class="w-full" v-if='Authenticated'> -->
     <div v-if="currentForm === 'nkyclist'">
     <NKYCList @updateDiv="handleUpdateDiv" />
   </div>
@@ -110,7 +110,7 @@
   <div v-if="currentForm === 'thankyou'">
     <THANKINGYOU @updateDiv="handleUpdateDiv" />
   </div>
-   </div>
+   <!-- </div> -->
 </template>
 
 <script setup>
@@ -151,7 +151,7 @@ import SIGNDRAWING from '~/components/NKYC_Forms/photo&sign/signdraw.vue'
 import ADDITIONALINFO from '~/components/NKYC_Forms/photo&sign/documentconfirmation.vue'
 import THANKINGYOU from '~/components/thankyou.vue'
 
-const Authenticated=ref(false)
+// const Authenticated=ref(false)
 const route = useRoute()
 const router = useRouter()
 
@@ -199,20 +199,20 @@ onMounted(() => {
   //router.replace({ query: {} })
   history.replaceState({ div: currentForm.value, formData: {} }, '', '')
   window.addEventListener('popstate', handleBackButton)
-  caches.open("my-cache").then(cache => {
-  cache.match("/my-value").then(response => {
-    if (response) {
-      response.json().then(data => {
-      if(data.value){
-          Authenticated.value=true
-      }
+//   caches.open("my-cache").then(cache => {
+//   cache.match("/my-value").then(response => {
+//     if (response) {
+//       response.json().then(data => {
+//       if(data.value){
+//           Authenticated.value=true
+//       }
       
-      });
-    } else {
-      router.push('/');
-    }
-  });
-});
+//       });
+//     } else {
+//       router.push('/');
+//     }
+//   });
+// });
 
 })
 

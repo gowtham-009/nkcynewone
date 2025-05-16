@@ -61,6 +61,7 @@ import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import PAN from '~/components/forminputs/paninput.vue';
 import DOB from '~/components/forminputs/dateinput.vue';
 import { encryptionrequestdata } from '~/utils/globaldata.js'
+import { kradatares } from '~/utils/kradata.js'
 
 const { baseurl } = globalurl();
 const panerror = ref(false);
@@ -84,13 +85,13 @@ const visibleDate = ref('')
 
 const buttonText = ref("Continue");
 
-const randomtoken = () => {
-  let token = ''
-  for (var i = 0; i <= 30; i++) {
-    token += Math.floor(Math.random() * 10)
-  }
-  return token
-}
+// const randomtoken = () => {
+//   let token = ''
+//   for (var i = 0; i <= 30; i++) {
+//     token += Math.floor(Math.random() * 10)
+//   }
+//   return token
+// }
 
 watch(panvalue, (newVal) => {
  if(newVal.length===10){
@@ -153,7 +154,7 @@ const kraaddresssubmission = async () => {
   const user = encryptionrequestdata({
     panNo: panvalue.value,
     dob: visibleDate.value,
-    pageCode:"panpage",
+    pageCode:"mobile",
     userToken:userkey||''
   });
 
@@ -207,12 +208,14 @@ const handleButtonClick = async () => {
       localStorage.setItem('userkey', data.payload.userKey || '')
 
       const decryt=   decryptdatadata({decryptdata:data});
-       const tokenval = randomtoken();
-        const response = new Response(JSON.stringify({ value: tokenval }));
-        const cache = await caches.open("my-cache");
-        await cache.put("/my-value", response);
-      console.log(decryt)
-      emit('updateDiv', 'mobile', decryt);
+      //  const tokenval = randomtoken();
+      //   const response = new Response(JSON.stringify({ value: tokenval }));
+      //   const cache = await caches.open("my-cache");
+      //   await cache.put("/my-value", response);
+      // console.log(decryt)
+
+      kradatares({kradata:decryt})
+      emit('updateDiv', 'mobile');
     }, 400);
   }
 };

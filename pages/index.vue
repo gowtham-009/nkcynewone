@@ -1,5 +1,5 @@
 <template>
- <div class="w-full" v-if="Authenticated">
+ <!-- <div class="w-full" v-if="Authenticated"> -->
   <div v-if="currentForm === 'pan'">
     <form1 @updateDiv="handleUpdateDiv" />
   </div>
@@ -10,7 +10,7 @@
     <form3 :data="data" @updateDiv="handleUpdateDiv" />
   </div>
 
- </div>
+ <!-- </div> -->
 </template>
 
 <script setup>
@@ -24,14 +24,16 @@ import { getServerData } from '~/utils/serverdata.js'
 const route = useRoute();
 const data = ref({});
 const currentForm = ref(route.query.form||'pan');
-const Authenticated=ref(false)
+// const Authenticated=ref(false)
 
-const formHistory = ref(['pan']); // History stack to track form flow
+const formHistory = ref(['pan']); 
 
 
 
 
 const handleUpdateDiv = (value, newData = {}) => {
+
+  console.log("uhyiu", newData)
   currentForm.value = value;
   formHistory.value.push(value); // Push to history stack
   data.value = newData;
@@ -54,11 +56,15 @@ onMounted(async() => {
 
   const userkey=localStorage.getItem('userkey')
   if(userkey){
-
+ 
     const mydata =await getServerData()
-    const activepage=mydata.payload.metaData.profile.pageStatus
-    console.log(activepage)
+    const activepage=mydata?.payload?.metaData?.profile?.pageStatus ||'pan'
+
     currentForm.value=activepage
+        console.log(activepage)
+    if(activepage=='main'){
+      router.push('/main')
+    }
   }
 
 
@@ -72,21 +78,21 @@ onMounted(async() => {
   history.replaceState({ div: currentForm.value }, '', '');
   window.addEventListener('popstate', handleBackButton);
 
-  caches.open("my-cache").then(cache => {
-  cache.match("/my-value").then(response => {
-    if (response) {
-      response.json().then(data => {
-       if(data.value){
-        Authenticated.value=false
-        router.push('/main')
-       }
-      });
-    } else {
-      router.push('/')
-      Authenticated.value=true
-    }
-  });
-});
+//   caches.open("my-cache").then(cache => {
+//   cache.match("/my-value").then(response => {
+//     if (response) {
+//       response.json().then(data => {
+//        if(data.value){
+//         Authenticated.value=false
+//         router.push('/main')
+//        }
+//       });
+//     } else {
+//       router.push('/')
+//       Authenticated.value=true
+//     }
+//   });
+// });
 
 window.history.pushState(null, null, window.location.href);
 window.addEventListener('popstate', handleBackButton);

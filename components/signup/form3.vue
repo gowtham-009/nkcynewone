@@ -17,7 +17,7 @@
           </div>
 
           <div class="w-full mt-4">
-             <div class="w-full" :class="{ 'disabled-div': emailbox }"
+            <div class="w-full" :class="{ 'disabled-div': emailbox }"
               :style="emailbox ? { pointerEvents: 'none', opacity: 0.5 } : {}">
               <EmailInput v-model="emailid" />
               <span v-if="erroremail" class="text-red-500">{{ emailerror }}</span>
@@ -29,7 +29,8 @@
             OTP sent
           </p>
           <p class="text-sm leading-6  font-normal text-gray-500">
-            We have sent an OTP to your email {{ emailidtext }}  <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Email ID" />
+            We have sent an OTP to your email {{ emailidtext }}
+            <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Email ID" />
           </p>
           <div class="w-full mt-3">
             <emailOTP v-model="e_otp" />
@@ -40,9 +41,9 @@
             </div>
             <div class="w-full mt-4 flex justify-between items-center">
               <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0')
-                }}s</h2>
+              }}s</h2>
 
-              <button :disabled="timeLeft" type="button" @click="resendotp" disabled
+              <button :disabled="timeLeft" type="button" @click="sendemailotp('resend')" disabled
                 class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
             </div>
           </div>
@@ -76,16 +77,14 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import EmailInput from '~/components/forminputs/emailinput.vue';
 
-const props = defineProps({
-  data: {
-    type: Object,
-    default: () => ({}),
-  },
-});
-console.log(props.data)
+import { encryptionrequestdata } from '~/utils/globaldata.js'
+import { getServerData } from '~/utils/serverdata.js'
+import { getEncryptionData } from '~/utils/kradata.js'
+
+const { baseurl } = globalurl();
 
 
-const { ourl } = useUrl();
+
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
 const timeLeft = ref(60); // Start from 60 seconds
@@ -94,23 +93,44 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Verify");
 const emailbox = ref(false)
 const emailidtext = ref('')
-const otperror=ref(false)
+const otperror = ref(false)
 
-const errorotp=ref('')
+const errorotp = ref('')
 
-const erroremail=ref(false)
-const emailerror=ref('')
+const erroremail = ref(false)
+const emailerror = ref('')
 let timer = null;
 const e_otp = ref('')
-const localvalue=localStorage.getItem('krastatus')
-  const localobj = localvalue ? JSON.parse(localvalue) : {};
-  const emailpropsdata = localobj?.KYC_DATA?.APP_EMAIL || '';
-  const emailid = ref(emailpropsdata);
 
-   if(localobj?.KYC_DATA?.APP_ERROR_DESC==='PAN NOT FOUND'){
-  emailid.value = localStorage.getItem('emailid') || ''
- }
 
+
+
+const emailid=ref('')
+const setEmailData = async () => {
+  try {
+    const kraResData = getEncryptionData();
+    const myData = await getServerData();
+
+    const appKraEmail = kraResData?.kradata?.decryptdata?.payload?.metaData?.KYC_DATA?.APP_EMAIL;
+    const profileEmail = myData?.payload?.metaData?.profile?.emailId;
+    const kraEmail = myData?.payload?.metaData?.kraPan?.APP_EMAIL;
+
+    const rawEmail = appKraEmail || profileEmail || kraEmail || '';
+    console.log("krares:", appKraEmail, "nkycdata1:",profileEmail, "nkycdata2:",kraEmail)
+    emailid.value = rawEmail;
+
+     if (myData?.payload?.metaData?.otpVerification?.email?.otpVerifiedStatus=='0') {
+     emailbox.value=true
+      
+    }
+
+  } catch (error) {
+    console.error('Error setting email data:', error);
+    emailid.value = '';
+  }
+};
+
+await setEmailData()
 
 const router = useRouter()
 
@@ -123,11 +143,11 @@ const isValidEmail = computed(() => {
 });
 
 watch(isValidEmail, (newValue) => {
-  if(newValue===false){
-    erroremail.value=false
-  }else{
-    isSending.value=false
-    buttonText.value="verify"
+  if (newValue === false) {
+    erroremail.value = false
+  } else {
+    isSending.value = false
+    buttonText.value = "verify"
   }
 });
 onMounted(() => {
@@ -170,11 +190,11 @@ const back = () => {
 
 }
 
-const sendemailotp = async () => {
+const sendemailotp = async (resend) => {
   isSending.value = true; // Disable button
-  const apiurl = ourl.value + 'send-email-otp.php'
+  const apiurl = baseurl.value + 'validateEmail'
 
-  const formData = new FormData()
+
   const email = emailid.value;
 
   function maskEmail(email) {
@@ -186,13 +206,25 @@ const sendemailotp = async () => {
 
   emailidtext.value = maskEmail(email);
 
+    const user = encryptionrequestdata({
+    otpType:'email',
+    email: emailid.value,
+    resend:'false',
+    pageCode:"email",
+    userToken:localStorage.getItem('userkey')
+  });
+ 
+    const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
 
-  formData.append('emailId', emailid.value)
-  formData.append('otpCode', '78956')
+
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
-      body: formData
+      headers:{
+        'Authorization':'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+      },
+      body: jsonString
 
     })
     if (!response.ok) {
@@ -200,84 +232,100 @@ const sendemailotp = async () => {
     }
     else {
       const data = await response.json()
-      if (data.Message == 'OK') {
-         emailbox.value = true
-         buttonText.value = "Verify OTP"
-        setTimeout(() => {
-          emailchecker(data.MessageID)
-        }, 5000);
-       
 
+           if(resend=='resend'){
+        resend_sh.value = true
+        timeLeft.value = 60;
+        clearInterval(timer);
+        timer = setInterval(() => {
+          if (timeLeft.value > 0) {
+            timeLeft.value -= 1;
+          } else {
+            clearInterval(timer);
+          }
+        }, 1000);
+     }
+    
+      if (data.payload.status == 'ok' && data.payload.otpStatus=='0') {
+     
+        alert('hekek')
+
+         isSending.value = true;
+        emailbox.value = true
+        buttonText.value = "Verify OTP"
+      
+      }
+
+      else if(data.payload.status == 'ok' && data.payload.otpStatus==1){
+       
+        emailbox.value=false
+        router.push('/main')
       }
     }
   } catch (error) {
     console.error(error.message)
   }
-   
 }
 
-function otpclear(){
-     emailbox.value = false
-      isSending.value=false;
-}
 
-const emailchecker = async (messageId) => {
-  const apiUrl = `${ourl.value}check-email-status.php?messageId=${messageId}`;
+
+const otpverfication = async () => {
+  isSending.value = true; // Disable button
+  const apiurl = baseurl.value + 'validateEmail'
+    const user = encryptionrequestdata({
+    userToken:localStorage.getItem('userkey'),
+    email:emailid.value,
+    verifyotp:"false",
+    otpCode:e_otp.value,
+     pageCode:"main",
+  });
+ 
+    const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
 
   try {
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-    });
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers:{
+        'Authorization':'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+      },
+      body: jsonString
 
+    })
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-
-    const data = await response.json();
-
-    if (
-      data.MessageEvents &&
-      data.MessageEvents.length > 0 &&
-      data.MessageEvents[0].Type === 'Bounced'
-    ) {
-      // STOP polling here — do not call emailchecker again
-      emailerror.value = 'Please enter a valid email ID';
-      erroremail.value = true;
-      isSending.value = true;
-      emailbox.value = false;
-      return; // This line ensures the function exits immediately
-    }
-    
-    else if( data.MessageEvents &&
-      data.MessageEvents.length > 0 &&
-      data.MessageEvents[0].Type === 'Opened'|| data.MessageEvents[0].Type === 'Delivered' ){
-      return
-    }
-
-    else if (e_otp.value === '78956') {
-      console.log('Correct OTP entered. Stopping polling.');
-      return;
-    }
-
-    // If bounce has not occurred, continue polling after 5 seconds
-    setTimeout(() => {
-      emailchecker(messageId);
-    }, 5000);
-
-  } catch (error) {
-    console.error('Fetch error:', error.message);
-    
-    // Retry on error after 5 seconds
-    setTimeout(() => {
-      emailchecker(messageId);
-    }, 5000);
+    else {
+      const data = await response.json()
+      if(data.payload.status=='ok'){
+       router.push('/main')
+      }
+       else if(data.payload.status==='error'){
+    otperror.value = true
+     errorotp.value = 'Invalid OTP'
+       isSending.value = true;
   }
-};
+     
+    
+    }
+  } catch (error) {
+    console.error(error.message)
+  }
+}
+
+function otpclear() {
+  emailbox.value = false
+      isSending.value = false;;
+  e_otp.value=''
+}
+
 
 watch(e_otp, (newval) => {
   if (newval.length === 5) {
+  
     isSending.value = false;
-    otperror.value=false
+    otperror.value = false
   }
   else {
     isSending.value = true;
@@ -302,26 +350,9 @@ const handleButtonClick = () => {
     circle.remove();
 
     if (e_otp.value.length === 5) {
-     if(e_otp.value=='78956'){
-      try {
-       localStorage.setItem('emailid', emailid.value)
 
+        otpverfication()
       
-        router.push({
-          path: '/main',
-         
-        });
-      } catch (error) {
-        console.error("Failed to cache token or route:", error);
-        // Optional: Show user feedback here
-      }
-     }
-     else{
-      errorotp.value='Invalid OTP'
-      otperror.value=true
-      isSending.value=true
-
-     }
     } else {
       sendemailotp();
     }
@@ -330,50 +361,13 @@ const handleButtonClick = () => {
 };
 
 const resend_sh = ref(false)
-const resendotp = async () => {
- 
-  if (timeLeft.value !== 0) return; // Only allow resend when timeLeft is 0
 
-  const apiurl = ourl.value + 'send-email-otp.php'
-  const formData = new FormData()
-
-  formData.append('emailId', emailid.value)
-  formData.append('otpCode', '78956')
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      body: formData
-
-    })
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    else {
-      const data = await response.json()
-      if (data.Message == 'OK') {
-        resend_sh.value = true
-        timeLeft.value = 60;
-        clearInterval(timer);
-        timer = setInterval(() => {
-          if (timeLeft.value > 0) {
-            timeLeft.value -= 1;
-          } else {
-            clearInterval(timer);
-          }
-        }, 1000);
-      }
-    }
-  } catch (error) {
-    console.error(error.message)
-  }
-
-}
 </script>
 
 <style scoped>
 .disabled-div {
   cursor: not-allowed;
   background-color: #f0f0f0;
- 
+
 }
 </style>
