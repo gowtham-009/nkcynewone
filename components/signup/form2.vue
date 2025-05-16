@@ -118,15 +118,14 @@ const setMobileData = async () => {
     const kraresdata=getEncryptionData()
     console.log("this my val:",kraresdata)
   
-    // Safely access nested values
+
     const appKraMobile = kraresdata?.kradata?.decryptdata?.payload?.metaData?.KYC_DATA?.APP_MOB_NO || '';
     const profileMobile = mydata?.payload?.metaData?.profile?.mobileNo;
      const kraMobile = mydata?.payload?.metaData?.kraPan?.APP_MOB_NO;
-    let rawMobile = appKraMobile || profileMobile || kraMobile || '';
-       console.log("krares:", appKraMobile, "nkycdata1:",profileMobile, "nkycdata2:",kraMobile)
+    let rawMobile = profileMobile || appKraMobile || kraMobile || '';
+      
 
 
-    // Remove '91' prefix if present and the number is 12 digits long
     if (rawMobile.startsWith('91') && rawMobile.length === 12) {
       rawMobile = rawMobile.slice(2);
     }

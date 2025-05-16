@@ -115,7 +115,7 @@ const setEmailData = async () => {
     const profileEmail = myData?.payload?.metaData?.profile?.emailId;
     const kraEmail = myData?.payload?.metaData?.kraPan?.APP_EMAIL;
 
-    const rawEmail = appKraEmail || profileEmail || kraEmail || '';
+    const rawEmail =  profileEmail || appKraEmail|| kraEmail || '';
     console.log("krares:", appKraEmail, "nkycdata1:",profileEmail, "nkycdata2:",kraEmail)
     emailid.value = rawEmail;
 
