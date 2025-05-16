@@ -250,7 +250,7 @@ const sendemailotp = async (resend) => {
     
       if (data.payload.status == 'ok' && data.payload.otpStatus=='0') {
      
-        alert('hekek')
+ 
 
          isSending.value = true;
         emailbox.value = true
