@@ -72,22 +72,6 @@
         </div>
 
 
-        <!-- <div class="w-full mt-2">
-            <span class="text-lg text-gray-500">Select Id proof</span>
-            <Proof v-model:selected="idProof" />
-          </div>
-          <div class="w-full mt-2" v-if="aadhar_s">
-            <Aadhar v-model="aadhar" />
-          </div>
-          <div class="w-full mt-2" v-if="pan_s">
-            <Pan v-model="pan" />
-          </div>
-          <div class="w-full mt-2" v-if="licence_s">
-            <Licence v-model="licence" />
-          </div> -->
-        <!-- <div class="w-full mt-2">
-          <Address v-model="address" />
-        </div> -->
 
         <div class="w-full mt-2">
           <div  :class="{ 'disabled-container': isDisabled }">
@@ -184,7 +168,7 @@ const handleKeyPress = (event) => {
 
     case 'Aadhar':
       // Allow only digits, max 12 chars
-      if (!/\d/.test(key) || currentValue.length >= 12) {
+      if (!/\d/.test(key) || currentValue.length >= 4) {
         event.preventDefault()
       }
       break
