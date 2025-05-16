@@ -133,7 +133,6 @@ const setEmailData = async () => {
 await setEmailData()
 
 const router = useRouter()
-
 const isSending = ref(false);
 
 
@@ -234,6 +233,7 @@ const sendemailotp = async (resend) => {
       const data = await response.json()
 
            if(resend=='resend'){
+            e_otp.value=''
         resend_sh.value = true
         timeLeft.value = 60;
         clearInterval(timer);
