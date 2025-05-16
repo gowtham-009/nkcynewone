@@ -66,7 +66,7 @@ import { ref, onMounted } from 'vue';
 
 const emit = defineEmits(['updateDiv']);
 
-
+const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const buttonText = ref("Continue");
 const rippleBtn = ref(null);
@@ -77,33 +77,52 @@ const state = ref('');
 const city = ref('');
 const pincode = ref('');
 
-const setPermanentAddress = async () => {
-  const localvalue = localStorage.getItem('krastatus');
-  const localobj = localvalue ? JSON.parse(localvalue) : null;
+// const setPermanentAddress = async () => {
+//   const localvalue = localStorage.getItem('krastatus');
+//   const localobj = localvalue ? JSON.parse(localvalue) : null;
 
-  const localvaluedigi = localStorage.getItem('digilockerstatus');
-  const localobjdigi = localvaluedigi ? JSON.parse(localvaluedigi) : null;
+//   const localvaluedigi = localStorage.getItem('digilockerstatus');
+//   const localobjdigi = localvaluedigi ? JSON.parse(localvaluedigi) : null;
 
-  if (localobjdigi && localobjdigi.status === 'digilocker') {
+//   if (localobjdigi && localobjdigi.status === 'digilocker') {
    
-    address.value = localobjdigi.address || '';
-    state.value = localobjdigi.state || '';
-    city.value = localobjdigi.city || '';
-    pincode.value = localobjdigi.pincode || '';
-  } else if (localobj && localobj.KYC_DATA) {
-    const add1 = localobj.KYC_DATA.APP_COR_ADD1 || '';
-    const add2 = localobj.KYC_DATA.APP_COR_ADD2 || '';
-    const add3 = localobj.KYC_DATA.APP_COR_ADD3 || '';
-    address.value = `${add1} ${add2} ${add3}`.trim();
+//     address.value = localobjdigi.address || '';
+//     state.value = localobjdigi.state || '';
+//     city.value = localobjdigi.city || '';
+//     pincode.value = localobjdigi.pincode || '';
+//   } else if (localobj && localobj.KYC_DATA) {
+//     const add1 = localobj.KYC_DATA.APP_COR_ADD1 || '';
+//     const add2 = localobj.KYC_DATA.APP_COR_ADD2 || '';
+//     const add3 = localobj.KYC_DATA.APP_COR_ADD3 || '';
+//     address.value = `${add1} ${add2} ${add3}`.trim();
 
-    const stateCode = String(localobj.KYC_DATA.APP_COR_STATE || '');
-    state.value = (localobj.statelist && localobj.statelist[stateCode]) || '';
-    city.value = localobj.KYC_DATA.APP_COR_CITY || '';
-    pincode.value = localobj.KYC_DATA.APP_COR_PINCD || '';
-  }
+//     const stateCode = String(localobj.KYC_DATA.APP_COR_STATE || '');
+//     state.value = (localobj.statelist && localobj.statelist[stateCode]) || '';
+//     city.value = localobj.KYC_DATA.APP_COR_CITY || '';
+//     pincode.value = localobj.KYC_DATA.APP_COR_PINCD || '';
+//   }
+// };
+
+
+const setCommunicationAddress = async () => {
+       const mydata = await getServerData();
+       const statuscheck=mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' '
+        if(statuscheck){
+        const add1=mydata?.payload?.metaData?.kraPan?.APP_COR_ADD1 ||''
+        const add2=mydata?.payload?.metaData?.kraPan?.APP_COR_ADD2 || ''
+        const add3=mydata?.payload?.metaData?.kraPan?.APP_COR_ADD3 ||''
+        address.value=add1+ " " +add2+ " "+add3 
+         const stateCode = String(mydata?.payload?.metaData?.kraPan?.APP_PER_STATE || ''); 
+        state.value = (mydata?.payload?.metaData?.kraIdentityData?.stateCode && mydata?.payload?.metaData?.kraIdentityData?.stateCode[stateCode]) || '';
+      city.value = mydata?.payload?.metaData?.kraPan?.APP_PER_CITY ||''
+      pincode.value =  mydata?.payload?.metaData?.kraPan?.APP_PER_PINCD||''
+        }
+        else{
+          
+        }
 };
 
-setPermanentAddress();
+await setCommunicationAddress();
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
@@ -111,6 +130,51 @@ onMounted(() => {
     });
 });
 
+
+
+const communicateaddressdata = async () => {
+
+  const apiurl = `${baseurl.value}address`;
+
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+   
+        pageCode: "submission",
+        communicationAddress:address.value,
+        communicationCity: city.value,
+        communicationState: state.value,
+        communicationPincode: pincode.value
+
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    })
+
+    if (!response.ok) {
+      throw new Error("Network is error", response.status);
+
+    }
+    else {
+      const data = await response.json()
+      if (data.payload.status == 'ok') {
+      emit('updateDiv', 'submission');
+      }
+    }
+
+  } catch (error) {
+    console.log(error.message)
+  }
+}
 
 const handleButtonClick = () => {
   
@@ -129,7 +193,8 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-    emit('updateDiv', 'submission','1');
+     
+   communicateaddressdata()
   }, 600)
 };
  
@@ -153,6 +218,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+    pagestatus('parmanentaddress')
     emit('updateDiv', 'parmanentaddress'); 
   }, 600)
     

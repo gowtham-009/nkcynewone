@@ -20,7 +20,6 @@ import form1 from '~/components/signup/form1.vue';
 import form2 from '~/components/signup/form2.vue';
 import form3 from '~/components/signup/form3.vue';
 import { getServerData } from '~/utils/serverdata.js'
-
 const route = useRoute();
 const data = ref({});
 const currentForm = ref(route.query.form||'pan');
@@ -28,12 +27,9 @@ const currentForm = ref(route.query.form||'pan');
 
 const formHistory = ref(['pan']); 
 
-
-
-
 const handleUpdateDiv = (value, newData = {}) => {
 
-  console.log("uhyiu", newData)
+
   currentForm.value = value;
   formHistory.value.push(value); // Push to history stack
   data.value = newData;
@@ -55,22 +51,19 @@ const router=useRouter()
 onMounted(async() => {
 
   const userkey=localStorage.getItem('userkey')
-  if(userkey){
- 
-    const mydata =await getServerData()
-    const activepage=mydata?.payload?.metaData?.profile?.pageStatus ||'pan'
+ if (userkey) {
+  const pagetext = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
+  const mydata = await getServerData();
+  const activepage = mydata?.payload?.metaData?.profile?.pageStatus || 'pan';
+  currentForm.value = activepage;
 
-    currentForm.value=activepage
-        console.log(activepage)
-    if(activepage=='main'){
-      router.push('/main')
-    }
+  // If the active page is NOT in the pagetext list, go to /main
+  if (!pagetext.includes(activepage)) {
+    router.push('/main');
   }
+}
 
-
-
-
-  const initial = route.query.signup;
+  const initial = route.query.form;
   if (initial) {
     currentForm.value = `email`;
     formHistory.value = [`email`];
@@ -96,7 +89,6 @@ onMounted(async() => {
 
 window.history.pushState(null, null, window.location.href);
 window.addEventListener('popstate', handleBackButton);
-
 });
 
 onBeforeUnmount(() => {

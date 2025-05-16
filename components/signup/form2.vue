@@ -84,6 +84,7 @@ import { ref, onMounted, watch, onUnmounted } from 'vue';
 import { encryptionrequestdata } from '~/utils/globaldata.js'
 import { getServerData } from '~/utils/serverdata.js'
 import { getEncryptionData } from '~/utils/kradata.js'
+import { pagestatus } from '~/utils/pagestatus.js'
 
 const { baseurl } = globalurl();
 const deviceHeight = ref(0);
@@ -100,15 +101,6 @@ let timer = null;
 const errormsg = ref(false)
 const errormobile = ref('')
 const p_otp = ref('')
-
-
-// const props = defineProps({
-//   data: {
-//     type: Object,
-//     default: () => ({}),
-//   },
-// });
-// console.log("88888",props.data)
 
 const mobileNo = ref(''); // Assuming you're using `ref` for mobileNo
 const setMobileData = async () => {
@@ -147,7 +139,6 @@ const setMobileData = async () => {
   }
 };
 
-// Call the function
 await setMobileData();
 
 
@@ -334,14 +325,7 @@ const mobile_signup = () => {
     if (p_otp.value.length === 4) {
 
     otpverfication()
-      // if (p_otp.value == '7895') {
-
-      //   emit('updateDiv', 'div3');
-      // }
-      // else {
-      //   otperror.value = true
-      //   errorotp.value = 'Invalid OTP'
-      // }
+    
     }
     else {
       sendmobileotp()
@@ -388,6 +372,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+    pagestatus('pan')
     emit('updateDiv', 'pan');
   }, 600)
 

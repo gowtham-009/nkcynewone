@@ -80,6 +80,7 @@ import EmailInput from '~/components/forminputs/emailinput.vue';
 import { encryptionrequestdata } from '~/utils/globaldata.js'
 import { getServerData } from '~/utils/serverdata.js'
 import { getEncryptionData } from '~/utils/kradata.js'
+import { pagestatus } from '~/utils/pagestatus.js'
 
 const { baseurl } = globalurl();
 
@@ -87,7 +88,7 @@ const { baseurl } = globalurl();
 
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
-const timeLeft = ref(60); // Start from 60 seconds
+const timeLeft = ref(60); 
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Verify");
@@ -184,6 +185,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+    pagestatus('mobile')
     emit('updateDiv', 'mobile');
   }, 600)
 

@@ -147,7 +147,7 @@ const handleButtonClick = () => {
             emit('updateDiv', 'info');
         }
         else if (props.data == 2) {
-            emit('updateDiv', '@bank?1');
+            emit('updateDiv', 'bank1');
         }
         else if (props.data == 3) {
             emit('updateDiv', 'tradingsegment');

@@ -111,7 +111,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useRoute } from 'vue-router'
-
+import { pagestatus } from '~/utils/pagestatus.js'
 const route = useRoute();
 
 const { url } = useUrlw3();
@@ -162,8 +162,6 @@ const panverification = async (panval) => {
             if (data.metaData.status == 'VALID') {
                emit('updateDiv', 'parmanentaddress',);
             }
-
-
         }
     } catch (error) {
         console.error(error.message)
@@ -185,19 +183,23 @@ const handleButtonClick = () => {
 
     button.$el.appendChild(circle)
 
-    setTimeout(() => {
+    setTimeout(async() => {
         circle.remove()
-         const localvalue = localStorage.getItem('krastatus')
-        const localobj = localvalue ? JSON.parse(localvalue) : {};
-        if (localobj?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
-             emit('updateDiv', 'ekyc');
+         const mydata = await getServerData();
+        
+        const statuscheck=mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' '
+        if(statuscheck){
+            pagestatus('parmanentaddress')
+         emit('updateDiv', 'parmanentaddress');
         }
-        else {
-            panverification()
+        else{
+            // pagestatus('ekyc')
+            // emit('updateDiv', 'ekyc');
+               pagestatus('parmanentaddress')
+         emit('updateDiv', 'parmanentaddress');
         }
+    
 
-
-       
     }, 600)
 };
 
@@ -219,20 +221,8 @@ function back() {
 
   setTimeout(() => {
     circle.remove()
-    caches.open("my-cache").then(cache => {
-  cache.delete("/my-value").then(success => {
-    if (success) {
-        console.log("Cache  removed.");
-    } else {
-      console.log("Cache entry not found or couldn't be removed.");
-    }
-  });
-});
-
-    router.push({
-        name: 'index',
-        query: { signup: 'email' }
-    });
+pagestatus('email')
+    router.push('/');
   }, 600)
    
 }

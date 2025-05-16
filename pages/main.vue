@@ -1,7 +1,7 @@
 <template>
  
    <!-- <div class="w-full" v-if='Authenticated'> -->
-    <div v-if="currentForm === 'nkyclist'">
+    <div v-if="currentForm === 'main'">
     <NKYCList @updateDiv="handleUpdateDiv" />
   </div>
   <div v-if="currentForm === 'pandetails'">
@@ -116,6 +116,7 @@
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { getServerData } from '~/utils/serverdata.js'
 
 import NKYCList from '~/components/NKYC_Forms/nkyclist.vue'
 import PAN_d from '~/components/NKYC_Forms/pandetails/pandetails.vue'
@@ -155,34 +156,13 @@ import THANKINGYOU from '~/components/thankyou.vue'
 const route = useRoute()
 const router = useRouter()
 
-const currentForm = ref(route.query.form || 'nkyclist')
+
+
+const currentForm = ref('nkyclist')
 const data = ref({})
 const formHistory = ref([{ form: currentForm.value, formData: {} }])
 
-// Update form when route query changes
-watch(() => route.query.form, (newForm) => {
-  if (newForm) {
-    currentForm.value = newForm
-    formHistory.value.push({ form: newForm, formData: {} })
-
-    // Remove query from URL after loading component
-    router.replace({ path: '/main' })
-  }
-})
-
-
-const handleUpdateDiv = (value, newData = {}) => {
- 
-  currentForm.value = value
-  data.value = newData
-
-  // Clean URL without query
-  router.replace({ path: '/main' })
-  formHistory.value.push({ form: value, formData: newData })
-}
-
-
-
+// Handle Back Button
 const handleBackButton = () => {
   if (formHistory.value.length > 1) {
     formHistory.value.pop()
@@ -195,31 +175,47 @@ const handleBackButton = () => {
   }
 }
 
-onMounted(() => {
-  //router.replace({ query: {} })
-  history.replaceState({ div: currentForm.value, formData: {} }, '', '')
-  window.addEventListener('popstate', handleBackButton)
-//   caches.open("my-cache").then(cache => {
-//   cache.match("/my-value").then(response => {
-//     if (response) {
-//       response.json().then(data => {
-//       if(data.value){
-//           Authenticated.value=true
-//       }
-      
-//       });
-//     } else {
-//       router.push('/');
-//     }
-//   });
-// });
+// Watch for query param changes
+watch(() => route.query.form, (newForm) => {
+  if (newForm) {
+    currentForm.value = newForm
+    data.value = {}
+    formHistory.value.push({ form: newForm, formData: {} })
+    router.replace({ path: '/main' }) // Remove query from URL
+  }
+})
 
+const handleUpdateDiv = (value, newData = {}) => {
+  currentForm.value = value
+  data.value = newData
+  router.replace({ path: '/main' })
+  formHistory.value.push({ form: value, formData: newData })
+}
+
+onMounted(async () => {
+  const queryForm = route.query.form
+
+  if (queryForm) {
+    currentForm.value = queryForm
+    formHistory.value = [{ form: queryForm, formData: {} }]
+  } else {
+    const userkey = localStorage.getItem('userkey')
+    if (userkey) {
+      const mydata = await getServerData()
+      const activepage = mydata?.payload?.metaData?.profile?.pageStatus || 'nkyclist'
+      currentForm.value = activepage
+      formHistory.value = [{ form: activepage, formData: {} }]
+    }
+  }
+
+  router.replace({ query: {} }) // Clear query params from URL
+  history.replaceState({ div: currentForm.value, formData: {} }, '', '/main')
+  window.addEventListener('popstate', handleBackButton)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('popstate', handleBackButton)
 })
-
 
 </script>
 

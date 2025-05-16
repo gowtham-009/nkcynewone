@@ -54,7 +54,7 @@
 import Father from '~/components/NKYC_Forms/profiledetails/profileinputs/father.vue'
 import Mother from '~/components/NKYC_Forms/profiledetails/profileinputs/mother.vue'
 import { ref, onMounted } from 'vue';
-
+import { pagestatus } from '~/utils/pagestatus.js'
 const emit = defineEmits(['updateDiv']);
 const deviceHeight = ref(0);
 const buttonText = ref("Next");

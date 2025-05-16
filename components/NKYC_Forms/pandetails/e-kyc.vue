@@ -137,7 +137,8 @@ const back = () => {
 
     setTimeout(() => {
         circle.remove()
-        emit('updateDiv', 'nkyclist');
+        pagestatus('main')
+        emit('updateDiv', 'main');
     }, 600)
 
 }
