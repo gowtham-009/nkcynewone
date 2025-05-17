@@ -1,14 +1,19 @@
 <template>
-  <span class="font-semibold text-lg">Enter PAN</span>
-  <div class="pan-input-wrapper w-full dark:!bg-gray-800">
-    <i class="pi pi-id-card pan-icon"></i>
-    <InputText
-      v-model="formattedPan"
-      placeholder="ABCDE 1234 F"
-      maxlength="12"
-      class="pan-input"
-      @input="formatPan"
-    />
+  <div class="w-full">
+    <span class="font-semibold text-lg block mb-2">Enter PAN</span>
+    <div class="pan-input-wrapper w-full dark:bg-gray-800">
+      <i class="pi pi-id-card pan-icon"></i>
+      <input
+        v-model="displayPan"
+        @input="handleInput"
+        placeholder="ABCDE 1234 F"
+        maxlength="13"
+        class="pan-input"
+        autocapitalize="characters"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
   </div>
 </template>
 
@@ -20,39 +25,38 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue'])
 
-const rawPan = ref(props.modelValue || '')
-const formattedPan = ref('')
+const rawPan = ref(props.modelValue?.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || '')
+const displayPan = ref('')
 
-// Format function on input
-function formatPan(e) {
-  const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')
-  const cleanPan = value.slice(0, 10)
-  rawPan.value = cleanPan
-
-  let formatted = ''
-  if (cleanPan.length <= 5) {
-    formatted = cleanPan
-  } else if (cleanPan.length <= 9) {
-    formatted = `${cleanPan.slice(0, 5)} ${cleanPan.slice(5)}`
-  } else {
-    formatted = `${cleanPan.slice(0, 5)} ${cleanPan.slice(5, 9)} ${cleanPan.slice(9)}`
-  }
-
-  formattedPan.value = formatted
+function formatPan(value) {
+  value = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10)
+  if (value.length <= 5) return value
+  if (value.length <= 9) return `${value.slice(0, 5)} ${value.slice(5)}`
+  return `${value.slice(0, 5)} ${value.slice(5, 9)} ${value.slice(9)}`
 }
 
-// Emit updated value when rawPan changes
+function handleInput(e) {
+  const input = e.target.value
+  rawPan.value = input.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10)
+  displayPan.value = formatPan(rawPan.value)
+}
+
+// Emit value to parent
 watch(rawPan, (val) => {
   emit('update:modelValue', val)
 })
 
-// Sync prop when changed externally
+// Watch prop changes
 watch(() => props.modelValue, (newVal) => {
-  if (newVal !== rawPan.value) {
-    rawPan.value = newVal || ''
-    formatPan({ target: { value: rawPan.value } })
+  const cleaned = newVal?.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || ''
+  if (cleaned !== rawPan.value) {
+    rawPan.value = cleaned
+    displayPan.value = formatPan(cleaned)
   }
 })
+
+// Init display value
+displayPan.value = formatPan(rawPan.value)
 </script>
 
 <style scoped>
@@ -73,10 +77,12 @@ watch(() => props.modelValue, (newVal) => {
 }
 
 .pan-input {
-  all: unset;
+  border: none;
+  outline: none;
+  background: transparent;
   font-size: 1.2rem;
   letter-spacing: 0.15em;
-  flex: 1;
-  min-width: 0;
+  width: 100%;
+  color: inherit;
 }
 </style>
