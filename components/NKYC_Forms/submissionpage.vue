@@ -90,7 +90,7 @@ const deviceHeight = ref(0);
 
 // }
 
-await setPermanentAddress();
+//await setPermanentAddress();
 
 
 
