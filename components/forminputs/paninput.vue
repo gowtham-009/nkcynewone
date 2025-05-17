@@ -7,7 +7,7 @@
         :value="displayPan"
         @input="onInput"
         placeholder="ABCDE 1234 F"
-        maxlength="13"
+        maxlength="11"
         class="pan-input"
         autocapitalize="characters"
         autocomplete="off"

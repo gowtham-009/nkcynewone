@@ -107,9 +107,13 @@
           <p class="text-right text-gray-500 text-md">Maximum limit: 100</p>
         </div>
         <div class="w-full mt-3">
-          <Button
-            :disabled="!selectedRelation  || !dob || !selected || !shareval || !inputval || !address || !mobileNo || !isValidEmail || isSending"
-            label="Save" @click="nomineesavedata" class="primary_color w-full text-white py-2" />
+         <Button
+  :disabled="isSaveDisabled"
+  label="Save"
+  @click="nomineesavedata"
+  class="primary_color w-full text-white py-2"
+/>
+
         </div>
       </Dialog>
 
@@ -227,6 +231,20 @@ const nomineedetails = async () => {
 
 await nomineedetails()
 
+const isSaveDisabled = computed(() => {
+  return (
+    !selectedRelation.value ||
+    !dob.value ||
+    !selected.value ||
+    !shareval.value ||
+    !inputval.value ||
+    !address.value ||
+    !mobileNo.value ||
+    !isValidEmail.value ||
+    isSending.value
+  );
+});
+
 
 const dialogbox = (editdata) => {
   let formattedDOB = '';
@@ -250,7 +268,8 @@ const dialogbox = (editdata) => {
   inputval.value = editdata.idNo;
   guardian.value = editdata.guardian;
   shareval.value = editdata.share;
-  isSending.value=true
+  prooftype.value=editdata.idType;
+ 
 };
 
 
