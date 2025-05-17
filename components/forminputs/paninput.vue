@@ -6,7 +6,7 @@
       <input
         v-model="displayPan"
         @input="handleInput"
-        placeholder="ABCDE 1234 F"
+        placeholder="ABCDE1234F"
         maxlength="13"
         class="pan-input"
         autocapitalize="characters"
