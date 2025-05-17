@@ -1,13 +1,13 @@
 <template>
   <div class="w-full">
     <span class="font-semibold text-lg block mb-2">Enter PAN</span>
-    <div class="pan-input-wrapper">
+    <div class="pan-input-wrapper w-full dark:bg-gray-800">
       <i class="pi pi-id-card pan-icon"></i>
       <input
-        :value="displayPan"
-        @input="onInput"
+        v-model="displayPan"
+        @input="handleInput"
         placeholder="ABCDE 1234 F"
-        maxlength="11"
+        maxlength="13"
         class="pan-input"
         autocapitalize="characters"
         autocomplete="off"
@@ -26,22 +26,24 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const rawPan = ref(props.modelValue?.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || '')
-const displayPan = ref(formatPan(rawPan.value))
+const displayPan = ref('')
 
 function formatPan(value) {
-  value = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10)
-  if (value.length <= 5) return value
-  if (value.length <= 9) return `${value.slice(0, 5)} ${value.slice(5)}`
-  return `${value.slice(0, 5)} ${value.slice(5, 9)} ${value.slice(9)}`
+  return value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10)
 }
 
-function onInput(event) {
-  const inputVal = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')
-  rawPan.value = inputVal.slice(0, 10)
+function handleInput(e) {
+  const input = e.target.value
+  rawPan.value = input.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10)
   displayPan.value = formatPan(rawPan.value)
-  emit('update:modelValue', rawPan.value)
 }
 
+// Emit value to parent
+watch(rawPan, (val) => {
+  emit('update:modelValue', val)
+})
+
+// Watch prop changes
 watch(() => props.modelValue, (newVal) => {
   const cleaned = newVal?.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || ''
   if (cleaned !== rawPan.value) {
@@ -49,6 +51,9 @@ watch(() => props.modelValue, (newVal) => {
     displayPan.value = formatPan(cleaned)
   }
 })
+
+// Init display value
+displayPan.value = formatPan(rawPan.value)
 </script>
 
 <style scoped>
@@ -76,6 +81,5 @@ watch(() => props.modelValue, (newVal) => {
   letter-spacing: 0.15em;
   width: 100%;
   color: inherit;
-  text-transform: uppercase;
 }
 </style>
