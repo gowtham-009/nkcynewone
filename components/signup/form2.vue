@@ -116,6 +116,7 @@ const setMobileData = async () => {
      const kraMobile = mydata?.payload?.metaData?.kraPan?.APP_MOB_NO;
     let rawMobile = profileMobile || appKraMobile || kraMobile || '';
       
+    console.log("krares:", appKraMobile, "nkycdata1:",profileMobile, "nkycdata2:",kraMobile)
 
 
     if (rawMobile.startsWith('91') && rawMobile.length === 12) {
@@ -298,7 +299,8 @@ const otpverfication = async () => {
 
 } catch (error) {
   console.error("OTP Send Error:", error.message);
-  errormsg.value = 'Something went wrong. Please try again.';
+   errormsg.value = true;
+    errormobile.value = 'Invalid mobile number';
 }
 };
 

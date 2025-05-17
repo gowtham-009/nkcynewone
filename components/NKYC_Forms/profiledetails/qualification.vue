@@ -58,18 +58,19 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
+import { pagestatus } from '~/utils/pagestatus.js'
 
+const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const activebox = ref('marriedbox');
 const emit = defineEmits(['updateDiv']);
- const localvalue = localStorage.getItem('qualification');
-const localobj = localvalue ? JSON.parse(localvalue) : {};
+
 
 // qualification Status
-const selected = ref(localobj.qualification || ""); 
+const selected = ref(""); 
 const options = [
     { label: "Illiterate", value: "Illiterate" },
     { label: "Under high school", value: "Under high school" },
@@ -85,6 +86,22 @@ const selectMaritalStatus = (value) => {
 };
 
 
+const profilesetinfo = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+
+  if (statuscheck) {
+  
+   selected.value=mydata?.payload?.metaData?.personal?.education || ''
+   
+  }
+  else{
+    
+  }
+};
+
+
+await profilesetinfo()
 
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
@@ -108,11 +125,48 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+    pagestatus('clientinfo')
     emit('updateDiv', 'clientinfo');
   }, 600)
    
 };
 
+const personalinfo = async () => {
+  const apiurl = `${baseurl.value}personal_info`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "tradingexperience",
+    education:selected.value,
+   
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    })
+
+    if (!response.ok) {
+      throw new Error("Network is error", response.status);
+
+    }
+    else {
+      const data = await response.json()
+      if (data.payload.status == 'ok') {
+      emit('updateDiv', 'tradingexperience'); 
+      }
+    }
+
+  } catch (error) {
+    console.log(error.message)
+  }
+}
 const handleButtonClick = () => {
     const button = rippleBtn.value
   const circle = document.createElement('span')
@@ -129,13 +183,9 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-      const qualification={
-        qualification:selected.value,
-      
-        
-    }
-    localStorage.setItem('qualification', JSON.stringify(qualification))
-    emit('updateDiv', 'tradingexperience');  }, 600)
+     personalinfo()
+   
+   }, 600)
 };
     
 </script>

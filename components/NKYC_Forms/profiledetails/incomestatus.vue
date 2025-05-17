@@ -51,6 +51,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { pagestatus } from '~/utils/pagestatus.js'
+const { baseurl } = globalurl();
 
 const emit=defineEmits(['updateDiv']);
 const deviceHeight = ref(0);
@@ -59,9 +61,8 @@ const buttonText = ref("Next");
 const rippleBtn = ref(null);
 
 const rippleBtnback = ref(null)
- const localvalue = localStorage.getItem('income');
-const localobj = localvalue ? JSON.parse(localvalue) : {};
-const selected =ref(localobj.income || ""); 
+
+const selected =ref(""); 
 const options = [
     { label: "Below 1 lakh", value: "Below 1 lakh" },
     { label: "1 lakh to 5 lakhs", value: "1 lakh to 5 lakhs" },
@@ -75,6 +76,23 @@ const selectMaritalStatus = (value) => {
     selected.value = value;
 };
 
+
+const profilesetinfo = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+
+  if (statuscheck) {
+  
+   selected.value=mydata?.payload?.metaData?.personal?.annualIncome || ''
+   
+  }
+  else{
+    
+  }
+};
+
+
+await profilesetinfo()
 const back = () => {
     const button = rippleBtnback.value
   const circle = document.createElement('span')
@@ -90,11 +108,11 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+      pagestatus('occupation')
     emit('updateDiv', 'occupation');
   }, 600)
    
 };
-
 
 
 onMounted(() => {
@@ -103,6 +121,45 @@ onMounted(() => {
         deviceHeight.value = window.innerHeight;
     });
 });
+
+const personalinfo = async () => {
+  const apiurl = `${baseurl.value}personal_info`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "nominee",
+   
+    annualIncome: selected.value,
+   
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    })
+
+    if (!response.ok) {
+      throw new Error("Network is error", response.status);
+
+    }
+    else {
+      const data = await response.json()
+      if(data.payload.status=='ok'){
+         emit('updateDiv', 'nominee');
+      }
+     
+    }
+
+  } catch (error) {
+    console.log(error.message)
+  }
+}
 
 const handleButtonClick = () => {
     const button = rippleBtn.value
@@ -120,13 +177,8 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-     const income={
-        income:selected.value,
-       
-        
-    }
-    localStorage.setItem('income', JSON.stringify(income))
-    emit('updateDiv', 'nominee');
+   personalinfo()
+   
   }, 600)
 };   
 </script>

@@ -55,16 +55,34 @@ import Father from '~/components/NKYC_Forms/profiledetails/profileinputs/father.
 import Mother from '~/components/NKYC_Forms/profiledetails/profileinputs/mother.vue'
 import { ref, onMounted } from 'vue';
 import { pagestatus } from '~/utils/pagestatus.js'
+const { baseurl } = globalurl();
 const emit = defineEmits(['updateDiv']);
+
 const deviceHeight = ref(0);
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
- const localvalue = localStorage.getItem('client');
-const localobj = localvalue ? JSON.parse(localvalue) : {};
-const father = ref(localobj.father || ""); 
-const mother = ref(localobj.mother || ""); 
 
+const father = ref(""); 
+const mother = ref(""); 
+
+const profilesetinfo = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+
+  if (statuscheck) {
+  
+    father.value =mydata?.payload?.metaData?.kraPan?.APP_F_NAME || ''
+     mother.value =mydata?.payload?.metaData?.kraPan?.APP_M_NAME ||mydata?.payload?.metaData?.personal?.motherName || ''
+   
+  }
+  else{
+    
+  }
+};
+
+
+await profilesetinfo()
 
 
 onMounted(() => {
@@ -74,6 +92,44 @@ onMounted(() => {
     });
 });
 
+const personalinfo = async () => {
+  const apiurl = `${baseurl.value}personal_info`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "qualification",
+     fatherName: father.value,
+    motherName: mother.value,
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    })
+
+    if (!response.ok) {
+      throw new Error("Network is error", response.status);
+
+    }
+    else {
+      const data = await response.json()
+          if(data.payload.status=='ok'){
+             emit('updateDiv', 'qualification'); 
+          }
+    
+    }
+
+  } catch (error) {
+    console.log(error.message)
+  }
+}
 
 const handleButtonClick = () => {
   
@@ -92,13 +148,7 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-      const clientinfo={
-        father:father.value,
-        mother:mother.value
-    }
-
-    localStorage.setItem('client', JSON.stringify(clientinfo))
-    emit('updateDiv', 'qualification'); 
+   personalinfo()
 }, 600)
 };
 
@@ -120,6 +170,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+     pagestatus('info')
     emit('updateDiv', 'info'); 
   }, 600)
    

@@ -1,8 +1,8 @@
 <template>
     <div class="w-full">
-      <label for="pan_label" class="text-gray-500 text-lg font-normal leading-3">Address <br><span class="text-sm text-gray-500 ">(Name, Area, City, State, Pincode)</span></label>
+      <label for="pan_label" class="text-gray-500 text-lg font-normal leading-3">Address </label>
       <div class="input-wrapper dark:!bg-gray-800">
-      <Textarea v-model="address" rows="5" class="w-full prime-input" cols="30"  />
+      <Textarea v-model="address" rows="3" class="w-full prime-input" cols="10"  />
       <span class="bottom-border"></span>
       </div>
     </div>

@@ -16,21 +16,26 @@
         <p class="text-sm text-gray-500 font-normal leading-6">Relationship with nominee</p>
 
         <div class="w-full flex flex-col gap-2 mt-3">
-          <div v-if="nomineescard" class="w-full p-2 flex gap-2 bg-gray-200 rounded-lg">
-            <div class="w-5/6">
-              <span class="text-gray-500">ADFAS: {{ shareval }}</span><br>
-              <span class="text-gray-500">Nominee's relationship: {{ relationship_c }}</span>
+          <div v-if="nomineescard">
+            <div class="w-full p-2 flex gap-2  mb-2  bg-gray-200 rounded-lg " style="border: 2px solid red;" v-for="nomineeshare in nomine">
+              <div class="w-5/6">
+                <span class="text-gray-500">ADFAS: {{ nomineeshare.name  }}</span><br>
+                <span class="text-gray-500">Nominee's relationship: {{ nomineeshare.name }}</span>
+              </div>
+              <div class="w-1/6">
+                <span class="text-gray-700 font-bold text-2xl flex">{{ nomineeshare.share }}</span>
+              </div>
             </div>
-            <div class="w-1/6">
-              <span class="text-gray-700 font-bold text-2xl">80%</span>
-            </div>
+
           </div>
 
-          <Button @click="visible = true" class="w-full py-3 primary_color text-white">
+       <div class="w-full" v-if="nomineecontainer">
+           <Button @click="visible = true" class="w-full py-3 primary_color text-white">
             {{ nomineetext }}
           </Button>
 
           <p v-if="skip" class="text-center text-md text-blue-600 mt-2">Skip now</p>
+       </div>
         </div>
       </div>
 
@@ -46,6 +51,17 @@
           <DOB v-model="dob" />
         </div>
 
+        <div class="w-full mt-2">
+          <Address v-model="address" />
+        </div>
+
+        <div class="w-full mt-2">
+          <Mobile v-model="mobileNo" />
+        </div>
+
+        <div class="w-full mt-2">
+          <Email v-model="email" />
+        </div>
         <div class="w-full mt-2">
           <div class="flex gap-2">
             <div class="flex items-center gap-2">
@@ -74,7 +90,7 @@
 
 
         <div class="w-full mt-2">
-          <div  :class="{ 'disabled-container': isDisabled }">
+          <div :class="{ 'disabled-container': isDisabled }">
             <Guardian v-model="guardian" />
           </div>
 
@@ -85,8 +101,8 @@
         </div>
         <div class="w-full mt-3">
           <Button
-            :disabled="!selectedRelation || !selectedRelation || !dob || !selected || !shareval || !inputval || isSending"
-            label="Save" @click="nomineesave" class="primary_color w-full text-white py-2" />
+            :disabled="!selectedRelation || !selectedRelation || !dob || !selected || !shareval || !inputval || !address || !mobileNo || !isValidEmail || isSending"
+            label="Save" @click="nomineesavedata" class="primary_color w-full text-white py-2" />
         </div>
       </Dialog>
 
@@ -109,14 +125,19 @@ import { ref, onMounted, watch } from 'vue';
 import Namemode from '~/components/nomineeinputs/dropdown.vue';
 import Name from '~/components/nomineeinputs/nameinput.vue';
 import DOB from '~/components/nomineeinputs/dateinput.vue';
+import Address from '~/components/nomineeinputs/address.vue';
+import Mobile from '~/components/nomineeinputs/mobileinput.vue';
+import Email from '~/components/nomineeinputs/emailinput.vue';
 import RadioButton from 'primevue/radiobutton'
 
 import Guardian from '~/components/nomineeinputs/guardian.vue';
 
 import Sharevalue from '~/components/nomineeinputs/sharevalue.vue';
-
+import { pagestatus } from '~/utils/pagestatus.js'
+const { baseurl } = globalurl();
 const emit = defineEmits(['updateDiv']);
 const isDisabled = ref(true)
+const nomineecontainer=ref(true)
 // States
 const shareval = ref('');
 const skip = ref(true);
@@ -126,13 +147,20 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const nomineetext = ref("Add Nominee");
+const nomineeCount = ref(0);
 
 const selectedRelation = ref('');
 const name = ref('');
 const dob = ref('');
 const address = ref('');
+const mobileNo = ref('')
+const email = ref('')
 
+const nomine = ref([]);
 
+const isValidEmail = computed(() => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value);
+});
 const isSending = ref(false);
 
 // Confirmation data
@@ -147,7 +175,113 @@ const selected = ref('PAN')
 const prooftype = ref('PAN')
 const inputval = ref('')
 
-const guardian=ref('')
+const guardian = ref('')
+
+
+
+const nomineedetails = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+
+  if (statuscheck) {
+    const nominee = mydata?.payload?.metaData?.nominee;
+    if (nominee) {
+      nomineescard.value = true;
+      const nomineeList = [];
+      let totalShare = 0;
+
+      for (let i = 1; i <= 10; i++) {
+        const name = nominee[`nominee${i}Name`];
+        if (name && name.trim() !== '') {
+          const share = parseFloat(nominee[`nominee${i}Share`] || 0);
+          totalShare += share;
+
+          nomineeList.push({
+            name,
+            relation: nominee[`nominee${i}Relation`],
+            address: nominee[`nominee${i}Address`],
+            share,
+            mobile: nominee[`nominee${i}Mobile`],
+            dob: nominee[`nominee${i}Dob`],
+            idType: nominee[`nominee${i}IdType`],
+            idNo: nominee[`nominee${i}IdNo`],
+          });
+        }
+      }
+
+      nomine.value = nomineeList;
+      nomineeCount.value = nomineeList.length;
+
+      // Hide container if total share is 100
+      nomineecontainer.value = totalShare < 100;
+    }
+  }
+};
+
+
+await nomineedetails()
+
+
+
+
+const nomineesavedata = async () => {
+
+  const apiurl = `${baseurl.value}nominee`;
+    if (nomineeCount.value >= 10) {
+    alert("Maximum of 10 nominees allowed.");
+    return;
+  }
+
+
+  let nominecount = nomineeCount.value + 1;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "nominee",
+    nomineeName: name.value,
+    nomineeRelation: selectedRelation.value,
+    nomineeAddress: address.value,
+    nomineeMobile: mobileNo.value,
+    nomineeEmail: email.value,
+    nomineeIdType: selected.value,
+    nomineeIdNo: inputval.value,
+    nomineeDob: dob.value,
+    nomineeGuardianName: guardian.value,
+    nomineeShare: shareval.value,
+nomineeId: nominecount,
+
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+
+  try {
+
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    })
+    if (!response.ok) {
+      throw new Error(`Network request failed with status ${response.status}`);
+
+    }
+
+    else {
+      const data = await response.json()
+      visible.value=false
+      nomineedetails()
+    }
+  } catch (error) {
+    console.log(error.message)
+  }
+};
+
+
 
 const emitSelection = () => {
   prooftype.value = selected.value
@@ -208,21 +342,14 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+    pagestatus('income')
     emit('updateDiv', 'income');
   }, 600)
 
 };
 
-const nomineesave = () => {
-  relationship_c.value = selectedRelation.value;
-  name_c.value = name.value;
-  dob_c.value = dob.value;
-  address_c.value = address.value;
 
-  visible.value = false;
-  skip.value = false;
-  nomineescard.value = true;
-};
+
 
 const handleButtonClick = (event) => {
   const button = rippleBtn.value;
@@ -247,7 +374,8 @@ const handleButtonClick = (event) => {
 };
 
 // Lifecycle
-onMounted(() => {
+onMounted(async() => {
+ await nomineedetails()
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -271,19 +399,19 @@ watch(dob, (newval) => {
     if (age < 18) {
       alert('hi')
       isDisabled.value = false;
-      if(age < 18 && guardian.value){
-      
-        isSending.value=true
+      if (age < 18 && guardian.value) {
+
+        isSending.value = true
       }
-      else{
-          isSending.value=false
+      else {
+        isSending.value = false
       }
-     
+
     } else {
       isDisabled.value = true;
-    
+
     }
-  } 
+  }
 });
 
 

@@ -95,9 +95,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-
-const deviceHeight = ref(0);
+import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
+const deviceHeight = ref(0);
+
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
@@ -137,6 +138,28 @@ const clientstatus = (value) => {
     clientselected.value = value;
 };
 
+
+
+const profilesetinfo = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+
+  if (statuscheck) {
+    const gender = mydata?.payload?.metaData?.kraPan?.APP_GEN || '';
+    selectedgender.value = gender === 'M' ? 'Male' : gender === 'F' ? 'Female' : 'Other';
+
+    const marriedstatus = mydata?.payload?.metaData?.kraPan?.APP_MAR_STATUS || '';
+    selected.value = marriedstatus === '01' ? 'married' : marriedstatus === '02' ? 'unmarried' : 'other';
+
+    clientselected.value=mydata?.payload?.metaData?.personal?.pep || ''
+  }
+  else{
+
+  }
+};
+
+
+await profilesetinfo()
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
@@ -166,13 +189,13 @@ const back = () => {
 
 
 const personalinfo = async () => {
-  const apiurl = `${baseurl.value}address`;
+  const apiurl = `${baseurl.value}personal_info`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "clientinfo",
     gender:selectedgender.value,
     maritalStatus: selected.value,
-    pep: clientselected.clientselected
+    pep: clientselected.value
   });
 
   const payload = { payload: user };
@@ -193,9 +216,11 @@ const personalinfo = async () => {
     }
     else {
       const data = await response.json()
-      if (data.payload.status == 'ok') {
-      emit('updateDiv', 'submission');
+      if(data.payload.status=='ok'){
+          emit('updateDiv', 'clientinfo');
       }
+     
+     
     }
 
   } catch (error) {
@@ -220,8 +245,8 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-  
-    emit('updateDiv', 'clientinfo');
+  personalinfo()
+   
 }, 600)
 };
 </script>
