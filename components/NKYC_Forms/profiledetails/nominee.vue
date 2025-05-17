@@ -245,15 +245,18 @@ const isSaveDisabled = computed(() => {
   );
 });
 
-
 const dialogbox = (editdata) => {
   let formattedDOB = '';
 
   if (editdata.dob) {
-    // Extract only the date part (before the 'T')
-    const datePart = editdata.dob.split('T')[0]; // "2025-05-06"
-    const [year, month, day] = datePart.split('-');
-    formattedDOB = `${day}/${month}/${year}`; // "06/05/2025"
+    // Handle ISO format and avoid NaN
+    const isoDateMatch = editdata.dob.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (isoDateMatch) {
+      const [, year, month, day] = isoDateMatch;
+      formattedDOB = `${day}/${month}/${year}`; // e.g., "06/05/2025"
+    } else {
+      console.warn('Invalid DOB format:', editdata.dob);
+    }
   }
 
   visible.value = true;
@@ -268,9 +271,9 @@ const dialogbox = (editdata) => {
   inputval.value = editdata.idNo;
   guardian.value = editdata.guardian;
   shareval.value = editdata.share;
-  prooftype.value=editdata.idType;
- 
+  prooftype.value = editdata.idType;
 };
+
 
 
 const nomineesavedata = async () => {

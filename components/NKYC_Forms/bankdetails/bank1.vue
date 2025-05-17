@@ -225,17 +225,17 @@ const bankvalidation = async () => {
     }
 
     const data = await response.json();
-    if (data.payload.metaData.bankVerifyStatus==1) {
+    if (data?.payload?.metaData?.bankVerifyStatus==1) {
       emit('updateDiv', 'bank4');
     }
     else {
-      //emit('updateDiv', 'bank4');
+      emit('updateDiv', 'bank4');
     }
 
 
   } catch (error) {
     console.error('Error:', error);
-    alert(error)
+  
 
 
   }

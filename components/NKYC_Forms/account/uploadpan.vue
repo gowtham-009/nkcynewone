@@ -57,9 +57,8 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 
 // Load from localStorage
-const localvalue = localStorage.getItem('income');
-const localobj = localvalue ? JSON.parse(localvalue) : {};
-const imageSrcpan = ref(localobj.panimage || null);
+
+const imageSrcpan = ref( null);
 
 // Optional: auto-save on change
 watch(imageSrcpan, (newVal) => {

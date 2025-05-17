@@ -29,7 +29,7 @@
                 <Button @click="back()" ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                 <i class="pi pi-angle-left text-3xl dark:text-white"></i>
             </Button>
-                <Button type="button"  ref="rippleBtn"  @click="handleButtonClick"
+                <Button type="button" :disabled="!imageCaptured"  ref="rippleBtn"  @click="handleButtonClick"
                     class=" primary_color  text-white w-5/6 py-4 text-xl border-0  ">
                     {{ buttonText }}
                 </Button>
@@ -45,14 +45,104 @@ import useGeolocation from '~/composables/useGeolocation'
 import CMAIDENTIFY from '~/components/NKYC_Forms/photo&sign/cameraidentification/cmaidentify.vue'
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
-
+const { baseurl } = globalurl();
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const imageCaptured = ref(null);
 
+import { watch } from 'vue'
+
 
 const { latitude, longitude, errorMessage } = useGeolocation()
+
+watch(latitude, (newLat) => {
+  if (newLat !== null && longitude.value !== null) {
+    console.log('Latitude:', newLat)
+    console.log('Longitude:', longitude.value)
+    getCountry()
+  }
+})
+
+const getCountry = async () => {
+  if (!latitude.value || !longitude.value) {
+    console.error('Latitude or longitude is missing')
+    return
+  }
+
+  const apiKey = 'R2ey6sqmfP210eJgVXX-NvmoUgrKlDAW4JwVXgVEaHs'
+  const apiUrl = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${latitude.value},${longitude.value}&lang=en-US&apiKey=${apiKey}`
+
+  try {
+    const response = await fetch(apiUrl)
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    if(data){
+          const geolocation={
+        latitute:data.items[0].position.lat,
+        longitude:data.items[0].position.lng,
+        conuntryname:data.items[0].address.countryName,
+        countrycode:data.items[0].address.countryCode,
+    }
+    return geolocation
+    }
+  
+    console.log('Reverse Geocoding Data:', data)
+  } catch (error) {
+    console.error('Error fetching location:', error.message)
+  }
+}
+
+
+const ipvfunction = async () => {
+
+  const apiurl = `${baseurl.value}ipv`;
+    const location=await getCountry()
+ 
+const user = encryptionrequestdata({
+  userToken: localStorage.getItem('userkey'),
+  pageCode: "ipv",
+  ipvImage: imageCaptured.value,
+  location: `${location.latitute},${location.longitude}`,
+  country: location.conuntryname
+})
+
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    })
+
+    if (!response.ok) {
+      throw new Error("Network is error", response.status);
+
+    }
+    else {
+      const data = await response.json()
+
+      if (data.payload.metaData.is_real == 'true') {
+       emit('updateDiv', 'photoproceed');
+      }
+      else{
+         emit('updateDiv', 'takephoto');
+      }
+
+    }
+
+  } catch (error) {
+    console.log(error.message)
+  }
+}
 
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
@@ -86,7 +176,7 @@ const back = () => {
 };
 const handleButtonClick = () => {
  
-    const button = rippleBtn.value
+  const button = rippleBtn.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
 
@@ -101,8 +191,8 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-    
-    emit('updateDiv', 'photoproceed', imageCaptured.value);
+    ipvfunction()
+   // emit('updateDiv', 'photoproceed', imageCaptured.value);
 }, 600)
 };
 
