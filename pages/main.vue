@@ -56,7 +56,7 @@
   <div v-if="currentForm === 'nominee'">
     <NOMINEE  @updateDiv="handleUpdateDiv" />
   </div>
-  <div v-if="currentForm === '@bank?1'">
+  <div v-if="currentForm === 'bank1'">
     <BANK1  @updateDiv="handleUpdateDiv" />
   </div>
 

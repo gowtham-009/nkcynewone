@@ -2,7 +2,7 @@
 
 import { encryptionrequestdata } from '~/utils/globaldata.js';
 
-export async function pagestatus(pagecode) {
+export async function pagestatus(pagecode, profileCode) {
 
   const apiUrl = "https://nnkyc.w3webtechnologies.co.in//api/v1/update_pagestatus";
 
@@ -10,7 +10,8 @@ export async function pagestatus(pagecode) {
 
   const encryptedUser = encryptionrequestdata({
     userToken: userkey,
-    pageCode:pagecode
+    pageCode:pagecode,
+    profileCode:profileCode
   });
 
   const payload = { payload: encryptedUser };

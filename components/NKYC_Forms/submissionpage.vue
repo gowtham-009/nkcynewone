@@ -83,6 +83,14 @@ const completedbox = ref(false);
 
 const deviceHeight = ref(0);
 
+// const setPermanentAddress = async () => {
+//   const mydata = await getServerData();
+//    const statuscheck = mydata?.payload?.metaData?.profile?.profileStatus || ' '
+//  return statuscheck
+
+// }
+
+await setPermanentAddress();
 
 
 

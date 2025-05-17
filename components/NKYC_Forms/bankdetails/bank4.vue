@@ -110,33 +110,39 @@ const rippleBtn = ref(null);
 const rippleBtnBack = ref(null);
 const deviceHeight = ref(window.innerHeight);
 
-function bankstatus() {
-  const localvalue = localStorage.getItem('bank');
-  const localobj = localvalue ? JSON.parse(localvalue) : {};
-  if (localobj[0].accountholdername) {
-    successtext.value='Bank account added'
+
+
+const profilesetinfo = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.bank?.bank1HolderName || '';
+
+  if (statuscheck) {
+   successtext.value='Bank account added'
     verifiedtext.value='Your bank details have been verified.'
-    bankname.value = localobj[0]?.bankname || ""
-    accno.value = localobj[0]?.accno || ""
-    ifsccode.value = localobj[0]?.ifsc || ""
-    MICR.value = localobj[0]?.micr || ""
-    address.value = localobj[0]?.address || ""
+
+
+    bankname.value = mydata?.payload?.metaData?.bank?.bank1Name||''
+    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo||''
+     ifsccode.value = mydata?.payload?.metaData?.bank?.bank1IFSC||''
+     MICR.value = mydata?.payload?.metaData?.bank?.bank1MICR||''
+    address.value = mydata?.payload?.metaData?.bank?.bank1Address||''
   }
-  else {
-    successtext.value='Bank account failed'
+  else{
+     successtext.value='Bank account failed'
     verifiedtext.value=''
     bankerror.value=true
-    bankname.value = localobj[0]?.bankname || ""
-    accno.value = localobj[0]?.accno || ""
-    ifsccode.value = localobj[0]?.ifsc || ""
-    MICR.value = localobj[0]?.micr || ""
-    address.value = localobj[0]?.address || ""
+   bankname.value = mydata?.payload?.metaData?.bank?.bank1Name||''
+    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo||''
+     ifsccode.value = mydata?.payload?.metaData?.bank?.bank1IFSC||''
+     MICR.value = mydata?.payload?.metaData?.bank?.bank1MICR||''
+    address.value = mydata?.payload?.metaData?.bank?.bank1Address||''
   }
+};
+await profilesetinfo()
 
 
-}
 
-bankstatus()
+
 onMounted(() => {
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -166,7 +172,10 @@ function handleButtonClick(event) {
 
 function back(event) {
   createRipple(rippleBtnBack.value, event);
-  setTimeout(() => emit('updateDiv', '@bank?1'), 600);
+   pagestatus('bank1')
+  setTimeout(() => emit('updateDiv', 'bank1'),
+   600);
+
 }
 </script>
 

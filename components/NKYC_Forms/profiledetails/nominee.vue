@@ -17,13 +17,19 @@
 
         <div class="w-full flex flex-col gap-2 mt-3">
           <div v-if="nomineescard">
-            <div class="w-full p-2 flex gap-2  mb-2  bg-gray-200 rounded-lg " style="border: 2px solid red;" v-for="nomineeshare in nomine">
-              <div class="w-5/6">
-                <span class="text-gray-500">ADFAS: {{ nomineeshare.name  }}</span><br>
-                <span class="text-gray-500">Nominee's relationship: {{ nomineeshare.name }}</span>
+            <div class="w-full p-2  cursor-pointer mb-2  bg-gray-200 rounded-lg " v-for="nomineeshare in nomine">
+            <div class="w-full">
+                <div class="w-4/5">
+                <span class="text-gray-500">Nominee Name: {{ nomineeshare.name  }}</span><br>
+                <span class="text-gray-500">Nominee's relationship: {{ nomineeshare.relation }}</span>
               </div>
-              <div class="w-1/6">
-                <span class="text-gray-700 font-bold text-2xl flex">{{ nomineeshare.share }}</span>
+              <div class="w-1/5" >
+                <p class="text-gray-700 font-bold text-2xl flex">{{ nomineeshare.share }} %</p>
+              </div>
+            </div>
+              <div class="w-full p-1 flex gap-2">
+                  <Button @click="dialogbox(nomineeshare)" type="button" class="w-full text-white">Edit</Button>
+                  <Button @click="nomineedelete(nomineeshare)" type="button" class="w-full text-white bg-red-500">Delete</Button>
               </div>
             </div>
 
@@ -34,13 +40,14 @@
             {{ nomineetext }}
           </Button>
 
-          <p v-if="skip" class="text-center text-md text-blue-600 mt-2">Skip now</p>
+        
        </div>
         </div>
       </div>
 
       <!-- Dialog Modal -->
       <Dialog class="p-0" v-model:visible="visible" modal header="Add Nominee" :style="{ width: '25rem' }">
+        <input type="text" v-model="idval" class="hidden">
         <div class="w-full">
           <Name v-model="name" />
         </div>
@@ -101,7 +108,7 @@
         </div>
         <div class="w-full mt-3">
           <Button
-            :disabled="!selectedRelation || !selectedRelation || !dob || !selected || !shareval || !inputval || !address || !mobileNo || !isValidEmail || isSending"
+            :disabled="!selectedRelation  || !dob || !selected || !shareval || !inputval || !address || !mobileNo || !isValidEmail || isSending"
             label="Save" @click="nomineesavedata" class="primary_color w-full text-white py-2" />
         </div>
       </Dialog>
@@ -138,9 +145,10 @@ const { baseurl } = globalurl();
 const emit = defineEmits(['updateDiv']);
 const isDisabled = ref(true)
 const nomineecontainer=ref(true)
+const idval=ref('')
 // States
 const shareval = ref('');
-const skip = ref(true);
+
 const visible = ref(false);
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
@@ -165,10 +173,6 @@ const isSending = ref(false);
 
 // Confirmation data
 const nomineescard = ref(false);
-const relationship_c = ref('');
-const name_c = ref('');
-const dob_c = ref('');
-const address_c = ref('');
 
 
 const selected = ref('PAN')
@@ -198,21 +202,23 @@ const nomineedetails = async () => {
 
           nomineeList.push({
             name,
+            id:i,
             relation: nominee[`nominee${i}Relation`],
             address: nominee[`nominee${i}Address`],
             share,
+            email: nominee[`nominee${i}Email`],
             mobile: nominee[`nominee${i}Mobile`],
+           
             dob: nominee[`nominee${i}Dob`],
             idType: nominee[`nominee${i}IdType`],
             idNo: nominee[`nominee${i}IdNo`],
+            guardian: nominee[`nominee${i}GuardianName`],
           });
         }
       }
 
       nomine.value = nomineeList;
       nomineeCount.value = nomineeList.length;
-
-      // Hide container if total share is 100
       nomineecontainer.value = totalShare < 100;
     }
   }
@@ -222,18 +228,43 @@ const nomineedetails = async () => {
 await nomineedetails()
 
 
+const dialogbox = (editdata) => {
+  let formattedDOB = '';
+
+  if (editdata.dob) {
+    // Extract only the date part (before the 'T')
+    const datePart = editdata.dob.split('T')[0]; // "2025-05-06"
+    const [year, month, day] = datePart.split('-');
+    formattedDOB = `${day}/${month}/${year}`; // "06/05/2025"
+  }
+
+  visible.value = true;
+  idval.value = editdata.id;
+  name.value = editdata.name;
+  selectedRelation.value = editdata.relation;
+  dob.value = formattedDOB;
+  address.value = editdata.address;
+  mobileNo.value = editdata.mobile;
+  email.value = editdata.email;
+  selected.value = editdata.idType;
+  inputval.value = editdata.idNo;
+  guardian.value = editdata.guardian;
+  shareval.value = editdata.share;
+  isSending.value=true
+};
 
 
 const nomineesavedata = async () => {
+  visible.value = true;
 
-  const apiurl = `${baseurl.value}nominee`;
-    if (nomineeCount.value >= 10) {
+  if (!idval.value && nomineeCount.value >= 10) {
     alert("Maximum of 10 nominees allowed.");
+    visible.value = false;
     return;
   }
 
+  const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
 
-  let nominecount = nomineeCount.value + 1;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "nominee",
@@ -247,17 +278,14 @@ const nomineesavedata = async () => {
     nomineeDob: dob.value,
     nomineeGuardianName: guardian.value,
     nomineeShare: shareval.value,
-nomineeId: nominecount,
-
-
+    nomineeId: nomineeId,
   });
 
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
-
+  const apiurl = `${baseurl.value}nominee`;
 
   try {
-
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
@@ -265,21 +293,64 @@ nomineeId: nominecount,
         'Content-Type': 'application/json',
       },
       body: jsonString,
-    })
+    });
+
     if (!response.ok) {
       throw new Error(`Network request failed with status ${response.status}`);
-
     }
 
-    else {
-      const data = await response.json()
-      visible.value=false
-      nomineedetails()
-    }
+    const data = await response.json();
+    visible.value = false;
+    nomineedetails(); // Refresh the nominee list or details
   } catch (error) {
-    console.log(error.message)
+    console.error("Error saving nominee:", error.message);
+    visible.value = false;
   }
 };
+
+
+const nomineedelete = async (deleteid) => {
+ 
+
+
+
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "nominee",
+   removeNominee:deleteid.id
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+  const apiurl = `${baseurl.value}nominee`;
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+  
+    nomineedetails(); // Refresh the nominee list or details
+  } catch (error) {
+    console.error("Error saving nominee:", error.message);
+    visible.value = false;
+  }
+};
+
+
+
+
 
 
 
@@ -397,7 +468,7 @@ watch(dob, (newval) => {
     }
 
     if (age < 18) {
-      alert('hi')
+   
       isDisabled.value = false;
       if (age < 18 && guardian.value) {
 

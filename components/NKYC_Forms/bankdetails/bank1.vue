@@ -16,12 +16,28 @@
         </p>
 
         <div class="w-full   p-1">
+            <div class="mt-1">
+          <span class="text-gray-500 text-md">Account Type</span>
+             <div class="flex gap-2">
+            <div class="flex items-center gap-2">
+              <RadioButton v-model="selected" inputId="SAVING " name="id" value="SAVING " @change="emitSelection" />
+              <label for="SAVING " class="text-gray-500">Saving Account</label>
+            </div>
+            <div class="flex items-center gap-2">
+              <RadioButton v-model="selected" inputId="CURRENT " name="id" value="CURRENT " @change="emitSelection" />
+              <label for="CURRENT " class="text-gray-500">Current Account</label>
+            </div>
+          
+          </div>
+
+        </div>
 
           <div class="mt-1">
             <span class="text-gray-500 text-md">Account no</span>
             <Accno v-model="accno" />
           </div>
 
+      
           <div class="mt-1">
             <span class="text-gray-500 text-md">IFSC code</span>
             <IFSC v-model="ifsc" />
@@ -78,21 +94,49 @@ import IFSC from '~/components/NKYC_Forms/bankdetails/bankinputs/ifsc.vue'
 import MICR from '~/components/NKYC_Forms/bankdetails/bankinputs/micr.vue'
 import Address from '~/components/NKYC_Forms/bankdetails/bankinputs/address.vue'
 const emit = defineEmits(['updateDiv']);
-const { url } = useUrlw3();
+
+import { pagestatus } from '~/utils/pagestatus.js'
+const { baseurl } = globalurl();
 
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 
-const localvalue = localStorage.getItem('bank');
-const localobj = localvalue ? JSON.parse(localvalue) : {};
 
-const bankname = ref(localobj[0]?.bankname || "");
-const accno = ref(localobj[0]?.accno || "");
-const ifsc = ref(localobj[0]?.ifsc || "");
-const micr = ref(localobj[0]?.micr || "");
-const address = ref(localobj[0]?.address || "");
+const bankname = ref("");
+const accno = ref("");
+const ifsc = ref("");
+const micr = ref("");
+const address = ref("");
+const selected = ref('SAVING')
+
+
+const profilesetinfo = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+
+  if (statuscheck) {
+  
+  selected.value= mydata?.payload?.metaData?.bank?.bank1AccType||''
+  accno.value=mydata?.payload?.metaData?.bank?.bank1AccNo||''
+  ifsc.value=mydata?.payload?.metaData?.bank?.bank1IFSC||''
+  micr.value=mydata?.payload?.metaData?.bank?.bank1MICR||''
+  address.value=mydata?.payload?.metaData?.bank?.bank1Address||''
+  bankname.value=mydata?.payload?.metaData?.bank?.bank1Name||''
+   
+  }
+  else{
+    
+  }
+};
+await profilesetinfo()
+
+
+const emitSelection = () => {
+  prooftype.value = selected.value
+  inputval.value = ''
+}
 
 onMounted(() => {
   deviceHeight.value = window.innerHeight;
@@ -148,32 +192,32 @@ const getbankaddress = async (ifscval) => {
 
 
 const bankvalidation = async () => {
-    const bankdetails = [
-        {
-          bankname: bankname.value,
-          accno: accno.value,
-          ifsc: ifsc.value,
-          micr: micr.value,
-          address: address.value
-        }
-      ]
-  const apiUrl = url.value + '/bank';
-  const formData = new FormData();
-  formData.append('brokerCode', 'UAT-KYC');
-  formData.append('appId', '1216');
-  formData.append('clientCode', 'C3HO3');
-  formData.append('bankAccNo', accno.value);
-  formData.append('bankIfsc', ifsc.value);
-  formData.append('clientName', localStorage.getItem('clientname'));
-  formData.append('clientMobile', localStorage.getItem('mobileNo'));
+   
+   const apiurl = `${baseurl.value}bank`;
+   const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "bank4",
+    bankAccType: selected.value,
+    bankAccNo: accno.value,
+    bankIFSC: ifsc.value,
+    bankMICR: micr.value,
+    bankName: bankname.value,
+    bankAddress: address.value
+
+   
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
 
   try {
-    const response = await fetch(apiUrl, {
+    const response = await fetch(apiurl, {
       method: 'POST',
-      body: formData,
+    
       headers: {
-        'Authorization': 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE'
-      }
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+      },
+        body: jsonString,
     });
 
     if (!response.ok) {
@@ -181,34 +225,11 @@ const bankvalidation = async () => {
     }
 
     const data = await response.json();
-    if (data.metaData.bank_acc_holder_name) {
-       const bankdetails = [
-        {
-          bankname: bankname.value,
-          accno: accno.value,
-          ifsc: ifsc.value,
-          micr: micr.value,
-          address: address.value,
-          accountholdername:data.metaData.bank_acc_holder_name
-        }
-      ]
-    
-      localStorage.setItem('bank', JSON.stringify(bankdetails))
+    if (data.payload.metaData.bankVerifyStatus==1) {
       emit('updateDiv', 'bank4');
     }
     else {
-        const bankdetails = [
-        {
-          bankname: bankname.value,
-          accno: accno.value,
-          ifsc: ifsc.value,
-          micr: micr.value,
-          address: address.value,
-          accountholdername:data.metaData.bank_acc_holder_name
-        }
-      ]
-       localStorage.setItem('bank', JSON.stringify(bankdetails))
-      emit('updateDiv', 'bank4');
+      //emit('updateDiv', 'bank4');
     }
 
 
