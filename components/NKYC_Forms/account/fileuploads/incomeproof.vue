@@ -39,7 +39,14 @@ watch(pdfUrl, (val) => emit('update:pdfUrl', val))
 const onFileSelect = (event) => {
   const file = event.target.files[0]
   if (file && file.type === 'application/pdf') {
-    pdfUrl.value = URL.createObjectURL(file)
+    const reader = new FileReader()
+    reader.onload = () => {
+      pdfUrl.value = reader.result // this is base64 string with data: prefix
+    }
+    reader.onerror = () => {
+      alert('Failed to read file.')
+    }
+    reader.readAsDataURL(file) // this gives base64
   } else {
     alert('Please select a valid PDF file.')
   }

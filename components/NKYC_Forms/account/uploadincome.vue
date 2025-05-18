@@ -56,20 +56,14 @@ import { ref, onMounted } from 'vue'
 import Income from '~/components/NKYC_Forms/account/fileuploads/incomeproof.vue'
 
 const emit = defineEmits(['updateDiv'])
-
+const { baseurl } = globalurl();
 const deviceHeight = ref(window.innerHeight)
 onMounted(() => {
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight
   })
 
-  // Load from localStorage
-  const localIncome = localStorage.getItem('incomeproof')
-  if (localIncome) {
-    const { pdfUrl: savedUrl, selectedStatement: savedStatement } = JSON.parse(localIncome)
-    pdfUrl.value = savedUrl
-    selectedStatement.value = savedStatement
-  }
+ 
 })
 
 const rippleBtn = ref(null)
@@ -88,20 +82,58 @@ const statementOptions = ref([
   { name: 'DP HOLDING STATEMENTS' }
 ])
 
+const proofupload = async () => {
+  const apiurl = `${baseurl.value}proofupload`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "submission",
+    incomeType:selectedStatement.value.name,
+   income:pdfUrl.value
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+        pagestatus('submission', '4'),
+      emit('updateDiv', 'submission')
+
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
 const back = (event) => {
   createRipple(event, rippleBtnBack.value)
-  setTimeout(() => emit('updateDiv', 'uploadbank'), 600)
+  setTimeout(() =>
+  pagestatus('uploadbank'),
+   emit('updateDiv', 'uploadbank'),
+  
+    600)
 }
 
 const handleButtonClick = (event) => {
   createRipple(event, rippleBtn.value)
 
   setTimeout(() => {
-    localStorage.setItem('incomeproof', JSON.stringify({
-      pdfUrl: pdfUrl.value,
-      selectedStatement: selectedStatement.value
-    }))
-    emit('updateDiv', 'submission', '4')
+  proofupload()
+    
   }, 600)
 }
 

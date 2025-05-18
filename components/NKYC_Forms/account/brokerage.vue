@@ -78,6 +78,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+    pagestatus('tradingsegment')
     emit('updateDiv', 'tradingsegment');
   }, 600)
    

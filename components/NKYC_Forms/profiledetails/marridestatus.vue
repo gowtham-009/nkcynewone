@@ -181,8 +181,9 @@ const back = () => {
   button.$el.appendChild(circle)
 
   setTimeout(() => {
+     pagestatus('submission', '1')
     circle.remove()
-    emit('updateDiv', 'submission', '1');
+    emit('updateDiv', 'submission');
   }, 600)
    
 };

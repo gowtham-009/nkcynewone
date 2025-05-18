@@ -54,6 +54,20 @@ const imageCaptured = ref(null);
 import { watch } from 'vue'
 
 
+const setPermanentAddress = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' '
+  if (statuscheck) {
+   
+  }
+  else {
+
+  }
+
+}
+
+await setPermanentAddress();
+
 const { latitude, longitude, errorMessage } = useGeolocation()
 
 watch(latitude, (newLat) => {
@@ -131,9 +145,11 @@ const user = encryptionrequestdata({
       const data = await response.json()
 
       if (data.payload.metaData.is_real == 'true') {
+         pagestatus('photoproceed')
        emit('updateDiv', 'photoproceed');
       }
       else{
+        pagestatus('takephoto')
          emit('updateDiv', 'takephoto');
       }
 
@@ -170,6 +186,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+    pagestatus('photosign1')
     emit('updateDiv', 'photosign1');
   }, 600)
    
@@ -192,7 +209,7 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
     ipvfunction()
-   // emit('updateDiv', 'photoproceed', imageCaptured.value);
+  
 }, 600)
 };
 

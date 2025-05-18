@@ -50,7 +50,7 @@ import { ref, onMounted, watch } from 'vue';
 import PAN from '~/components/NKYC_Forms/account/fileuploads/pancard.vue';
 
 const emit = defineEmits(['updateDiv']);
-
+const { baseurl } = globalurl();
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
@@ -61,12 +61,47 @@ const rippleBtnback = ref(null);
 const imageSrcpan = ref( null);
 
 // Optional: auto-save on change
-watch(imageSrcpan, (newVal) => {
-  const updated = {
-    panimage: newVal
-  };
-  localStorage.setItem('income', JSON.stringify(updated));
-});
+// watch(imageSrcpan, (newVal) => {
+//   const updated = {
+//     panimage: newVal
+//   };
+//   localStorage.setItem('income', JSON.stringify(updated));
+// });
+
+
+const proofupload = async () => {
+  const apiurl = `${baseurl.value}proofupload`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "uploadbank",
+   pancard:imageSrcpan.value
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+     emit('updateDiv', 'uploadbank');
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+};
 
 const back = (event) => {
   const button = rippleBtnback.value;
@@ -83,6 +118,7 @@ const back = (event) => {
 
   setTimeout(() => {
     circle.remove();
+     pagestatus('brokerage'),
     emit('updateDiv', 'brokerage');
   }, 600);
 };
@@ -102,11 +138,8 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove();
-    const proofpan = {
-      panimage: imageSrcpan.value
-    };
-    localStorage.setItem('income', JSON.stringify(proofpan));
-    emit('updateDiv', 'uploadbank');
+   proofupload()
+ 
   }, 600);
 };
 

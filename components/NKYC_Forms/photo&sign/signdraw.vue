@@ -29,7 +29,7 @@
               <Button @click="back()" ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                 <i class="pi pi-angle-left text-3xl dark:text-white"></i>
             </Button>
-                <Button type="button"  ref="rippleBtn"  @click="handleButtonClick"
+                <Button type="button"  ref="rippleBtn"  @click="handleButtonClick" :disabled="!imageSrc"
                     class=" primary_color  text-white w-5/6 py-4 text-xl border-0  ">
                     {{ buttonText }}
                 </Button>
@@ -53,6 +53,8 @@ let ctx = null;
 let isDrawing = false;
 const isImageUploaded = ref(false);
 
+const { baseurl } = globalurl();
+
 // 🖊️ Start drawing
 const startDrawing = (event) => {
   if (isImageUploaded.value) return; // 🔒 Prevent drawing on uploaded image
@@ -74,7 +76,12 @@ const draw = (event) => {
 const stopDrawing = () => {
   isDrawing = false;
   ctx.beginPath();
+
+  if (!isImageUploaded.value) {
+    imageSrc.value = canvasRef.value.toDataURL('image/png');
+  }
 };
+
 
 // Get Mouse/Tap Position
 const getMousePos = (event) => {
@@ -160,10 +167,48 @@ const handleButtonClick=()=>{
 
   setTimeout(() => {
     circle.remove()
-    emit('updateDiv', 'additionalinformation');
+    uploadsign()
     }, 600)
 }
 
+
+const uploadsign = async () => {
+  const apiurl = `${baseurl.value}proofupload`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "additionalinformation",
+    signature:imageSrc.value,
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+          emit('updateDiv', 'additionalinformation');
+
+    
+
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+};
 
 const back = () => {
   const button = rippleBtnback.value
@@ -180,6 +225,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+     pagestatus('signature')
     emit('updateDiv', 'signature');
   }, 600)
    
@@ -216,8 +262,10 @@ const uploadImage = (event) => {
       const x = (canvas.width - img.width * scale) / 2;
       const y = (canvas.height - img.height * scale) / 2;
 
-      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-      isImageUploaded.value = true; // ✅ Disable drawing
+     ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+isImageUploaded.value = true;
+imageSrc.value = canvas.toDataURL('image/png'); // ✅ set imageSrc
+
     };
     img.src = e.target.result;
   };

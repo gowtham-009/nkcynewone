@@ -167,7 +167,10 @@ function createRipple(buttonRef, event) {
 
 function handleButtonClick(event) {
   createRipple(rippleBtn.value, event);
-  setTimeout(() => emit('updateDiv', 'submission', '3'), 600);
+  setTimeout(() =>
+   pagestatus('submission', '3'),
+   emit('updateDiv', 'submission'), 
+   600);
 }
 
 function back(event) {

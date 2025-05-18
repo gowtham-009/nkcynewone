@@ -62,13 +62,28 @@ import { ref, onMounted } from 'vue';
 
 const emit = defineEmits(['updateDiv']);
 
+const { baseurl } = globalurl();
+
 const deviceHeight = ref(window.innerHeight);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 
-// Read from localStorage and fallback to empty array
-const localvalue = localStorage.getItem('tradingsegment');
-const selected = ref(localvalue ? JSON.parse(localvalue) : []);
+
+const selected = ref([]);
+
+const getsegmentdata = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' '
+  if (statuscheck) {
+   
+  }
+  else {
+
+  }
+
+}
+
+await getsegmentdata();
 
 const options = [
   { label: "NSE CASH", value: "NSE CASH" },
@@ -92,6 +107,66 @@ const toggleSelection = (value) => {
   }
 };
 
+
+const segmentdata = async () => {
+  const apiurl = `${baseurl.value}segments`;
+  const selectedSegments = selected.value; // e.g., ["NSE CASH", "NSE F & O", "BSE F & O"]
+
+  const allSegments = {
+    nseCASH: "NSE CASH",
+    nseFO: "NSE F & O",
+    nseCOM: "NSE COMMODITIES",
+    nseCD: "NSE CD",
+    nseMF: "NSE MF",
+    bseCASH: "BSE CASH",
+    bseFO: "BSE F & O",
+    bseCOM: "BSE COMMODITIES",
+    bseCD: "BSE CD",
+    bseMF: "BSE MF",
+    MCX: "MCX",
+    ICEX: "ICEX",
+    mseCD: "MCX CD",
+  };
+
+  const segmentFlags = {};
+  for (const key in allSegments) {
+    segmentFlags[key] = selectedSegments.includes(allSegments[key]) ? "YES" : "NO";
+  }
+
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "brokerage",
+    ...segmentFlags
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+     emit('updateDiv', 'brokerage');
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+
+
 const back = (event) => {
   const button = rippleBtnback.value;
   const circle = document.createElement('span');
@@ -108,9 +183,12 @@ const back = (event) => {
 
   setTimeout(() => {
     circle.remove();
-    emit('updateDiv', 'submission', '3');
+    pagestatus('submission', '3')
+    emit('updateDiv', 'submission');
   }, 600);
 };
+
+
 
 const handleButtonClick = (event) => {
   const button = rippleBtn.value;
@@ -128,8 +206,8 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove();
-    localStorage.setItem('tradingsegment', JSON.stringify(selected.value));
-    emit('updateDiv', 'brokerage');
+   segmentdata()
+   
   }, 600);
 };
 

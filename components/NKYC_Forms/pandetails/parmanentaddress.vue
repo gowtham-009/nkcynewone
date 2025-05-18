@@ -182,8 +182,8 @@ const permanentaddressdata = async () => {
       if (data.payload.status == 'ok') {
         const isConfirmed = commAddressRef.value?.confirm;
         if (isConfirmed) {
-          // pagestatus('submission', '1')
-          emit('updateDiv', 'submission', '1');
+          pagestatus('submission', '1')
+          emit('updateDiv', 'submission');
         } else {
    
           emit('updateDiv', 'communicationaddress');

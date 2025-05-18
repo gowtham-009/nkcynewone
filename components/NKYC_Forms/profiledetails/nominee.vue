@@ -462,7 +462,9 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove();
-    emit('updateDiv', 'submission', '2');
+   
+       pagestatus('submission', '2')
+    emit('updateDiv', 'submission');
   }, 600);
 };
 

@@ -141,6 +141,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+    pagestatus('signdraw')
     emit('updateDiv', 'signdraw');
   }, 600)
    
@@ -151,7 +152,8 @@ const back = () => {
 
 const handleButtonClick = () => {
     visible.value=false
-    emit('updateDiv', 'submission', '5');
+    pagestatus('submission', '5')
+    emit('updateDiv', 'submission');
 };
 
 
@@ -171,8 +173,8 @@ const handleButton = () => {
 
   setTimeout(() => {
     circle.remove()
-
-    emit('updateDiv', 'submission', '5');
+       pagestatus('submission', '5')
+    emit('updateDiv', 'submission');
   }, 600)
 };
 

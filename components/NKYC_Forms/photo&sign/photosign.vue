@@ -135,7 +135,8 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
-    emit('updateDiv', 'submission', '4');
+   pagestatus('submission', '4')
+    emit('updateDiv', 'submission');
   }, 600)
 }
 
@@ -155,6 +156,7 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+    pagestatus('takephoto'),
     emit('updateDiv', 'takephoto');
   }, 600)
 };

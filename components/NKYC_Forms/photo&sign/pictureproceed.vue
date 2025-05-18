@@ -85,6 +85,7 @@ onMounted(() => {
         deviceHeight.value = window.innerHeight;
     });
 });
+
 const emit = defineEmits(['updateDiv']);
 const retake = () => {
     const button = rippleBtnback.value
@@ -101,6 +102,7 @@ const retake = () => {
 
     setTimeout(() => {
         circle.remove()
+          pagestatus('takephoto')
         emit('updateDiv', 'takephoto');
     }, 600)
 
@@ -124,7 +126,7 @@ const handleButtonClick = () => {
 
     setTimeout(() => {
         circle.remove()
-
+        pagestatus('signature')
         emit('updateDiv', 'signature');
     }, 600)
 };

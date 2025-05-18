@@ -51,16 +51,50 @@ const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
+const { baseurl } = globalurl();
 
-// Load from localStorage
-const saved = localStorage.getItem('bankproof');
-const imageSrcbank = ref(saved ? JSON.parse(saved).bankimage : null);
+const imageSrcbank = ref( null);
 
 // Auto-save when updated
-watch(imageSrcbank, (val) => {
-  localStorage.setItem('bankproof', JSON.stringify({ bankimage: val }));
-});
+// watch(imageSrcbank, (val) => {
+//   localStorage.setItem('bankproof', JSON.stringify({ bankimage: val }));
+// });
 
+
+const proofupload = async () => {
+  const apiurl = `${baseurl.value}proofupload`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "uploadincome",
+   pancard:imageSrcbank.value
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+        emit('updateDiv', 'uploadincome');
+
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+};
 const back = (event) => {
   const button = rippleBtnback.value;
   const circle = document.createElement('span');
@@ -74,6 +108,7 @@ const back = (event) => {
 
   setTimeout(() => {
     circle.remove();
+    pagestatus('uploadproof'),
     emit('updateDiv', 'uploadproof');
   }, 600);
 };
@@ -91,7 +126,7 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove();
-    emit('updateDiv', 'uploadincome');
+    proofupload()
   }, 600);
 };
 

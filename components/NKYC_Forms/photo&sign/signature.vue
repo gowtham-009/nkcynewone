@@ -75,7 +75,6 @@
             </div>
 
         </div>
-        <input type="file" ref="fileInput" @change="handleFileChange" accept="image/*" class="hidden" />
 
     </div>
 </template>
@@ -119,29 +118,13 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+     pagestatus('photoproceed')
     emit('updateDiv', 'photoproceed');
   }, 600)
     
 }
 
-const fileInput = ref(null);
-const selectedFile = ref(null);
-const imageUrl = ref(null);
 
-
-
-const handleFileChange = (event) => {
-    const file = event.target.files[0]; // Get the selected file
-    if (file) {
-        selectedFile.value = file;
-    
-        imageUrl.value = URL.createObjectURL(file);
-       if(imageUrl.value){
-        emit('updateDiv', 'signupload', imageUrl.value);
-       }
-
-    }
-};
 
 const handleButtonClick = () => {
     const button = rippleBtn.value
@@ -159,6 +142,7 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+      pagestatus('signdraw')
     emit('updateDiv', 'signdraw');
 }, 600)
 };

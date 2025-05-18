@@ -202,8 +202,9 @@ onMounted(async () => {
     const userkey = localStorage.getItem('userkey')
     if (userkey) {
       const mydata = await getServerData()
-      const activepage = mydata?.payload?.metaData?.profile?.pageStatus || 'nkyclist'
-      currentForm.value = activepage
+      const activepage = mydata?.payload?.metaData?.profile?.pageStatus || 'main'
+    currentForm.value = activepage
+ // currentForm.value='parmanentaddress'
       formHistory.value = [{ form: activepage, formData: {} }]
     }
   }
