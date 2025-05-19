@@ -15,14 +15,19 @@
   </template>
   
   <script setup>
-  import { ref, watch } from 'vue'
-  import RadioButton from 'primevue/radiobutton'
-  
-  const emit = defineEmits(['update:selected'])
-  const selected = ref('Once in Quarter')
-  
-  function emitSelection() {
-    emit('update:selected', selected.value)
-  }
+ import { computed } from 'vue'
+import RadioButton from 'primevue/radiobutton'
+
+const props = defineProps({
+  selected: String
+})
+
+const emit = defineEmits(['update:selected'])
+
+const selected = computed({
+  get: () => props.selected,
+  set: (val) => emit('update:selected', val)
+})
+
   </script>
   

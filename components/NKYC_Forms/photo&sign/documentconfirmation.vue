@@ -46,7 +46,7 @@
                     </div>
                     <div class="w-full mt-2">
                         <p class="text-gray-500 font-medium text-sm">OTHER DP DETAILS:</p>
-                        <Option7 class="mt-2" v-model:selected="question7" />
+                        <Option7 class="mt-2"v-model:selected="question7" />
                     </div>
                     <div class="w-full mt-2">
                         <p class="text-gray-500 font-medium text-sm">I/We further wish to have settlement of my account (funds and securities):</p>
@@ -94,8 +94,9 @@ import Option6 from '~/components/NKYC_Forms/photo&sign/questionoption/radioques
 import Option7 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption7.vue'
 import Option8 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption8.vue'
 const emit = defineEmits(['updateDiv']);
-const deviceHeight = ref(0);
 
+const deviceHeight = ref(0);
+const { baseurl } = globalurl();
 const visible = ref(true)
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
@@ -108,7 +109,25 @@ const question5=ref('')
 const question6=ref('')
 const question7=ref('')
 const question8=ref('')
-onMounted(() => {
+
+const getsegmentdata = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.additional_docs || '';
+  if (statuscheck) {
+    question1.value=mydata?.payload?.metaData?.additional_docs?.documentConsentMode || ''
+    question2.value=mydata?.payload?.metaData?.additional_docs?.contractNoteMode || ''
+    question3.value=mydata?.payload?.metaData?.additional_docs?.standardDocsConsent || ''
+    question4.value=mydata?.payload?.metaData?.additional_docs?.internetTradingOpted || ''
+    question5.value=mydata?.payload?.metaData?.additional_docs?.pastActionsDetails || ''
+    question6.value=mydata?.payload?.metaData?.additional_docs?.otherBrokerDetails|| ''
+    question7.value=mydata?.payload?.metaData?.additional_docs?.accountSettlementPreference || ''
+    question8.value=mydata?.payload?.metaData?.additional_docs?.settlementStatementConsent || ''
+  }
+};
+
+
+onMounted(async() => {
+   await getsegmentdata()
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
@@ -123,7 +142,50 @@ onMounted(() => {
 
 
 
+const additionaldocument = async () => {
 
+  const apiurl = `${baseurl.value}additional_docs`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "submission",
+    documentConsentMode: question1.value,
+    contractNoteMode: question2.value,
+    standardDocsConsent: question3.value,
+    internetTradingOpted: question4.value,
+    pastActionsDetails: question5.value,
+    otherBrokerDetails:question6.value,
+    accountSettlementPreference: question7.value,
+    settlementStatementConsent: question8.value
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+          pagestatus('submission', '5')
+    emit('updateDiv', 'submission');
+
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+};
 
 
 const back = () => {
@@ -152,8 +214,8 @@ const back = () => {
 
 const handleButtonClick = () => {
     visible.value=false
-    pagestatus('submission', '5')
-    emit('updateDiv', 'submission');
+    additionaldocument()
+ 
 };
 
 
