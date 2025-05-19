@@ -55,18 +55,49 @@ const { baseurl } = globalurl();
 
 const imageSrcbank = ref( null);
 
-// Auto-save when updated
-// watch(imageSrcbank, (val) => {
-//   localStorage.setItem('bankproof', JSON.stringify({ bankimage: val }));
-// });
+const getsegmentdata = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+  if (statuscheck) {
+    const segments = mydata?.payload?.metaData?.proofs?.bank || '';
+    if (segments) {
+      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+      const userToken = localStorage.getItem('userkey');
+      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+      console.log(imgSrc)
+      imageSrcbank.value = imgSrc; // ✅ Set image to component
+    }
+  }
+};
+
+
+
+const urlToBase64 = async (url) => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
 
 
 const proofupload = async () => {
+
+    if (!imageSrcbank.value) {
+    console.error('No image to upload');
+    return;
+  }
+
+    const base64value = await urlToBase64(imageSrcbank.value);
   const apiurl = `${baseurl.value}proofupload`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "uploadincome",
-   pancard:imageSrcbank.value
+   bank:base64value
   });
 
   const payload = { payload: user };
@@ -130,7 +161,8 @@ const handleButtonClick = (event) => {
   }, 600);
 };
 
-onMounted(() => {
+onMounted(async() => {
+  await getsegmentdata();
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });

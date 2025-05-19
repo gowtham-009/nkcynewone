@@ -1,8 +1,8 @@
 <template>
   <div class="space-y-4">
     <a
-      v-if="pdfUrl"
-      :href="pdfUrl"
+      v-if="internalPdfUrl"
+      :href="internalPdfUrl"
       target="_blank"
       rel="noopener noreferrer"
       class="text-blue-500 text-center underline block mb-2"
@@ -26,33 +26,46 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, defineProps, watch } from 'vue'
+import { ref, watch, defineEmits, defineProps } from 'vue'
 
 const emit = defineEmits(['update:pdfUrl'])
-const props = defineProps({ pdfUrl: String })
+const props = defineProps({
+  pdfUrl: {
+    type: String,
+    default: ''
+  }
+})
+
+// Use internal ref and sync with v-model
+const internalPdfUrl = ref(props.pdfUrl)
+
+watch(() => props.pdfUrl, (newVal) => {
+  internalPdfUrl.value = newVal
+})
+
+watch(internalPdfUrl, (newVal) => {
+  emit('update:pdfUrl', newVal)
+})
 
 const fileInput = ref(null)
-const pdfUrl = ref(props.pdfUrl)
 
-watch(pdfUrl, (val) => emit('update:pdfUrl', val))
+const triggerFileInput = () => {
+  fileInput.value.click()
+}
 
 const onFileSelect = (event) => {
   const file = event.target.files[0]
   if (file && file.type === 'application/pdf') {
     const reader = new FileReader()
     reader.onload = () => {
-      pdfUrl.value = reader.result // this is base64 string with data: prefix
+      internalPdfUrl.value = reader.result // base64
     }
     reader.onerror = () => {
       alert('Failed to read file.')
     }
-    reader.readAsDataURL(file) // this gives base64
+    reader.readAsDataURL(file)
   } else {
     alert('Please select a valid PDF file.')
   }
-}
-
-const triggerFileInput = () => {
-  fileInput.value.click()
 }
 </script>

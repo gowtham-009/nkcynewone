@@ -73,15 +73,36 @@ const selected = ref([]);
 
 const getsegmentdata = async () => {
   const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' '
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' ';
   if (statuscheck) {
-   
-  }
-  else {
+    const segments = mydata?.payload?.metaData?.segments;
+    const allSegments = {
+      nseCASH: "NSE CASH",
+      nseFO: "NSE F & O",
+      nseCOM: "NSE COMMODITIES",
+      nseCD: "NSE CD",
+      nseMF: "NSE MF",
+      bseCASH: "BSE CASH",
+      bseFO: "BSE F & O",
+      bseCOM: "BSE COMMODITIES",
+      bseCD: "BSE CD",
+      bseMF: "BSE MF",
+      MCX: "MCX",
+      ICEX: "ICEX",
+      mseCD: "MCX CD",
+    };
 
-  }
+    // Map "YES" keys to their corresponding labels
+    selected.value = Object.entries(segments)
+      .filter(([key, value]) => value === "YES" && allSegments[key])
+      .map(([key]) => allSegments[key]);
 
+    console.log(selected.value);  // e.g. ["NSE CASH", "NSE F & O", "BSE F & O"]
+  } else {
+    selected.value = [];
+  }
 }
+
 
 await getsegmentdata();
 

@@ -55,26 +55,51 @@ const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
-
-// Load from localStorage
-
 const imageSrcpan = ref( null);
 
-// Optional: auto-save on change
-// watch(imageSrcpan, (newVal) => {
-//   const updated = {
-//     panimage: newVal
-//   };
-//   localStorage.setItem('income', JSON.stringify(updated));
-// });
 
+const getsegmentdata = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+  if (statuscheck) {
+    const segments = mydata?.payload?.metaData?.proofs?.pancard || '';
+    if (segments) {
+      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+      const userToken = localStorage.getItem('userkey');
+      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+      console.log('Image URL:', imgSrc);
+      imageSrcpan.value = imgSrc;
+    }
+  }
+};
+
+
+
+
+const urlToBase64 = async (url) => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
 
 const proofupload = async () => {
+  if (!imageSrcpan.value) {
+    console.error('No image to upload');
+    return;
+  }
+
+  const base64value = await urlToBase64(imageSrcpan.value);
   const apiurl = `${baseurl.value}proofupload`;
+
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-    pageCode: "uploadbank",
-   pancard:imageSrcpan.value
+    pageCode: 'uploadbank',
+    pancard: base64value,
   });
 
   const payload = { payload: user };
@@ -96,12 +121,13 @@ const proofupload = async () => {
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
-     emit('updateDiv', 'uploadbank');
+      emit('updateDiv', 'uploadbank');
     }
   } catch (error) {
-    console.error(error.message);
+    console.error('Upload failed:', error.message);
   }
 };
+
 
 const back = (event) => {
   const button = rippleBtnback.value;
@@ -143,7 +169,8 @@ const handleButtonClick = (event) => {
   }, 600);
 };
 
-onMounted(() => {
+onMounted(async() => {
+  await getsegmentdata();
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });

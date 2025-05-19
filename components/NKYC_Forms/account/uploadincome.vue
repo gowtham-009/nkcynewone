@@ -16,8 +16,13 @@
         <div class="w-full mt-4">
           <span class="text-gray-500 text-xl font-medium">Income Proof Type</span>
           <div class="input-wrapper dark:!bg-gray-800">
-            <Select v-model="selectedStatement" :options="statementOptions" optionLabel="name"
-              placeholder="Choose Income Proof" class="w-full prime-input md:w-56" />
+            <Select
+              v-model="selectedStatement"
+              :options="statementOptions"
+              optionLabel="name"
+              placeholder="Choose Income Proof"
+              class="w-full prime-input md:w-56"
+            />
             <span class="bottom-border"></span>
           </div>
         </div>
@@ -56,15 +61,8 @@ import { ref, onMounted } from 'vue'
 import Income from '~/components/NKYC_Forms/account/fileuploads/incomeproof.vue'
 
 const emit = defineEmits(['updateDiv'])
-const { baseurl } = globalurl();
+const { baseurl } = globalurl()
 const deviceHeight = ref(window.innerHeight)
-onMounted(() => {
-  window.addEventListener('resize', () => {
-    deviceHeight.value = window.innerHeight
-  })
-
- 
-})
 
 const rippleBtn = ref(null)
 const rippleBtnBack = ref(null)
@@ -82,58 +80,75 @@ const statementOptions = ref([
   { name: 'DP HOLDING STATEMENTS' }
 ])
 
+const getsegmentdata = async () => {
+  const mydata = await getServerData()
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ''
+  if (statuscheck) {
+    const segments = mydata?.payload?.metaData?.proofs?.income || ''
+    const incomeType = mydata?.payload?.metaData?.proofs?.incomeType || ''
+    selectedStatement.value = statementOptions.value.find(opt => opt.name === incomeType) || ''
+    if (segments) {
+      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+      const userToken = localStorage.getItem('userkey')
+      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`
+      pdfUrl.value = imgSrc 
+    }
+  }
+}
+
+onMounted(async () => {
+  await getsegmentdata()
+  window.addEventListener('resize', () => {
+    deviceHeight.value = window.innerHeight
+  })
+})
+
 const proofupload = async () => {
-  const apiurl = `${baseurl.value}proofupload`;
+  const apiurl = `${baseurl.value}proofupload`
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-    pageCode: "submission",
-    incomeType:selectedStatement.value.name,
-   income:pdfUrl.value
-  });
+    pageCode: 'submission',
+    incomeType: selectedStatement.value?.name || '', // Handle fallback
+    income: pdfUrl.value
+  })
 
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
+  const payload = { payload: user }
+  const jsonString = JSON.stringify(payload)
 
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
+        Authorization: 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json'
       },
-      body: jsonString,
-    });
+      body: jsonString
+    })
 
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Network error: ${response.status}`)
 
-    const data = await response.json();
+    const data = await response.json()
     if (data.payload.status === 'ok') {
-        pagestatus('submission', '4'),
+      pagestatus('submission', '4')
       emit('updateDiv', 'submission')
-
     }
   } catch (error) {
-    console.error(error.message);
+    console.error(error.message)
   }
-};
+}
 
 const back = (event) => {
   createRipple(event, rippleBtnBack.value)
-  setTimeout(() =>
-  pagestatus('uploadbank'),
-   emit('updateDiv', 'uploadbank'),
-  
-    600)
+  setTimeout(() => {
+    pagestatus('uploadbank')
+    emit('updateDiv', 'uploadbank')
+  }, 600)
 }
 
 const handleButtonClick = (event) => {
   createRipple(event, rippleBtn.value)
-
   setTimeout(() => {
-  proofupload()
-    
+    proofupload()
   }, 600)
 }
 
