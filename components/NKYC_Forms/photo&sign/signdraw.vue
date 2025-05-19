@@ -147,29 +147,7 @@ onUnmounted(() => {
 const imageSrc = ref('');
 const emit = defineEmits(['updateDiv']);
 
-const handleButtonClick=()=>{
-    const canvas = canvasRef.value;
-  if (!canvas) return;
-  imageSrc.value = canvas.toDataURL('image/png'); 
 
-  const button = rippleBtn.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
-
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
-
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-
-  button.$el.appendChild(circle)
-
-  setTimeout(() => {
-    circle.remove()
-    uploadsign()
-    }, 600)
-}
 
 
 const uploadsign = async () => {
@@ -272,6 +250,29 @@ imageSrc.value = canvas.toDataURL('image/png'); // ✅ set imageSrc
   reader.readAsDataURL(file);
 };
 
+const handleButtonClick=()=>{
+    const canvas = canvasRef.value;
+  if (!canvas) return;
+  imageSrc.value = canvas.toDataURL('image/png'); 
+
+  const button = rippleBtn.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+
+  button.$el.appendChild(circle)
+
+  setTimeout(() => {
+    circle.remove()
+    uploadsign()
+    }, 600)
+}
 </script>
 <style>
 canvas {

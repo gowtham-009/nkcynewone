@@ -193,26 +193,43 @@ const handleUpdateDiv = (value, newData = {}) => {
 }
 
 onMounted(async () => {
-  const queryForm = route.query.form
+  const queryForm = route.query.form 
 
   if (queryForm) {
-    currentForm.value = queryForm
-    formHistory.value = [{ form: queryForm, formData: {} }]
+    currentForm.value = queryForm;
+    formHistory.value = [{ form: queryForm, formData: {} }];
   } else {
-    const userkey = localStorage.getItem('userkey')
+    const userkey = localStorage.getItem('userkey');
+
     if (userkey) {
-      const mydata = await getServerData()
-      const activepage = mydata?.payload?.metaData?.profile?.pageStatus || 'main'
-    currentForm.value = activepage
- // currentForm.value='parmanentaddress'
-      formHistory.value = [{ form: activepage, formData: {} }]
+      const mydata = await getServerData();
+      const activePage =
+        mydata?.payload?.metaData?.profile?.pageStatus || 'main';
+
+      currentForm.value = activePage;
+      formHistory.value = [{ form: activePage, formData: {} }];
+
+      const restrictedPages = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
+      if (restrictedPages.includes(activePage)) {
+        router.push('/');
+        return; // Stop further processing
+      }
     }
   }
 
-  router.replace({ query: {} }) // Clear query params from URL
-  history.replaceState({ div: currentForm.value, formData: {} }, '', '/main')
-  window.addEventListener('popstate', handleBackButton)
-})
+  // Clean up query params in the URL
+  router.replace({ query: {} });
+
+  // Set initial history state
+  history.replaceState(
+    { div: currentForm.value, formData: {} },
+    '',
+    '/main'
+  );
+
+  // Handle back button navigation
+  window.addEventListener('popstate', handleBackButton);
+});
 
 onBeforeUnmount(() => {
   window.removeEventListener('popstate', handleBackButton)
