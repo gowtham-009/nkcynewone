@@ -51,8 +51,18 @@
         <div class="w-full">
           <Name v-model="name" />
         </div>
-        <div class="w-full mt-2">
-          <Namemode v-model="selectedRelation" />
+        <div class="w-full mt-4">
+          <span class="text-gray-500 text-xl font-medium">Income Proof Type</span>
+          <div class="input-wrapper dark:!bg-gray-800">
+            <Select
+              v-model="selectedStatement"
+              :options="statementOptions"
+              optionLabel="name"
+             
+              class="w-full prime-input md:w-56"
+            />
+            <span class="bottom-border"></span>
+          </div>
         </div>
         <div class="w-full mt-2">
           <DOB v-model="dob" />
@@ -133,7 +143,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 
-import Namemode from '~/components/nomineeinputs/dropdown.vue';
 import Name from '~/components/nomineeinputs/nameinput.vue';
 import DOB from '~/components/nomineeinputs/dateinput.vue';
 import Address from '~/components/nomineeinputs/address.vue';
@@ -161,7 +170,16 @@ const buttonText = ref("Continue");
 const nomineetext = ref("Add Nominee");
 const nomineeCount = ref(0);
 
-const selectedRelation = ref('');
+const selectedStatement = ref('')
+
+const statementOptions = ref([
+   {value:'Son',name: 'Son' },
+  { value:'Daughter',name: 'Daughter' },
+  { value:'Spouse',name: 'Spouse' },
+  { value:'Father',name: 'Father' },
+  { value:'Mother',name: 'Mother' }
+])
+
 const name = ref('');
 const dob = ref('');
 const address = ref('');
@@ -173,7 +191,7 @@ const nomine = ref([]);
 const isValidEmail = computed(() => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value);
 });
-const isSending = ref(false);
+
 
 // Confirmation data
 const nomineescard = ref(false);
@@ -233,19 +251,21 @@ await nomineedetails()
 
 const isSaveDisabled = computed(() => {
   return (
-    !selectedRelation.value ||
+    !selectedStatement.value ||
     !dob.value ||
     !selected.value ||
     !shareval.value ||
     !inputval.value ||
     !address.value ||
     !mobileNo.value ||
-    !isValidEmail.value ||
-    isSending.value
+    !isValidEmail.value 
+  
   );
 });
 
 const dialogbox = (editdata) => {
+
+  console.log("arjaoei",editdata)
   let formattedDOB = '';
 
   if (editdata.dob) {
@@ -259,10 +279,13 @@ const dialogbox = (editdata) => {
     }
   }
 
+  console.log(editdata.relation)
+  editdata.relation
   visible.value = true;
   idval.value = editdata.id;
   name.value = editdata.name;
-  selectedRelation.value = editdata.relation;
+  selectedStatement.value = editdata.relation;
+  console.log(selectedStatement.value)
   dob.value = formattedDOB;
   address.value = editdata.address;
   mobileNo.value = editdata.mobile;
@@ -291,7 +314,7 @@ const nomineesavedata = async () => {
     userToken: localStorage.getItem('userkey'),
     pageCode: "nominee",
     nomineeName: name.value,
-    nomineeRelation: selectedRelation.value,
+    nomineeRelation: selectedStatement.value.name,
     nomineeAddress: address.value,
     nomineeMobile: mobileNo.value,
     nomineeEmail: email.value,
@@ -494,13 +517,7 @@ watch(dob, (newval) => {
     if (age < 18) {
    
       isDisabled.value = false;
-      if (age < 18 && guardian.value) {
-
-        isSending.value = true
-      }
-      else {
-        isSending.value = false
-      }
+    
 
     } else {
       isDisabled.value = true;

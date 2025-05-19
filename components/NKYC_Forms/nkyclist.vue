@@ -114,11 +114,11 @@ import { useRoute } from 'vue-router'
 import { pagestatus } from '~/utils/pagestatus.js'
 const route = useRoute();
 
-const { url } = useUrlw3();
+
 
 
 const emit = defineEmits(['updateDiv']);
-
+const { baseurl } = globalurl();
 const buttonText = ref("Continue");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
@@ -130,28 +130,35 @@ onMounted(() => {
     });
 });
 
-const panverification = async (panval) => {
+const panverification = async () => {
+   const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+  let panno, clientname
+  if(statuscheck){
+    panno=mydata?.payload?.metaData?.kraPan?.APP_PAN_NO || '';
+    clientname=mydata?.payload?.metaData?.kraPan?.APP_NAME || '';
+  }
+    const apiurl = baseurl.value + 'pan_verification'
+  
+ const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "main",
+    panNo: panno,
+    panName: clientname
+
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
    
-    const apiurl = url.value + 'pan'
-    const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
-
-    const localvalue = localStorage.getItem('krastatus')
-    const localobj = localvalue ? JSON.parse(localvalue) : {};
-
-    const formData = new FormData()
-
-    formData.append('panNo', localobj?.KYC_DATA?.APP_PAN_NO )
-    formData.append('panName', 'VIJAY')
-    formData.append('brokerCode', 'UAT-KYC')
-    formData.append('appId', '1216')
-    formData.append('clientCode', 'W3VJ1')
     try {
         const response = await fetch(apiurl, {
             method: 'POST',
             headers: {
-                'Authorization': authorization,
+                'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
             },
-            body: formData
+            body: jsonString
 
         })
         if (!response.ok) {
@@ -159,8 +166,13 @@ const panverification = async (panval) => {
         }
         else {
             const data = await response.json()
-            if (data.metaData.status == 'VALID') {
-               emit('updateDiv', 'parmanentaddress',);
+            if (data.payload.status == 'ok') {
+               pagestatus('parmanentaddress')
+               emit('updateDiv', 'parmanentaddress');
+            }
+            else{
+                 pagestatus('main')
+                 alert('pan verification failed')
             }
         }
     } catch (error) {
@@ -185,18 +197,18 @@ const handleButtonClick = () => {
 
     setTimeout(async() => {
         circle.remove()
+      
          const mydata = await getServerData();
-        
         const statuscheck=mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' '
         if(statuscheck){
-            pagestatus('parmanentaddress')
-         emit('updateDiv', 'parmanentaddress');
+              panverification()
+          
         }
         else{
-            // pagestatus('ekyc')
-            // emit('updateDiv', 'ekyc');
-               pagestatus('parmanentaddress')
-         emit('updateDiv', 'parmanentaddress');
+            pagestatus('ekyc')
+            emit('updateDiv', 'ekyc');
+        //        pagestatus('parmanentaddress')
+        //  emit('updateDiv', 'parmanentaddress');
         }
     
 
