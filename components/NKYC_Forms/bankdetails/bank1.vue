@@ -102,7 +102,8 @@ const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
-
+const prooftype=ref('')
+const inputval=ref('')
 
 const bankname = ref("");
 const accno = ref("");

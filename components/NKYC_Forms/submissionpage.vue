@@ -87,12 +87,14 @@ const setPermanentAddress = async () => {
   const mydata = await getServerData();
   const statusCheck = parseInt(mydata?.payload?.metaData?.profile?.profileStatus || 0);
   statusid.value = statusCheck;
+  console.log(statusid.value)
   if (statusCheck > 0) completedbox.value = true;
 };
 
-await setPermanentAddress();
 
-onMounted(() => {
+
+onMounted(async() => {
+  await setPermanentAddress();
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
