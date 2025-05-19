@@ -154,10 +154,19 @@ const handleButtonClick = () => {
 
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('takephoto'),
+     const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.proofs?.ipvImg || '';
+  if(statuscheck){
+     pagestatus('photoproceed'),
+    emit('updateDiv', 'photoproceed');
+  }else{
+     pagestatus('takephoto'),
     emit('updateDiv', 'takephoto');
+  }
+
+   
   }, 600)
 };
        
