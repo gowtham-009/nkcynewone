@@ -40,7 +40,7 @@
       </div>
 
       <div class="w-full flex gap-2">
-        <Button @click="back" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+        <Button @click="back"  ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" ref="rippleBtn" @click="handleButtonClick" class="primary_color text-white w-5/6 py-4 text-xl border-0">
@@ -57,6 +57,7 @@ import { ref, computed, onMounted } from 'vue';
 const emit = defineEmits(['updateDiv']);
 
 const buttonText = ref('Continue');
+const rippleBtnback = ref(null)
 const rippleBtn = ref(null);
 const completedbox = ref(false);
 const pendingbox = ref(true);
@@ -147,8 +148,24 @@ const handleButtonClick = (event) => {
   }, 600);
 };
 
-function back() {
-  switch (statusid.value) {
+
+
+const back = () => {
+    const button = rippleBtnback.value
+    const circle = document.createElement('span')
+    circle.classList.add('ripple')
+
+    const rect = button.$el.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+
+    circle.style.left = `${x}px`
+    circle.style.top = `${y}px`
+    button.$el.appendChild(circle)
+
+    setTimeout(() => {
+        circle.remove()
+        switch (statusid.value) {
     case 1:
         pagestatus('parmanentaddress')
       emit('updateDiv', 'parmanentaddress');
@@ -172,6 +189,8 @@ function back() {
     default:
       break;
   }
+    }, 600)
+
 }
 </script>
 
