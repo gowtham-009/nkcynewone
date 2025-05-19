@@ -40,7 +40,7 @@
 
       <!-- Footer Buttons -->
       <div class="w-full flex gap-2">
-        <Button @click="back" ref="rippleBtnBack" class="primary_color border-0 text-white w-1/6 dark:bg-slate-900">
+        <Button @click="back" ref="rippleBtnback" class="primary_color border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button
@@ -65,7 +65,7 @@ const { baseurl } = globalurl()
 const deviceHeight = ref(window.innerHeight)
 
 const rippleBtn = ref(null)
-const rippleBtnBack = ref(null)
+const rippleBtnback = ref(null)
 
 const buttonText = ref('Next')
 const pdfUrl = ref(null)
@@ -137,35 +137,55 @@ const proofupload = async () => {
   }
 }
 
-const back = (event) => {
-  createRipple(event, rippleBtnBack.value)
-  setTimeout(() => {
-    pagestatus('uploadbank')
-    emit('updateDiv', 'uploadbank')
-  }, 600)
-}
 
-const handleButtonClick = (event) => {
-  createRipple(event, rippleBtn.value)
-  setTimeout(() => {
-    proofupload()
-  }, 600)
-}
-
-function createRipple(event, buttonRef) {
+const back = () => {
+    const button = rippleBtnback.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
 
-  const rect = buttonRef.$el.getBoundingClientRect()
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+  button.$el.appendChild(circle)
+
+  setTimeout(() => {
+    circle.remove()
+     pagestatus('uploadbank')
+    emit('updateDiv', 'uploadbank')
+  }, 600)
+   
+};
+
+
+
+
+
+
+const handleButtonClick = () => {
+  
+    const button = rippleBtn.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
   const x = event.clientX - rect.left
   const y = event.clientY - rect.top
 
   circle.style.left = `${x}px`
   circle.style.top = `${y}px`
 
-  buttonRef.$el.appendChild(circle)
-  setTimeout(() => circle.remove(), 500)
-}
+  button.$el.appendChild(circle)
+
+  setTimeout(() => {
+    circle.remove()
+  proofupload()
+}, 600)
+};
+
+
 </script>
 
 <style scoped>
@@ -211,21 +231,5 @@ function createRipple(event, buttonRef) {
   height: 4px;
 }
 
-.ripple {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  transform: scale(0);
-  animation: ripple-effect 0.6s linear;
-  pointer-events: none;
-}
 
-@keyframes ripple-effect {
-  to {
-    transform: scale(2.5);
-    opacity: 0;
-  }
-}
 </style>
