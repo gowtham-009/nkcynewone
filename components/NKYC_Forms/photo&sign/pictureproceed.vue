@@ -36,7 +36,7 @@
             
               
                 <div class="w-full flex gap-2">
-                    <Button @click="retake()" ref="rippleBtnback"
+                    <Button @click="back()" ref="rippleBtnback"
                         class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                         <i class="pi pi-angle-left text-3xl dark:text-white"></i>
                     </Button>
@@ -93,7 +93,12 @@ onMounted(async() => {
 });
 
 const emit = defineEmits(['updateDiv']);
-const retake = () => {
+
+const retake=()=>{
+  pagestatus('takephoto')
+        emit('updateDiv', 'takephoto');
+}
+const back = () => {
     const button = rippleBtnback.value
     const circle = document.createElement('span')
     circle.classList.add('ripple')
@@ -108,8 +113,8 @@ const retake = () => {
 
     setTimeout(() => {
         circle.remove()
-          pagestatus('takephoto')
-        emit('updateDiv', 'takephoto');
+         pagestatus('photosign1')
+        emit('updateDiv', 'photosign1');
     }, 600)
 
 }
