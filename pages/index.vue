@@ -56,6 +56,7 @@ onMounted(async() => {
   const mydata = await getServerData();
   const activepage = mydata?.payload?.metaData?.profile?.pageStatus || 'pan';
   currentForm.value = activepage;
+  console.log(activepage)
 
   // If the active page is NOT in the pagetext list, go to /main
   if (!pagetext.includes(activepage)) {

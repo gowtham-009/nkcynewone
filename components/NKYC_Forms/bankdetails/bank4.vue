@@ -149,29 +149,37 @@ onMounted(() => {
   });
 });
 
-function createRipple(buttonRef, event) {
-  const button = buttonRef?.$el || buttonRef;
-  const circle = document.createElement('span');
-  circle.classList.add('ripple');
 
-  const rect = button.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+const handleButtonClick = () => {
 
-  circle.style.left = `${x}px`;
-  circle.style.top = `${y}px`;
 
-  button.appendChild(circle);
-  setTimeout(() => circle.remove(), 600);
-}
 
-function handleButtonClick(event) {
-  createRipple(rippleBtn.value, event);
-  setTimeout(() =>
-   pagestatus('submission', '3'),
-   emit('updateDiv', 'submission'), 
-   600);
-}
+  const button = rippleBtn.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+
+  button.$el.appendChild(circle)
+
+  setTimeout(() => {
+    circle.remove()
+
+ pagestatus('submission', '3'),
+    emit('updateDiv', 'submission');
+  }, 600)
+};
+
+
+
+
+ 
+
 
 function back(event) {
   createRipple(rippleBtnBack.value, event);
@@ -183,7 +191,7 @@ function back(event) {
 </script>
 
 <style scoped>
-.ripple {
+/* .ripple {
   position: absolute;
   background: rgba(255, 255, 255, 0.6);
   border-radius: 50%;
@@ -199,5 +207,5 @@ function back(event) {
     transform: scale(2.5);
     opacity: 0;
   }
-}
+} */
 </style>
