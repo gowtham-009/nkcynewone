@@ -118,7 +118,7 @@ const route = useRoute();
 
 
 const emit = defineEmits(['updateDiv']);
-const { baseurl } = globalurl();
+
 const buttonText = ref("Continue");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
