@@ -71,6 +71,17 @@ const getsegmentdata = async () => {
       imageSrcpan.value = imgSrc;
     }
   }
+
+  else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument){
+      const segments = mydata?.payload?.metaData?.proofs?.pancard || '';
+    if (segments) {
+      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+      const userToken = localStorage.getItem('userkey');
+      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+      console.log('Image URL:', imgSrc);
+      imageSrcpan.value = imgSrc;
+    }
+  }
 };
 
 
@@ -121,6 +132,7 @@ const proofupload = async () => {
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
+       pagestatus('uploadbank'),
       emit('updateDiv', 'uploadbank');
     }
   } catch (error) {

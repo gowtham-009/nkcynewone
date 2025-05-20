@@ -86,6 +86,34 @@ const getsegmentdata = async () => {
 }
 
   }
+
+   else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+    const segments = mydata?.payload?.metaData?.proofs?.signature || '';
+   if (segments) {
+  const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+  const userToken = localStorage.getItem('userkey');
+  const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+  imageSrc.value = imgSrc;
+
+  
+  const img = new Image();
+  img.crossOrigin = "Anonymous"; // Required for canvas toDataURL from remote source
+  img.onload = () => {
+    const canvas = canvasRef.value;
+    if (!canvas || !ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+    const x = (canvas.width - img.width * scale) / 2;
+    const y = (canvas.height - img.height * scale) / 2;
+
+    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+    isImageUploaded.value = true;
+  };
+  img.src = imgSrc;
+}
+   }
 };
 
 

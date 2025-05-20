@@ -244,6 +244,41 @@ const nomineedetails = async () => {
       nomineecontainer.value = totalShare < 100;
     }
   }
+  else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument){
+    const nominee = mydata?.payload?.metaData?.nominee;
+    if (nominee) {
+      nomineescard.value = true;
+      const nomineeList = [];
+      let totalShare = 0;
+
+      for (let i = 1; i <= 10; i++) {
+        const name = nominee[`nominee${i}Name`];
+        if (name && name.trim() !== '') {
+          const share = parseFloat(nominee[`nominee${i}Share`] || 0);
+          totalShare += share;
+
+          nomineeList.push({
+            name,
+            id:i,
+            relation: nominee[`nominee${i}Relation`],
+            address: nominee[`nominee${i}Address`],
+            share,
+            email: nominee[`nominee${i}Email`],
+            mobile: nominee[`nominee${i}Mobile`],
+           
+            dob: nominee[`nominee${i}Dob`],
+            idType: nominee[`nominee${i}IdType`],
+            idNo: nominee[`nominee${i}IdNo`],
+            guardian: nominee[`nominee${i}GuardianName`],
+          });
+        }
+      }
+
+      nomine.value = nomineeList;
+      nomineeCount.value = nomineeList.length;
+      nomineecontainer.value = totalShare < 100;
+    }
+  }
 };
 
 

@@ -97,8 +97,34 @@ const getsegmentdata = async () => {
       .filter(([key, value]) => value === "YES" && allSegments[key])
       .map(([key]) => allSegments[key]);
 
-    console.log(selected.value);  // e.g. ["NSE CASH", "NSE F & O", "BSE F & O"]
-  } else {
+  
+  } 
+  else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument){
+     const segments = mydata?.payload?.metaData?.segments;
+    const allSegments = {
+      nseCASH: "NSE CASH",
+      nseFO: "NSE F & O",
+      nseCOM: "NSE COMMODITIES",
+      nseCD: "NSE CD",
+      nseMF: "NSE MF",
+      bseCASH: "BSE CASH",
+      bseFO: "BSE F & O",
+      bseCOM: "BSE COMMODITIES",
+      bseCD: "BSE CD",
+      bseMF: "BSE MF",
+      MCX: "MCX",
+      ICEX: "ICEX",
+      mseCD: "MCX CD",
+    };
+
+    // Map "YES" keys to their corresponding labels
+    selected.value = Object.entries(segments)
+      .filter(([key, value]) => value === "YES" && allSegments[key])
+      .map(([key]) => allSegments[key]);
+
+  }
+  
+  else {
     selected.value = [];
   }
 }

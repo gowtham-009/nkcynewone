@@ -76,8 +76,12 @@ const profilesetinfo = async () => {
      mother.value =mydata?.payload?.metaData?.kraPan?.APP_M_NAME ||mydata?.payload?.metaData?.personal?.motherName || ''
    
   }
+   else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+   father.value =mydata?.payload?.metaData?.personal?.fatherName || ''
+     mother.value =mydata?.payload?.metaData?.personal?.motherName ||''
+}
   else{
-    
+   
   }
 };
 

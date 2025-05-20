@@ -108,6 +108,7 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+    pagestatus('uploadproof'),
     emit('updateDiv', 'uploadproof'); 
   }, 600)
 };

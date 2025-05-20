@@ -68,6 +68,16 @@ const getsegmentdata = async () => {
       imageSrcbank.value = imgSrc; // ✅ Set image to component
     }
   }
+   else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument){
+     const segments = mydata?.payload?.metaData?.proofs?.bank || '';
+    if (segments) {
+      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+      const userToken = localStorage.getItem('userkey');
+      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+      console.log(imgSrc)
+      imageSrcbank.value = imgSrc; // ✅ Set image to component
+    }
+   }
 };
 
 

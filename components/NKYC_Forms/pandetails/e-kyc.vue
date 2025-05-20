@@ -5,6 +5,7 @@
             <logo style="width: 40px; height: 40px;" />
             <profile />
         </div>
+        <!--  -->
         <div v-if="content" class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full mt-2 px-2">
@@ -85,7 +86,7 @@
     <div v-if="loading" class="flex justify-center items-center  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
         :style="{ height: deviceHeight * 0.92 + 'px' }">
         <ProgressSpinner />
-     
+
     </div>
 </template>
 <script setup>
@@ -93,19 +94,16 @@
 
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { parseString } from 'xml2js';
+
 
 const route = useRoute()
-const { url } = useUrlw3();
-
+const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Start e-KYC");
-
-const content = ref(true)
-const loading = ref(false)
-
+const content=ref(true)
+const loading=ref(false)
 
 
 onMounted(() => {
@@ -113,10 +111,10 @@ onMounted(() => {
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
     });
-    if (route.query.requestId) {
-        content.value = false;
-        loading.value = true;
-        digilocker_requestcheck();
+    if (route.query.requestId) { 
+     digilocker_request()
+     content.value=false
+     loading.value=true
     }
 });
 
@@ -145,43 +143,24 @@ const back = () => {
 
 
 const digilocker_create = async () => {
-  
-    const apiurl = url.value + 'digilocker';
-     const url1 = 'http://localhost:3000/main?form=ekyc';
-      const url2 = 'http://localhost:3000/main??form=ekyc';
-
-    //   const url1 = 'https://nkcynewone.vercel.app/main?form=ekyc';
-    //    const url2 = 'https://nkcynewone.vercel.app/main??form=ekyc';
-
-    const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
-    const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
-
-    const redirecturl = JSON.stringify({
-        task: "url",
-        essentials: {
-            redirectTime: 1,
-            getScope: true,
-            docType: ["PANCR", "ADHAR"],
-            redirectUrl: url1,
-            callbackUrl: url2
-        }
+    const apiurl = baseurl.value + 'digilocker';
+    const authorization = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+    const user = encryptionrequestdata({
+        userToken: localStorage.getItem('userkey'),
+        digilockerAction: "createUrl",
+        redirecUrl:'https://nkcynewone.vercel.app/main'
     });
 
-    const formData = new FormData();
-    formData.append('task', 'createUrl');
-    formData.append('brokerCode', 'UAT-KYC');
-    formData.append('appId', '1216');
-    formData.append('clientCode', 'gow001');
-    formData.append('rawPostData', redirecturl);
+    const payload = { payload: user };
+    const jsonString = JSON.stringify(payload);
 
     try {
         const response = await fetch(apiurl, {
             method: 'POST',
             headers: {
                 'Authorization': authorization,
-                'Cookie': cookies
             },
-            body: formData
+            body: jsonString
         });
 
         if (!response.ok) {
@@ -189,239 +168,164 @@ const digilocker_create = async () => {
         }
 
         const data = await response.json();
-        if (data.status == 'ok') {
+        if (data.payload.status == 'ok') {
 
-            const url = data.metaData.result.url
+            const url = data.payload.metaData.url
             window.location.href = url;
+        }
+      
+    } catch (error) {
+        console.error('Error:', error.message);
+       
+    }
+
+    finally{
+        content.value=true
+        loading.value=false
+    }
+   
+};
+
+
+const digilocker_request = async () => {
+    const apiurl = baseurl.value + 'digilocker';
+    const authorization = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+    const user = encryptionrequestdata({
+        userToken: localStorage.getItem('userkey'),
+        digilockerAction: "getDetails",
+        digilockerReqId:route.query.requestId
+    });
+
+    const payload = { payload: user };
+    const jsonString = JSON.stringify(payload);
+
+    try {
+        const response = await fetch(apiurl, {
+            method: 'POST',
+            headers: {
+                'Authorization': authorization,
+            },
+            body: jsonString
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.payload.status == 'ok') {
+            digilocker_getfiles(data)
+           
+        }
+
+        else{
+            content.value=true
+            loading.value=false
+        }
+        
+
+
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+    finally{
+      
+    }
+};
+
+
+const digilocker_getfiles = async (requestid) => {
+    const apiurl = baseurl.value + 'digilocker';
+    const authorization = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+const files = requestid.payload.metaData.fileIds;
+
+
+
+
+    const user = encryptionrequestdata({
+        userToken: localStorage.getItem('userkey'),
+        digilockerAction: "getFiles",
+        digilockerReqId:requestid.payload.metaData.requestId,
+        filesIds:files
+    });
+
+    const payload = { payload: user };
+    const jsonString = JSON.stringify(payload);
+
+    try {
+        const response = await fetch(apiurl, {
+            method: 'POST',
+            headers: {
+                'Authorization': authorization,
+            },
+            body: jsonString
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.payload.status == 'ok') {
+
+           digilocker_getaadhardoc(requestid.payload.metaData.requestId)
         }
 
     } catch (error) {
         console.error('Error:', error.message);
+    }
+    finally{
+      
     }
 };
 
 
 
-const digilocker_requestcheck = async () => {
+const digilocker_getaadhardoc = async (requestid) => {
 
-    const apiurl = url.value + 'digilocker';
-    const requestqueryvalue = route.query.requestId;
+    const apiurl = baseurl.value + 'digilocker';
+    const authorization = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
 
-    const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
-    const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
 
-    const redirecturl = JSON.stringify({
-        task: "getDetails",
-        essentials: {
-            requestId: requestqueryvalue,
-
-        }
+    const user = encryptionrequestdata({
+        userToken: localStorage.getItem('userkey'),
+        digilockerAction: "createAadhaar",
+        digilockerReqId:requestid,
+       
     });
 
-    const formData = new FormData();
-
-    formData.append('brokerCode', 'UAT-KYC');
-    formData.append('appId', '1216');
-    formData.append('clientCode', 'gow001');
-    formData.append('rawPostData', redirecturl);
+    const payload = { payload: user };
+    const jsonString = JSON.stringify(payload);
 
     try {
         const response = await fetch(apiurl, {
             method: 'POST',
             headers: {
                 'Authorization': authorization,
-                'Cookie': cookies
             },
-            body: formData
+            body: jsonString
         });
-
 
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        else {
-            const successdata = await response.json()
 
-            if (successdata.metaData.result.files[0].doctype) {
-                const files_id = []
-                successdata.metaData.result.files.forEach(element => {
-                    files_id.push(element.id)
-                });
+        const data = await response.json();
+        if (data.payload.status == 'ok') {
 
-                digilockerGetFiles(files_id)
-            }
+             pagestatus('parmanentaddress')
+               emit('updateDiv', 'parmanentaddress');
         }
 
-    }
-
-    catch (error) {
+    } catch (error) {
         console.error('Error:', error.message);
-        emit('updateDiv', 'ekyc');
-        content.value = true;
-        loading.value = false;
     }
-
-}
-
-const digilockerGetFiles = async (id) => {
-
-    const apiurl = url.value + 'digilocker';
-    const requestqueryvalue = route.query.requestId;
-
-    const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
-    const cookies = 'PHPSESSID=m89vmdhtu75tts1jr79ddk1ekl';
-
-    const redirecturl = JSON.stringify({
-        task: "getFiles",
-        essentials: {
-            requestId: requestqueryvalue,
-            fileIds: id
-
-        }
-    });
-
-    const formData = new FormData();
-
-    formData.append('brokerCode', 'UAT-KYC');
-    formData.append('appId', '1216');
-    formData.append('clientCode', 'gow001');
-    formData.append('rawPostData', redirecturl);
-
-    try {
-        const response = await fetch(apiurl, {
-            method: 'POST',
-            headers: {
-                'Authorization': authorization,
-                'Cookie': cookies
-            },
-            body: formData
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        else {
-            const data = await response.json()
+    finally{
       
-
-if (data.metaData.result.files[0].file && data.metaData.result.files[1].file) {
-    const xmldataaadhar = data.metaData.result.files[0].file.xml;
-    const xmldatapan = data.metaData.result.files[1].file.xml;
-
-    try {
-        // Fetch both XMLs in parallel
-   
-        const [aadhaarResponse, panResponse] = await Promise.all([
-            fetch(xmldataaadhar),
-            fetch(xmldatapan)
-        ]);
-
-        const [aadhaarXmlText, panXmlText] = await Promise.all([
-            aadhaarResponse.text(),
-            panResponse.text()
-        ]);
-
-        // Parse Aadhaar XML
-        parseString(aadhaarXmlText, { explicitArray: false }, (err, aadharData) => {
-            if (err) {
-                console.error('Error parsing Aadhaar XML:', err);
-            } else {
-                console.log('Parsed Aadhaar:', aadharData);
-               
-
-                const add1=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.co
-                const add2=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.street
-                const add3=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.lm
-                const add4=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.subdist
-             const add5=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.pc
-                const address=add1 + ' ' + add2 + ' ' + add3+' '+add4+' '+add5
-                const city=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.subdist
-                const state=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.state
-                const pincode=aadharData.Certificate.CertificateData.KycRes.UidData.Poa.$.pc
-
-                const mydatadigi={
-                    status:'digilocker',
-                    address:address,
-                    city:city,
-                    state:state,
-                    pincode:pincode
-                }
-                
-                localStorage.setItem('digilockerstatus',JSON.stringify(mydatadigi))
-            }
-        });
-
-        // Parse PAN XML
-        parseString(panXmlText, { explicitArray: false }, (err, panData) => {
-            if (err) {
-                console.error('Error parsing PAN XML:', err);
-            } else {
-                console.log('Parsed PAN:', panData);
-                const panno = panData.Certificate?.$?.number;
-                if (panno) {
-                    panverification(panno);
-                }
-            }
-        });
-
-    } catch (error) {
-        console.error('Error fetching or parsing XML files:', error);
     }
-}
-
-              
-               
-            
-
-        }
-
-    }
-
-    catch (error) {
-        console.error('Error:', error.message);
-    }
-
-}
+};
 
 
-const panverification = async (panval) => {
-   
-    const apiurl = url.value + 'pan'
-    const authorization = 'F2CB3616F1EC269F0BF328CB77FEE4EFCDF5450D7BD21A94721C2F4E49E88F83A4FCE196070903C1BDCAA25F08F037538567D785FC56D139C09A6EC7927D5EFE';
-
- 
-
-    const formData = new FormData()
-
-    formData.append('panNo', panval)
-    formData.append('panName', 'VIJAY')
-    formData.append('brokerCode', 'UAT-KYC')
-    formData.append('appId', '1216')
-    formData.append('clientCode', 'W3VJ1')
-    try {
-        const response = await fetch(apiurl, {
-            method: 'POST',
-            headers: {
-                'Authorization': authorization,
-            },
-            body: formData
-
-        })
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        else {
-            const data = await response.json()
-            if (data.metaData.status == 'VALID') {
-               emit('updateDiv', 'parmanentaddress',);
-            }
-
-
-        }
-    } catch (error) {
-        console.error(error.message)
-    }
-}
 
 
 const handleButtonClick = () => {
@@ -440,19 +344,7 @@ const handleButtonClick = () => {
 
     setTimeout(() => {
         circle.remove()
-
-        const localvalue = localStorage.getItem('krastatus')
-        const localobj = localvalue ? JSON.parse(localvalue) : {};
-        console.log(localobj)
-
-        if (localobj?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
-            
-            digilocker_create()
-        }
-       
-
-
-
+          digilocker_create()
     }, 600)
 };
 

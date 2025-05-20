@@ -130,55 +130,6 @@ onMounted(() => {
     });
 });
 
-const panverification = async () => {
-   const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
-  let panno, clientname
-  if(statuscheck){
-    panno=mydata?.payload?.metaData?.kraPan?.APP_PAN_NO || '';
-    clientname=mydata?.payload?.metaData?.kraPan?.APP_NAME || '';
-  }
-    const apiurl = baseurl.value + 'pan_verification'
-  
- const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: "main",
-    panNo: panno,
-    panName: clientname
-
-
-  });
-
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-   
-    try {
-        const response = await fetch(apiurl, {
-            method: 'POST',
-            headers: {
-                'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-            },
-            body: jsonString
-
-        })
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        else {
-            const data = await response.json()
-            if (data.payload.status == 'ok') {
-               pagestatus('parmanentaddress')
-               emit('updateDiv', 'parmanentaddress');
-            }
-            else{
-                 pagestatus('main')
-                 alert('pan verification failed')
-            }
-        }
-    } catch (error) {
-        console.error(error.message)
-    }
-}
 
 const handleButtonClick = () => {
 
@@ -199,16 +150,15 @@ const handleButtonClick = () => {
         circle.remove()
       
          const mydata = await getServerData();
-        const statuscheck=mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' '
+        const statuscheck=mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ''
         if(statuscheck){
-              panverification()
+             pagestatus('parmanentaddress')
+               emit('updateDiv', 'parmanentaddress');
           
         }
         else{
             pagestatus('ekyc')
             emit('updateDiv', 'ekyc');
-        //        pagestatus('parmanentaddress')
-        //  emit('updateDiv', 'parmanentaddress');
         }
     
 

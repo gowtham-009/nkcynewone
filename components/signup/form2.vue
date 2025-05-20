@@ -14,7 +14,7 @@
               account</p>
           </div>
 
-          <div class="w-full mt-4 flex gap-2 items-center">
+           <div class="w-full mt-4 flex gap-2 items-center">
             <div class="w-full" :class="{ 'disabled-div': mobileotp }"
               :style="mobileotp ? { pointerEvents: 'none', opacity: 0.5 } : {}">
               <MobileInput v-model="mobileNo" />
@@ -39,7 +39,6 @@
             We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }} <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Mobile Number" />
           </p>
           <div class="w-full mt-3">
-
             <phoneOTP v-model="p_otp" />
             <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
 
@@ -56,10 +55,6 @@
         </div>
       </div>
 
-
-
-
-
       <div class="w-full flex gap-2">
         <Button ref="rippleBtnback" @click="back()"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
@@ -71,6 +66,7 @@
           {{ buttonText }}
         </Button>
       </div>
+
     </div>
   </div>
 </template>
@@ -85,11 +81,10 @@ import { encryptionrequestdata } from '~/utils/globaldata.js'
 import { getServerData } from '~/utils/serverdata.js'
 import { getEncryptionData } from '~/utils/kradata.js'
 import { pagestatus } from '~/utils/pagestatus.js'
-
 const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
-const timeLeft = ref(60); // Start from 60 seconds
+const timeLeft = ref(60); 
 const phoneNumber = ref('')
 const mobileotp = ref(false)
 const rippleBtn = ref(null)
@@ -108,7 +103,7 @@ const setMobileData = async () => {
     const mydata = await getServerData();
 
     const kraresdata=getEncryptionData()
-    console.log("this my val:",kraresdata)
+   
   
 
     const appKraMobile = kraresdata?.kradata?.decryptdata?.payload?.metaData?.KYC_DATA?.APP_MOB_NO || '';
@@ -117,7 +112,6 @@ const setMobileData = async () => {
     let rawMobile = profileMobile || appKraMobile || kraMobile || '';
       
     console.log("krares:", appKraMobile, "nkycdata1:",profileMobile, "nkycdata2:",kraMobile)
-
 
     if (rawMobile.startsWith('91') && rawMobile.length === 12) {
       rawMobile = rawMobile.slice(2);
@@ -180,8 +174,6 @@ const sendmobileotp = async (resend) => {
   errormobile.value = '';
   const apiurl = `${baseurl.value}validateMobile`;
   phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
-
-
     const user = encryptionrequestdata({
     otpType:'mobile',
     mobile: mobileNo.value,

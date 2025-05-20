@@ -127,9 +127,14 @@ const profilesetinfo = async () => {
   bankname.value=mydata?.payload?.metaData?.bank?.bank1Name||''
    
   }
-  else{
-    
-  }
+   else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+ selected.value= mydata?.payload?.metaData?.bank?.bank1AccType||''
+  accno.value=mydata?.payload?.metaData?.bank?.bank1AccNo||''
+  ifsc.value=mydata?.payload?.metaData?.bank?.bank1IFSC||''
+  micr.value=mydata?.payload?.metaData?.bank?.bank1MICR||''
+  address.value=mydata?.payload?.metaData?.bank?.bank1Address||''
+  bankname.value=mydata?.payload?.metaData?.bank?.bank1Name||''
+}
 };
 await profilesetinfo()
 

@@ -153,8 +153,17 @@ const profilesetinfo = async () => {
 
     clientselected.value=mydata?.payload?.metaData?.personal?.pep || ''
   }
-  else{
+   else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+  const gender = mydata?.payload?.metaData?.digi_info?.gender || ''
+    selectedgender.value = gender === 'MALE' ? 'Male' : gender === 'FEMALE' ? 'Female' : 'Other';
 
+       const marriedstatus = mydata?.payload?.metaData?.personal?.maritalStatus || '';
+    selected.value = marriedstatus
+
+clientselected.value=mydata?.payload?.metaData?.personal?.pep
+}
+  else{
+   
   }
 };
 

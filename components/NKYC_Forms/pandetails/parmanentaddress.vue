@@ -60,7 +60,7 @@ import State from '~/components/NKYC_Forms/pandetails/paninputs/state.vue';
 import City from '~/components/NKYC_Forms/pandetails/paninputs/city.vue';
 import Pincode from '~/components/NKYC_Forms/pandetails/paninputs/pincode.vue';
 import Addresscheck from '~/components/NKYC_Forms/pandetails/paninputs/confirmcheckbox.vue';
-import { parseString } from 'xml2js';
+
 import { pagestatus } from '~/utils/pagestatus.js'
 
 
@@ -96,35 +96,11 @@ onBeforeUnmount(() => {
 
 
 
-// const setPermanentAddress = async () => {
-//   const localvalue = localStorage.getItem('krastatus');
-//   const localobj = localvalue ? JSON.parse(localvalue) : null;
 
-//   const localvaluedigi = localStorage.getItem('digilockerstatus');
-//   const localobjdigi = localvaluedigi ? JSON.parse(localvaluedigi) : null;
-
-//   if (localobjdigi && localobjdigi.status === 'digilocker') {
-
-//     address.value = localobjdigi.address || '';
-//     state.value = localobjdigi.state || '';
-//     city.value = localobjdigi.city || '';
-//     pincode.value = localobjdigi.pincode || '';
-//   } else if (localobj && localobj.KYC_DATA) {
-//     const add1 = localobj.KYC_DATA.APP_COR_ADD1 || '';
-//     const add2 = localobj.KYC_DATA.APP_COR_ADD2 || '';
-//     const add3 = localobj.KYC_DATA.APP_COR_ADD3 || '';
-//     address.value = `${add1} ${add2} ${add3}`.trim();
-
-//     const stateCode = String(localobj.KYC_DATA.APP_COR_STATE || '');
-//     state.value = (localobj.statelist && localobj.statelist[stateCode]) || '';
-//     city.value = localobj.KYC_DATA.APP_COR_CITY || '';
-//     pincode.value = localobj.KYC_DATA.APP_COR_PINCD || '';
-//   }
-// };
 
 const setPermanentAddress = async () => {
   const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' '
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO
   if (statuscheck) {
     const add1 = mydata?.payload?.metaData?.kraPan?.APP_PER_ADD1 || ''
     const add2 = mydata?.payload?.metaData?.kraPan?.APP_PER_ADD2 || ''
@@ -135,7 +111,14 @@ const setPermanentAddress = async () => {
     city.value = mydata?.payload?.metaData?.kraPan?.APP_PER_CITY || ''
     pincode.value = mydata?.payload?.metaData?.kraPan?.APP_PER_PINCD || ''
   }
-  else {
+  else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument ) {
+  address.value = mydata?.payload?.metaData?.address?.perAddress || ''
+   
+    state.value = mydata?.payload?.metaData?.address.perState || ''
+    city.value = mydata?.payload?.metaData?.address.perCity || ''
+    pincode.value = mydata?.payload?.metaData?.address.perPincode || ''
+  }
+  else{
 
   }
 
@@ -209,71 +192,69 @@ const permanentaddressdata = async () => {
 
 // Handle continue button click
 const handleButtonClick = (event) => {
-  animateRipple(rippleBtn.value, event);
+
+ 
+    const button = rippleBtn.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+
+  button.$el.appendChild(circle)
+
   setTimeout(() => {
-    permanentaddressdata()
-
-
-  }, 600);
+    circle.remove()
+     
+   permanentaddressdata()
+  }, 600)
 };
 
 
-const back = (event) => {
-  animateRipple(rippleBtnback.value, event);
-  setTimeout(() => {
-    const localvalue = localStorage.getItem('krastatus');
-    const local = localvalue ? JSON.parse(localvalue) : null;
 
-    if (local?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
-      pagestatus('ekyc')
-      emit('updateDiv', 'ekyc');
-    }
-    else {
+function back() {
+    const button = rippleBtnback.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+  button.$el.appendChild(circle)
+
+  setTimeout(async() => {
+    circle.remove()
+
+       const mydata = await getServerData();
+        const statuscheck=mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO
+    if (statuscheck) {
+      
       pagestatus('main')
       emit('updateDiv', 'main');
     }
-
-
-  }, 600);
-};
-
-// Ripple effect
-function animateRipple(buttonRef, event) {
-  const button = buttonRef?.$el || buttonRef;
-  if (!button) return;
-
-  const ripple = document.createElement('span');
-  ripple.className = 'ripple';
-
-  const rect = button.getBoundingClientRect();
-  ripple.style.left = `${event.clientX - rect.left}px`;
-  ripple.style.top = `${event.clientY - rect.top}px`;
-
-  button.appendChild(ripple);
-  setTimeout(() => ripple.remove(), 600);
+    else {
+     pagestatus('ekyc')
+      emit('updateDiv', 'ekyc');
+    }
+  }, 600)
+   
 }
+
+ 
+
+
 </script>
 
 
 <style scoped>
-.ripple {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.6);
-  border-radius: 50%;
-  transform: scale(0);
-  animation: ripple-animation 0.6s linear;
-  width: 100px;
-  height: 100px;
-  pointer-events: none;
-  z-index: 10;
-}
 
-@keyframes ripple-animation {
-  to {
-    transform: scale(2.5);
-    opacity: 0;
-  }
-}
 
 .p-checkbox-checked .p-checkbox-icon {
   color: white !important;

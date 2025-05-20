@@ -89,6 +89,9 @@ const profilesetinfo = async () => {
    selected.value=mydata?.payload?.metaData?.personal?.occupation || ''
    
   }
+   else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+  selected.value=mydata?.payload?.metaData?.personal?.occupation || ''
+}
   else{
     
   }
