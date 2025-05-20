@@ -178,8 +178,13 @@ const additionaldocument = async () => {
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
-          pagestatus('submission', '5')
-    emit('updateDiv', 'submission');
+
+       const mydata= await pagestatus('submission', '5')
+     if(mydata.payload.status=='ok'){
+       emit('updateDiv', 'submission');
+     }
+
+        
 
     }
   } catch (error) {
@@ -233,10 +238,14 @@ const handleButton = () => {
 
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-       pagestatus('submission', '5')
-    emit('updateDiv', 'submission');
+
+     const mydata= await pagestatus('submission', '5')
+     if(mydata.payload.status=='ok'){
+       emit('updateDiv', 'submission');
+     }
+      
   }, 600)
 };
 

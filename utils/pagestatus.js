@@ -33,7 +33,7 @@ export async function pagestatus(pagecode, profileCode) {
 
     const data = await response.json();
    
-    return data;
+    return data
   } catch (error) {
     console.error('Fetch error:', error);
     return null;

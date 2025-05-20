@@ -265,7 +265,6 @@ const isSaveDisabled = computed(() => {
 
 const dialogbox = (editdata) => {
 
-  console.log("arjaoei",editdata)
   let formattedDOB = '';
 
   if (editdata.dob) {
@@ -279,13 +278,11 @@ const dialogbox = (editdata) => {
     }
   }
 
-  console.log(editdata.relation)
-  editdata.relation
   visible.value = true;
   idval.value = editdata.id;
   name.value = editdata.name;
-  selectedStatement.value = editdata.relation;
-  console.log(selectedStatement.value)
+  selectedStatement.value = editdata.relation
+
   dob.value = formattedDOB;
   address.value = editdata.address;
   mobileNo.value = editdata.mobile;
@@ -483,11 +480,15 @@ const handleButtonClick = (event) => {
 
   button.$el.appendChild(circle);
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove();
    
-       pagestatus('submission', '2')
-    emit('updateDiv', 'submission');
+     const mydata= await pagestatus('submission', '2')
+     if(mydata.payload.status=='ok'){
+       emit('updateDiv', 'submission');
+     }
+
+   
   }, 600);
 };
 

@@ -167,8 +167,10 @@ const communicateaddressdata = async () => {
     else {
       const data = await response.json()
       if (data.payload.status == 'ok') {
-       pagestatus('submission', '1')
-      emit('updateDiv', 'submission');
+     const mydata= await pagestatus('submission', '2')
+     if(mydata.payload.status=='ok'){
+       emit('updateDiv', 'submission');
+     }
       }
     }
 
