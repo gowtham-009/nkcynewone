@@ -1,7 +1,7 @@
 <template>
   <div class="w-full">
     <span class="font-semibold text-lg block mb-2">Enter PAN</span>
-    <div class="pan-input-wrapper w-full dark:bg-gray-800">
+    <div class="pan-input-wrapper w-full dark:!bg-gray-800">
       <i class="pi pi-id-card pan-icon"></i>
       <input
         v-model="displayPan"
