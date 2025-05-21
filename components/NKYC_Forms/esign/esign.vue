@@ -115,6 +115,49 @@ const createEsign = async () => {
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
+        const document=data.payload.metaData.dataEsign
+        const decoded = atob(document);
+
+        console.warn(decoded);
+         window.location.href = decoded;
+    // esignStatusCheck(data)
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+
+const esignStatusCheck = async (requesid) => {
+
+  const apiurl = `${baseurl.value}esign`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "esign",
+      esignId: requesid.payload.metaData.documentId,
+     esignAction: "checkEsignStatus"
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
 
      
         
@@ -124,8 +167,6 @@ const createEsign = async () => {
     console.error(error.message);
   }
 };
-
-
 
 
 const handleButtonClick = () => {
