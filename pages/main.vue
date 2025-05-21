@@ -106,7 +106,9 @@
     <ADDITIONALINFO :data="data" @updateDiv="handleUpdateDiv" />
   </div>
  
- 
+  <div v-if="currentForm === 'esign'">
+    <ESIGN  @updateDiv="handleUpdateDiv" />
+  </div>
   <div v-if="currentForm === 'thankyou'">
     <THANKINGYOU @updateDiv="handleUpdateDiv" />
   </div>
@@ -150,6 +152,7 @@ import PHOTOPROCEED from '~/components/NKYC_Forms/photo&sign/pictureproceed.vue'
 import SIGNATURE from '~/components/NKYC_Forms/photo&sign/signature.vue'
 import SIGNDRAWING from '~/components/NKYC_Forms/photo&sign/signdraw.vue'
 import ADDITIONALINFO from '~/components/NKYC_Forms/photo&sign/documentconfirmation.vue'
+import ESIGN from '~/components/NKYC_Forms/esign/esign.vue'
 import THANKINGYOU from '~/components/thankyou.vue'
 
 // const Authenticated=ref(false)

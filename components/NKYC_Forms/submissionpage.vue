@@ -139,8 +139,8 @@ const handleButtonClick = (event) => {
         emit('updateDiv', 'photosign1');
         break;
       case 5:
-         pagestatus('thankyou')
-        emit('updateDiv', 'thankyou');
+         pagestatus('esign')
+        emit('updateDiv', 'esign');
         break;
       default:
         break;
