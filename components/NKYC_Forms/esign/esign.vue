@@ -37,8 +37,6 @@
                         <div class="font-normal text-sm text-gray-500">F.</div>
                         <div class="font-normal text-sm text-gray-500">Esign Complete</div>
                     </div>
-                  
-                  
                 </div>
 
             </div>
@@ -73,7 +71,7 @@ import { ref, onMounted } from 'vue';
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
 const deviceHeight = ref(0);
-const buttonText = ref('Next Step');
+const buttonText = ref('Ready for Esign');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 onMounted(() => {
