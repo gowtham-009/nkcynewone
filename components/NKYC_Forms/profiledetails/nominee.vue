@@ -59,7 +59,7 @@
               :options="statementOptions"
               optionLabel="name"
              
-              class="w-full prime-input md:w-56"
+              class="w-full prime-input "
             />
             <span class="bottom-border"></span>
           </div>
@@ -580,10 +580,10 @@ watch(dob, (newval) => {
 }
 
 .uppercase {
-  text-transform: uppercase;
-}
+    text-transform: uppercase;
+  }
 
-.input-wrapper {
+  .input-wrapper {
   position: relative;
   display: flex;
   align-items: center;

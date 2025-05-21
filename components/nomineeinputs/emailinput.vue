@@ -41,14 +41,26 @@ const validateEmail = () => {
 </script>
 
 <style scoped>
-.input-wrapper {
+.uppercase {
+    text-transform: uppercase;
+  }
+
+  .input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
   background-color: #e0e0e0;
   border-radius: 10px;
- 
+  padding: 0 10px;
   overflow: hidden;
+}
+
+.country-code {
+  font-size: 16px;
+  color: #333;
+  padding-right: 8px;
+  white-space: nowrap;
+  user-select: none;
 }
 
 .prime-input {
@@ -57,9 +69,9 @@ const validateEmail = () => {
   outline: none;
   font-size: 16px;
   flex: 1;
-
+  padding: 10px 0;
   z-index: 1;
-
+  box-shadow: none !important;
 }
 
 .prime-input::placeholder {
@@ -82,5 +94,4 @@ const validateEmail = () => {
 .input-wrapper:focus-within .bottom-border {
   width: 100%;
   height: 4px;
-}
-</style>
+}</style>

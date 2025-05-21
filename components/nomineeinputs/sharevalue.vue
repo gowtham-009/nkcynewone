@@ -39,7 +39,7 @@
   });
   </script>
   <style scoped>
-  .uppercase {
+ .uppercase {
     text-transform: uppercase;
   }
 

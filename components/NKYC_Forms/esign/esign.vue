@@ -38,7 +38,6 @@
                         <div class="font-normal text-sm text-gray-500">Esign Complete</div>
                     </div>
                 </div>
-
             </div>
 
             <div class="w-full flex gap-2">
@@ -51,9 +50,6 @@
                     {{ buttonText }}
                 </Button>
             </div>
-
-
-
         </div>
 
     </div>
