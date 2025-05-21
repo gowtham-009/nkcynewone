@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import Bankupload from '~/components/NKYC_Forms/account/fileuploads/bankproof.vue';
 
 const emit = defineEmits(['updateDiv']);
