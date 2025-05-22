@@ -82,11 +82,11 @@ const route=useRoute()
 
 
 
-onMounted(() => {
+onMounted(async() => {
 
    if(route.query.documentId){
   
-      esignStatusCheck(route.query.documentId)
+      await esignStatusCheck(route.query.documentId)
      
     }
     deviceHeight.value = window.innerHeight;
