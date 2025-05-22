@@ -228,10 +228,14 @@ const back = (event) => {
 
   button.$el.appendChild(circle);
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove();
-    pagestatus('submission', '3')
-    emit('updateDiv', 'submission');
+
+     const mydata= await pagestatus('submission', '3')
+       if(mydata.payload.status=='ok'){
+         emit('updateDiv', 'submission');
+       }
+  
   }, 600);
 };
 

@@ -290,10 +290,14 @@ function back() {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-     pagestatus('submission', '2')
-    emit('updateDiv', 'submission');
+
+     const mydata= await pagestatus('submission', '2')
+       if(mydata.payload.status=='ok'){
+         emit('updateDiv', 'submission');
+       }
+ 
   }, 600)
 
 }
