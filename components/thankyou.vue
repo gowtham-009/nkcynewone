@@ -144,10 +144,14 @@ circle.style.left = `${x}px`
 circle.style.top = `${y}px`
 button.$el.appendChild(circle)
 
-setTimeout(() => {
+setTimeout(async() => {
 circle.remove()
-  pagestatus('esign')
-emit('updateDiv', 'esign');
+
+  const mydata= await pagestatus('esign')
+       if(mydata.payload.status=='ok'){
+         emit('updateDiv', 'esign');
+       }
+ 
 }, 600)
 
 }
