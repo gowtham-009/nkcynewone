@@ -146,8 +146,8 @@ button.$el.appendChild(circle)
 
 setTimeout(() => {
 circle.remove()
-  pagestatus('submission', '5')
-emit('updateDiv', 'submission');
+  pagestatus('esign')
+emit('updateDiv', 'esign');
 }, 600)
 
 }
