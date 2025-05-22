@@ -206,7 +206,7 @@ const esignStatusCheck = async (requesid) => {
     if (data.payload.status === 'ok') {
          content.value=false
         loading.value=true
-      pagestatus('thankyou')
+ 
         emit('updateDiv', 'thankyou');
 
     }
