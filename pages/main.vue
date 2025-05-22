@@ -244,7 +244,7 @@ onMounted(async () => {
     }
   }
 
-  router.replace({ query: {} })
+ 
 
   history.replaceState({ div: currentForm.value, formData: {} }, '', '/main')
   window.addEventListener('popstate', handleBackButton)
