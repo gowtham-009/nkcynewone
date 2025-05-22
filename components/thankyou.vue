@@ -51,7 +51,7 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const route=useRoute()
 onMounted(() => {
-  route.query.documentId=' '
+  
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
@@ -148,7 +148,7 @@ button.$el.appendChild(circle)
 
 setTimeout(async() => {
 circle.remove()
-
+route.query.documentId=''
   const mydata= await pagestatus('esign')
        if(mydata.payload.status=='ok'){
          emit('updateDiv', 'esign');
