@@ -5,7 +5,7 @@
             <logo style="width: 40px; height: 40px;" />
             <profile />
         </div>
-        <div class="flex  justify-between items-center px-3 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
+        <div v-if="content" class="flex  justify-between items-center px-3 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full p-1">
                 <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">Esign</p>
@@ -57,24 +57,71 @@
 
 
 
+ <div v-if="loading" class="flex justify-center items-center  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
+        :style="{ height: deviceHeight * 0.92 + 'px' }">
+        <ProgressSpinner />
 
+    </div>
 
 </template>
 <script setup>
 
 import { ref, onMounted } from 'vue';
-
+import { useRoute } from 'vue-router';
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const buttonText = ref('Ready for Esign');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
+const content=ref(true)
+const loading=ref(false)
+
+const route=useRoute()
+
+const createunsignedDocument = async () => {
+  const apiurl = `${baseurl.value}nkyc_document`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+  
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
+
 onMounted(() => {
+  createunsignedDocument()
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
     });
+
+    if(route.query.documentId){
+      esignStatusCheck(route.query.documentId)
+    }
+
+
 });
 
 
@@ -112,12 +159,17 @@ const createEsign = async () => {
         const document=data.payload.metaData.dataEsign
         const decoded = atob(document);
 
-        console.warn(decoded);
          window.location.href = decoded;
-    // esignStatusCheck(data)
+   
     }
   } catch (error) {
     console.error(error.message);
+  }
+  finally{
+    
+        content.value=true
+        loading.value=false
+    
   }
 };
 
@@ -127,8 +179,8 @@ const esignStatusCheck = async (requesid) => {
   const apiurl = `${baseurl.value}esign`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-    pageCode: "esign",
-      esignId: requesid.payload.metaData.documentId,
+    pageCode: "thankyou",
+      esignId:requesid,
      esignAction: "checkEsignStatus"
 
   });
@@ -152,9 +204,10 @@ const esignStatusCheck = async (requesid) => {
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
-
-     
-        
+         content.value=false
+        loading.value=true
+      pagestatus('thankyou')
+        emit('updateDiv', 'thankyou');
 
     }
   } catch (error) {

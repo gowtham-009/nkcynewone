@@ -43,6 +43,8 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 const emit = defineEmits(['updateDiv']);
+
+const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const buttonText = ref('Exit');
 const rippleBtn = ref(null);
@@ -53,9 +55,55 @@ onMounted(() => {
         deviceHeight.value = window.innerHeight;
     });
 });
-
-
 const router=useRouter()
+
+const camsbankdata = async () => {
+
+     const mydata = await getServerData();
+     const ifscvalue=mydata.payload.metaData.bank.bank1IFSC
+
+  const apiurl = `${baseurl.value}cams`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "thankyou",
+    camsAction: "createCams",
+    bankIfsc:ifscvalue,
+    redirecUrl: "https://nkcynewone.vercel.app/main"
+
+   
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+
+         window.location.href = data.payload.metaData.redirectionurl;
+
+        
+
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
 const handleButtonClick = () => {
  const button = rippleBtn.value
   const circle = document.createElement('span')
@@ -73,7 +121,7 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
 
- router.push('/')
+camsbankdata()
  
   }, 600)
 };

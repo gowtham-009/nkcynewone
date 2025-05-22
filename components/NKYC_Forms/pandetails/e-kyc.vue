@@ -148,7 +148,7 @@ const digilocker_create = async () => {
     const user = encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "createUrl",
-        redirecUrl:'https://nkcynewone.vercel.app/main'
+        redirecUrl:"https://nkcynewone.vercel.app/main"
     });
 
     const payload = { payload: user };
