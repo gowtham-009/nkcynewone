@@ -82,6 +82,7 @@ onMounted(() => {
   })
 const queryid=route.query.documentId
   if (queryid) {
+    alert('hi')
     esignStatusCheck(queryid)
   }
 })
