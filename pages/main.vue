@@ -1,115 +1,33 @@
 <template>
-  <div v-if="currentForm === 'main'">
-    <NKYCList @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'ekyc'">
-    <EKYC :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'parmanentaddress'">
-    <PARMANENTADDRESS :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'failedstatus'">
-    <FAILEDSTATUS @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'communicationaddress'">
-    <COMMUNICATIONADDRESS :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'submission'">
-    <SUBMISSIONFORM :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'info'">
-    <MARRIEDSTATUS @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'clientinfo'">
-    <CLIENTINFO @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'qualification'">
-    <QUALIFICATION @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'occupation'">
-    <OCCUPATION @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'tradingexperience'">
-    <TRADINGEXPERIENCE @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'income'">
-    <INCOME @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'nominee'">
-    <NOMINEE @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'bank1'">
-    <BANK1 @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'bank4'">
-    <BANK4 :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'tradingsegment'">
-    <TRADINGSEGMENT :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'brokerage'">
-    <BROKERAGE :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'uploadproof'">
-    <UPLOADPROOF :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'uploadincome'">
-    <UPLOADINCOME :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'uploadbank'">
-    <UPLOADBANK :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'photosign1'">
-    <PHOTOSIGN1 @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'takephoto'">
-    <TAKEPHOTO @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'photoproceed'">
-    <PHOTOPROCEED :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'signature'">
-    <SIGNATURE @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'signdraw'">
-    <SIGNDRAWING :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'additionalinformation'">
-    <ADDITIONALINFO :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'esign'">
-    <ESIGN @updateDiv="handleUpdateDiv" />
-  </div>
-
-  <div v-if="currentForm === 'thankyou'">
-    <THANKINGYOU @updateDiv="handleUpdateDiv" />
-  </div>
+  <!-- All forms rendered based on currentForm -->
+  <div v-if="currentForm === 'main'"><NKYCList @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'ekyc'"><EKYC :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'parmanentaddress'"><PARMANENTADDRESS :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'failedstatus'"><FAILEDSTATUS @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'communicationaddress'"><COMMUNICATIONADDRESS :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'submission'"><SUBMISSIONFORM :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'info'"><MARRIEDSTATUS @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'clientinfo'"><CLIENTINFO @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'qualification'"><QUALIFICATION @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'occupation'"><OCCUPATION @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'tradingexperience'"><TRADINGEXPERIENCE @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'income'"><INCOME @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'nominee'"><NOMINEE @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'bank1'"><BANK1 @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'bank4'"><BANK4 :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'tradingsegment'"><TRADINGSEGMENT :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'brokerage'"><BROKERAGE :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'uploadproof'"><UPLOADPROOF :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'uploadincome'"><UPLOADINCOME :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'uploadbank'"><UPLOADBANK :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'photosign1'"><PHOTOSIGN1 @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'takephoto'"><TAKEPHOTO @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'photoproceed'"><PHOTOPROCEED :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'signature'"><SIGNATURE @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'signdraw'"><SIGNDRAWING :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'additionalinformation'"><ADDITIONALINFO :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'esign'"><ESIGN @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'thankyou'"><THANKINGYOU @updateDiv="handleUpdateDiv" /></div>
 </template>
 
 <script setup>
@@ -117,7 +35,7 @@ import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getServerData } from '~/utils/serverdata.js'
 
-// Components imports (same as before)
+// Import components
 import NKYCList from '~/components/NKYC_Forms/nkyclist.vue'
 import EKYC from '~/components/NKYC_Forms/pandetails/e-kyc.vue'
 import PARMANENTADDRESS from '~/components/NKYC_Forms/pandetails/parmanentaddress.vue'
@@ -146,16 +64,12 @@ import SIGNDRAWING from '~/components/NKYC_Forms/photo&sign/signdraw.vue'
 import ADDITIONALINFO from '~/components/NKYC_Forms/photo&sign/documentconfirmation.vue'
 import ESIGN from '~/components/NKYC_Forms/esign/esign.vue'
 import THANKINGYOU from '~/components/thankyou.vue'
-
-// State refs
 const route = useRoute()
 const router = useRouter()
-
 const currentForm = ref('nkyclist')
 const data = ref({})
-const formHistory = ref([{ form: currentForm.value, formData: {} }])
 
-// Query parameter to internal form name mapping
+// Query param to form mapping
 const formMap = {
   '$@main1': 'main',
   '$@ekyc1': 'ekyc',
@@ -187,70 +101,50 @@ const formMap = {
   '$@thankyou1': 'thankyou',
 }
 
-// Back button handler
-const handleBackButton = () => {
-  if (formHistory.value.length > 1) {
-    formHistory.value.pop()
-    const previous = formHistory.value[formHistory.value.length - 1]
-    currentForm.value = previous.form
-    data.value = previous.formData || {}
-    router.replace({ query: { form: previous.form } })
-  } else {
-    history.back()
-  }
-}
-
-// Watch for query parameter changes
-watch(() => route.query.form, (newForm) => {
-  if (newForm && formMap[newForm]) {
-    const mappedForm = formMap[newForm]
-    currentForm.value = mappedForm
-    data.value = {}
-    formHistory.value.push({ form: mappedForm, formData: {} })
-    router.replace({ path: '/main' }) // Clean URL
-  }
-})
-
-// Handle updates from child components
+// ⚡️ Form change via event
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value
   data.value = newData
-  router.replace({ path: '/main' })
-  formHistory.value.push({ form: value, formData: newData })
 }
 
-// On mount, set form based on query or server
+// ⚡️ Watch the form query param
+watch(() => route.query.form, (newForm) => {
+  if (newForm && formMap[newForm]) {
+    currentForm.value = formMap[newForm]
+    data.value = {}
+  }
+})
+
 onMounted(async () => {
   const queryForm = route.query.form
 
+  // 🟢 Case 1: User manually typed form param in URL
   if (queryForm && formMap[queryForm]) {
     const mappedForm = formMap[queryForm]
     currentForm.value = mappedForm
+    data.value = {}
     formHistory.value = [{ form: mappedForm, formData: {} }]
-  } else {
-    const userkey = localStorage.getItem('userkey')
-    if (userkey) {
-      const mydata = await getServerData()
-      const activePage = mydata?.payload?.metaData?.profile?.pageStatus || 'main'
-
-      currentForm.value = activePage
-      formHistory.value = [{ form: activePage, formData: {} }]
-
-      const restrictedPages = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp']
-      if (restrictedPages.includes(activePage)) {
-        router.push('/')
-        return
-      }
-    }
+    return // ✅ Done
   }
 
- 
+  // 🔵 Case 2: Default load from localStorage/server if no query param
+  const userkey = localStorage.getItem('userkey')
+  if (userkey) {
+    const mydata = await getServerData()
+    const activePage = mydata?.payload?.metaData?.profile?.pageStatus || 'main'
+    currentForm.value = activePage
+    formHistory.value = [{ form: activePage, formData: {} }]
 
-  history.replaceState({ div: currentForm.value, formData: {} }, '', '/main')
-  window.addEventListener('popstate', handleBackButton)
+    const restrictedPages = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp']
+    if (restrictedPages.includes(activePage)) {
+      router.push('/')
+      return
+    }
+
+    // 🧹 Clean up the URL (remove ?form=...) for auto-load
+    router.replace({ path: '/main' })
+  }
 })
 
-onBeforeUnmount(() => {
-  window.removeEventListener('popstate', handleBackButton)
-})
+
 </script>

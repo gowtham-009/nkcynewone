@@ -80,14 +80,15 @@ const loading=ref(false)
 const route=useRoute()
 
 
- if(route.query.documentId){
-    alert('hi')
-      esignStatusCheck(route.query.documentId)
-     
-    }
+
 
 onMounted(() => {
 
+   if(route.query.documentId){
+  
+      esignStatusCheck(route.query.documentId)
+     
+    }
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
