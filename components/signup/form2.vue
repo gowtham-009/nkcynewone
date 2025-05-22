@@ -98,6 +98,8 @@ const errormobile = ref('')
 const p_otp = ref('')
 
 const mobileNo = ref(''); // Assuming you're using `ref` for mobileNo
+
+
 const setMobileData = async () => {
   try {
     const mydata = await getServerData();
@@ -180,8 +182,6 @@ const sendmobileotp = async (resend) => {
     resend:'false',
     pageCode:"mobile",
     userToken:localStorage.getItem('userkey')
-
-   
   });
  
     const payload = { payload: user };
@@ -199,7 +199,6 @@ const sendmobileotp = async (resend) => {
   const data = await response.json(); // Read body regardless of status
 
   if (!response.ok) {
-  
     console.error("Error:", data.message);
     errormsg.value = data.message; // Show in UI
     return;
@@ -316,7 +315,8 @@ const mobile_signup = () => {
   button.$el.appendChild(circle)
   setTimeout(async () => {
     circle.remove()
-    if (p_otp.value.length === 4) {
+
+     if (p_otp.value.length === 4) {
 
     otpverfication()
     
@@ -324,6 +324,32 @@ const mobile_signup = () => {
     else {
       sendmobileotp()
     }
+
+
+//   const mydata = await getServerData();
+//   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+
+//   if(statuscheck){
+//       if(mobileNo.value && mobileNo.value.length===10){
+//         pagestatus('email')
+//          emit('updateDiv', 'email');
+//       }
+//   }
+// else{
+
+//     if (p_otp.value.length === 4) {
+
+//     otpverfication()
+    
+//     }
+//     else {
+//       sendmobileotp()
+//     }
+
+// }
+
+
+
 
 
   }, 600)

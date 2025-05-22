@@ -208,14 +208,15 @@ const handleButtonClick = async () => {
       localStorage.setItem('userkey', data.payload.userKey || '')
 
       const decryt=   decryptdatadata({decryptdata:data});
-      //  const tokenval = randomtoken();
-      //   const response = new Response(JSON.stringify({ value: tokenval }));
-      //   const cache = await caches.open("my-cache");
-      //   await cache.put("/my-value", response);
-      // console.log(decryt)
+     
+      console.log(decryt)
 
       kradatares({kradata:decryt})
-      emit('updateDiv', 'mobile');
+
+      if(data.payload.status=='ok'){
+        emit('updateDiv', 'mobile');
+      }
+      
     }, 400);
   }
 };
