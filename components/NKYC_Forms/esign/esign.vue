@@ -138,6 +138,7 @@ const esignStatusCheck = async (requestId) => {
     if (data.payload.status === 'ok') {
       content.value = false;
       loading.value = true;
+      route.query.documentId=null
       pagestatus('thankyou');
       emit('updateDiv', 'thankyou');
     }

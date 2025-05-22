@@ -41,7 +41,7 @@
 <script setup>
 
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 const emit = defineEmits(['updateDiv']);
 
 const { baseurl } = globalurl();
@@ -49,7 +49,7 @@ const deviceHeight = ref(0);
 const buttonText = ref('Exit');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
-const route=useRoute()
+
 onMounted(() => {
   
     deviceHeight.value = window.innerHeight;
@@ -148,7 +148,7 @@ button.$el.appendChild(circle)
 
 setTimeout(async() => {
 circle.remove()
-route.query.documentId=''
+
   const mydata= await pagestatus('esign')
        if(mydata.payload.status=='ok'){
          emit('updateDiv', 'esign');
