@@ -23,16 +23,17 @@
       </div>
 
       <div class="w-full flex gap-2">
-        <button  @click="back" ref="rippleBtnback"
-                class="primary_color cursor-pointer border-0 text-white w-1/6 py-4 dark:bg-slate-900 relative overflow-hidden">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </button>
+       <!-- Buttons -->
+<button @click="back($event)" ref="rippleBtnback"
+        class="primary_color cursor-pointer border-0 text-white w-1/6 py-4 dark:bg-slate-900 relative overflow-hidden">
+  <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+</button>
 
-        <button type="button" ref="rippleBtn" @click="handleButtonClick"
-               
-                class="primary_color wave-btn text-white w-5/6 py-4 text-xl border-0 relative overflow-hidden">
-          {{ buttonText }}
-        </button>
+<button @click="handleButtonClick($event)" ref="rippleBtn"
+        class="primary_color wave-btn text-white w-5/6 py-4 text-xl border-0 relative overflow-hidden">
+  {{ buttonText }}
+</button>
+
       </div>
     </div>
 
@@ -53,7 +54,7 @@ const { baseurl } = globalurl();
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Ready for Esign');
 const rippleBtn = ref(null);
-const rippleBtnback = ref(null)
+const rippleBtnback = ref(null);
 const content = ref(true);
 const loading = ref(false);
 
@@ -68,17 +69,17 @@ const steps = [
   { label: 'F.', text: 'Esign Complete' },
 ];
 
-onMounted(async () => {
+onMounted(() => {
   if (route.query.documentId) {
-    await esignStatusCheck(route.query.documentId);
+    esignStatusCheck(route.query.documentId);
   }
 
   const updateHeight = () => {
     deviceHeight.value = window.innerHeight;
   };
-
   window.addEventListener('resize', updateHeight);
 });
+
 const createEsign = async () => {
   const apiurl = `${baseurl.value}esign`;
   const user = encryptionrequestdata({
@@ -99,8 +100,8 @@ const createEsign = async () => {
     });
 
     if (!response.ok) throw new Error(`Network error: ${response.status}`);
-
     const data = await response.json();
+
     if (data.payload.status === 'ok') {
       const decoded = atob(data.payload.metaData.dataEsign);
       window.location.href = decoded;
@@ -133,12 +134,12 @@ const esignStatusCheck = async (requestId) => {
     });
 
     if (!response.ok) throw new Error(`Network error: ${response.status}`);
-
     const data = await response.json();
+
     if (data.payload.status === 'ok') {
       content.value = false;
       loading.value = true;
-      route.query.documentId=null
+      route.query.documentId = null;
       pagestatus('thankyou');
       emit('updateDiv', 'thankyou');
     }
@@ -147,93 +148,42 @@ const esignStatusCheck = async (requestId) => {
   }
 };
 
+const createRipple = (event, buttonRef) => {
+  const button = buttonRef.value;
+  const circle = document.createElement('span');
+  circle.classList.add('ripple');
 
-const handleButtonClick = () => {
+  const rect = button.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
 
- const button = rippleBtn.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
+  circle.style.left = `${x}px`;
+  circle.style.top = `${y}px`;
 
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+  button.appendChild(circle);
 
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-
-  button.$el.appendChild(circle)
-
-  setTimeout(async() => {
-    circle.remove()
-     createEsign();
-   
-  }, 600)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
+  setTimeout(() => {
+    circle.remove();
+  }, 600);
 };
 
+const handleButtonClick = async (event) => {
+  createRipple(event, rippleBtn);
+  setTimeout(() => createEsign(), 600);
+};
 
-
-
-const back = () => {
-
-     const button = rippleBtnback.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
-
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
-
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-  button.$el.appendChild(circle)
-
-  setTimeout(async() => {
-    circle.remove()
+const back = async (event) => {
+  createRipple(event, rippleBtnback);
+  setTimeout(async () => {
     const myData = await pagestatus('submission', '5');
-  if (myData?.payload?.status === 'ok') {
-    emit('updateDiv', 'submission');
-  }
-  }, 600)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-}
-
-
+    if (myData?.payload?.status === 'ok') {
+      emit('updateDiv', 'submission');
+    }
+  }, 600);
+};
 </script>
-
 <style scoped>
-/* .ripple {
+.ripple {
   position: absolute;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.4);
@@ -250,5 +200,6 @@ const back = () => {
     transform: translate(-50%, -50%) scale(3);
     opacity: 0;
   }
-} */
+}
 </style>
+
