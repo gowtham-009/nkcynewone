@@ -23,13 +23,13 @@
       </div>
 
       <div class="w-full flex gap-2">
-        <button ref="rippleBtnBack" @click="back"
+        <button  @click="back" ref="rippleBtnback"
                 class="primary_color cursor-pointer border-0 text-white w-1/6 py-4 dark:bg-slate-900 relative overflow-hidden">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </button>
 
-        <button @click="handleButtonClick"
-                ref="rippleBtn"
+        <button type="button" ref="rippleBtn" @click="handleButtonClick"
+               
                 class="primary_color wave-btn text-white w-5/6 py-4 text-xl border-0 relative overflow-hidden">
           {{ buttonText }}
         </button>
@@ -53,7 +53,7 @@ const { baseurl } = globalurl();
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Ready for Esign');
 const rippleBtn = ref(null);
-const rippleBtnBack = ref(null);
+const rippleBtnback = ref(null)
 const content = ref(true);
 const loading = ref(false);
 
