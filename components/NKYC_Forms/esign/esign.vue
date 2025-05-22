@@ -149,6 +149,7 @@ const esignStatusCheck = async (requestId) => {
 
 
 const handleButtonClick = () => {
+
  const button = rippleBtn.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
@@ -164,17 +165,33 @@ const handleButtonClick = () => {
 
   setTimeout(async() => {
     circle.remove()
-
      createEsign();
-      
+   
   }, 600)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
 };
 
 
 
 
 const back = () => {
-    const button = rippleBtnback.value
+
+     const button = rippleBtnback.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
 
@@ -188,11 +205,27 @@ const back = () => {
 
   setTimeout(async() => {
     circle.remove()
-   const myData = await pagestatus('submission', '5');
+    const myData = await pagestatus('submission', '5');
   if (myData?.payload?.status === 'ok') {
     emit('updateDiv', 'submission');
   }
   }, 600)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    
 }
 
