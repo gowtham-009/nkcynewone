@@ -75,16 +75,18 @@ const rippleBtnback = ref(null)
 const content = ref(true)
 const loading = ref(false)
 
-onMounted(() => {
+onMounted(async() => {
+  const queryid=route.query.documentId
+  if (queryid) {
+    alert('hi')
+   await esignStatusCheck(queryid)
+  }
+
   deviceHeight.value = window.innerHeight
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight
   })
-const queryid=route.query.documentId
-  if (queryid) {
-    alert('hi')
-    esignStatusCheck(queryid)
-  }
+
 })
 
 const handleButtonClick = async (event) => {
