@@ -147,38 +147,60 @@ const esignStatusCheck = async (requestId) => {
   }
 };
 
-const handleRipple = (event, refEl) => {
-  const button = refEl.value;
-  const circle = document.createElement('span');
-  circle.classList.add('ripple');
 
-  const rect = button.getBoundingClientRect();
-  circle.style.left = `${event.clientX - rect.left}px`;
-  circle.style.top = `${event.clientY - rect.top}px`;
+const handleButtonClick = () => {
+ const button = rippleBtn.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
 
-  button.appendChild(circle);
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
 
-  setTimeout(() => {
-    circle.remove();
-  }, 600);
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+
+  button.$el.appendChild(circle)
+
+  setTimeout(async() => {
+    circle.remove()
+
+     createEsign();
+      
+  }, 600)
 };
 
-const handleButtonClick = (event) => {
-  handleRipple(event, rippleBtn);
-  createEsign();
-};
 
-const back = async (event) => {
-  handleRipple(event, rippleBtnBack);
-  const myData = await pagestatus('submission', '5');
+
+
+const back = () => {
+    const button = rippleBtnback.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+  button.$el.appendChild(circle)
+
+  setTimeout(async() => {
+    circle.remove()
+   const myData = await pagestatus('submission', '5');
   if (myData?.payload?.status === 'ok') {
     emit('updateDiv', 'submission');
   }
-};
+  }, 600)
+   
+}
+
+
 </script>
 
 <style scoped>
-.ripple {
+/* .ripple {
   position: absolute;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.4);
@@ -195,5 +217,5 @@ const back = async (event) => {
     transform: translate(-50%, -50%) scale(3);
     opacity: 0;
   }
-}
+} */
 </style>
