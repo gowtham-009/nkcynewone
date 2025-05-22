@@ -177,7 +177,7 @@ const createEsign = async () => {
 
 
 const esignStatusCheck = async (requesid) => {
-  alert('hi')
+
   const apiurl = `${baseurl.value}esign`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -208,7 +208,7 @@ const esignStatusCheck = async (requesid) => {
     if (data.payload.status === 'ok') {
          content.value=false
         loading.value=true
- 
+        pagestatus('thankyou')
         emit('updateDiv', 'thankyou');
 
     }
