@@ -216,6 +216,11 @@ const handleButtonClick = async () => {
       if(data.payload.status=='ok'){
         emit('updateDiv', 'mobile');
       }
+
+      else{
+        
+         alert("your response:",data.payload.status)
+      }
       
     }, 400);
   }
