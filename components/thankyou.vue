@@ -41,7 +41,7 @@
 <script setup>
 
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 const emit = defineEmits(['updateDiv']);
 
 const { baseurl } = globalurl();
@@ -49,7 +49,9 @@ const deviceHeight = ref(0);
 const buttonText = ref('Exit');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
+const route=useRoute()
 onMounted(() => {
+  route.query.documentId=' '
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
