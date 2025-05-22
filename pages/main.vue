@@ -123,7 +123,7 @@ onMounted(async () => {
     const mappedForm = formMap[queryForm]
     currentForm.value = mappedForm
     data.value = {}
-    formHistory.value = [{ form: mappedForm, formData: {} }]
+   
     return // ✅ Done
   }
 
@@ -133,7 +133,7 @@ onMounted(async () => {
     const mydata = await getServerData()
     const activePage = mydata?.payload?.metaData?.profile?.pageStatus || 'main'
     currentForm.value = activePage
-    formHistory.value = [{ form: activePage, formData: {} }]
+   
 
     const restrictedPages = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp']
     if (restrictedPages.includes(activePage)) {
