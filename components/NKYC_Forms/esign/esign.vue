@@ -118,7 +118,9 @@ onMounted(() => {
     });
 
     if(route.query.documentId){
+       alert('hi')
       esignStatusCheck(route.query.documentId)
+     
     }
 
 
