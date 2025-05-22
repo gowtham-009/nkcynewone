@@ -189,7 +189,10 @@ const additionaldocument = async () => {
     const data = await response.json();
     if (data.payload.status === 'ok') {
       createunsignedDocument()
-      emit('updateDiv', 'esign');
+     const mydata= await pagestatus('submission', '5')
+     if(mydata.payload.status=='ok'){
+       emit('updateDiv', 'submission');
+     }
 
         
 
@@ -279,7 +282,7 @@ const handleButton = () => {
 
      const mydata= await pagestatus('submission', '5')
      if(mydata.payload.status=='ok'){
-       emit('updateDiv', 'esign');
+       emit('updateDiv', 'submission');
      }
       
   }, 600)
