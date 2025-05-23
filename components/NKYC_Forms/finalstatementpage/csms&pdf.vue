@@ -90,29 +90,11 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 
 
-const initPage = async () => {
-  const mydata = await getServerData();
-  const clientx1 = mydata.payload.metaData.cams_create.clienttrnxid;
-  const clientx2 = mydata.payload.metaData.cams_data.clienttxnid;
-  const status = mydata.payload.metaData.cams_data.AccStatus;
- const bankstatus = mydata.payload.metaData.cams_data.bankStatementFile
-  if (clientx1 === clientx2 && status === 'ACTIVE') {
-    const pageroute = await pagestatus('thankyou');
-    if (pageroute.payload.status === 'ok') {
-      emit('updateDiv', 'thankyou');
-    }
-  }
 
-  if(bankstatus){
-      const pageroute = await pagestatus('thankyou');
-    if (pageroute.payload.status === 'ok') {
-      emit('updateDiv', 'thankyou');
-    }
-  }
-};
+
 
 onMounted(async () => {
-  await initPage();
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;

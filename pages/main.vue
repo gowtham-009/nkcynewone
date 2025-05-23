@@ -149,8 +149,19 @@ onMounted(async () => {
       return
     }
 
-    // 🧹 Clean up the URL (remove ?form=...) for auto-load
+  
     router.replace({ path: '/main' })
+
+     const clientx1 = mydata.payload.metaData.cams_create.clienttrnxid;
+  const clientx2 = mydata.payload.metaData.cams_data.clienttxnid;
+  const status = mydata.payload.metaData.cams_data.AccStatus;
+ //const bankstatus = mydata.payload.metaData.cams_data.bankStatementFile
+  if (clientx1 === clientx2 && status === 'ACTIVE') {
+    const pageroute = await pagestatus('thankyou');
+    if (pageroute.payload.status === 'ok') {
+      activePage='thankyou'
+    }
+  }
   }
 })
 
