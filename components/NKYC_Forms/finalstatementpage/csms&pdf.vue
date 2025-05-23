@@ -98,11 +98,7 @@ const initPage =  async() => {
    const clientx2 = mydata.payload.metaData.cams_data.clienttxnid;
    const status = mydata.payload.metaData.cams_data.AccStatus;
  if (clientx1 === clientx2 && status === 'ACTIVE') {
-    alert('hi')
-      const pageroute = await pagestatus('thankyou');
-    if (pageroute.payload.status === 'ok') {
-      emit('updateDiv', 'thankyou');
-    }
+    emit('updateDiv', 'thankyou');
   }  
 };
 
