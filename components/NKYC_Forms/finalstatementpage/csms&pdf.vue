@@ -79,249 +79,187 @@
    
 </template>
 <script setup>
-
 import { ref, onMounted } from 'vue';
 
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
-const deviceHeight = ref(0);
+
+const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
-const rippleBtnback = ref(null)
+const rippleBtnback = ref(null);
+const fileInput = ref(null);
 
-const initPage =  async() => {
-
-  const mydata = await getServerData();
-
-   const clientx1 = mydata.payload.metaData.cams_create.clienttrnxid;
-   const clientx2 = mydata.payload.metaData.cams_data.clienttxnid;
-   const status = mydata.payload.metaData.cams_data.AccStatus;
- if (clientx1 === clientx2 && status === 'ACTIVE') {
-  await camsbankdatacheck()
-  }  
-};
-
-const camsbankdatacheck = async () => {
-
-  const apiurl = `${baseurl.value}cams`;
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: "thankyou",
-     camsAction: "checkCamsStatus"
-
-  });
-
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
-      },
-      body: jsonString,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data.payload.status === 'ok') {
-
-           emit('updateDiv', 'thankyou');
-    }
-  } catch (error) {
-    console.error(error.message);
-  }
-};
-
-await initPage();
-
-
-
+// Update device height on resize
 onMounted(() => {
-
-  deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
+  initPage();
 });
 
+const initPage = async () => {
+  const mydata = await getServerData();
+  const { clienttrnxid } = mydata.payload.metaData.cams_create;
+  const { clienttxnid, AccStatus } = mydata.payload.metaData.cams_data;
 
-const camsbankdata = async () => {
+  if (clienttrnxid === clienttxnid && AccStatus === 'ACTIVE') {
+    await camsbankdatacheck();
+  }
+};
 
-     const mydata = await getServerData();
-     const ifscvalue=mydata.payload.metaData.bank.bank1IFSC
-
+const camsbankdatacheck = async () => {
   const apiurl = `${baseurl.value}cams`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-    pageCode: "csmspdf",
-    camsAction: "createCams",
-    bankIfsc:ifscvalue,
-    redirecUrl: "https://nkcynewone.vercel.app/main"
-  });
-
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
-      },
-      body: jsonString,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data.payload.status === 'ok') {
-
-         window.location.href = data.payload.metaData.redirectionurl;
-        
-    }
-  } catch (error) {
-    console.error(error.message);
-  }
-};
-
-
-
-const bankstatemetnFastmode=()=>{
-camsbankdata()
-}
-const fileInput = ref(null);
-const triggerUpload = () => {
-  fileInput.value?.click();
-};
-
-const uploadPDF = (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  // Allow only PDF files
-  if (file.type !== 'application/pdf') {
-    alert('Only PDF files are allowed.');
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-   
-    const pdfDataUrl = e.target.result;
-    if(pdfDataUrl){
-        bankstatement(pdfDataUrl)
-    }
-
- 
-  };
-
-  reader.readAsDataURL(file);
-};
-
-
-
-
-
-const bankstatement = async (pdfval) => {
-    
-  const apiurl = `${baseurl.value}proofupload`
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
     pageCode: 'thankyou',
-    bank: pdfval
-  })
-
-  const payload = { payload: user }
-  const jsonString = JSON.stringify(payload)
+    camsAction: 'checkCamsStatus',
+  });
 
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
         Authorization: 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: jsonString
-    })
+      body: JSON.stringify({ payload: user }),
+    });
 
-    if (!response.ok) throw new Error(`Network error: ${response.status}`)
-
-    const data = await response.json()
-    if(data.payload.status=='ok'){
-        
-         const pageroute= await pagestatus('thankyou')
-       if(pageroute.payload.status=='ok'){
-         emit('updateDiv', 'thankyou');
-       }
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+      emit('updateDiv', 'thankyou');
     }
-   
   } catch (error) {
-    console.error(error.message)
+    console.error('camsbankdatacheck error:', error.message);
   }
-}
-
-
-
-const handleButtonClick = () => {
- const button = rippleBtn.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
-
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
-
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-
-  button.$el.appendChild(circle)
-
-  setTimeout(() => {
-    circle.remove()
-
-
- 
-  }, 600)
 };
 
+const camsbankdata = async () => {
+  const mydata = await getServerData();
+  const ifscvalue = mydata.payload.metaData.bank.bank1IFSC;
 
+  const apiurl = `${baseurl.value}cams`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: 'csmspdf',
+    camsAction: 'createCams',
+    bankIfsc: ifscvalue,
+    redirecUrl: 'https://nkcynewone.vercel.app/main',
+  });
 
-const back=()=>{
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        Authorization: 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ payload: user }),
+    });
 
-const button = rippleBtnback.value
-const circle = document.createElement('span')
-circle.classList.add('ripple')
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+      window.location.href = data.payload.metaData.redirectionurl;
+    }
+  } catch (error) {
+    console.error('camsbankdata error:', error.message);
+  }
+};
 
-const rect = button.$el.getBoundingClientRect()
-const x = event.clientX - rect.left
-const y = event.clientY - rect.top
+const bankstatemetnFastmode = () => {
+  camsbankdata();
+};
 
-circle.style.left = `${x}px`
-circle.style.top = `${y}px`
-button.$el.appendChild(circle)
+const triggerUpload = () => {
+  fileInput.value?.click();
+};
 
-setTimeout(async() => {
-circle.remove()
+const uploadPDF = (event) => {
+  const file = event.target.files[0];
+  if (!file || file.type !== 'application/pdf') {
+    alert('Only PDF files are allowed.');
+    return;
+  }
 
-  const mydata= await pagestatus('bankfile')
-       if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'bankfile');
-       }
- 
-}, 600)
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const pdfDataUrl = e.target.result;
+    if (pdfDataUrl) bankstatement(pdfDataUrl);
+  };
+  reader.readAsDataURL(file);
+};
 
-}
+const bankstatement = async (pdfval) => {
+  const apiurl = `${baseurl.value}proofupload`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: 'thankyou',
+    bank: pdfval,
+  });
 
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        Authorization: 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ payload: user }),
+    });
 
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+      const pageroute = await pagestatus('thankyou');
+      if (pageroute.payload.status === 'ok') {
+        emit('updateDiv', 'thankyou');
+      }
+    }
+  } catch (error) {
+    console.error('bankstatement error:', error.message);
+  }
+};
 
+const handleButtonClick = (event) => {
+  const button = rippleBtn.value;
+  const circle = document.createElement('span');
+  circle.classList.add('ripple');
 
+  const rect = button.$el.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  circle.style.left = `${x}px`;
+  circle.style.top = `${y}px`;
+
+  button.$el.appendChild(circle);
+
+  setTimeout(() => {
+    circle.remove();
+  }, 600);
+};
+
+const back = async (event) => {
+  const button = rippleBtnback.value;
+  const circle = document.createElement('span');
+  circle.classList.add('ripple');
+
+  const rect = button.$el.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  circle.style.left = `${x}px`;
+  circle.style.top = `${y}px`;
+
+  button.$el.appendChild(circle);
+
+  setTimeout(async () => {
+    circle.remove();
+    const mydata = await pagestatus('bankfile');
+    if (mydata.payload.status === 'ok') {
+      emit('updateDiv', 'bankfile');
+    }
+  }, 600);
+};
 </script>
+
