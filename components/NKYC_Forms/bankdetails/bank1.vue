@@ -231,12 +231,10 @@ const bankvalidation = async () => {
     }
 
     const data = await response.json();
-    if (data?.payload?.metaData?.bankVerifyStatus==1) {
-      emit('updateDiv', 'bank4');
+    if(data){
+        return data; 
     }
-    else {
-      emit('updateDiv', 'bank4');
-    }
+   
 
 
   } catch (error) {
@@ -245,34 +243,40 @@ const bankvalidation = async () => {
 
 
   }
+  return null;
 };
 
 
 
-const handleButtonClick = () => {
+const handleButtonClick = async() => {
+
+
+const data=await  bankvalidation()
+ 
+
+ if (waveRef.value) {
+    waveRef.value.className = 'wave start-half';
+  }
 
 
 
-  const button = rippleBtn.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
+  if (data && waveRef.value) {
+    void waveRef.value.offsetWidth;
+    waveRef.value.className = 'wave finish-half';
 
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+    setTimeout(async () => {
+    
+     if (data?.payload?.metaData?.bankVerifyStatus==1) {
+      emit('updateDiv', 'bank4');
+    }
+    else {
+      emit('updateDiv', 'bank4');
+    }
+      
+    }, 400);
+  }
 
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-
-  button.$el.appendChild(circle)
-
-  setTimeout(() => {
-    circle.remove()
-
-
-
-    bankvalidation()
-  }, 600)
+  
 };
 
 
@@ -304,3 +308,52 @@ function back() {
 
 
 </script>
+<style scoped>
+.wave-btn {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.3s ease-in-out;
+}
+
+.wave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(76, 75, 75, 0.3);
+  pointer-events: none;
+}
+
+.wave.start-half {
+  animation: waveHalf 0.4s ease-out forwards;
+}
+
+.wave.finish-half {
+  animation: waveFinish 0.4s ease-out forwards;
+}
+
+@keyframes waveHalf {
+  0% {
+    width: 0%;
+    opacity: 2;
+  }
+  100% {
+    width: 70%;
+    opacity: 2;
+  }
+}
+
+@keyframes waveFinish {
+  0% {
+    width: 70%;
+    opacity: 2;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+</style>
