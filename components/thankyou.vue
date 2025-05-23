@@ -5,7 +5,7 @@
             <logo style="width: 40px; height: 40px;"/>
             <profile/>
         </div>
-        <div class="flex  justify-between items-center px-3 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
+        <div class="flex  justify-between items-center px-2 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full p-1"></div>
             <div class="w-full p-1">
