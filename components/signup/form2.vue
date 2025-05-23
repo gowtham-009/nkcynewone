@@ -21,14 +21,10 @@
               <span v-if="errormsg" class="text-red-500">{{ errormobile }}</span>
             </div>
            
-
           </div>
-
           <div class="w-full mt-4">
             <Checkbox v-model="checkboxValue" />
           </div>
-
-
         </div>
 
         <div class="w-full  mt-4" v-if="mobileotp">
@@ -66,7 +62,6 @@
           {{ buttonText }}
         </Button>
       </div>
-
     </div>
   </div>
 </template>
@@ -97,17 +92,11 @@ const errormsg = ref(false)
 const errormobile = ref('')
 const p_otp = ref('')
 
-const mobileNo = ref(''); // Assuming you're using `ref` for mobileNo
-
-
+const mobileNo = ref(''); 
 const setMobileData = async () => {
   try {
     const mydata = await getServerData();
-
     const kraresdata=getEncryptionData()
-   
-  
-
     const appKraMobile = kraresdata?.kradata?.decryptdata?.payload?.metaData?.KYC_DATA?.APP_MOB_NO || '';
     const profileMobile = mydata?.payload?.metaData?.profile?.mobileNo;
      const kraMobile = mydata?.payload?.metaData?.kraPan?.APP_MOB_NO;
@@ -138,18 +127,11 @@ const setMobileData = async () => {
 
 await setMobileData();
 
-
-
-
 onMounted(() => {
-
-
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
-
-
   timer = setInterval(() => {
     if (timeLeft.value > 0) {
       timeLeft.value -= 1;

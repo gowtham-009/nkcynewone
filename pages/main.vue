@@ -28,8 +28,8 @@
   <div v-if="currentForm === 'additionalinformation'"><ADDITIONALINFO :data="data" @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'esign'"><ESIGN @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'bankfile'"><BANKFILE @updateDiv="handleUpdateDiv" /></div>
-   <div v-if="currentForm === 'csmspdf'"><CSMSPDF @updateDiv="handleUpdateDiv" /></div>
-      <div v-if="currentForm === 'thankyou'"><THANKYOU @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'csmspdf'"><CSMSPDF @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'thankyou'"><THANKYOU @updateDiv="handleUpdateDiv" /></div>
 
 </template>
 
@@ -75,7 +75,7 @@ const router = useRouter()
 const currentForm = ref('nkyclist')
 const data = ref({})
 
-// Query param to form mapping
+
 const formMap = {
   '$@main1': 'main',
   '$@ekyc1': 'ekyc',

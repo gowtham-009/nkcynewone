@@ -88,18 +88,52 @@ const deviceHeight = ref(0);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
+const camsbankdatacheck = async () => {
 
+  const apiurl = `${baseurl.value}cams`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "thankyou",
+     camsAction: "checkCamsStatus"
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+
+           emit('updateDiv', 'thankyou');
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+};
 
 const initPage =  async() => {
-    alert('hi')
+
   const mydata = await getServerData();
 
    const clientx1 = mydata.payload.metaData.cams_create.clienttrnxid;
    const clientx2 = mydata.payload.metaData.cams_data.clienttxnid;
    const status = mydata.payload.metaData.cams_data.AccStatus;
  if (clientx1 === clientx2 && status === 'ACTIVE') {
-    pagestatus('thankyou')
-    emit('updateDiv', 'thankyou');
+   camsbankdatacheck()
   }  
 };
 
@@ -155,6 +189,8 @@ const camsbankdata = async () => {
     console.error(error.message);
   }
 };
+
+
 
 const bankstatemetnFastmode=()=>{
 camsbankdata()
