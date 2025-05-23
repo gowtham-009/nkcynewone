@@ -88,6 +88,23 @@ const deviceHeight = ref(0);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
+
+
+const initPage =  async() => {
+
+  const mydata = await getServerData();
+
+   const clientx1 = mydata.payload.metaData.cams_create.clienttrnxid;
+   const clientx2 = mydata.payload.metaData.cams_data.clienttxnid;
+   const status = mydata.payload.metaData.cams_data.AccStatus;
+ if (clientx1 === clientx2 && status === 'ACTIVE') {
+   camsbankdatacheck()
+  }  
+};
+
+await initPage();
+
+
 const camsbankdatacheck = async () => {
 
   const apiurl = `${baseurl.value}cams`;
@@ -124,20 +141,6 @@ const camsbankdatacheck = async () => {
     console.error(error.message);
   }
 };
-
-const initPage =  async() => {
-
-  const mydata = await getServerData();
-
-   const clientx1 = mydata.payload.metaData.cams_create.clienttrnxid;
-   const clientx2 = mydata.payload.metaData.cams_data.clienttxnid;
-   const status = mydata.payload.metaData.cams_data.AccStatus;
- if (clientx1 === clientx2 && status === 'ACTIVE') {
-   camsbankdatacheck()
-  }  
-};
-
-await initPage();
 
 onMounted(() => {
 
