@@ -118,7 +118,7 @@ const esignStatusCheck = async (requestId) => {
   const apiurl = `${baseurl.value}esign`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-    pageCode: 'thankyou',
+    pageCode: 'bankfile',
     esignId: requestId,
     esignAction: 'checkEsignStatus',
   });
@@ -140,8 +140,8 @@ const esignStatusCheck = async (requestId) => {
       content.value = false;
       loading.value = true;
       route.query.documentId = null;
-      pagestatus('thankyou');
-      emit('updateDiv', 'thankyou');
+      pagestatus('bankfile');
+      emit('updateDiv', 'bankfile');
     }
   } catch (error) {
     console.error('Status check failed:', error.message);

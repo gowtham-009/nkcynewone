@@ -27,11 +27,14 @@
   <div v-if="currentForm === 'signdraw'"><SIGNDRAWING :data="data" @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'additionalinformation'"><ADDITIONALINFO :data="data" @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'esign'"><ESIGN @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'thankyou'"><THANKINGYOU @updateDiv="handleUpdateDiv" /></div>
+  <div v-if="currentForm === 'bankfile'"><BANKFILE @updateDiv="handleUpdateDiv" /></div>
+   <div v-if="currentForm === 'csmspdf'"><CSMSPDF @updateDiv="handleUpdateDiv" /></div>
+      <div v-if="currentForm === 'thankyou'"><THANKYOU @updateDiv="handleUpdateDiv" /></div>
+
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getServerData } from '~/utils/serverdata.js'
 
@@ -63,7 +66,10 @@ import SIGNATURE from '~/components/NKYC_Forms/photo&sign/signature.vue'
 import SIGNDRAWING from '~/components/NKYC_Forms/photo&sign/signdraw.vue'
 import ADDITIONALINFO from '~/components/NKYC_Forms/photo&sign/documentconfirmation.vue'
 import ESIGN from '~/components/NKYC_Forms/esign/esign.vue'
-import THANKINGYOU from '~/components/thankyou.vue'
+import BANKFILE from '~/components/NKYC_Forms/finalstatementpage/bankfile.vue'
+import CSMSPDF from '~/components/NKYC_Forms/finalstatementpage/csms&pdf.vue'
+import THANKYOU from '~/components/NKYC_Forms/thankyou.vue'
+
 const route = useRoute()
 const router = useRouter()
 const currentForm = ref('nkyclist')
@@ -98,6 +104,8 @@ const formMap = {
   '$@signdraw1': 'signdraw',
   '$@additional1': 'additionalinformation',
   '$@esign1': 'esign',
+  '$@bankfile1': 'bankfile',
+  '$@csmspdf1': 'csmspdf',
   '$@thankyou1': 'thankyou',
 }
 

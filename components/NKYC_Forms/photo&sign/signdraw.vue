@@ -280,8 +280,6 @@ const erase = () => {
 };
 
 
-
-
 const fileInput = ref(null);
 
 const triggerUpload = () => {

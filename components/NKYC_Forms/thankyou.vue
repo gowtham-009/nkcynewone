@@ -8,9 +8,9 @@
         <div class="flex  justify-between items-center px-2 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full p-1"></div>
-            <div class="w-full p-1">
-                <p class="text-3xl font-semibold text-center text-blue-600">Thank You!</p>
-            </div>
+            <div class="w-full p-1 flex flex-col justify-center items-center">
+                <p class="text-xl font-normal text-center text-blue-500">Thank you</p>
+              </div>
             <div class="w-full flex gap-2">
                 <Button ref="rippleBtnback" @click="back()" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                 <i class="pi pi-angle-left text-3xl dark:text-white"></i>
@@ -32,19 +32,13 @@
 
     </div>
 
-   
-
-
 
    
 </template>
 <script setup>
 
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 const emit = defineEmits(['updateDiv']);
-
-const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const buttonText = ref('Get Bank Statement');
 const rippleBtn = ref(null);
@@ -57,54 +51,7 @@ onMounted(() => {
         deviceHeight.value = window.innerHeight;
     });
 });
-const router=useRouter()
 
-const camsbankdata = async () => {
-
-     const mydata = await getServerData();
-     const ifscvalue=mydata.payload.metaData.bank.bank1IFSC
-
-  const apiurl = `${baseurl.value}cams`;
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: "thankyou",
-    camsAction: "createCams",
-    bankIfsc:ifscvalue,
-    redirecUrl: "https://nkcynewone.vercel.app/main"
-
-   
-
-  });
-
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
-      },
-      body: jsonString,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data.payload.status === 'ok') {
-
-         window.location.href = data.payload.metaData.redirectionurl;
-
-        
-
-    }
-  } catch (error) {
-    console.error(error.message);
-  }
-};
 
 const handleButtonClick = () => {
  const button = rippleBtn.value
@@ -123,10 +70,11 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
 
-camsbankdata()
+
  
   }, 600)
 };
+
 
 
 
@@ -149,9 +97,9 @@ button.$el.appendChild(circle)
 setTimeout(async() => {
 circle.remove()
 
-  const mydata= await pagestatus('esign')
+  const mydata= await pagestatus('csmspdf')
        if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'esign');
+         emit('updateDiv', 'csmspdf');
        }
  
 }, 600)

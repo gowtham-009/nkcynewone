@@ -47,6 +47,7 @@ onMounted(async () => {
   const pagetext = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
 
   if (userkey) {
+  
     const mydata = await getServerData();
     const activepage = mydata?.payload?.metaData?.profile?.pageStatus || 'pan';
 
