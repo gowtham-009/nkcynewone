@@ -46,7 +46,7 @@ const emit = defineEmits(['updateDiv']);
 
 const { baseurl } = globalurl();
 const deviceHeight = ref(0);
-const buttonText = ref('Exit');
+const buttonText = ref('Get Bank Statement');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 
