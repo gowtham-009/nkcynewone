@@ -4,7 +4,7 @@
       <logo style="width: 40px; height: 40px;" />
       <ThemeSwitch />
     </div>
-    <div class="flex justify-between  p-1 px-3 flex-col bg-white rounded-t-3xl dark:bg-black"
+    <div class="flex justify-between  p-1 px-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full">
         <div class="w-full mt-2  flex flex-col justify-between">

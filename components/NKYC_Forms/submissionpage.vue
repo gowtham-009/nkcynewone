@@ -11,7 +11,7 @@
           <div class="w-full px-4 mt-1">
             <div v-for="(step, index) in filteredSteps" :key="index" class="w-full flex items-center gap-5 mt-1">
               <div class="p-2 px-2 flex justify-center items-center w-10 h-10 bg-green-400 dark:bg-slate-900 rounded-full flex-shrink-0">
-                <span><i class="pi pi-check text-white text-xl"></i></span>
+                <i class="pi pi-check text-white text-xl"></i>
               </div>
               <div class="p-1">
                 <p class="text-lg font-medium text-blue-950 dark:text-gray-400">{{ step.title }}</p>
@@ -28,7 +28,7 @@
           <div class="w-full px-4 mt-2">
             <div v-for="(step, index) in stepspending.slice(statusid)" :key="index" class="w-full flex items-center gap-5 mt-1">
               <div class="p-2 px-2 flex justify-center items-center w-10 h-10 bg-blue-200 dark:bg-slate-900 rounded-full flex-shrink-0">
-                <span><i :class="`pi ${step.icon} text-blue-900 text-xl`"></i></span>
+               <i :class="`pi ${step.icon} text-blue-900 text-xl`"></i>
               </div>
               <div class="p-1">
                 <p class="text-lg font-medium text-blue-950 dark:text-gray-400">{{ step.title }}</p>

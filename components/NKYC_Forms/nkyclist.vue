@@ -20,7 +20,7 @@
                         <div class="w-full flex items-center gap-5">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                                <span><i class="pi pi-folder-open text-blue-900 text-xl "></i></span>
+                               <i class="pi pi-folder-open text-blue-900 text-xl "></i>
                             </div>
                             <div class=" p-1">
                                 <p class="text-lg font-medium text-blue-950 dark:text-gray-400">Complete e-KYC</p>
@@ -31,7 +31,7 @@
                         <div class="w-full flex items-center gap-5 mt-1">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                                <span><i class="pi pi-user text-blue-900 text-xl"></i></span>
+                                <i class="pi pi-user text-blue-900 text-xl"></i>
                             </div>
                             <div class="p-1">
                                 <p class="text-lg font-medium text-blue-950 dark:text-gray-400">Set up your profile</p>
@@ -42,7 +42,7 @@
                         <div class="w-full flex items-center gap-5 mt-1">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                                <span><i class="pi pi-credit-card text-blue-900 text-xl"></i></span>
+                               <i class="pi pi-credit-card text-blue-900 text-xl"></i>
                             </div>
                             <div class="p-1">
                                 <p class="text-lg font-medium text-blue-950 dark:text-gray-400">Link your bank a/c</p>
@@ -54,7 +54,7 @@
                         <div class="w-full flex items-center gap-5 mt-1">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                                <span><i class="pi pi-building-columns text-blue-900 text-xl"></i></span>
+                               <i class="pi pi-building-columns text-blue-900 text-xl"></i>
                             </div>
                             <div class="p-1">
                                 <p class="text-lg font-medium text-blue-950 dark:text-gray-400">Select your account</p>
@@ -66,7 +66,7 @@
                         <div class="w-full flex items-center gap-5 mt-1">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                                <span><i class="pi pi-verified text-blue-900 text-xl"></i></span>
+                                <i class="pi pi-verified text-blue-900 text-xl"></i>
                             </div>
                             <div class="p-1">
                                 <p class="text-lg font-medium text-blue-950 dark:text-gray-400">Confirm it's you</p>
@@ -78,7 +78,7 @@
                         <div class="w-full flex items-center gap-5 mt-1">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                                <span><i class="pi pi-pen-to-square text-blue-900 text-xl"></i></span>
+                                <i class="pi pi-pen-to-square text-blue-900 text-xl"></i>
                             </div>
                             <div class="p-1">
                                 <p class="text-lg font-medium text-blue-950 dark:text-gray-400">eSign and Login</p>
