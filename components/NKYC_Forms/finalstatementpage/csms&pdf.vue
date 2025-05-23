@@ -92,7 +92,7 @@ const rippleBtnback = ref(null)
 
 const initPage =  async() => {
     alert('hi')
-  const mydata =  getServerData();
+  const mydata = await getServerData();
 
    const clientx1 = mydata.payload.metaData.cams_create.clienttrnxid;
    const clientx2 = mydata.payload.metaData.cams_data.clienttxnid;
