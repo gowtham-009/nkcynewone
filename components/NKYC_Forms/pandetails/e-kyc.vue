@@ -79,15 +79,17 @@
 
         </div>
 
-
-
-    </div>
-
-    <div v-if="loading" class="flex justify-center items-center  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
+          <div v-if="loading" class="flex justify-center items-center  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
         :style="{ height: deviceHeight * 0.92 + 'px' }">
         <ProgressSpinner />
 
     </div>
+
+
+
+    </div>
+
+  
 </template>
 <script setup>
 
