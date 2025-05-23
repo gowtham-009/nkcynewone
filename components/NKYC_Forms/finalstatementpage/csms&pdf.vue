@@ -101,8 +101,6 @@ const initPage =  async() => {
   }  
 };
 
-await initPage();
-
 const camsbankdatacheck = async () => {
 
   const apiurl = `${baseurl.value}cams`;
@@ -139,6 +137,9 @@ const camsbankdatacheck = async () => {
     console.error(error.message);
   }
 };
+
+await initPage();
+
 
 
 onMounted(() => {
