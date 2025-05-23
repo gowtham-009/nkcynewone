@@ -23,7 +23,7 @@
     >
     <div class="w-full mt-2 px-2 flex flex-col justify-between">
       <span class="font-medium text-gray-500 text-lg">Identity Verification</span>
-      <p class="text-3xl font-semibold">Fill Your PAN Details</p>
+      <p class="text-3xl font-semibold dark:text-gray-400" >Fill Your PAN Details</p>
             <span class="font-medium text-gray-500 text-lg">This is required as mandated by regulator for verification purposes. </span>
 
         <div class="w-full mt-4">
@@ -85,13 +85,7 @@ const visibleDate = ref('')
 
 const buttonText = ref("Continue");
 
-// const randomtoken = () => {
-//   let token = ''
-//   for (var i = 0; i <= 30; i++) {
-//     token += Math.floor(Math.random() * 10)
-//   }
-//   return token
-// }
+
 
 watch(panvalue, (newVal) => {
  if(newVal.length===10){
@@ -209,7 +203,7 @@ const handleButtonClick = async () => {
 
       const decryt=   decryptdatadata({decryptdata:data});
      
-      console.log(decryt)
+  
 
       kradatares({kradata:decryt})
 

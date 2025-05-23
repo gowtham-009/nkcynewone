@@ -26,7 +26,7 @@
                     <div class="w-full flex items-center gap-3 p-1 mt-2">
                         <div
                             class="p-2 px-2 flex justify-center items-center static w-10 h-10 bg-gray-200 rounded-md flex-shrink-0 dark:bg-gray-800">
-                            <span><i class="pi pi-file-arrow-up text-xl text-blue-600"></i></span>
+                            <i class="pi pi-file-arrow-up text-xl text-blue-600"></i>
                         </div>
                         <div class="p-2">
                             <p class="font-normal leading-5 text-sm text-gray-500">
@@ -38,7 +38,7 @@
                     <div class="w-full flex items-center gap-3 p-1 mt-2">
                         <div
                             class="p-2 px-2 flex justify-center items-center static w-10 h-10 bg-gray-200 rounded-md flex-shrink-0 dark:bg-gray-800">
-                            <span><i class="pi pi-users text-xl text-blue-600"></i></span>
+                            <i class="pi pi-users text-xl text-blue-600"></i>
                         </div>
                         <div class="p-2">
                             <p class="font-normal leading-5 text-sm text-gray-500">
@@ -50,7 +50,7 @@
                     <div class="w-full flex items-center gap-3 p-1 mt-2">
                         <div
                             class="p-2 px-2 flex justify-center items-center static w-10 h-10 bg-gray-200 rounded-md flex-shrink-0 dark:bg-gray-800">
-                            <span><i class="pi pi-id-card text-xl text-blue-600"></i></span>
+                            <i class="pi pi-id-card text-xl text-blue-600"></i>
                         </div>
                         <div class="p-2">
                             <p class="font-normal leading-5 text-sm text-gray-500">
