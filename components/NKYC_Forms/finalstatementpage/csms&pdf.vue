@@ -90,7 +90,7 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 
 
-const initPage =  () => {
+const initPage =  async() => {
     alert('hi')
   const mydata =  getServerData();
 
@@ -98,17 +98,14 @@ const initPage =  () => {
    const clientx2 = mydata.payload.metaData.cams_data.clienttxnid;
    const status = mydata.payload.metaData.cams_data.AccStatus;
  if (clientx1 === clientx2 && status === 'ACTIVE') {
-      alert('hi')
-    setTimeout(async() => {
-        const pageroute = await pagestatus('thankyou');
+      const pageroute = await pagestatus('thankyou');
     if (pageroute.payload.status === 'ok') {
       emit('updateDiv', 'thankyou');
     }
-    }, 200);
   }  
 };
 
- initPage();
+await initPage();
 
 onMounted(() => {
 
