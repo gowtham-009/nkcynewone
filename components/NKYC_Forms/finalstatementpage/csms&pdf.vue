@@ -5,7 +5,7 @@
             <logo style="width: 40px; height: 40px;"/>
             <profile/>
         </div>
-        <div class="flex  justify-between items-center px-2 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
+        <div v-if="content" class="flex  justify-between items-center px-2 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
            
           <div class="w-full flex flex-col gap-3">
@@ -70,16 +70,19 @@
        
         </div>
 
+          <div v-if="loading" class="flex justify-center items-center  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
+        :style="{ height: deviceHeight * 0.92 + 'px' }">
+        <ProgressSpinner />
+
     </div>
-
-   
-
+    </div>
 
 
    
 </template>
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router'
 
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
@@ -90,7 +93,12 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const fileInput = ref(null);
 
+const content=ref(true)
+const loading=ref(false)
+
 // Update device height on resize
+
+const route=useRoute()
 onMounted(() => {
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -99,16 +107,24 @@ onMounted(() => {
 });
 
 const initPage = async () => {
-  const mydata = await getServerData();
-  const { clienttrnxid } = mydata.payload.metaData.cams_create;
-  const { clienttxnid, AccStatus } = mydata.payload.metaData.cams_data;
+    const queryval=route.query.ecres
+    if(queryval){
+        content.value=false
+        loading.value=true
+        setInterval(() => {
+            camsbankdatacheck();
+        }, 5000);
+    }
+ 
 
-  if (clienttrnxid === clienttxnid && AccStatus === 'ACTIVE') {
-    await camsbankdatacheck();
-  }
+
+
+
+
 };
 
 const camsbankdatacheck = async () => {
+
   const apiurl = `${baseurl.value}cams`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -128,7 +144,19 @@ const camsbankdatacheck = async () => {
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
-      emit('updateDiv', 'thankyou');
+        const clienttrnxid1=data.payload.metaData.cams_create.clienttrnxid
+        const clienttrnxid2=data.payload.metaData.cams_data.clienttxnid
+        if(clienttrnxid2){
+              if(clienttrnxid1==clienttrnxid2){
+            if(data.payload.metaData.cams_create.consentStatus=='ACTIVE'){
+                if(data.payload.metaData.cams_data.bankStatementFile){
+                     emit('updateDiv', 'thankyou');
+                }
+            }
+
+        }
+        }
+
     }
   } catch (error) {
     console.error('camsbankdatacheck error:', error.message);
