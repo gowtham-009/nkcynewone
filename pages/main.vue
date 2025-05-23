@@ -37,9 +37,8 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getServerData } from '~/utils/serverdata.js'
-import { pagestatus } from '~/utils/pagestatus.js' // ✅ Make sure this is correctly imported
 
-// Component imports...
+// Import components
 import NKYCList from '~/components/NKYC_Forms/nkyclist.vue'
 import EKYC from '~/components/NKYC_Forms/pandetails/e-kyc.vue'
 import PARMANENTADDRESS from '~/components/NKYC_Forms/pandetails/parmanentaddress.vue'
@@ -71,13 +70,12 @@ import BANKFILE from '~/components/NKYC_Forms/finalstatementpage/bankfile.vue'
 import CSMSPDF from '~/components/NKYC_Forms/finalstatementpage/csms&pdf.vue'
 import THANKYOU from '~/components/NKYC_Forms/thankyou.vue'
 
-// State
 const route = useRoute()
 const router = useRouter()
-const currentForm = ref('main')
+const currentForm = ref('nkyclist')
 const data = ref({})
 
-// Mapping query param -> form
+// Query param to form mapping
 const formMap = {
   '$@main1': 'main',
   '$@ekyc1': 'ekyc',
@@ -111,13 +109,13 @@ const formMap = {
   '$@thankyou1': 'thankyou',
 }
 
-// 🔁 From component form change
+// ⚡️ Form change via event
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value
   data.value = newData
 }
 
-// 🔁 Watch query param
+// ⚡️ Watch the form query param
 watch(() => route.query.form, (newForm) => {
   if (newForm && formMap[newForm]) {
     currentForm.value = formMap[newForm]
@@ -125,22 +123,25 @@ watch(() => route.query.form, (newForm) => {
   }
 })
 
-// 🔁 On load
 onMounted(async () => {
   const queryForm = route.query.form
 
-  // 🟢 Load from query param
+  // 🟢 Case 1: User manually typed form param in URL
   if (queryForm && formMap[queryForm]) {
-    currentForm.value = formMap[queryForm]
+    const mappedForm = formMap[queryForm]
+    currentForm.value = mappedForm
     data.value = {}
-    return
+   
+    return // ✅ Done
   }
 
-  // 🔵 Load from server if available
+  // 🔵 Case 2: Default load from localStorage/server if no query param
   const userkey = localStorage.getItem('userkey')
   if (userkey) {
     const mydata = await getServerData()
-    let activePage = mydata?.payload?.metaData?.profile?.pageStatus || 'main'
+    const activePage = mydata?.payload?.metaData?.profile?.pageStatus || 'main'
+    currentForm.value = activePage
+   
 
     const restrictedPages = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp']
     if (restrictedPages.includes(activePage)) {
@@ -148,21 +149,12 @@ onMounted(async () => {
       return
     }
 
-    // Check if user is already ACTIVE
-    const clientx1 = mydata.payload.metaData.cams_create?.clienttrnxid
-    const clientx2 = mydata.payload.metaData.cams_data?.clienttxnid
-    const status = mydata.payload.metaData.cams_data?.AccStatus
-
-    if (clientx1 === clientx2 && status === 'ACTIVE') {
-      const pageroute = await pagestatus('thankyou')
-      if (pageroute?.payload?.status === 'ok') {
-        activePage = 'thankyou'
-      }
-    }
-
-    currentForm.value = activePage
+  
     router.replace({ path: '/main' })
+
+  
   }
 })
-</script>
 
+
+</script>
