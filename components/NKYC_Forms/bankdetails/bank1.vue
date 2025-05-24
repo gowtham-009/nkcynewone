@@ -228,13 +228,14 @@ const bankvalidation = async () => {
     }
 
     const data = await response.json();
+    waitingbox.value=true
     if (data?.payload?.metaData?.bankVerifyStatus==1) {
-      waitingbox.value=true
+      
       emit('updateDiv', 'bank4');
 
     }
     else {
-       waitingbox.value=true
+     
       emit('updateDiv', 'bank4');
     }
 
