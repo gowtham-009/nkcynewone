@@ -32,21 +32,19 @@
         </div>
 
         <div v-if="loginotpbox" class="w-full p-2 mt-1" >
-            <p class="font-medium text-slate-800 text-2xl dark:text-gray-400">
-            OTP sent
+            <p class="font-medium text-gray-500 text-lg dark:text-gray-400">
+            OTP Sent mobile number +91 {{ phoneNumber }}
           </p>
-            <p class="text-sm leading-6  font-normal text-gray-500">
-            We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }} & Email ID {{ emailid }}
-          </p>
+           
           <LOGINOTP v-model="loginotpval"/>
           <span class="text-red-500" v-if="loginerror">{{ errorval }}</span>
 
-           <div class="w-full h-6 flex justify-center gap-2">
-              <p class="text-lg font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resend Successfully </p>
-            </div>
+          
+            
 
               <div class="w-full flex justify-between items-center">
               <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
+               <p class="text-lg font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resent </p>
               <button :disabled="timeLeft" type="button" @click="kraaddresssubmission('resend')"
                 class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
             </div>
@@ -98,7 +96,7 @@ const buttonText = ref("Continue");
 const tokenval = ref('');
 
 const resend_sh=ref(false)
-const timeLeft = ref(60); 
+const timeLeft = ref(10); 
 let timer = null;
 const emit = defineEmits(['updateDiv']);
 
