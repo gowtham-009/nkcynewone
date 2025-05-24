@@ -147,10 +147,19 @@ const back = (event) => {
 
   button.$el.appendChild(circle);
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove();
-    pagestatus('uploadproof'),
+     const mydata = await getServerData();
+    const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' ';
+    if(statuscheck){
+        pagestatus('brokerage'),
+    emit('updateDiv', 'brokerage');
+    
+    }
+    else{
+     pagestatus('uploadproof'),
     emit('updateDiv', 'uploadproof');
+    }
   }, 600);
 };
 

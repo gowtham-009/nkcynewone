@@ -106,10 +106,20 @@ const handleButtonClick = () => {
 
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
+    const mydata = await getServerData();
+    const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' ';
+    if(statuscheck){
+          pagestatus('uploadbank'),
+      emit('updateDiv', 'uploadbank');
+    }
+    else{
     pagestatus('uploadproof'),
-    emit('updateDiv', 'uploadproof'); 
+    emit('updateDiv', 'uploadproof');
+    }
+
+    
   }, 600)
 };
 </script>
