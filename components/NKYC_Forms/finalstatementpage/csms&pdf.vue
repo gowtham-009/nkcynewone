@@ -138,6 +138,7 @@ const camsbankdatacheck = async () => {
         data.payload.metaData.cams_data.bankStatementFile
       ) {
         clearInterval(intervalId); // ✅ Stop the interval when all conditions are met
+        pagestatus('thankyou')
         emit('updateDiv', 'thankyou');
       }
     }
