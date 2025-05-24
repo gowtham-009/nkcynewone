@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <span class="font-semibold text-lg block mb-2">Enter PAN</span>
+    <span class="font-semibold text-lg block ">Enter PAN</span>
     <div class="pan-input-wrapper w-full dark:!bg-gray-800">
       <i class="pi pi-id-card pan-icon"></i>
       <input
@@ -61,7 +61,7 @@ displayPan.value = formatPan(rawPan.value)
   display: flex;
   align-items: center;
   border: 2px solid #a4a4a4;
-  padding: 5px 12px;
+  padding: 5px 5px;
   border-radius: 8px;
   background-color: white;
   width: 100%;

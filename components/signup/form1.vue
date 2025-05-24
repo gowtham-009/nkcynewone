@@ -22,16 +22,16 @@
         <span class="font-medium text-gray-500 text-lg">This is required as mandated by regulator for verification
           purposes. </span>
 
-        <div class="w-full mt-4">
+        <div class="w-full mt-2">
           <PAN v-model="panvalue" />
           <span class="text-red-500" v-if="panerror">{{ error }}</span>
         </div>
 
-        <div class="w-full mt-4" v-if="dobbox">
+        <div class="w-full mt-2" v-if="dobbox">
           <DOB v-model="visibleDate" />
         </div>
 
-        <div v-if="loginotpbox" class="w-full p-2 mt-2" >
+        <div v-if="loginotpbox" class="w-full p-2 mt-1" >
             <p class="font-medium text-slate-800 text-2xl dark:text-gray-400">
             OTP sent
           </p>
@@ -41,7 +41,7 @@
           <LOGINOTP v-model="loginotpval"/>
           <span class="text-red-500" v-if="loginerror">{{ errorval }}</span>
 
-           <div class="w-full h-12 flex justify-center gap-2">
+           <div class="w-full h-6 flex justify-center gap-2">
               <p class="text-lg font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resend Successfully </p>
             </div>
 
