@@ -59,6 +59,9 @@ onMounted(async () => {
     currentForm.value = activepage;
   }
 
+  else{
+     router.push('/');
+  }
   const queryForm = route.query.form;
   if (queryForm && formMap[queryForm]) {
     currentForm.value = formMap[queryForm];
