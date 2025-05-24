@@ -195,7 +195,7 @@ const getbankaddress = async (ifscval) => {
 
 
 const bankvalidation = async () => {
-   
+      waitingbox.value=true
    const apiurl = `${baseurl.value}bank`;
    const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -228,7 +228,7 @@ const bankvalidation = async () => {
     }
 
     const data = await response.json();
-    waitingbox.value=true
+ 
     if (data?.payload?.metaData?.bankVerifyStatus==1) {
       
       emit('updateDiv', 'bank4');
@@ -242,6 +242,7 @@ const bankvalidation = async () => {
 
   } catch (error) {
     console.error('Error:', error);
+    waitingbox.value=false
   }
   finally{
     waitingbox.value=false
