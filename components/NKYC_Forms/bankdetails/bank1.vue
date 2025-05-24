@@ -6,26 +6,26 @@
     </div>
     <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
-      <div class="w-full mt-2 px-2 p-1">
+      <div class="w-full mt-1 px-2 p-1">
         <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">
           Link your bank account
         </p>
 
-        <p class="text-sm  text-gray-500 font-normal leading-6">
+        <p class="text-sm  text-gray-500 font-normal leading-5">
           Please provide your bank account details to link your bank account with your trading account.
         </p>
 
         <div class="w-full   p-1">
-            <div class="mt-1">
+            <div >
           <span class="text-gray-500 text-md">Account Type</span>
              <div class="flex gap-2">
             <div class="flex items-center gap-2">
               <RadioButton v-model="selected" inputId="SAVING " name="id" value="SAVING " @change="emitSelection" />
-              <label for="SAVING " class="text-gray-500">Saving Account</label>
+              <label for="SAVING " class="text-gray-500">Saving</label>
             </div>
             <div class="flex items-center gap-2">
               <RadioButton v-model="selected" inputId="CURRENT " name="id" value="CURRENT " @change="emitSelection" />
-              <label for="CURRENT " class="text-gray-500">Current Account</label>
+              <label for="CURRENT " class="text-gray-500">Current </label>
             </div>
           
           </div>
@@ -54,11 +54,15 @@
             <Bankname v-model="bankname" />
           </div>
 
-
           <div class="mt-1">
             <p class="text-gray-500 text-md font-normal leading-4">Bank Address</p>
             <Address v-model="address" class="mt-1" />
           </div>
+
+          <div v-if="waitingbox" class="w-full px-2 py-2 mt-1 rounded-lg bg-blue-50">
+              <p class="text-md text-blue-600 leading-5 text-center">Please wait. We're depositing ₹1 to your account to verify your bank details</p>
+          </div>
+
         </div>
       </div>
 
@@ -112,6 +116,8 @@ const micr = ref("");
 const address = ref("");
 const selected = ref('SAVING')
 
+const waitingbox=ref(false)
+
 
 const profilesetinfo = async () => {
   const mydata = await getServerData();
@@ -127,7 +133,7 @@ const profilesetinfo = async () => {
   bankname.value=mydata?.payload?.metaData?.bank?.bank1Name||''
    
   }
-   else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+  else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
  selected.value= mydata?.payload?.metaData?.bank?.bank1AccType||''
   accno.value=mydata?.payload?.metaData?.bank?.bank1AccNo||''
   ifsc.value=mydata?.payload?.metaData?.bank?.bank1IFSC||''
@@ -152,11 +158,6 @@ onMounted(() => {
 });
 
 
-
-
-
-
-
 watch(ifsc, (newIfsc) => {
   if (newIfsc && newIfsc.length === 11) {
     getbankaddress(newIfsc)
@@ -169,18 +170,14 @@ watch(ifsc, (newIfsc) => {
 
 const getbankaddress = async (ifscval) => {
   const apiUrl = `https://ifsc.razorpay.com/${ifscval}`;
-
-
   try {
     const response = await fetch(apiUrl, {
       method: 'GET',
-
     });
 
     if (!response.ok) {
       throw new Error('Network response was not ok ' + response.status);
     }
-
     const data = await response.json();
     if (data) {
 
@@ -232,18 +229,21 @@ const bankvalidation = async () => {
 
     const data = await response.json();
     if (data?.payload?.metaData?.bankVerifyStatus==1) {
+      waitingbox.value=true
       emit('updateDiv', 'bank4');
+
     }
     else {
+       waitingbox.value=true
       emit('updateDiv', 'bank4');
     }
 
 
   } catch (error) {
     console.error('Error:', error);
-  
-
-
+  }
+  finally{
+    waitingbox.value=false
   }
 };
 

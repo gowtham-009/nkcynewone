@@ -5,7 +5,7 @@
         class="w-full prime-input"
         v-model="address"
         variant="filled"
-        rows="3"
+        rows="2"
         cols="10"
         @input="onInput"
       />
