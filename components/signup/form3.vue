@@ -231,18 +231,23 @@ const sendemailotp = async (resend) => {
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
+    
     else {
       const data = await response.json()
 
+       clearInterval(timer);
+    timeLeft.value = 10; // reset countdown
+    timer = setInterval(() => {
+      if (timeLeft.value > 0) {
+        timeLeft.value -= 1;
+      } else {
+        clearInterval(timer);
+      }
+    }, 1000);
            if(resend=='resend'){
 
-             timer = setInterval(() => {
-    if (timeLeft.value > 0) {
-      timeLeft.value -= 1;
-    } else {
-      clearInterval(timer);
-    }
-  }, 1000);
+          
 
             e_otp.value=''
         resend_sh.value = true
