@@ -245,12 +245,15 @@ const handleButtonClick = async () => {
       const metaData = data?.payload?.metaData;
 
       if (status === 'ok') {
-        if (metaData?.APP_KRA_INFO) {
+        if (metaData?.KYC_DATA?.APP_KRA_INFO) {
+          localStorage.setItem('userkey',data.payload.userKey)
           emit('updateDiv', 'mobile');
-        } else if (metaData?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
+        } 
+        else if (metaData?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
           localStorage.setItem('userkey', data.payload.userKey);
           emit('updateDiv', 'mobile');
-        } else if (metaData?.loginStatus === 0) {
+        } 
+        else if (metaData?.loginStatus === 0) {
           timer = setInterval(() => {
             if (timeLeft.value > 0) {
               timeLeft.value -= 1;

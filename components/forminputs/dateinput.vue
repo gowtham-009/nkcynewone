@@ -6,7 +6,7 @@
       v-model="internalDate"
       dateFormat="dd/mm/yy"
       placeholder="DD / MM / YYYY"
-      class="custom-calendar w-full"
+      class="custom-calendar w-full dark:!bg-gray-800"
       inputClass="custom-input"
    
     />
