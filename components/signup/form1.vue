@@ -31,35 +31,26 @@
           <DOB v-model="visibleDate" />
         </div>
 
-        <div v-if="loginotpbox" class="w-full p-2 mt-1" >
-            <p class="font-medium text-gray-500 text-lg dark:text-gray-400">
+        <div v-if="loginotpbox" class="w-full  mt-1">
+          <p class="font-medium text-gray-500 text-lg dark:text-gray-400">
             OTP Sent mobile number +91 {{ phoneNumber }}
           </p>
-           
-          <LOGINOTP v-model="loginotpval"/>
+          <LOGINOTP v-model="loginotpval" />
           <span class="text-red-500" v-if="loginerror">{{ errorval }}</span>
-
-          
-            
-
-              <div class="w-full flex justify-between items-center">
-              <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
-               <p class="text-lg font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resent </p>
-              <button :disabled="timeLeft" type="button" @click="kraaddresssubmission('resend')"
-                class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
-            </div>
-
+          <div class="w-full flex justify-between items-center">
+            <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
+            <p class="text-lg font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resent </p>
+            <button :disabled="timeLeft" type="button" @click="kraaddresssubmission('resend')"
+              class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
+          </div>
         </div>
-
       </div>
       <div class="w-full">
-      <Button ref="buttonRef" :disabled="!panvalue || !visibleDate || isSending"
-        @click="handleButtonClick"
-        class="primary_color w-full text-white py-4 text-xl border-0 wave-btn">
-  <span ref="waveRef" class="wave"></span>
-  {{ buttonText }}
-</Button>
-
+        <Button ref="buttonRef" :disabled="!panvalue || !visibleDate || isSending" @click="handleButtonClick"
+          class="primary_color w-full text-white py-4 text-xl border-0 wave-btn">
+          <span ref="waveRef" class="wave"></span>
+          {{ buttonText }}
+        </Button>
       </div>
     </div>
   </div>
@@ -95,8 +86,8 @@ const isSending = ref(false);
 const buttonText = ref("Continue");
 const tokenval = ref('');
 
-const resend_sh=ref(false)
-const timeLeft = ref(10); 
+const resend_sh = ref(false)
+const timeLeft = ref(10);
 let timer = null;
 const emit = defineEmits(['updateDiv']);
 
@@ -161,9 +152,9 @@ const kraaddresssubmission = async (resend) => {
     }
 
     const data = await response.json();
-    if(resend=='resend'){
-        resend_sh.value=true
-         timeLeft.value = 60;
+    if (resend == 'resend') {
+      resend_sh.value = true
+      timeLeft.value = 60;
 
       if (timer) {
         clearInterval(timer);
@@ -260,15 +251,15 @@ const handleButtonClick = async () => {
           localStorage.setItem('userkey', data.payload.userKey);
           emit('updateDiv', 'mobile');
         } else if (metaData?.loginStatus === 0) {
-            timer = setInterval(() => {
-    if (timeLeft.value > 0) {
-      timeLeft.value -= 1;
-    } else {
-      clearInterval(timer);
-    }
-  }, 1000);
+          timer = setInterval(() => {
+            if (timeLeft.value > 0) {
+              timeLeft.value -= 1;
+            } else {
+              clearInterval(timer);
+            }
+          }, 1000);
 
-   
+
           loginotpbox.value = true;
           phoneNumber.value = metaData.mobile || '';
           emailid.value = metaData.email || '';
@@ -317,6 +308,7 @@ watch(loginotpval, (val) => {
     width: 0%;
     opacity: 2;
   }
+
   100% {
     width: 70%;
     opacity: 2;
@@ -328,10 +320,10 @@ watch(loginotpval, (val) => {
     width: 70%;
     opacity: 2;
   }
+
   100% {
     width: 100%;
     opacity: 0;
   }
 }
-
 </style>
