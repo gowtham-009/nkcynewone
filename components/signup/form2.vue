@@ -56,11 +56,17 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button ref="rippleBtn" type="button" label="Verify OTP"
-          class="primary_color  text-white w-5/6 py-4 text-xl border-0" @click="mobile_signup()"
-          :disabled="!mobileNo || mobileNo.length !== 10 || isSending">
-          {{ buttonText }}
-        </Button>
+        <Button
+  ref="rippleBtn"
+  type="button"
+  label="Verify OTP"
+  class="primary_color text-white w-5/6 py-4 text-xl border-0"
+  @click="mobile_signup"
+  :disabled="isButtonDisabled"
+>
+  {{ buttonText }}
+</Button>
+
       </div>
     </div>
   </div>
@@ -79,7 +85,7 @@ import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
-const timeLeft = ref(60); 
+const timeLeft = ref(10); 
 const phoneNumber = ref('')
 const mobileotp = ref(false)
 const rippleBtn = ref(null)
@@ -92,6 +98,7 @@ const errormsg = ref(false)
 const errormobile = ref('')
 const p_otp = ref('')
 
+const isSending = ref(false);
 const mobileNo = ref(''); 
 const setMobileData = async () => {
   try {
@@ -106,6 +113,7 @@ const setMobileData = async () => {
 
     if (rawMobile.startsWith('91') && rawMobile.length === 12) {
       rawMobile = rawMobile.slice(2);
+  
     }
 
     // Show OTP input if required
@@ -128,17 +136,13 @@ const setMobileData = async () => {
 await setMobileData();
 
 onMounted(() => {
+
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
-  timer = setInterval(() => {
-    if (timeLeft.value > 0) {
-      timeLeft.value -= 1;
-    } else {
-      clearInterval(timer);
-    }
-  }, 1000);
+
 });
 
 onUnmounted(() => {
@@ -149,13 +153,9 @@ onUnmounted(() => {
 
 
 
-const isSending = ref(false);
 
 
 const sendmobileotp = async (resend) => {
-  isSending.value = true;
-  errormsg.value = false;
-  errormobile.value = '';
   const apiurl = `${baseurl.value}validateMobile`;
   phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
     const user = encryptionrequestdata({
@@ -166,7 +166,7 @@ const sendmobileotp = async (resend) => {
     userToken:localStorage.getItem('userkey')
   });
  
-    const payload = { payload: user };
+  const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
  try {
   const response = await fetch(apiurl, {
@@ -186,35 +186,39 @@ const sendmobileotp = async (resend) => {
     return;
   }
 
-  if(resend=='resend'){
-    if (data) {
-      resend_sh.value = true;
-      timeLeft.value = 60;
-
-      if (timer) {
+   // Reset the timer before starting a new one
+    clearInterval(timer);
+    timeLeft.value = 10; // reset countdown
+    timer = setInterval(() => {
+      if (timeLeft.value > 0) {
+        timeLeft.value -= 1;
+      } else {
         clearInterval(timer);
       }
-
-      timer = setInterval(() => {
-        if (timeLeft.value > 0) {
-          timeLeft.value -= 1;
-        } else {
-          clearInterval(timer);
-        }
-      }, 1000);
-    }
+    }, 1000);
+  if(resend=='resend'){
+  
+     resend_sh.value=true
+       
   }
 
   if (data.payload.status === 'ok' && data.payload.otpStatus=='0') {
+    
     mobileotp.value=true
     buttonText.value='Verify Otp'
-    
+
   }
   else if(data.payload.status === 'ok' && data.payload.otpStatus=='1'){
  
      mobileotp.value=false
     buttonText.value='Verify Otp'
      emit('updateDiv', 'email');
+  }
+  else if(data.payload.status=='error'){
+    
+    errormsg.value=true
+    errormobile.value=data.payload.message
+     
   }
 
 } catch (error) {
@@ -226,8 +230,7 @@ const sendmobileotp = async (resend) => {
 
 
 const otpverfication = async () => {
-  isSending.value = true;
-  errormsg.value = false;
+
   errormobile.value = '';
   const usekey=localStorage.getItem('userkey')
   const apiurl = `${baseurl.value}validateMobile`;
@@ -267,6 +270,7 @@ const otpverfication = async () => {
   else if(data.payload.status==='error'){
     otperror.value = true
      errorotp.value = 'Invalid OTP'
+      isSending.value=true
   }
 
 
@@ -280,80 +284,50 @@ const otpverfication = async () => {
 function otpclear(){
   p_otp.value=''
     mobileotp.value = false;
-    isSending.value=false;
+   isSending.value=false
 
 }
 
-const mobile_signup = () => {
+const isButtonDisabled = computed(() => {
+  if (!mobileNo.value || mobileNo.value.length !== 10) return true;
+  if (mobileotp.value && p_otp.value.length !== 4) return true;
+  return isSending.value;
+});
 
-  const button = rippleBtn.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-  button.$el.appendChild(circle)
+
+const mobile_signup = async (event) => {
+  const button = rippleBtn.value;
+  const circle = document.createElement('span');
+  circle.classList.add('ripple');
+
+  const rect = button.$el.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+
+  circle.style.left = `${x}px`;
+  circle.style.top = `${y}px`;
+  button.$el.appendChild(circle);
+
   setTimeout(async () => {
-    circle.remove()
+    circle.remove();
 
-     if (p_otp.value.length === 4) {
-
-    otpverfication()
-    
+    if (mobileotp.value && p_otp.value.length === 4) {
+      await otpverfication();
+    } else {
+      await sendmobileotp();
     }
-    else {
-      sendmobileotp()
-    }
-
-
-//   const mydata = await getServerData();
-//   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
-
-//   if(statuscheck){
-//       if(mobileNo.value && mobileNo.value.length===10){
-//         pagestatus('email')
-//          emit('updateDiv', 'email');
-//       }
-//   }
-// else{
-
-//     if (p_otp.value.length === 4) {
-
-//     otpverfication()
-    
-//     }
-//     else {
-//       sendmobileotp()
-//     }
-
-// }
+  }, 600);
+};
 
 
 
-
-
-  }, 600)
-}
-
-watch(mobileNo, (newval) => {
-  if (newval.length === 10) {
-    errormsg.value = false
-    isSending.value = false;
-
-  }
-  else {
-
-    errormsg.value = false
-  }
-})
 watch(p_otp, (newval) => {
   if (newval.length === 4) {
-    isSending.value = false;
+   isSending.value=false
   }
   else {
-    isSending.value = true;
+
+    otperror.value=false
   }
 })
 

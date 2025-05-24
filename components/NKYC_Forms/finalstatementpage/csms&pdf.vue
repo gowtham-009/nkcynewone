@@ -250,26 +250,32 @@ const handleButtonClick = (event) => {
   }, 600);
 };
 
-const back = async (event) => {
-  const button = rippleBtnback.value;
-  const circle = document.createElement('span');
-  circle.classList.add('ripple');
 
-  const rect = button.$el.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
 
-  circle.style.left = `${x}px`;
-  circle.style.top = `${y}px`;
 
-  button.$el.appendChild(circle);
 
-  setTimeout(async () => {
-    circle.remove();
+
+const back = () => {
+  const button = rippleBtnback.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+  button.$el.appendChild(circle)
+
+  setTimeout(async() => {
+    circle.remove()
     const mydata = await pagestatus('bankfile');
     if (mydata.payload.status === 'ok') {
       emit('updateDiv', 'bankfile');
     }
-  }, 600);
-};
+  }, 600)
+
+}
+
 </script>

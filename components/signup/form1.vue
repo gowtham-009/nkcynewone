@@ -31,78 +31,96 @@
           <DOB v-model="visibleDate" />
         </div>
 
+        <div v-if="loginotpbox" class="w-full p-2 mt-2" >
+            <p class="font-medium text-slate-800 text-2xl dark:text-gray-400">
+            OTP sent
+          </p>
+            <p class="text-sm leading-6  font-normal text-gray-500">
+            We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }} & Email ID {{ emailid }}
+          </p>
+          <LOGINOTP v-model="loginotpval"/>
+          <span class="text-red-500" v-if="loginerror">{{ errorval }}</span>
+
+           <div class="w-full h-12 flex justify-center gap-2">
+              <p class="text-lg font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resend Successfully </p>
+            </div>
+
+              <div class="w-full flex justify-between items-center">
+              <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
+              <button :disabled="timeLeft" type="button" @click="kraaddresssubmission('resend')"
+                class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
+            </div>
+
+        </div>
+
       </div>
       <div class="w-full">
-        <Button ref="buttonRef" :disabled="!panvalue || !visibleDate" @click="handleButtonClick"
-          class="primary_color w-full text-white py-4 text-xl border-0 wave-btn">
-          <span class="wave" ref="waveRef"></span>
-          {{ buttonText }}
-        </Button>
+      <Button ref="buttonRef" :disabled="!panvalue || !visibleDate || isSending"
+        @click="handleButtonClick"
+        class="primary_color w-full text-white py-4 text-xl border-0 wave-btn">
+  <span ref="waveRef" class="wave"></span>
+  {{ buttonText }}
+</Button>
+
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import PAN from '~/components/forminputs/paninput.vue';
 import DOB from '~/components/forminputs/dateinput.vue';
-import { encryptionrequestdata } from '~/utils/globaldata.js'
-import { kradatares } from '~/utils/kradata.js'
+import LOGINOTP from '~/components/forminputs/loginotp.vue';
+import { encryptionrequestdata } from '~/utils/globaldata.js';
+import { kradatares } from '~/utils/kradata.js';
 
 const { baseurl } = globalurl();
 const panerror = ref(false);
 const panvalue = ref('');
 const dobbox = ref(false);
-
+const loginotpbox = ref(false);
 const box1Height = ref(0);
 const box2Height = ref(0);
 const showBox2 = ref(false);
-const error = ref('')
-
+const error = ref('');
+const loginerror = ref(false);
+const errorval = ref('');
 const buttonRef = ref(null);
 const waveRef = ref(null);
-
-const emit = defineEmits(['updateDiv']);
-
-
-const visibleDate = ref('')
-
-
-
+const phoneNumber = ref('');
+const emailid = ref('');
+const loginotpval = ref('');
+const visibleDate = ref('');
+const isSending = ref(false);
 const buttonText = ref("Continue");
+const tokenval = ref('');
 
-
+const resend_sh=ref(false)
+const timeLeft = ref(60); 
+let timer = null;
+const emit = defineEmits(['updateDiv']);
 
 watch(panvalue, (newVal) => {
   if (newVal.length === 10) {
     const pattern = /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/;
     const isValid = pattern.test(newVal);
-    if (isValid) {
-      panerror.value = false;
-      dobbox.value = true;
-    }
-
-    else {
-      panerror.value = true;
-      error.value = 'Please enter a valid PAN no'
-    }
-  }
-
-  else if (newVal.length === 0) {
+    panerror.value = !isValid;
+    error.value = isValid ? '' : 'Please enter a valid PAN no';
+    dobbox.value = isValid;
+  } else {
     panerror.value = false;
     dobbox.value = false;
   }
-
 });
 
 onMounted(() => {
-
   const fullHeight = window.innerHeight;
   box1Height.value = fullHeight;
   box2Height.value = 0;
   showBox2.value = false;
+
   setTimeout(() => {
     showBox2.value = true;
     box1Height.value = fullHeight * 0.3;
@@ -111,30 +129,24 @@ onMounted(() => {
 
   window.addEventListener('resize', () => {
     const updatedHeight = window.innerHeight;
-    if (!showBox2.value) {
-      box1Height.value = updatedHeight;
-      box2Height.value = 0;
-    } else {
-      box1Height.value = updatedHeight * 0.3;
-      box2Height.value = updatedHeight * 0.7;
-    }
+    box1Height.value = showBox2.value ? updatedHeight * 0.3 : updatedHeight;
+    box2Height.value = showBox2.value ? updatedHeight * 0.7 : 0;
   });
 });
 
+onUnmounted(() => {
+  clearInterval(timer);
+});
 
-const kraaddresssubmission = async () => {
-  const apiurl = baseurl.value + 'kra_pan';
-  const userkey = localStorage.getItem('userkey')
-  //const apiurl='https://nnkyc.w3webtechnologies.co.in/api/v1/kra_pan?kra_data=true'
-  const user = encryptionrequestdata({
+const kraaddresssubmission = async (resend) => {
+  const apiurl = `${baseurl.value}kra_pan`;
+  const userkey = localStorage.getItem('userkey') || '';
+  const encryptedPayload = encryptionrequestdata({
     panNo: panvalue.value,
     dob: visibleDate.value,
     pageCode: "mobile",
-    userToken: userkey || ''
+    userToken: userkey
   });
-
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
 
   try {
     const response = await fetch(apiurl, {
@@ -143,7 +155,7 @@ const kraaddresssubmission = async () => {
         'Content-Type': 'application/json',
         'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
       },
-      body: jsonString,
+      body: JSON.stringify({ payload: encryptedPayload })
     });
 
     if (!response.ok) {
@@ -151,55 +163,129 @@ const kraaddresssubmission = async () => {
     }
 
     const data = await response.json();
+    if(resend=='resend'){
+        resend_sh.value=true
+         timeLeft.value = 60;
 
-    if (data) {
+      if (timer) {
+        clearInterval(timer);
+      }
 
-
-      return data; // ✅ Return the actual data
+      timer = setInterval(() => {
+        if (timeLeft.value > 0) {
+          timeLeft.value -= 1;
+        } else {
+          clearInterval(timer);
+        }
+      }, 1000);
     }
-
+    return data;
   } catch (error) {
     console.error('Error during KRA address submission:', error.message);
+    return null;
   }
-
-  return null;
 };
 
+const otpverfication = async () => {
+  const apiurl = `${baseurl.value}login_verification`;
+  const encrypted = encryptionrequestdata({
+    userToken: tokenval.value,
+    pageCode: "pan",
+    otpCode: loginotpval.value
+  });
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+      },
+      body: JSON.stringify({ payload: encrypted })
+    });
+
+    if (!response.ok) {
+      throw new Error("Network error");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('OTP verification failed:', error.message);
+    return null;
+  }
+};
 
 const handleButtonClick = async () => {
-
+  if (isSending.value) return; // prevent multiple clicks
 
   if (waveRef.value) {
     waveRef.value.className = 'wave start-half';
   }
 
-  const data = await kraaddresssubmission();
+  await new Promise(r => setTimeout(r, 400));
 
-  if (data && waveRef.value) {
+  let data = null;
+
+  if (loginotpval.value.length === 4) {
+    data = await otpverfication();
+  } else {
+    data = await kraaddresssubmission();
+  }
+
+  if (!data) return;
+
+  if (waveRef.value) {
     void waveRef.value.offsetWidth;
     waveRef.value.className = 'wave finish-half';
-    setTimeout(async () => {
-      localStorage.setItem('userkey', data.payload.userKey || '')
-      const decryt = decryptdatadata({ decryptdata: data });
-      kradatares({ kradata: decryt })
-      if (data.payload.status == 'ok') {
-        emit('updateDiv', 'mobile');
-      }
-
-      else {
-
-        alert("your response:", data.payload.status)
-      }
-
-    }, 400);
   }
+
+  setTimeout(async () => {
+    if (loginotpval.value.length === 4) {
+      const status = data?.payload?.status;
+      if (status === 'ok') {
+        localStorage.setItem('userkey', tokenval.value);
+        const mydata = await getServerData();
+        const statuscheck = mydata?.payload?.metaData?.profile?.pageStatus;
+        if (statuscheck) emit('updateDiv', statuscheck);
+      } else {
+        loginerror.value = true;
+        errorval.value = data.payload.message;
+      }
+    } else {
+      const status = data?.payload?.status;
+      const metaData = data?.payload?.metaData;
+
+      if (status === 'ok') {
+        if (metaData?.APP_KRA_INFO) {
+          emit('updateDiv', 'mobile');
+        } else if (metaData?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
+          localStorage.setItem('userkey', data.payload.userKey);
+          emit('updateDiv', 'mobile');
+        } else if (metaData?.loginStatus === 0) {
+            timer = setInterval(() => {
+    if (timeLeft.value > 0) {
+      timeLeft.value -= 1;
+    } else {
+      clearInterval(timer);
+    }
+  }, 1000);
+
+   
+          loginotpbox.value = true;
+          phoneNumber.value = metaData.mobile || '';
+          emailid.value = metaData.email || '';
+          tokenval.value = metaData.userKey;
+        }
+      }
+    }
+  }, 400);
 };
 
-
-
-
-
-
+watch(loginotpval, (val) => {
+  loginerror.value = false;
+  errorval.value = '';
+  isSending.value = !(val.length === 4);
+});
 </script>
 
 <style scoped>
@@ -233,7 +319,6 @@ const handleButtonClick = async () => {
     width: 0%;
     opacity: 2;
   }
-
   100% {
     width: 70%;
     opacity: 2;
@@ -245,10 +330,10 @@ const handleButtonClick = async () => {
     width: 70%;
     opacity: 2;
   }
-
   100% {
     width: 100%;
     opacity: 0;
   }
 }
+
 </style>

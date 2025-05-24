@@ -57,7 +57,7 @@
         </Button>
         <Button type="button" ref="rippleBtn" label="Verify OTP"
           class="primary_color text-white w-5/6 py-4 text-xl border-0" @click="handleButtonClick()"
-          :disabled="!isValidEmail || isSending">
+          :disabled="isButtonDisabled">
           {{ buttonText }}
 
         </Button>
@@ -142,6 +142,13 @@ const isValidEmail = computed(() => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailid.value);
 });
 
+const isButtonDisabled = computed(() => {
+  if (!emailbox.value && !isValidEmail.value) return true;
+  if (emailbox.value && e_otp.value.length !== 5) return true;
+  return isSending.value;
+});
+
+
 watch(isValidEmail, (newValue) => {
   if (newValue === false) {
     erroremail.value = false
@@ -157,14 +164,7 @@ onMounted(() => {
   });
 
 
-  timer = setInterval(() => {
-    if (timeLeft.value > 0) {
-      timeLeft.value -= 1;
-    } else {
-      clearInterval(timer);
-    }
-  }, 1000);
-
+ 
 
 
 });
@@ -235,17 +235,18 @@ const sendemailotp = async (resend) => {
       const data = await response.json()
 
            if(resend=='resend'){
+
+             timer = setInterval(() => {
+    if (timeLeft.value > 0) {
+      timeLeft.value -= 1;
+    } else {
+      clearInterval(timer);
+    }
+  }, 1000);
+
             e_otp.value=''
         resend_sh.value = true
-        timeLeft.value = 60;
-        clearInterval(timer);
-        timer = setInterval(() => {
-          if (timeLeft.value > 0) {
-            timeLeft.value -= 1;
-          } else {
-            clearInterval(timer);
-          }
-        }, 1000);
+     
      }
     
       if (data.payload.status == 'ok' && data.payload.otpStatus=='0') {
@@ -262,6 +263,10 @@ const sendemailotp = async (resend) => {
        
         emailbox.value=false
         router.push('/main')
+      }
+      else if(data.payload.status == 'error'){
+          erroremail.value=true
+          emailerror.value=data.payload.message
       }
     }
   } catch (error) {
@@ -305,7 +310,7 @@ const otpverfication = async () => {
       }
        else if(data.payload.status==='error'){
     otperror.value = true
-     errorotp.value = 'Invalid OTP'
+     errorotp.value = data.payload.message
        isSending.value = true;
   }
      
@@ -331,35 +336,44 @@ watch(e_otp, (newval) => {
   }
   else {
     isSending.value = true;
+     otperror.value = false
   }
 })
 
 const handleButtonClick = () => {
-  const button = rippleBtn.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
+  const button = rippleBtn.value;
+  const circle = document.createElement('span');
+  circle.classList.add('ripple');
 
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+  const rect = button.$el.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
 
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-
-  button.$el.appendChild(circle)
+  circle.style.left = `${x}px`;
+  circle.style.top = `${y}px`;
+  button.$el.appendChild(circle);
 
   setTimeout(async () => {
     circle.remove();
 
-    if (e_otp.value.length === 5) {
-
-        otpverfication()
-      
+    if (!emailbox.value) {
+      // First step: trigger sending OTP
+      if (isValidEmail.value) {
+        await sendemailotp();
+      } else {
+        erroremail.value = true;
+        emailerror.value = 'Please enter a valid email address';
+      }
     } else {
-      sendemailotp();
+      // Second step: verify the OTP
+      if (e_otp.value.length === 5) {
+        await otpverfication();
+      } else {
+        otperror.value = true;
+        errorotp.value = 'Enter a valid 5-digit OTP';
+      }
     }
   }, 600);
-
 };
 
 const resend_sh = ref(false)
