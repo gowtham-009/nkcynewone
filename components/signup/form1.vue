@@ -58,6 +58,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
+import {useRouter} from 'vue-router'
 import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import PAN from '~/components/forminputs/paninput.vue';
 import DOB from '~/components/forminputs/dateinput.vue';
@@ -65,6 +66,7 @@ import LOGINOTP from '~/components/forminputs/loginotp.vue';
 import { encryptionrequestdata } from '~/utils/globaldata.js';
 import { kradatares } from '~/utils/kradata.js';
 
+const router=useRouter()
 const { baseurl } = globalurl();
 const panerror = ref(false);
 const panvalue = ref('');
@@ -205,55 +207,73 @@ const otpverfication = async () => {
 };
 
 const handleButtonClick = async () => {
-  if (isSending.value) return; // prevent multiple clicks
+  if (isSending.value) return; // Prevent multiple rapid clicks
 
+  // Start wave animation
   if (waveRef.value) {
     waveRef.value.className = 'wave start-half';
   }
 
-  await new Promise(r => setTimeout(r, 400));
+  await new Promise(r => setTimeout(r, 400)); // Allow animation to play
 
   let data = null;
 
+  // Determine if OTP verification or KRA address submission should occur
   if (loginotpval.value.length === 4) {
     data = await otpverfication();
   } else {
     data = await kraaddresssubmission();
   }
 
-  if (!data) return;
+  if (!data) return; // Exit if no data returned
 
+  // Trigger finish animation
   if (waveRef.value) {
-    void waveRef.value.offsetWidth;
+    void waveRef.value.offsetWidth; // Force reflow to reset animation
     waveRef.value.className = 'wave finish-half';
   }
 
   setTimeout(async () => {
+    const status = data?.payload?.status;
+    const metaData = data?.payload?.metaData;
+
+    // If handling OTP verification
     if (loginotpval.value.length === 4) {
-      const status = data?.payload?.status;
       if (status === 'ok') {
         localStorage.setItem('userkey', tokenval.value);
         const mydata = await getServerData();
         const statuscheck = mydata?.payload?.metaData?.profile?.pageStatus;
-        if (statuscheck) emit('updateDiv', statuscheck);
+
+        const pagetext = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
+
+        if (statuscheck) {
+          const matchedPage = pagetext.find(page =>
+            statuscheck.toLowerCase().includes(page)
+          );
+
+          if (matchedPage) {
+            emit('updateDiv', matchedPage); // Go to known page
+          } else {
+            pagestatus(statuscheck); // Custom handler for other statuses
+            router.push('/main'); // Default route
+          }
+        }
       } else {
+        // Handle OTP verification error
         loginerror.value = true;
         errorval.value = data.payload.message;
       }
-    } else {
-      const status = data?.payload?.status;
-      const metaData = data?.payload?.metaData;
 
+    } else {
+      // If handling KRA address submission
       if (status === 'ok') {
-        if (metaData?.KYC_DATA?.APP_KRA_INFO) {
-          localStorage.setItem('userkey',data.payload.userKey)
-          emit('updateDiv', 'mobile');
-        } 
-        else if (metaData?.KYC_DATA?.APP_ERROR_DESC === 'PAN NOT FOUND') {
+        const kycData = metaData?.KYC_DATA;
+
+        if (kycData?.APP_KRA_INFO || kycData?.APP_ERROR_DESC === 'PAN NOT FOUND') {
           localStorage.setItem('userkey', data.payload.userKey);
           emit('updateDiv', 'mobile');
-        } 
-        else if (metaData?.loginStatus === 0) {
+        } else if (metaData?.loginStatus === 0) {
+          // Start OTP timer
           timer = setInterval(() => {
             if (timeLeft.value > 0) {
               timeLeft.value -= 1;
@@ -262,7 +282,7 @@ const handleButtonClick = async () => {
             }
           }, 1000);
 
-
+          // Show OTP input box and set user details
           loginotpbox.value = true;
           phoneNumber.value = metaData.mobile || '';
           emailid.value = metaData.email || '';

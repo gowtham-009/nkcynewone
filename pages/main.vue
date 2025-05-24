@@ -124,37 +124,41 @@ watch(() => route.query.form, (newForm) => {
 })
 
 onMounted(async () => {
-  const queryForm = route.query.form
+  const queryForm = route.query.form;
 
-  // 🟢 Case 1: User manually typed form param in URL
+  // 🟢 Case 1: Handle manual query param in URL
   if (queryForm && formMap[queryForm]) {
-    const mappedForm = formMap[queryForm]
-    currentForm.value = mappedForm
-    data.value = {}
-   
-    return // ✅ Done
+    currentForm.value = formMap[queryForm];
+    data.value = {};
+    return; // ✅ Done
   }
 
-  // 🔵 Case 2: Default load from localStorage/server if no query param
-  const userkey = localStorage.getItem('userkey')
-  if (userkey) {
-    const mydata = await getServerData()
-    const activePage = mydata?.payload?.metaData?.profile?.pageStatus || 'main'
-    currentForm.value = activePage
-   
+  // 🔵 Case 2: Handle default form via localStorage + server
+  const userkey = localStorage.getItem('userkey');
+  if (!userkey) {
+    router.push('/');
+    return;
+  }
 
-    const restrictedPages = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp']
+  try {
+    const mydata = await getServerData();
+    const activePage = mydata?.payload?.metaData?.profile?.pageStatus || 'main';
+    console.log("siurhaerh", activePage)
+
+    const restrictedPages = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
     if (restrictedPages.includes(activePage)) {
-      router.push('/')
-      return
+      router.push('/');
+      return;
     }
 
-  
-    router.replace({ path: '/main' })
-
-  
+    currentForm.value = activePage;
+    router.replace({ path: '/main' }); // Optional: You may also add query if needed
+  } catch (error) {
+    console.error('Error fetching server data:', error);
+    router.push('/');
   }
-})
+});
+
 
 
 </script>
