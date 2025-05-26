@@ -1,7 +1,7 @@
 <template>
     <div ref="dropdownRef" class="relative inline-block ">
         <!-- Toggle Button -->
-        <Button  class="rounded-full bg  w-12 h-12 border-0 text-3xl flex-shrink-0 shadow " @click="toggleDropdown">
+        <Button  class="rounded-full bg  w-10 h-10 border-0 text-2xl flex-shrink-0 shadow " @click="toggleDropdown">
             <i class="pi pi-user text-2xl text-white"></i>
         </Button>
 

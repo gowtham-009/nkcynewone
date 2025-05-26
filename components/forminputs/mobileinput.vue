@@ -42,7 +42,7 @@ watch(localPhoneNo, (newValue) => {
   align-items: center;
   background-color: #e0e0e0;
   border-radius: 10px;
-  padding: 0 0.75rem;
+  padding: 0 8px;
   overflow: hidden;
 }
 
@@ -60,7 +60,7 @@ watch(localPhoneNo, (newValue) => {
   outline: none;
   font-size: 16px;
   flex: 1;
-  padding: 1rem 0;
+  padding: 8px 0;
   z-index: 1;
   box-shadow: none !important;
 }

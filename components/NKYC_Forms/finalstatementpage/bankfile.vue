@@ -9,7 +9,7 @@
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full p-1"></div>
             <div class="w-full p-1 flex flex-col justify-center items-center">
-                <p class="text-xl font-normal text-center text-gray-500">Thank you, esign completed. If you want to activate F&O / MCX, please upload the last 6 months bank statements or Download automatically.</p>
+                <p class="text-md font-normal text-center leading-5 text-gray-500">Thank you, esign completed. If you want to activate F&O / MCX, please upload the last 6 months bank statements or Download automatically.</p>
                 <Chip label="Activate Now" class="bg-blue-50 mt-2 text-blue-500" @click="CsmsPdf()"/>
               </div>
             <div class="w-full flex gap-2">
@@ -21,7 +21,7 @@
             @click="handleButtonClick"
             ref="rippleBtn"
           
-            class="primary_color wave-btn text-white w-5/6 py-4 text-xl border-0 relative overflow-hidden"
+            class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden"
           >
             {{ buttonText }}
           </Button>

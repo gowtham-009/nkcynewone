@@ -17,10 +17,10 @@
       class="w-full p-1 flex flex-col justify-between bg-white rounded-t-3xl dark:bg-black transition-all duration-300"
       :style="{ height: box2Height + 'px' }">
       <div class="w-full mt-2 px-2 flex flex-col justify-between">
-        <span class="font-medium text-gray-500 text-lg">Identity Verification</span>
-        <p class="text-3xl font-semibold dark:text-gray-400">Fill Your PAN Details</p>
-        <span class="font-medium text-gray-500 text-lg">This is required as mandated by regulator for verification
-          purposes. </span>
+        <span class="font-medium text-gray-500 text-md">Identity Verification</span>
+        <p class="text-xl font-semibold dark:text-gray-400">Fill Your PAN Details</p>
+        <p class="font-medium text-gray-500 text-md leading-5">This is required as mandated by regulator for verification
+          purposes. </p>
 
         <div class="w-full mt-2">
           <PAN v-model="panvalue" />
@@ -32,22 +32,22 @@
         </div>
 
         <div v-if="loginotpbox" class="w-full  mt-1">
-          <p class="font-medium text-gray-500 text-lg dark:text-gray-400">
+          <p class="font-medium text-gray-500 text-md dark:text-gray-400">
             OTP Sent mobile number +91 {{ phoneNumber }}
           </p>
           <LOGINOTP v-model="loginotpval" />
           <span class="text-red-500" v-if="loginerror">{{ errorval }}</span>
           <div class="w-full flex justify-between items-center">
             <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
-            <p class="text-lg font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resent </p>
+            <p class="text-md font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resent </p>
             <button :disabled="timeLeft" type="button" @click="kraaddresssubmission('resend')"
-              class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
+              class="text-lg font-medium text-blue-500 cursor-pointer ">Resend</button>
           </div>
         </div>
       </div>
       <div class="w-full">
         <Button ref="buttonRef" :disabled="!panvalue || !visibleDate || isSending" @click="handleButtonClick"
-          class="primary_color w-full text-white py-4 text-xl border-0 wave-btn">
+          class="primary_color w-full text-white py-3 text-xl border-0 wave-btn">
           <span ref="waveRef" class="wave"></span>
           {{ buttonText }}
         </Button>

@@ -9,12 +9,12 @@
       <div class="w-full">
         <div class="w-full mt-2  flex flex-col justify-between">
           <div class="w-full">
-            <p class="text-2xl font-medium dark:text-gray-400">Ready to get started?</p>
-            <p class="leading-6 text-sm font-normal text-gray-500">Enter your mobile number to help us set up your 
+            <p class="text-xl font-medium dark:text-gray-400">Ready to get started?</p>
+            <p class="text-sm font-normal text-gray-500 leading-5">Enter your mobile number to help us set up your 
               account</p>
           </div>
 
-           <div class="w-full mt-4 flex gap-2 items-center">
+           <div class="w-full mt-3 flex gap-2 items-center">
             <div class="w-full" :class="{ 'disabled-div': mobileotp }"
               :style="mobileotp ? { pointerEvents: 'none', opacity: 0.5 } : {}">
               <MobileInput v-model="mobileNo" />
@@ -39,13 +39,13 @@
             <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
 
             <div class="w-full h-12 flex justify-center gap-2">
-              <p class="text-lg font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resend Successfully <br> +91 {{
+              <p class="text-sm font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resend Successfully <br> +91 {{
                 phoneNumber }}</p>
             </div>
             <div class="w-full flex justify-between items-center">
-              <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
+              <h2 class="font-medium text-sm dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
               <button :disabled="timeLeft" type="button" @click="sendmobileotp('resend')"
-                class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
+                class="text-lg font-medium text-blue-500 cursor-pointer ">Resend</button>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@
   ref="rippleBtn"
   type="button"
   label="Verify OTP"
-  class="primary_color text-white w-5/6 py-4 text-xl border-0"
+  class="primary_color text-white w-5/6 py-3 text-xl border-0"
   @click="mobile_signup"
   :disabled="isButtonDisabled"
 >

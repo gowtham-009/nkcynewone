@@ -8,13 +8,13 @@
     <div v-if="content" class="flex justify-between items-center px-2 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full p-1">
-        <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">Esign</p>
-        <p class="text-sm text-gray-500 font-normal leading-6">
+        <p class="text-xl text-blue-900 font-medium dark:text-gray-400">Esign</p>
+        <p class="text-sm text-gray-500 font-normal leading-5">
           You will receive OTP to Aadhaar Linked Mobile No
         </p>
 
-        <div class="w-full mt-3">
-          <div v-for="(step, index) in steps" :key="index" class="w-full flex gap-1">
+        <div class="w-full mt-2 rounded-lg bg-blue-50 gap-1 p-2">
+          <div v-for="(step, index) in steps" :key="index" class="w-full flex ">
             <div class="font-normal text-sm text-gray-500">{{ step.label }}</div>
             <div class="font-normal text-sm text-gray-500">{{ step.text }}</div>
           </div>
@@ -24,12 +24,12 @@
       <div class="w-full flex gap-2">
         <!-- Buttons -->
         <button @click="back($event)" ref="rippleBtnback"
-          class="primary_color cursor-pointer rounded-lg border-0 text-white w-1/6 py-4 dark:bg-slate-900 relative overflow-hidden">
+          class="primary_color cursor-pointer rounded-lg border-0 text-white w-1/6 py-3 dark:bg-slate-900 relative overflow-hidden">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </button>
 
         <button @click="handleButtonClick($event)" ref="rippleBtn"
-          class="primary_color wave-btn text-white w-5/6 py-4 rounded-lg text-xl border-0 relative overflow-hidden">
+          class="primary_color wave-btn text-white w-5/6 py-3 rounded-lg text-xl border-0 relative overflow-hidden">
           {{ buttonText }}
         </button>
 

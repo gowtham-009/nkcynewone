@@ -11,11 +11,11 @@
       :style="{ height: deviceHeight * 0.92 + 'px' }">
 
       <!-- Nominee Info -->
-      <div class="w-full mt-2 px-2 p-1">
-        <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">Add nominee</p>
-        <p class="text-sm text-gray-500 font-normal leading-6">Relationship with nominee</p>
+      <div class="w-full mt-1 px-2 p-1">
+        <p class="text-xl text-blue-900 font-medium dark:text-gray-400">Add nominee</p>
+        <p class="text-sm text-gray-500 font-normal leading-5">Relationship with nominee</p>
 
-        <div class="w-full flex flex-col gap-2 mt-3">
+        <div class="w-full flex flex-col gap-2 mt-2">
           <div v-if="nomineescard">
             <div class="w-full p-2  cursor-pointer mb-2  bg-gray-200 rounded-lg " v-for="nomineeshare in nomine">
             <div class="w-full">
@@ -133,7 +133,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button ref="rippleBtn" @click="handleButtonClick" class="primary_color w-5/6 text-white py-4 text-xl border-0">
+        <Button ref="rippleBtn" @click="handleButtonClick" class="primary_color w-5/6 text-white py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
       </div>
@@ -589,7 +589,7 @@ watch(dob, (newval) => {
   align-items: center;
   background-color: #e0e0e0;
   border-radius: 10px;
-  padding: 0 10px;
+  padding: 0 8px;
   overflow: hidden;
 }
 
@@ -607,7 +607,7 @@ watch(dob, (newval) => {
   outline: none;
   font-size: 16px;
   flex: 1;
-  padding: 10px 0;
+  padding: 8px 0;
   z-index: 1;
   box-shadow: none !important;
 }

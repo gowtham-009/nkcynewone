@@ -1,5 +1,5 @@
 <template>
-      <span class="text-lg text-gray-500">Email ID</span>
+      <span class="text-md text-gray-500">Email ID</span>
   <div class="input-wrapper">
     <InputText
       id="email"
@@ -51,7 +51,7 @@ const validateEmail = () => {
   align-items: center;
   background-color: #e0e0e0;
   border-radius: 10px;
-  padding: 0 10px;
+  padding: 0 8px;
   overflow: hidden;
 }
 
@@ -69,7 +69,7 @@ const validateEmail = () => {
   outline: none;
   font-size: 16px;
   flex: 1;
-  padding: 10px 0;
+  padding: 8px 0;
   z-index: 1;
   box-shadow: none !important;
 }

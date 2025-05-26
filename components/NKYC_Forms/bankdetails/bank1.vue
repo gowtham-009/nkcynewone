@@ -7,60 +7,60 @@
     <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full mt-1 px-2 p-1">
-        <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">
+        <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
           Link your bank account
         </p>
 
-        <p class="text-sm  text-gray-500 font-normal leading-5">
+        <p class="text-sm  text-gray-500 font-normal leading-4">
           Please provide your bank account details to link your bank account with your trading account.
         </p>
 
-        <div class="w-full   p-1">
+        <div class="w-full ">
             <div >
-          <span class="text-gray-500 text-md">Account Type</span>
+          <span class="text-gray-500 text-sm mt-1">Account Type</span>
              <div class="flex gap-2">
             <div class="flex items-center gap-2">
               <RadioButton v-model="selected" inputId="SAVING " name="id" value="SAVING " @change="emitSelection" />
-              <label for="SAVING " class="text-gray-500">Saving</label>
+              <label for="SAVING " class="text-gray-500 text-sm">Saving</label>
             </div>
             <div class="flex items-center gap-2">
               <RadioButton v-model="selected" inputId="CURRENT " name="id" value="CURRENT " @change="emitSelection" />
-              <label for="CURRENT " class="text-gray-500">Current </label>
+              <label for="CURRENT " class="text-gray-500  text-sm">Current </label>
             </div>
           
           </div>
 
         </div>
 
-          <div class="mt-1">
-            <span class="text-gray-500 text-md">Account no</span>
+          <div >
+            <span class="text-gray-500  text-sm">Account no</span>
             <Accno v-model="accno" />
           </div>
 
       
-          <div class="mt-1">
-            <span class="text-gray-500 text-md">IFSC code</span>
+          <div >
+            <span class="text-gray-500  text-sm">IFSC code</span>
             <IFSC v-model="ifsc" />
           </div>
 
 
-          <div class="mt-1">
-            <span class="text-gray-500 text-md">MICR code</span>
+          <div >
+            <span class="text-gray-500  text-sm">MICR code</span>
             <MICR v-model="micr" />
           </div>
 
-          <div class="mt-1">
-            <span class="text-gray-500 text-md">Bank name</span>
+          <div >
+            <span class="text-gray-500  text-sm">Bank name</span>
             <Bankname v-model="bankname" />
           </div>
 
-          <div class="mt-1">
-            <p class="text-gray-500 text-md font-normal leading-4">Bank Address</p>
+          <div >
+            <p class="text-gray-500  text-sm font-normal leading-4">Bank Address</p>
             <Address v-model="address" class="mt-1" />
           </div>
 
           <div v-if="waitingbox" class="w-full px-2 py-2 mt-1 rounded-lg bg-blue-50">
-              <p class="text-md text-blue-600 leading-5 text-center">Please wait. We're depositing ₹1 to your account to verify your bank details</p>
+              <p class=" text-sm text-blue-600 leading-4 text-center">Please wait. We're depositing ₹1 to your account to verify your bank details</p>
           </div>
 
         </div>
@@ -72,7 +72,7 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button @click="handleButtonClick" ref="rippleBtn" :disabled="!bankname || !accno || !ifsc || !micr || !address"
-          class="primary_color  w-5/6 text-white  py-4 text-xl border-0">
+          class="primary_color  w-5/6 text-white  py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
       </div>
@@ -252,9 +252,6 @@ const bankvalidation = async () => {
 
 
 const handleButtonClick = () => {
-
-
-
   const button = rippleBtn.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')

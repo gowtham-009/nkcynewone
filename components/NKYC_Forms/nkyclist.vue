@@ -10,79 +10,79 @@
 
             <div class="w-full p-1">
                     <div class="w-full">
-                        <p class="text-3xl text-center text-blue-600 font-medium">
+                        <p class="text-2xl text-center text-blue-600 font-medium">
                             Here's what's next
                         </p>
                     </div>
 
 
                     <div class="w-full px-4 mt-2">
-                        <div class="w-full flex items-center gap-5">
+                        <div class="w-full flex items-center gap-3">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                               <i class="pi pi-folder-open text-blue-900 text-xl "></i>
+                               <i class="pi pi-folder-open text-blue-900 text-lg "></i>
                             </div>
                             <div class=" p-1">
-                                <p class="text-lg font-medium text-blue-950 dark:text-gray-400">Complete e-KYC</p>
-                                <p class="text-sm font-normal text-gray-500">Keep your Aadhaar and PAN card handy</p>
+                                <p class="text-md font-medium text-blue-950 dark:text-gray-400">Complete e-KYC</p>
+                                <p class="text-sm font-normal text-gray-500 leading-4">Keep your Aadhaar and PAN card handy</p>
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center gap-5 mt-1">
+                        <div class="w-full flex items-center gap-3">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                                <i class="pi pi-user text-blue-900 text-xl"></i>
+                                <i class="pi pi-user text-blue-900 text-lg"></i>
                             </div>
                             <div class="p-1">
-                                <p class="text-lg font-medium text-blue-950 dark:text-gray-400">Set up your profile</p>
-                                <p class="text-sm font-normal text-gray-500">Answer a few question about yourself</p>
+                                <p class="text-md font-medium text-blue-950 dark:text-gray-400">Set up your profile</p>
+                                <p class="text-sm left-4 font-normal text-gray-500">Answer a few question about yourself</p>
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center gap-5 mt-1">
+                        <div class="w-full flex items-center gap-3">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                               <i class="pi pi-credit-card text-blue-900 text-xl"></i>
+                               <i class="pi pi-credit-card text-blue-900 text-lg"></i>
                             </div>
                             <div class="p-1">
-                                <p class="text-lg font-medium text-blue-950 dark:text-gray-400">Link your bank a/c</p>
-                                <p class="text-sm font-normal text-gray-500">Set the primary account for your
+                                <p class="text-md font-medium text-blue-950 dark:text-gray-400">Link your bank a/c</p>
+                                <p class="text-sm leading-4 font-normal text-gray-500">Set the primary account for your
                                     transactions</p>
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center gap-5 mt-1">
+                        <div class="w-full flex items-center gap-3">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                               <i class="pi pi-building-columns text-blue-900 text-xl"></i>
+                               <i class="pi pi-building-columns text-blue-900 text-lg"></i>
                             </div>
                             <div class="p-1">
-                                <p class="text-lg font-medium text-blue-950 dark:text-gray-400">Select your account</p>
-                                <p class="text-sm font-normal text-gray-500">Upload proofs, Trading segment, Brokerage
+                                <p class="text-md font-medium text-blue-950 dark:text-gray-400">Select your account</p>
+                                <p class="text-sm leading-4 font-normal text-gray-500">Upload proofs, Trading segment, Brokerage
                                     details.</p>
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center gap-5 mt-1">
+                        <div class="w-full flex items-center gap-3">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                                <i class="pi pi-verified text-blue-900 text-xl"></i>
+                                <i class="pi pi-verified text-blue-900 text-lg"></i>
                             </div>
                             <div class="p-1">
-                                <p class="text-lg font-medium text-blue-950 dark:text-gray-400">Confirm it's you</p>
-                                <p class="text-sm font-normal text-gray-500">Click a photo and submit your signature
+                                <p class="text-md font-medium text-blue-950 dark:text-gray-400">Confirm it's you</p>
+                                <p class="text-sm leading-4 font-normal text-gray-500">Click a photo and submit your signature
                                 </p>
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center gap-5 mt-1">
+                        <div class="w-full flex items-center gap-3">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
-                                <i class="pi pi-pen-to-square text-blue-900 text-xl"></i>
+                                <i class="pi pi-pen-to-square text-blue-900 text-lg"></i>
                             </div>
                             <div class="p-1">
-                                <p class="text-lg font-medium text-blue-950 dark:text-gray-400">eSign and Login</p>
-                                <p class="text-sm font-normal text-gray-500">Sign your application and start investing
+                                <p class="text-md font-medium text-blue-950 dark:text-gray-400">eSign and Login</p>
+                                <p class="text-sm leading-4 font-normal text-gray-500">Sign your application and start investing
                                 </p>
                             </div>
                         </div>
@@ -94,7 +94,7 @@
                         <i class="pi pi-angle-left text-3xl dark:text-white"></i>
                     </Button>
                     <Button type="button" ref="rippleBtn" label="Continue" @click="handleButtonClick"
-                        class=" primary_color  text-white w-5/6 py-4 text-xl border-0  ">
+                        class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
                         {{ buttonText }}
                     </Button>
                 </div>

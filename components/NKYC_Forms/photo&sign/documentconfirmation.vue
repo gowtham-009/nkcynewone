@@ -7,8 +7,8 @@
         </div>
         <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
-            <div class="w-full mt-2 px-2 p-1">
-                <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">
+            <div class="w-full mt-1 px-2 p-1">
+                <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
                     Additional information
                 </p>
                 <p class="text-gray-500 leading-5 font-normal text-sm mt-2">These details are required by SEBI to open
@@ -73,7 +73,7 @@
                 <i class="pi pi-angle-left text-3xl dark:text-white"></i>
             </Button>
                 <Button type="button" ref="rippleBtn"  @click="handleButton"
-                    class=" primary_color wave-btn text-white w-5/6 py-4 text-xl border-0  ">
+                    class=" primary_color wave-btn text-white w-5/6 py-3 text-xl border-0  ">
                     {{ buttonText }}
                 </Button>
             </div>

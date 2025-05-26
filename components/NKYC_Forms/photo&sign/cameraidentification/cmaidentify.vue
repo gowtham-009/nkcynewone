@@ -5,7 +5,7 @@
       <img v-if="imageCaptured" :src="capturedImage" alt="Captured Face" class="camera-image" />
       <canvas ref="canvas" class="hidden"></canvas>
     </div>
-    <span class="mt-4 dark:text-gray-400">
+    <span class="mt-3 dark:text-gray-400">
       Face distance score: {{ faceDistanceScore.toFixed(2) }}%
     </span>
     <span class="dark:text-gray-400">

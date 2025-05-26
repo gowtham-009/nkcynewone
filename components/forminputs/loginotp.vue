@@ -73,7 +73,7 @@ function onBackspace(index) {
 
 <style scoped>
 .custom-otp-input {
-  height: 48px;
+  height: 40px;
   font-size: 24px;
   appearance: none;
   text-align: center;

@@ -10,22 +10,22 @@
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             
             <!-- Income Selection -->
-            <div class="w-full mt-2 px-2 p-1">
-                <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">
+            <div class="w-full mt-1 px-2 p-1">
+                <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
                    Brokerage details
                 </p>
-                <p class="text-sm  text-gray-500 font-normal leading-6">
+                <p class="text-sm  text-gray-500 font-normal leading-5">
                     These details are required by SEBI to open your Demat account.
                 </p>
 
 
                 <div class="w-full mt-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-900">
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-xl text-green-500 font-semibold"></i> <span class="font-semibold text-lg text-gray-800 dark:text-gray-500">EQUITY DELIVERY</span><span class="text-md font-normal text-gray-500">:0.5%</span></p>
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-xl text-green-500 font-semibold"></i> <span class="font-semibold text-lg text-gray-800 dark:text-gray-500">EQUITY INTRADAY</span><span class="text-md font-normal text-gray-500">:0.1%</span></p>
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-xl text-green-500 font-semibold"></i> <span class="font-semibold text-lg text-gray-800 dark:text-gray-500">EQUITY FUTURES</span><span class="text-md font-normal text-gray-500">:0.05%</span></p>
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-xl text-green-500 font-semibold"></i> <span class="font-semibold text-lg text-gray-800 dark:text-gray-500">EQUITY OPTIONS</span><span class="text-md font-normal text-gray-500">:RS.100 PER LOT OR ORDER</span></p>
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-xl text-green-500 font-semibold"></i> <span class="font-semibold text-lg text-gray-800 dark:text-gray-500">MCX FUTURES</span><span class="text-md font-normal text-gray-500">:0.06%</span></p>
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-xl text-green-500 font-semibold"></i> <span class="font-semibold text-lg text-gray-800 dark:text-gray-500">MCX OPTIONS</span><span class="text-md font-normal text-gray-500">:RS.100 PER LOT</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY DELIVERY</span><span class="text-sm font-normal text-gray-500">:0.5%</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY INTRADAY</span><span class="text-sm font-normal text-gray-500">:0.1%</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY FUTURES</span><span class="text-sm font-normal text-gray-500">:0.05%</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY OPTIONS</span><span class="text-sm font-normal text-gray-500">:RS.100 PER LOT OR ORDER</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">MCX FUTURES</span><span class="text-sm font-normal text-gray-500">:0.06%</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">MCX OPTIONS</span><span class="text-sm font-normal text-gray-500">:RS.100 PER LOT</span></p>
 
                 </div>
                 
@@ -40,7 +40,7 @@
                 <Button 
                     type="button"  ref="rippleBtn"  
                     @click="handleButtonClick" 
-                    class="primary_color wave-btn text-white w-5/6 py-4 text-xl border-0"
+                    class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0"
                 >
                     {{ buttonText }}
                 </Button>

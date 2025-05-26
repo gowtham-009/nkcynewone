@@ -8,15 +8,15 @@
         <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
 
-            <div class="w-full px-2 p-1 mt-2">
-                <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">
+            <div class="w-full px-2 p-1 mt-1">
+                <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
                    Draw your signature
                 </p>
-                <p class="text-gray-500 leading-6 font-normal text-sm">
+                <p class="text-gray-500 leading-5 font-normal text-sm">
                     Use the signature box to sign
                 </p>
                 <canvas ref="canvasRef" class="mt-3 border-2 border-dashed rounded-lg"></canvas>
-                <div class="w-full mt-2 flex gap-2 justify-center">
+                <div class="w-full mt-1 flex gap-2 justify-center">
                   <Button @click="erase" icon="pi pi-trash" label="Clear" class="px-2 py-1 text-white bg border-0"></Button>
                   <Button  @click="triggerUpload" class="primary_color text-white" icon="pi pi-plus" label="Upload Signature"></Button>
                   <input type="file" accept="image/*" ref="fileInput" @change="uploadImage" style="display: none" />
@@ -30,7 +30,7 @@
                 <i class="pi pi-angle-left text-3xl dark:text-white"></i>
             </Button>
                 <Button type="button"  ref="rippleBtn"  @click="handleButtonClick" :disabled="!imageSrc"
-                    class=" primary_color  text-white w-5/6 py-4 text-xl border-0  ">
+                    class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
                     {{ buttonText }}
                 </Button>
             </div>

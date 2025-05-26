@@ -10,13 +10,13 @@
       <div class="w-full p-1 mt-2">
         <div class="w-full mt-2 ">
           <div class="w-full">
-            <p class="text-2xl font-medium dark:text-gray-400">Add your email</p>
-            <p class=" leading-6 text-sm font-normal text-gray-500">
+            <p class="text-xl font-medium dark:text-gray-400">Add your email</p>
+            <p class=" leading-5 text-sm font-normal text-gray-500">
               This is where we'll send you important updates and insights on the market.
             </p>
           </div>
 
-          <div class="w-full mt-4">
+          <div class="w-full mt-3">
             <div class="w-full" :class="{ 'disabled-div': emailbox }"
               :style="emailbox ? { pointerEvents: 'none', opacity: 0.5 } : {}">
               <EmailInput v-model="emailid" />
@@ -25,7 +25,7 @@
           </div>
         </div>
         <div class="w-full mt-2" v-if="emailbox">
-          <p class="font-medium text-slate-800 text-2xl dark:text-gray-400">
+          <p class="font-medium text-slate-800 text-xl dark:text-gray-400">
             OTP sent
           </p>
           <p class="text-sm leading-6  font-normal text-gray-500">
@@ -36,7 +36,7 @@
             <emailOTP v-model="e_otp" />
             <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
             <div class="w-full h-8">
-              <p class="text-lg font-medium text-center text-gray-500" v-if="resend_sh">OTP Resend
+              <p class="text-sm font-medium text-center text-gray-500" v-if="resend_sh">OTP Resend
                 Successfully ({{ emailidtext }}) </p>
             </div>
             <div class="w-full mt-4 flex justify-between items-center">
@@ -44,7 +44,7 @@
               }}s</h2>
 
               <button :disabled="timeLeft" type="button" @click="sendemailotp('resend')" disabled
-                class="text-xl font-medium text-blue-500 cursor-pointer ">Resend</button>
+                class="text-lg font-medium text-blue-500 cursor-pointer ">Resend</button>
             </div>
           </div>
         </div>
@@ -56,7 +56,7 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" ref="rippleBtn" label="Verify OTP"
-          class="primary_color text-white w-5/6 py-4 text-xl border-0" @click="handleButtonClick()"
+          class="primary_color text-white w-5/6 py-3 text-xl border-0" @click="handleButtonClick()"
           :disabled="isButtonDisabled">
           {{ buttonText }}
 

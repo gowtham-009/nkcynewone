@@ -7,21 +7,21 @@
         </div>
         <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black" 
             :style="{ height: deviceHeight * 0.92 + 'px' }">
-            <div class="w-full mt-2 px-2 p-1">
-                <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">
+            <div class="w-full mt-1 px-2 p-1">
+                <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
                     Add your Signature
                 </p>
-                <p class="text-gray-500 leading-6 font-normal text-sm">
+                <p class="text-gray-500 leading-5 font-normal text-sm">
                     Upload an image or use the signature box to sign
                 </p>
 
-                <div class="w-full mt-2 rounded-lg px-3 py-3 bg-blue-50 dark:bg-slate-900">
-                    <h2 class="text-blue-900 text-xl font-medium mt-2 dark:text-gray-400">Please remember:</h2>
+                <div class="w-full mt-1 rounded-lg px-2 py-2 bg-blue-50 dark:bg-slate-900">
+                    <h2 class="text-blue-900 text-md font-medium mt-2 dark:text-gray-400">Please remember:</h2>
 
                     <div class="w-full flex items-center  gap-3 mt-1">
                         <div
                             class="p-2 px-2 flex justify-center items-center  w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
-                            <i class="pi pi-cog text-xl text-blue-600"></i>
+                            <i class="pi pi-cog text-md text-blue-600"></i>
                         </div>
                         <div class="p-2">
                             <p class="text-gray-500 leading-6 font-normal text-sm">
@@ -33,7 +33,7 @@
                     <div class="w-full flex items-center  gap-3 mt-1">
                         <div
                         class="p-2 px-2 flex justify-center items-center w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
-                          <i class="pi pi-clone text-xl text-blue-600"></i>
+                          <i class="pi pi-clone text-md text-blue-600"></i>
                         </div>
                         <div class="p-2">
                             <p class="text-gray-500 leading-6 font-normal text-sm">
@@ -44,7 +44,7 @@
                     <div class="w-full flex items-center gap-3 mt-1">
                         <div
                         class="p-2 px-2 flex justify-center items-center  w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
-                      <i class="pi pi-upload text-xl text-blue-600"></i>
+                      <i class="pi pi-upload text-md text-blue-600"></i>
                         </div>
                         <div class="p-2">
                             <p class="text-gray-500 leading-6 font-normal text-sm">
@@ -67,7 +67,7 @@
                 <i class="pi pi-angle-left text-3xl dark:text-white"></i>
             </Button>
                 <Button type="button"  ref="rippleBtn" @click="handleButtonClick"  
-                    class=" primary_color  text-white w-5/6 py-4 text-xl border-0  ">
+                    class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
                     {{ buttonText }}
                 </Button>
 

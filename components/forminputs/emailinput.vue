@@ -7,7 +7,7 @@
      
       variant="filled"
       placeholder="Your Email ID"
-      size="large"
+      
       @blur="validateEmail"
        autocomplete="off"
     />

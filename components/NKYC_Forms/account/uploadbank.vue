@@ -6,12 +6,12 @@
     </div>
 
     <div class="flex flex-col justify-between p-2 bg-white rounded-t-3xl dark:bg-black" :style="{ height: deviceHeight * 0.92 + 'px' }">
-      <div class="w-full mt-2 px-2 p-1">
-        <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">Upload proofs</p>
-        <p class="text-sm text-gray-500 font-normal leading-6">These details are required by SEBI to open your Demat account.</p>
+      <div class="w-full mt-1 px-2 p-1">
+        <p class="text-md text-blue-900 font-medium dark:text-gray-400">Upload proofs</p>
+        <p class="text-sm text-gray-500 font-normal leading-5">These details are required by SEBI to open your Demat account.</p>
 
         <div class="w-full mt-3">
-          <span class="text-gray-500 text-xl font-medium">Upload Bank</span>
+          <span class="text-gray-500 text-md font-medium">Upload Bank</span>
           <div class="grid grid-cols-1 gap-3">
             <div class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white">
               <div class="px-2 py-2">
@@ -32,7 +32,7 @@
           ref="rippleBtn"
           @click="handleButtonClick"
           :disabled="!imageSrcbank"
-          class="primary_color wave-btn text-white w-5/6 py-4 text-xl border-0"
+          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0"
         >
           {{ buttonText }}
         </Button>

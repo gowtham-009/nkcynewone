@@ -9,11 +9,11 @@
     <!-- Content Area -->
     <div class="flex justify-between p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
-      <div class="w-full mt-2 p-1 px-2">
-        <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">
+      <div class="w-full mt-1 p-1 px-2">
+        <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
           Verify your Permanent address
         </p>
-        <p class="text-sm mt-2 leading-6 text-gray-500 font-normal">
+        <p class="text-sm  leading-5 text-gray-500 font-normal">
           Please confirm your address as per the documents you have uploaded.
         </p>
 

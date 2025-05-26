@@ -10,18 +10,18 @@
          :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full flex flex-col gap-3">
         <div class="w-full p-1">
-          <p class="text-xl font-semibold text-blue-600">CAMS</p>
+          <p class="text-lg font-medium text-blue-600">CAMS</p>
           <div class="w-full flex gap-2 pl-3">
-            <div class="text-md text-normal text-gray-500">1.</div>
-            <div class="text-md text-normal text-gray-500">Thank you, esign completed.</div>
+            <div class="text-sm text-normal text-gray-500">1.</div>
+            <div class="text-sm text-normal text-gray-500">Thank you, esign completed.</div>
           </div>
           <div class="w-full flex gap-2 pl-3">
-            <div class="text-md text-normal text-gray-500">2.</div>
-            <div class="text-md text-normal text-gray-500">If you want to activate F&O / MCX.</div>
+            <div class="text-sm text-normal text-gray-500">2.</div>
+            <div class="text-sm text-normal text-gray-500">If you want to activate F&O / MCX.</div>
           </div>
           <div class="w-full flex gap-2 pl-3">
-            <div class="text-md text-normal text-gray-500">3.</div>
-            <div class="text-md text-normal text-gray-500">please upload the last 6 months bank statements or Download automatically.</div>
+            <div class="text-sm text-normal text-gray-500">3.</div>
+            <div class="text-sm text-normal text-gray-500">please upload the last 6 months bank statements or Download automatically.</div>
           </div>
           <div class="w-full flex gap-2 justify-center mt-3">
             <Chip label="Fast Mode" @click="bankstatemetnFastmode()" class="bg-blue-50 text-blue-500" />
@@ -33,18 +33,18 @@
         </div>
 
         <div class="w-full p-1">
-          <p class="text-xl font-semibold text-blue-600">Upload Last 6 Months Bank Statement PDF</p>
+          <p class="text-lg font-medium text-blue-600">Upload Last 6 Months Bank Statement PDF</p>
           <div class="w-full flex gap-2 pl-3">
-            <div class="text-md text-normal text-gray-500">1.</div>
-            <div class="text-md text-normal text-gray-500">Thank you, esign completed.</div>
+            <div class="text-sm text-normal text-gray-500">1.</div>
+            <div class="text-sm text-normal text-gray-500">Thank you, esign completed.</div>
           </div>
           <div class="w-full flex gap-2 pl-3">
-            <div class="text-md text-normal text-gray-500">2.</div>
-            <div class="text-md text-normal text-gray-500">If you want to activate F&O / MCX.</div>
+            <div class="text-sm text-normal text-gray-500">2.</div>
+            <div class="text-sm text-normal text-gray-500">If you want to activate F&O / MCX.</div>
           </div>
           <div class="w-full flex gap-2 pl-3">
-            <div class="text-md text-normal text-gray-500">3.</div>
-            <div class="text-md text-normal text-gray-500">please upload the last 6 months bank statements or Download automatically.</div>
+            <div class="text-sm text-normal text-gray-500">3.</div>
+            <div class="text-sm text-normal text-gray-500">please upload the last 6 months bank statements or Download automatically.</div>
           </div>
           <div class="w-full flex gap-2 justify-center mt-3">
             <Chip label="Upload PDF" @click="triggerUpload" class="bg-blue-50 text-blue-500" />
@@ -58,7 +58,7 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" ref="rippleBtn" @click="handleButtonClick"
-                class="primary_color wave-btn text-white w-5/6 py-4 text-xl border-0 relative overflow-hidden">
+                class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
           {{ buttonText }}
         </Button>
       </div>
