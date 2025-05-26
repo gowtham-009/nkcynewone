@@ -348,6 +348,7 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
+    localStorage.removeItem('userkey')
     pagestatus('pan')
     emit('updateDiv', 'pan');
   }, 600)

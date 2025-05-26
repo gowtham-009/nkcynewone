@@ -1,7 +1,9 @@
 <template>
-  <div v-if="currentForm === 'pan'">
+ <div v-if="logauth">
+   <div v-if="currentForm === 'pan'">
     <form1 @updateDiv="handleUpdateDiv" />
   </div>
+ </div>
   <div v-if="currentForm === 'mobile'">
     <form2 :data="data" @updateDiv="handleUpdateDiv" />
   </div>
@@ -18,68 +20,39 @@ import form2 from '~/components/signup/form2.vue';
 import form3 from '~/components/signup/form3.vue';
 import { getServerData } from '~/utils/serverdata.js';
 
-const route = useRoute();
+
 const router = useRouter();
 
 const data = ref({});
-const currentForm = ref('pan'); // Default to PAN
+const currentForm = ref('pan');
+const logauth = ref(false);
 
-const formMap = {
-  '$@pan1': 'pan',
-  '$@mobile1': 'mobile',
-  '$@email1': 'email',
-};
 
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value;
   data.value = newData;
 };
 
-// Monitor route.query.form but restrict access unless token is present
-watch(() => route.query, (query) => {
-  const hasToken = !!query.token;
 
-  // If "form" param is present but token is missing, force PAN form and clean URL
-  if (query.form && !hasToken) {
-    currentForm.value = 'pan';
-    const cleanQuery = { ...query };
-    delete cleanQuery.form;
-    router.replace({ query: cleanQuery });
-    return;
-  }
-
-  // If token is present and form param is valid, set form
-  if (hasToken && query.form && formMap[query.form]) {
-    currentForm.value = formMap[query.form];
-  }
-}, { immediate: true });
 
 onMounted(async () => {
+  logauth.value = true; // Assuming user is logged in, adjust as needed
   const userkey = localStorage.getItem('userkey');
-  const allowedPages = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
+  const pagetext = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
 
   if (userkey) {
-    try {
-      const mydata = await getServerData();
+    logauth.value = false;
+    const mydata = await getServerData();
+    const activepage = mydata?.payload?.metaData?.profile?.pageStatus || 'pan';
 
-      const activepage = mydata?.payload?.metaData?.profile?.pageStatus;
-
-      if (!activepage || !allowedPages.includes(activepage)) {
-        router.push('/main');
-        return;
-      }
-
-      currentForm.value = activepage;
-    } catch (error) {
-      console.error('Failed to fetch server data:', error);
-      router.push('/main'); // fallback to /main if error occurs
+    if (!pagetext.includes(activepage)) {
+      router.push('/main');
+      return;
     }
-  } else {
-    const token = route.query.token;
-    if (!token) {
-      currentForm.value = 'pan';
-    }
+
+    currentForm.value = activepage;
   }
-});
 
+ 
+});
 </script>
