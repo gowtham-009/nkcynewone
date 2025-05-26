@@ -18,7 +18,7 @@
       :style="{ height: box2Height + 'px' }">
       <div class="w-full mt-2 px-2 flex flex-col justify-between">
         <span class="font-medium text-gray-500 text-md">Identity Verification</span>
-        <p class="text-xl font-semibold dark:text-gray-400">Fill Your PAN Details</p>
+        <p class="text-lg font-semibold dark:text-gray-400">Fill Your PAN Details</p>
         <p class="font-medium text-gray-500 text-md leading-5">This is required as mandated by regulator for verification
           purposes. </p>
 
