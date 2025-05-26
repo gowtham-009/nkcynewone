@@ -22,12 +22,12 @@ const route = useRoute();
 const router = useRouter();
 
 const data = ref({});
-const currentForm = ref('pan');
+const currentForm = ref('pan'); // Default to PAN
 
 const formMap = {
   '$@pan1': 'pan',
   '$@mobile1': 'mobile',
-  '$@email1': 'email'
+  '$@email1': 'email',
 };
 
 const handleUpdateDiv = (value, newData = {}) => {
@@ -35,33 +35,51 @@ const handleUpdateDiv = (value, newData = {}) => {
   data.value = newData;
 };
 
-watch(() => route.query.form, (newForm) => {
-  if (newForm && formMap[newForm]) {
-    currentForm.value = formMap[newForm];
-    router.replace({ path: '/' }); // Optional: clean URL
+// Monitor route.query.form but restrict access unless token is present
+watch(() => route.query, (query) => {
+  const hasToken = !!query.token;
+
+  // If "form" param is present but token is missing, force PAN form and clean URL
+  if (query.form && !hasToken) {
+    currentForm.value = 'pan';
+    const cleanQuery = { ...query };
+    delete cleanQuery.form;
+    router.replace({ query: cleanQuery });
+    return;
   }
-});
+
+  // If token is present and form param is valid, set form
+  if (hasToken && query.form && formMap[query.form]) {
+    currentForm.value = formMap[query.form];
+  }
+}, { immediate: true });
 
 onMounted(async () => {
   const userkey = localStorage.getItem('userkey');
-  const pagetext = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
+  const allowedPages = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
 
   if (userkey) {
-  
-    const mydata = await getServerData();
-    const activepage = mydata?.payload?.metaData?.profile?.pageStatus || 'pan';
+    try {
+      const mydata = await getServerData();
 
-    if (!pagetext.includes(activepage)) {
-      router.push('/main');
-      return;
+      const activepage = mydata?.payload?.metaData?.profile?.pageStatus;
+
+      if (!activepage || !allowedPages.includes(activepage)) {
+        router.push('/main');
+        return;
+      }
+
+      currentForm.value = activepage;
+    } catch (error) {
+      console.error('Failed to fetch server data:', error);
+      router.push('/main'); // fallback to /main if error occurs
     }
-
-    currentForm.value = activepage;
-  }
-
-  const queryForm = route.query.form;
-  if (queryForm && formMap[queryForm]) {
-    currentForm.value = formMap[queryForm];
+  } else {
+    const token = route.query.token;
+    if (!token) {
+      currentForm.value = 'pan';
+    }
   }
 });
+
 </script>

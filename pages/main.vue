@@ -1,5 +1,6 @@
 <template>
- 
+ <div v-if="authenticated">
+  
   <div v-if="currentForm === 'main'"><NKYCList @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'ekyc'"><EKYC :data="data" @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'parmanentaddress'"><PARMANENTADDRESS :data="data" @updateDiv="handleUpdateDiv" /></div>
@@ -31,6 +32,7 @@
   <div v-if="currentForm === 'bankfile'"><BANKFILE @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'csmspdf'"><CSMSPDF @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'thankyou'"><THANKYOU @updateDiv="handleUpdateDiv" /></div>
+ </div>
 
 </template>
 
@@ -72,6 +74,7 @@ import BANKFILE from '~/components/NKYC_Forms/finalstatementpage/bankfile.vue'
 import CSMSPDF from '~/components/NKYC_Forms/finalstatementpage/csms&pdf.vue'
 import THANKYOU from '~/components/NKYC_Forms/thankyou.vue'
 
+const authenticated = ref(true) // Assuming you have a way to check if the user is authenticated
 const route = useRoute()
 const router = useRouter()
 const currentForm = ref('nkyclist')
@@ -127,26 +130,30 @@ watch(() => route.query.form, (newForm) => {
 })
 
 onMounted(async () => {
-  const queryForm = route.query.form;
+  const token = localStorage.getItem('userkey');
 
-  // 🟢 Case 1: Handle manual query param in URL
-  if (queryForm && formMap[queryForm]) {
-    currentForm.value = formMap[queryForm];
-    data.value = {};
-    return; // ✅ Done
-  }
-
-  // 🔵 Case 2: Handle default form via localStorage + server
-  const userkey = localStorage.getItem('userkey');
-  if (!userkey) {
+  // 🔴 No token? Redirect to "/"
+  if (!token) {
+    authenticated.value = false;
     router.push('/');
     return;
   }
 
+  authenticated.value = true; // 🟢 Mark user as authenticated
+
+  const queryForm = route.query.form;
+
   try {
+    // 🟢 If query param exists and is valid, show that form
+    if (queryForm && formMap[queryForm]) {
+      currentForm.value = formMap[queryForm];
+      data.value = {};
+      return;
+    }
+
+    // 🔵 Otherwise, load server data to get default page
     const mydata = await getServerData();
     const activePage = mydata?.payload?.metaData?.profile?.pageStatus || 'main';
-    console.log("siurhaerh", activePage)
 
     const restrictedPages = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
     if (restrictedPages.includes(activePage)) {
@@ -155,7 +162,10 @@ onMounted(async () => {
     }
 
     currentForm.value = activePage;
-    router.replace({ path: '/main' }); // Optional: You may also add query if needed
+
+    // Optional: clean URL
+    router.replace({ path: '/main' });
+
   } catch (error) {
     console.error('Error fetching server data:', error);
     router.push('/');
