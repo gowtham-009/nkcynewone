@@ -25,7 +25,6 @@
             {{ buttonText }}
           </Button>
             </div>
-       
 
        
         </div>
@@ -40,7 +39,7 @@
 import { ref, onMounted } from 'vue';
 const emit = defineEmits(['updateDiv']);
 const deviceHeight = ref(0);
-const buttonText = ref('Get Bank Statement');
+const buttonText = ref('Back to Home');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 
@@ -110,7 +109,6 @@ if (statuscheck) {
     bseCD, bseMF,
     MCXcategory, ICEX, mseCD
   } = statuscheck;
-
   const onlyCashYes =
     nseCASH === 'YES' &&
     bseCASH === 'YES' &&
