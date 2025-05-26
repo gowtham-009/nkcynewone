@@ -141,11 +141,10 @@ const proofupload = async () => {
     const data = await response.json()
     if (data.payload.status === 'ok') {
 
-        const mydata= await pagestatus('submission', '4')
+    const mydata= await pagestatus('submission', '4')
      if(mydata.payload.status=='ok'){
        emit('updateDiv', 'submission');
      }
-    
     }
   } catch (error) {
     console.error(error.message)

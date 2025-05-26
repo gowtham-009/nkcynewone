@@ -59,7 +59,6 @@ const deviceHeight = ref(0);
 
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
-
 const rippleBtnback = ref(null)
 
 
@@ -78,8 +77,8 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
-    pagestatus('tradingsegment')
-    emit('updateDiv', 'tradingsegment');
+    pagestatus('segment1')
+    emit('updateDiv', 'segment1');
   }, 600)
    
 };

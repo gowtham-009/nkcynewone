@@ -106,7 +106,7 @@ const proofupload = async () => {
   const apiurl = `${baseurl.value}proofupload`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-    pageCode: "uploadincome",
+    pageCode: "submission",
    bank:base64value
   });
 
@@ -128,14 +128,15 @@ const proofupload = async () => {
     }
 
     const data = await response.json();
-    if (data.payload.status === 'ok') {
-        emit('updateDiv', 'uploadincome');
-
-    }
+       const mydata= await pagestatus('submission', '4')
+     if(mydata.payload.status=='ok'){
+       emit('updateDiv', 'submission');
+     }
   } catch (error) {
     console.error(error.message);
   }
 };
+
 const back = (event) => {
   const button = rippleBtnback.value;
   const circle = document.createElement('span');

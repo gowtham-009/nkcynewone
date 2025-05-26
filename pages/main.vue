@@ -1,5 +1,5 @@
 <template>
-  <!-- All forms rendered based on currentForm -->
+ 
   <div v-if="currentForm === 'main'"><NKYCList @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'ekyc'"><EKYC :data="data" @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'parmanentaddress'"><PARMANENTADDRESS :data="data" @updateDiv="handleUpdateDiv" /></div>
@@ -15,10 +15,11 @@
   <div v-if="currentForm === 'nominee'"><NOMINEE @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'bank1'"><BANK1 @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'bank4'"><BANK4 :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'tradingsegment'"><TRADINGSEGMENT :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <!-- <div v-if="currentForm === 'tradingsegment'"><TRADINGSEGMENT :data="data" @updateDiv="handleUpdateDiv" /></div> -->
+  <div v-if="currentForm === 'segment1'"><SEGMENT :data="data" @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'brokerage'"><BROKERAGE :data="data" @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'uploadproof'"><UPLOADPROOF :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'uploadincome'"><UPLOADINCOME :data="data" @updateDiv="handleUpdateDiv" /></div>
+  <!-- <div v-if="currentForm === 'uploadincome'"><UPLOADINCOME :data="data" @updateDiv="handleUpdateDiv" /></div> -->
   <div v-if="currentForm === 'uploadbank'"><UPLOADBANK :data="data" @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'photosign1'"><PHOTOSIGN1 @updateDiv="handleUpdateDiv" /></div>
   <div v-if="currentForm === 'takephoto'"><TAKEPHOTO @updateDiv="handleUpdateDiv" /></div>
@@ -55,6 +56,7 @@ import NOMINEE from '~/components/NKYC_Forms/profiledetails/nominee.vue'
 import BANK1 from '~/components/NKYC_Forms/bankdetails/bank1.vue'
 import BANK4 from '~/components/NKYC_Forms/bankdetails/bank4.vue'
 import TRADINGSEGMENT from '~/components/NKYC_Forms/account/tradingsegment.vue'
+import SEGMENT from '~/components/NKYC_Forms/account/segment.vue'
 import BROKERAGE from '~/components/NKYC_Forms/account/brokerage.vue'
 import UPLOADPROOF from '~/components/NKYC_Forms/account/uploadpan.vue'
 import UPLOADINCOME from '~/components/NKYC_Forms/account/uploadincome.vue'
@@ -93,6 +95,7 @@ const formMap = {
   '$@bank1': 'bank1',
   '$@bank4': 'bank4',
   '$@segment1': 'tradingsegment',
+  '$@segments1': 'segment1',
   '$@brokerage1': 'brokerage',
   '$@uploadproof1': 'uploadproof',
   '$@uploadincome1': 'uploadincome',

@@ -92,12 +92,11 @@ const getsegmentdata = async () => {
       mseCD: "MCX CD",
     };
 
-    // Map "YES" keys to their corresponding labels
+   
     selected.value = Object.entries(segments)
       .filter(([key, value]) => value === "YES" && allSegments[key])
       .map(([key]) => allSegments[key]);
 
-  
   } 
   else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument){
      const segments = mydata?.payload?.metaData?.segments;
@@ -121,7 +120,6 @@ const getsegmentdata = async () => {
     selected.value = Object.entries(segments)
       .filter(([key, value]) => value === "YES" && allSegments[key])
       .map(([key]) => allSegments[key]);
-
   }
   
   else {
@@ -182,7 +180,7 @@ const segmentdata = async () => {
 
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-    pageCode: "brokerage",
+    pageCode: "segment1",
     ...segmentFlags
   });
 
@@ -205,7 +203,7 @@ const segmentdata = async () => {
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
-     emit('updateDiv', 'brokerage');
+     emit('updateDiv', 'segment1');
     }
   } catch (error) {
     console.error(error.message);

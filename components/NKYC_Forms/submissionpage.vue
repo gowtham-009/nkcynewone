@@ -53,9 +53,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-
 const emit = defineEmits(['updateDiv']);
-
 const buttonText = ref('Continue');
 const rippleBtnback = ref(null)
 const rippleBtn = ref(null);
@@ -131,8 +129,8 @@ const handleButtonClick = (event) => {
         emit('updateDiv', 'bank1');
         break;
       case 3:
-         pagestatus('tradingsegment')
-        emit('updateDiv', 'tradingsegment');
+         pagestatus('segment1')
+        emit('updateDiv', 'segment1');
         break;
       case 4:
          pagestatus('photosign1')
@@ -179,8 +177,8 @@ const back = () => {
       emit('updateDiv', 'bank4');
       break;
     case 4:
-        pagestatus('uploadincome')
-      emit('updateDiv', 'uploadincome');
+        pagestatus('uploadbank')
+      emit('updateDiv', 'uploadbank');
       break;
     case 5:
         pagestatus('additionalinformation')

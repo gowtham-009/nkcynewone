@@ -1,13 +1,12 @@
 <template>
   <div class="primary_color">
-    <div class="flex justify-between primary_color items-center px-3"
-         :style="{ height: deviceHeight * 0.08 + 'px' }">
+    <div class="flex justify-between primary_color items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
       <logo style="width: 40px; height: 40px;" />
       <profile />
     </div>
 
-    <div v-if="content" class="flex justify-between items-center px-3 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
-         :style="{ height: deviceHeight * 0.92 + 'px' }">
+    <div v-if="content" class="flex justify-between items-center px-2 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
+      :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full p-1">
         <p class="text-2xl text-blue-900 font-medium dark:text-gray-400">Esign</p>
         <p class="text-sm text-gray-500 font-normal leading-6">
@@ -23,22 +22,22 @@
       </div>
 
       <div class="w-full flex gap-2">
-       <!-- Buttons -->
-<button @click="back($event)" ref="rippleBtnback"
-        class="primary_color cursor-pointer border-0 text-white w-1/6 py-4 dark:bg-slate-900 relative overflow-hidden">
-  <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-</button>
+        <!-- Buttons -->
+        <button @click="back($event)" ref="rippleBtnback"
+          class="primary_color cursor-pointer rounded-lg border-0 text-white w-1/6 py-4 dark:bg-slate-900 relative overflow-hidden">
+          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+        </button>
 
-<button @click="handleButtonClick($event)" ref="rippleBtn"
-        class="primary_color wave-btn text-white w-5/6 py-4 text-xl border-0 relative overflow-hidden">
-  {{ buttonText }}
-</button>
+        <button @click="handleButtonClick($event)" ref="rippleBtn"
+          class="primary_color wave-btn text-white w-5/6 py-4 rounded-lg text-xl border-0 relative overflow-hidden">
+          {{ buttonText }}
+        </button>
 
       </div>
     </div>
 
     <div v-if="loading" class="flex justify-center items-center p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
-         :style="{ height: deviceHeight * 0.92 + 'px' }">
+      :style="{ height: deviceHeight * 0.92 + 'px' }">
       <ProgressSpinner />
     </div>
   </div>
@@ -140,8 +139,46 @@ const esignStatusCheck = async (requestId) => {
       content.value = false;
       loading.value = true;
       route.query.documentId = null;
-      pagestatus('bankfile');
-      emit('updateDiv', 'bankfile');
+
+  const mydata = await getServerData();  
+const statuscheck = mydata?.payload?.metaData?.segments;
+
+if (statuscheck) {
+  const {
+    nseCASH, bseCASH,
+    nseFO, bseFO,
+    nseCOM, bseCOM, MCX,
+    nseCD, nseMF,
+    bseCD, bseMF,
+    MCXcategory, ICEX, mseCD
+  } = statuscheck;
+
+  const onlyCashYes =
+    nseCASH === 'YES' &&
+    bseCASH === 'YES' &&
+    nseFO !== 'YES' &&
+    bseFO !== 'YES' &&
+    nseCOM !== 'YES' &&
+    bseCOM !== 'YES' &&
+    MCX !== 'YES' &&
+    nseCD !== 'YES' &&
+    bseCD !== 'YES' &&
+    nseMF !== 'YES' &&
+    bseMF !== 'YES' &&
+    MCXcategory !== 'YES' &&
+    ICEX !== 'YES' &&
+    mseCD !== 'YES';
+
+  if (onlyCashYes) {
+    pagestatus('thankyou');
+    emit('updateDiv', 'thankyou');
+  } else {
+    pagestatus('bankfile');
+    emit('updateDiv', 'bankfile');
+  }
+}
+
+    
     }
   } catch (error) {
     console.error('Status check failed:', error.message);
@@ -202,4 +239,3 @@ const back = async (event) => {
   }
 }
 </style>
-
