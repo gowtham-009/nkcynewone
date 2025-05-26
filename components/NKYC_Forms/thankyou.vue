@@ -97,10 +97,49 @@ button.$el.appendChild(circle)
 setTimeout(async() => {
 circle.remove()
 
-  const mydata= await pagestatus('csmspdf')
+
+const mydata = await getServerData();  
+const statuscheck = mydata?.payload?.metaData?.segments;
+
+if (statuscheck) {
+  const {
+    nseCASH, bseCASH,
+    nseFO, bseFO,
+    nseCOM, bseCOM, MCX,
+    nseCD, nseMF,
+    bseCD, bseMF,
+    MCXcategory, ICEX, mseCD
+  } = statuscheck;
+
+  const onlyCashYes =
+    nseCASH === 'YES' &&
+    bseCASH === 'YES' &&
+    nseFO !== 'YES' &&
+    bseFO !== 'YES' &&
+    nseCOM !== 'YES' &&
+    bseCOM !== 'YES' &&
+    MCX !== 'YES' &&
+    nseCD !== 'YES' &&
+    bseCD !== 'YES' &&
+    nseMF !== 'YES' &&
+    bseMF !== 'YES' &&
+    MCXcategory !== 'YES' &&
+    ICEX !== 'YES' &&
+    mseCD !== 'YES';
+
+  if (onlyCashYes) {
+    pagestatus('esign');
+    emit('updateDiv', 'esign');
+  } else {
+    const mydata= await pagestatus('csmspdf')
        if(mydata.payload.status=='ok'){
          emit('updateDiv', 'csmspdf');
        }
+  }
+}
+
+
+ 
  
 }, 600)
 
