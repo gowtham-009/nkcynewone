@@ -1,40 +1,39 @@
 <template>
- <div v-if="authenticated">
-  
-  <div v-if="currentForm === 'main'"><NKYCList @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'ekyc'"><EKYC :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'parmanentaddress'"><PARMANENTADDRESS :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'failedstatus'"><FAILEDSTATUS @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'communicationaddress'"><COMMUNICATIONADDRESS :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'submission'"><SUBMISSIONFORM :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'info'"><MARRIEDSTATUS @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'clientinfo'"><CLIENTINFO @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'qualification'"><QUALIFICATION @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'occupation'"><OCCUPATION @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'tradingexperience'"><TRADINGEXPERIENCE @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'income'"><INCOME @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'nominee'"><NOMINEE @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'bank1'"><BANK1 @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'bank4'"><BANK4 :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <!-- <div v-if="currentForm === 'tradingsegment'"><TRADINGSEGMENT :data="data" @updateDiv="handleUpdateDiv" /></div> -->
-  <div v-if="currentForm === 'segment1'"><SEGMENT :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'brokerage'"><BROKERAGE :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'uploadproof'"><UPLOADPROOF :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <!-- <div v-if="currentForm === 'uploadincome'"><UPLOADINCOME :data="data" @updateDiv="handleUpdateDiv" /></div> -->
-  <div v-if="currentForm === 'uploadbank'"><UPLOADBANK :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'photosign1'"><PHOTOSIGN1 @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'takephoto'"><TAKEPHOTO @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'photoproceed'"><PHOTOPROCEED :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'signature'"><SIGNATURE @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'signdraw'"><SIGNDRAWING :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'additionalinformation'"><ADDITIONALINFO :data="data" @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'esign'"><ESIGN @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'bankfile'"><BANKFILE @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'csmspdf'"><CSMSPDF @updateDiv="handleUpdateDiv" /></div>
-  <div v-if="currentForm === 'thankyou'"><THANKYOU @updateDiv="handleUpdateDiv" /></div>
- </div>
-
+  <div v-if="authenticated">
+    <transition name="fade-slide" mode="out-in">
+      <div v-if="currentForm === 'main'"><NKYCList @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'ekyc'"><EKYC :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'parmanentaddress'"><PARMANENTADDRESS :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'failedstatus'"><FAILEDSTATUS @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'communicationaddress'"><COMMUNICATIONADDRESS :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'submission'"><SUBMISSIONFORM :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'info'"><MARRIEDSTATUS @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'clientinfo'"><CLIENTINFO @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'qualification'"><QUALIFICATION @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'occupation'"><OCCUPATION @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'tradingexperience'"><TRADINGEXPERIENCE @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'income'"><INCOME @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'nominee'"><NOMINEE @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'bank1'"><BANK1 @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'bank4'"><BANK4 :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'segment1'"><SEGMENT :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'brokerage'"><BROKERAGE :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'uploadproof'"><UPLOADPROOF :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'uploadbank'"><UPLOADBANK :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'photosign1'"><PHOTOSIGN1 @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'takephoto'"><TAKEPHOTO @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'photoproceed'"><PHOTOPROCEED :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'signature'"><SIGNATURE @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'signdraw'"><SIGNDRAWING :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'additionalinformation'"><ADDITIONALINFO :data="data" @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'esign'"><ESIGN @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'bankfile'"><BANKFILE @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'csmspdf'"><CSMSPDF @updateDiv="handleUpdateDiv" /></div>
+      <div v-else-if="currentForm === 'thankyou'"><THANKYOU @updateDiv="handleUpdateDiv" /></div>
+    </transition>
+  </div>
 </template>
+
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
@@ -175,3 +174,17 @@ onMounted(async () => {
 
 
 </script>
+<style scoped>
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.4s ease;
+}
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+</style>
