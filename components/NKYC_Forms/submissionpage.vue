@@ -43,7 +43,7 @@
         <Button @click="back"  ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" class="primary_color text-white w-5/6 py-4 text-xl border-0">
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick" class="primary_color text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
       </div>

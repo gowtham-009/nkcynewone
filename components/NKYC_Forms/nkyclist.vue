@@ -35,7 +35,7 @@
                             </div>
                             <div class="p-1">
                                 <p class="text-md font-medium text-blue-950 dark:text-gray-400">Set up your profile</p>
-                                <p class="text-sm left-4 font-normal text-gray-500">Answer a few question about yourself</p>
+                                <p class="text-sm left-4 font-normal text-gray-500 leading-4">Answer a few question about yourself</p>
                             </div>
                         </div>
 
