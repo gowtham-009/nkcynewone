@@ -111,14 +111,18 @@ const handleButtonClick = () => {
     const statuscheck = mydata.payload.metaData.kraPan.APP_KRA_INFO ;
      const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName 
     if(statuscheck && statuscheck1){
-    pagestatus('submission', '4'),
-    emit('updateDiv', 'submission');
+
+          const mydata= await pagestatus('submission', '4')
+       if(mydata.payload.status=='ok'){
+         emit('updateDiv', 'submission');
+       }
+   
     }
     else if(statuscheck && !statuscheck1){
      pagestatus('uploadbank'),
      emit('updateDiv', 'uploadbank');
     }
-    else {
+    else if(!statuscheck) {
     pagestatus('uploadproof'),
     emit('updateDiv', 'uploadproof');
     }

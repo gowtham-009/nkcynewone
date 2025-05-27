@@ -132,8 +132,19 @@ const proofupload = async () => {
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
-       pagestatus('uploadbank'),
+
+    const mydata = await getServerData();
+     const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName
+     if(statuscheck1){
+      alert('hi')
+      pagestatus('submission', '4'),
+      emit('updateDiv', 'submission');
+     }
+     else{
+      pagestatus('uploadbank'),
       emit('updateDiv', 'uploadbank');
+     }
+      
     }
   } catch (error) {
     console.error('Upload failed:', error.message);

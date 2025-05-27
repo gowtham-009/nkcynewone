@@ -161,7 +161,7 @@ const back = () => {
     circle.style.top = `${y}px`
     button.$el.appendChild(circle)
 
-    setTimeout(() => {
+    setTimeout(async() => {
         circle.remove()
         switch (statusid.value) {
     case 1:
@@ -177,8 +177,28 @@ const back = () => {
       emit('updateDiv', 'bank4');
       break;
     case 4:
-        pagestatus('uploadbank')
+    const mydata = await getServerData();
+
+    const statuscheck = mydata.payload.metaData.kraPan.APP_KRA_INFO ;
+    const statuscheck1 = mydata.payload.metaData.bank.bank1HolderName ;
+
+    if(statuscheck && statuscheck1){
+      pagestatus('brokerage')
+      emit('updateDiv', 'brokerage');
+    }
+    else if(statuscheck && !statuscheck1){
+      pagestatus('uploadbank')
       emit('updateDiv', 'uploadbank');
+    }
+    else if(!statuscheck && statuscheck1) {
+      pagestatus('uploadproof')
+      emit('updateDiv', 'uploadproof');
+    }
+    else if(!statuscheck && !statuscheck1) {
+      pagestatus('uploadbank')
+      emit('updateDiv', 'uploadbank');
+    }
+      
       break;
     case 5:
         pagestatus('additionalinformation')

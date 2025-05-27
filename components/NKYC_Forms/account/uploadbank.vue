@@ -151,7 +151,7 @@ const back = (event) => {
   setTimeout(async() => {
     circle.remove();
      const mydata = await getServerData();
-    const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' ';
+    const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO ;
     if(statuscheck){
         pagestatus('brokerage'),
     emit('updateDiv', 'brokerage');
