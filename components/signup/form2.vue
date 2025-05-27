@@ -349,11 +349,17 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    localStorage.removeItem('userkey')
-  
-    router.push('/');
+ localStorage.removeItem('userkey')
+    const mydata= await pagestatus('pan')
+       if(mydata.payload.status=='ok'){
+         emit('updateDiv', 'pan');
+       }
+
+   
+   
+
   }, 600)
 
 }
