@@ -19,9 +19,13 @@
                     <p class="text-sm mt-2 text-gray-500 font-normal leading-6" v-if="latitude && longitude">Latitude: {{ latitude }}, Longitude: {{ longitude }}</p>
                     <p v-if="errorMessage" class="text-red-500">{{ errorMessage }}</p>
                 </div>
-
+                
                 <div class="w-full p-1 mt-2 flex justify-center">
                     <CMAIDENTIFY @captured="onImageCaptured"/>
+                </div>
+
+                <div class="w-full p-1" style="border: 2px solid red;">
+
                 </div>
             </div>
 
