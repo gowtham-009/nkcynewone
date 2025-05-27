@@ -19,13 +19,13 @@
                     <p class="text-sm mt-2 text-gray-500 font-normal leading-6" v-if="latitude && longitude">Latitude: {{ latitude }}, Longitude: {{ longitude }}</p>
                     <p v-if="errorMessage" class="text-red-500">{{ errorMessage }}</p>
                 </div>
-                
+
                 <div class="w-full p-1 mt-2 flex justify-center">
                     <CMAIDENTIFY @captured="onImageCaptured"/>
                 </div>
 
-                <div class="w-full p-1" style="border: 2px solid red;">
-
+                <div v-if="photoprogress" class="w-full p-1 flex justify-center rounded-lg bg-blue-50 text-blue-500" >
+                  <p class=" text-blue-500">please Wait...</p>
                 </div>
             </div>
 
@@ -54,7 +54,7 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const imageCaptured = ref(null);
-
+const photoprogress = ref(false);
 import { watch } from 'vue'
 
 
@@ -116,7 +116,7 @@ const getCountry = async () => {
 
 
 const ipvfunction = async () => {
-
+photoprogress.value = true;
   const apiurl = `${baseurl.value}ipv`;
     const location=await getCountry()
  
