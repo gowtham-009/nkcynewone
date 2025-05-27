@@ -141,6 +141,15 @@ const camsbankdatacheck = async () => {
         pagestatus('thankyou')
         emit('updateDiv', 'thankyou');
       }
+
+      else if(data.payload.metaData.cams_create.consentStatus==='REJECTED'){
+        alert('hhh')
+        loading.value = false;
+        clearInterval(intervalId); // ✅ Stop the interval if rejected
+        content.value = true;
+
+
+      }
     }
   } catch (error) {
     console.error('camsbankdatacheck error:', error.message);
