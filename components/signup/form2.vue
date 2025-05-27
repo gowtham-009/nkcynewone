@@ -10,17 +10,17 @@
         <div class="w-full mt-2  flex flex-col justify-between">
           <div class="w-full">
             <p class="text-xl font-medium dark:text-gray-400">Ready to get started?</p>
-            <p class="text-sm font-normal text-gray-500 leading-5">Enter your mobile number to help us set up your 
+            <p class="text-sm font-normal text-gray-500 leading-5">Enter your mobile number to help us set up your
               account</p>
           </div>
 
-           <div class="w-full mt-3 flex gap-2 items-center">
+          <div class="w-full mt-3 flex gap-2 items-center">
             <div class="w-full" :class="{ 'disabled-div': mobileotp }"
               :style="mobileotp ? { pointerEvents: 'none', opacity: 0.5 } : {}">
               <MobileInput v-model="mobileNo" />
               <span v-if="errormsg" class="text-red-500">{{ errormobile }}</span>
             </div>
-           
+
           </div>
           <div class="w-full mt-4">
             <Checkbox v-model="checkboxValue" />
@@ -32,15 +32,17 @@
             OTP sent
           </p>
           <p class="text-sm leading-6  font-normal text-gray-500">
-            We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }} <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Mobile Number" />
+            We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }}
+            <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Mobile Number" />
           </p>
           <div class="w-full mt-3">
             <phoneOTP v-model="p_otp" />
             <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
 
             <div class="w-full h-12 flex justify-center gap-2">
-              <p class="text-sm font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resend Successfully <br> +91 {{
-                phoneNumber }}</p>
+              <p class="text-sm font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resend
+                Successfully <br> +91 {{
+                  phoneNumber }}</p>
             </div>
             <div class="w-full flex justify-between items-center">
               <h2 class="font-medium text-sm dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
@@ -56,16 +58,11 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button
-  ref="rippleBtn"
-  type="button"
-  label="Verify OTP"
-  class="primary_color text-white w-5/6 py-3 text-xl border-0"
-  @click="mobile_signup"
-  :disabled="isButtonDisabled"
->
-  {{ buttonText }}
-</Button>
+        <Button ref="rippleBtn" type="button" label="Verify OTP"
+          class="primary_color text-white w-5/6 py-3 text-xl border-0" @click="mobile_signup"
+          :disabled="isButtonDisabled">
+          {{ buttonText }}
+        </Button>
 
       </div>
     </div>
@@ -86,7 +83,7 @@ import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
-const timeLeft = ref(10); 
+const timeLeft = ref(10);
 const phoneNumber = ref('')
 const mobileotp = ref(false)
 const rippleBtn = ref(null)
@@ -100,35 +97,35 @@ const errormobile = ref('')
 const p_otp = ref('')
 
 const isSending = ref(false);
-const mobileNo = ref(''); 
+const mobileNo = ref('');
 
 const router = useRouter();
 const setMobileData = async () => {
   try {
     const mydata = await getServerData();
-    const kraresdata=getEncryptionData()
+    const kraresdata = getEncryptionData()
     const appKraMobile = kraresdata?.kradata?.decryptdata?.payload?.metaData?.KYC_DATA?.APP_MOB_NO || '';
     const profileMobile = mydata?.payload?.metaData?.profile?.mobileNo;
-     const kraMobile = mydata?.payload?.metaData?.kraPan?.APP_MOB_NO;
+    const kraMobile = mydata?.payload?.metaData?.kraPan?.APP_MOB_NO;
     let rawMobile = profileMobile || appKraMobile || kraMobile || '';
-      
-    console.log("krares:", appKraMobile, "nkycdata1:",profileMobile, "nkycdata2:",kraMobile)
+
+    console.log("krares:", appKraMobile, "nkycdata1:", profileMobile, "nkycdata2:", kraMobile)
 
     if (rawMobile.startsWith('91') && rawMobile.length === 12) {
       rawMobile = rawMobile.slice(2);
-  
+
     }
 
     // Show OTP input if required
-    if (mydata?.payload?.metaData?.otpVerification?.mobile?.otpVerifiedStatus=='0') {
-     
+    if (mydata?.payload?.metaData?.otpVerification?.mobile?.otpVerifiedStatus == '0') {
+
       mobileotp.value = true;
     }
 
     // Check for valid 10-digit mobile number
     const isValidMobile = /^\d{10}$/.test(rawMobile);
     mobileNo.value = isValidMobile ? rawMobile : '';
-    
+
   } catch (error) {
     console.error('Error setting mobile data:', error);
     mobileNo.value = '';
@@ -161,35 +158,35 @@ onUnmounted(() => {
 const sendmobileotp = async (resend) => {
   const apiurl = `${baseurl.value}validateMobile`;
   phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
-    const user = encryptionrequestdata({
-    otpType:'mobile',
+  const user = encryptionrequestdata({
+    otpType: 'mobile',
     mobile: mobileNo.value,
-    resend:'false',
-    pageCode:"mobile",
-    userToken:localStorage.getItem('userkey')
+    resend: 'false',
+    pageCode: "mobile",
+    userToken: localStorage.getItem('userkey')
   });
- 
+
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
- try {
-  const response = await fetch(apiurl, {
-    method: 'POST',
-    headers: {
-      'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-      'Content-Type': 'application/json',
-    },
-    body: jsonString,
-  });
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
 
-  const data = await response.json(); // Read body regardless of status
+    const data = await response.json(); // Read body regardless of status
 
-  if (!response.ok) {
-    console.error("Error:", data.message);
-    errormsg.value = data.message; // Show in UI
-    return;
-  }
+    if (!response.ok) {
+      console.error("Error:", data.message);
+      errormsg.value = data.message; // Show in UI
+      return;
+    }
 
-   // Reset the timer before starting a new one
+    // Reset the timer before starting a new one
     clearInterval(timer);
     timeLeft.value = 10; // reset countdown
     timer = setInterval(() => {
@@ -199,35 +196,35 @@ const sendmobileotp = async (resend) => {
         clearInterval(timer);
       }
     }, 1000);
-  if(resend=='resend'){
-  
-     resend_sh.value=true
-       
-  }
+    if (resend == 'resend') {
 
-  if (data.payload.status === 'ok' && data.payload.otpStatus=='0') {
-    
-    mobileotp.value=true
-    buttonText.value='Verify Otp'
+      resend_sh.value = true
 
-  }
-  else if(data.payload.status === 'ok' && data.payload.otpStatus=='1'){
- 
-     mobileotp.value=false
-    buttonText.value='Verify Otp'
-     emit('updateDiv', 'email');
-  }
-  else if(data.payload.status=='error'){
-    
-    errormsg.value=true
-    errormobile.value=data.payload.message
-     
-  }
+    }
 
-} catch (error) {
-  console.error("OTP Send Error:", error.message);
-  errormsg.value = 'Something went wrong. Please try again.';
-}
+    if (data.payload.status === 'ok' && data.payload.otpStatus == '0') {
+
+      mobileotp.value = true
+      buttonText.value = 'Verify Otp'
+
+    }
+    else if (data.payload.status === 'ok' && data.payload.otpStatus == '1') {
+
+      mobileotp.value = false
+      buttonText.value = 'Verify Otp'
+      emit('updateDiv', 'email');
+    }
+    else if (data.payload.status == 'error') {
+
+      errormsg.value = true
+      errormobile.value = data.payload.message
+
+    }
+
+  } catch (error) {
+    console.error("OTP Send Error:", error.message);
+    errormsg.value = 'Something went wrong. Please try again.';
+  }
 };
 
 
@@ -235,59 +232,59 @@ const sendmobileotp = async (resend) => {
 const otpverfication = async () => {
 
   errormobile.value = '';
-  const usekey=localStorage.getItem('userkey')
+  const usekey = localStorage.getItem('userkey')
   const apiurl = `${baseurl.value}validateMobile`;
-    const user = encryptionrequestdata({
-    userToken:usekey,
+  const user = encryptionrequestdata({
+    userToken: usekey,
     mobile: mobileNo.value,
-    verifyotp:'false',
-    otpCode:p_otp.value,
-    pageCode:"email",
+    verifyotp: 'false',
+    otpCode: p_otp.value,
+    pageCode: "email",
   });
- 
-    const payload = { payload: user };
+
+  const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
- try {
-  const response = await fetch(apiurl, {
-    method: 'POST',
-    headers: {
-      'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-      'Content-Type': 'application/json',
-    },
-    body: jsonString,
-  });
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
 
-  const data = await response.json(); // Read body regardless of status
+    const data = await response.json(); // Read body regardless of status
 
-  if (!response.ok) {
-    // Show API message even on errors like 409
-    console.error("Error:", data.message);
-    errormsg.value = data.message; // Show in UI
-    return;
-  }
+    if (!response.ok) {
+      // Show API message even on errors like 409
+      console.error("Error:", data.message);
+      errormsg.value = data.message; // Show in UI
+      return;
+    }
 
-  if (data.payload.status === 'ok') {
-     
-    emit('updateDiv', 'email');
-  }
-  else if(data.payload.status==='error'){
-    otperror.value = true
-     errorotp.value = 'Invalid OTP'
-      isSending.value=true
-  }
+    if (data.payload.status === 'ok') {
+
+      emit('updateDiv', 'email');
+    }
+    else if (data.payload.status === 'error') {
+      otperror.value = true
+      errorotp.value = 'Invalid OTP'
+      isSending.value = true
+    }
 
 
-} catch (error) {
-  console.error("OTP Send Error:", error.message);
-   errormsg.value = true;
+  } catch (error) {
+    console.error("OTP Send Error:", error.message);
+    errormsg.value = true;
     errormobile.value = 'Invalid mobile number';
-}
+  }
 };
 
-function otpclear(){
-  p_otp.value=''
-    mobileotp.value = false;
-   isSending.value=false
+function otpclear() {
+  p_otp.value = ''
+  mobileotp.value = false;
+  isSending.value = false
 
 }
 
@@ -326,11 +323,11 @@ const mobile_signup = async (event) => {
 
 watch(p_otp, (newval) => {
   if (newval.length === 4) {
-   isSending.value=false
+    isSending.value = false
   }
   else {
 
-    otperror.value=false
+    otperror.value = false
   }
 })
 
@@ -349,17 +346,13 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
- localStorage.removeItem('userkey')
-    const mydata= await pagestatus('pan')
-       if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'pan');
-       }
-
-   
-   
-
+    localStorage.removeItem('userkey')
+    const mydata = await pagestatus('pan')
+    if (mydata.payload.status == 'ok') {
+      emit('updateDiv', 'pan');
+    }
   }, 600)
 
 }
@@ -373,6 +366,6 @@ const resend_sh = ref(false)
 .disabled-div {
   cursor: not-allowed;
   background-color: #f0f0f0;
- 
+
 }
 </style>
