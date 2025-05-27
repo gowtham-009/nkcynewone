@@ -28,7 +28,7 @@ const router = useRouter();
 
 const data = ref({});
 const currentForm = ref('pan');
-const logauth = ref(false);
+const logauth = ref(true);
 
 
 const handleUpdateDiv = (value, newData = {}) => {
@@ -39,7 +39,6 @@ const handleUpdateDiv = (value, newData = {}) => {
 
 
 onMounted(async () => {
-  logauth.value = true; // Assuming user is logged in, adjust as needed
   const userkey = localStorage.getItem('userkey');
   const pagetext = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
 
