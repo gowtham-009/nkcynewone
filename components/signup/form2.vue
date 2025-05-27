@@ -73,6 +73,7 @@
 </template>
 
 <script setup>
+import { useRoute, useRouter } from 'vue-router'
 import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import phoneOTP from '~/components/forminputs/otpinput.vue'
 import MobileInput from '~/components/forminputs/mobileinput.vue';
@@ -100,6 +101,8 @@ const p_otp = ref('')
 
 const isSending = ref(false);
 const mobileNo = ref(''); 
+
+const router = useRouter();
 const setMobileData = async () => {
   try {
     const mydata = await getServerData();
@@ -350,6 +353,7 @@ const back = () => {
     circle.remove()
     localStorage.removeItem('userkey')
     pagestatus('pan')
+    router.push('/');
     emit('updateDiv', 'pan');
   }, 600)
 
