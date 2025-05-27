@@ -54,10 +54,8 @@ onBeforeUnmount(() => {
 })
 
 async function logout() {
-
-     //router.push('/');
       localStorage.removeItem('userkey')
-      window.location.reload()
+       router.push('/');
 
 //   try {
 //     const cache = await caches.open("my-cache");
