@@ -143,7 +143,7 @@ const camsbankdatacheck = async () => {
       }
 
       else if(data.payload.metaData.cams_create.consentStatus==='REJECTED'){
-        alert('hhh')
+      
         loading.value = false;
         clearInterval(intervalId); // ✅ Stop the interval if rejected
         content.value = true;
