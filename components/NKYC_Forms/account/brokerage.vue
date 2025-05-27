@@ -1,18 +1,18 @@
 <template>
     <div class="primary_color">
         <div class="flex justify-between primary_color items-center px-3"
-            :style="{ height: deviceHeight * 0.08 + 'px' }">
-            <logo style="width: 40px; height: 40px;" />
-            <profile />
+            :style="{ height: deviceHeight * 0.08 + 'px' }"> 
+            <logo style="width: 40px; height: 40px;"/>
+            <profile/>
         </div>
-
+        
         <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
-
+            
             <!-- Income Selection -->
             <div class="w-full mt-1 px-2 p-1">
                 <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
-                    Brokerage details
+                   Brokerage details
                 </p>
                 <p class="text-sm  text-gray-500 font-normal leading-5">
                     These details are required by SEBI to open your Demat account.
@@ -20,38 +20,28 @@
 
 
                 <div class="w-full mt-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-900">
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
-                        <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY DELIVERY</span><span
-                            class="text-sm font-normal text-gray-500">:0.5%</span></p>
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
-                        <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY INTRADAY</span><span
-                            class="text-sm font-normal text-gray-500">:0.1%</span></p>
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
-                        <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY FUTURES</span><span
-                            class="text-sm font-normal text-gray-500">:0.05%</span></p>
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
-                        <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY OPTIONS</span><span
-                            class="text-sm font-normal text-gray-500">:RS.100 PER LOT OR ORDER</span></p>
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
-                        <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">MCX FUTURES</span><span
-                            class="text-sm font-normal text-gray-500">:0.06%</span></p>
-                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
-                        <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">MCX OPTIONS</span><span
-                            class="text-sm font-normal text-gray-500">:RS.100 PER LOT</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY DELIVERY</span><span class="text-sm font-normal text-gray-500">:0.5%</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY INTRADAY</span><span class="text-sm font-normal text-gray-500">:0.1%</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY FUTURES</span><span class="text-sm font-normal text-gray-500">:0.05%</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY OPTIONS</span><span class="text-sm font-normal text-gray-500">:RS.100 PER LOT OR ORDER</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">MCX FUTURES</span><span class="text-sm font-normal text-gray-500">:0.06%</span></p>
+                    <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i> <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">MCX OPTIONS</span><span class="text-sm font-normal text-gray-500">:RS.100 PER LOT</span></p>
 
                 </div>
-
-
+                
+              
             </div>
 
             <!-- Submit Button -->
             <div class="w-full flex gap-2">
-                <Button @click="back()" ref="rippleBtnback"
-                    class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-                    <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-                </Button>
-                <Button type="button" ref="rippleBtn" @click="handleButtonClick"
-                    class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
+                <Button @click="back()" ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+                <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+            </Button>
+                <Button 
+                    type="button"  ref="rippleBtn"  
+                    @click="handleButtonClick" 
+                    class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0"
+                >
                     {{ buttonText }}
                 </Button>
             </div>
@@ -74,23 +64,23 @@ const rippleBtnback = ref(null)
 
 const back = () => {
     const button = rippleBtnback.value
-    const circle = document.createElement('span')
-    circle.classList.add('ripple')
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
 
-    const rect = button.$el.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
 
-    circle.style.left = `${x}px`
-    circle.style.top = `${y}px`
-    button.$el.appendChild(circle)
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+  button.$el.appendChild(circle)
 
-    setTimeout(() => {
-        circle.remove()
-        pagestatus('segment1')
-        emit('updateDiv', 'segment1');
-    }, 600)
-
+  setTimeout(() => {
+    circle.remove()
+    pagestatus('segment1')
+    emit('updateDiv', 'segment1');
+  }, 600)
+   
 };
 
 onMounted(() => {
@@ -100,41 +90,40 @@ onMounted(() => {
     });
 });
 
-const handleButtonClick = async (event) => {
-    const button = rippleBtn.value;
-    const circle = document.createElement('span');
-    circle.classList.add('ripple');
+const handleButtonClick = () => {
+ 
+    const button = rippleBtn.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
 
-    const rect = button.$el.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
 
-    circle.style.left = `${x}px`;
-    circle.style.top = `${y}px`;
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
 
-    button.$el.appendChild(circle);
+  button.$el.appendChild(circle)
 
-    setTimeout(async () => {
-        circle.remove();
+  setTimeout(async() => {
+    circle.remove()
+    const mydata = await getServerData();
+    const statuscheck = mydata.payload.metaData.kraPan.APP_KRA_INFO ;
+     const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName 
+    if(statuscheck && statuscheck1){
+    pagestatus('submission', '4'),
+    emit('updateDiv', 'submission');
+    }
+    else if(statuscheck && !statuscheck1){
+     pagestatus('uploadbank'),
+     emit('updateDiv', 'uploadbank');
+    }
+    else {
+    pagestatus('uploadproof'),
+    emit('updateDiv', 'uploadproof');
+    }
 
-        const mydata = await getServerData();
-        const statuscheck = mydata.payload.metaData.kraPan.APP_KRA_INFO;
-        const statuscheck1 = mydata.payload.metaData.bank.bank1HolderName;
-
-        if (statuscheck && statuscheck1) {
-            const submissionData = await pagestatus('submission', '4');
-            if (submissionData.payload.status === 'ok') {
-                emit('updateDiv', 'submission');
-            }
-        } else if (statuscheck) {
-            await pagestatus('uploadbank');
-            emit('updateDiv', 'uploadbank');
-        } else if (statuscheck1) {
-            await pagestatus('uploadproof');
-            emit('updateDiv', 'uploadproof');
-        }
-
-    }, 600);
+    
+  }, 600)
 };
-
 </script>
