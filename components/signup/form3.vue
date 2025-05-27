@@ -2,7 +2,7 @@
   <div class="primary_color">
     <div class="flex justify-between items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
       <logo style="width: 40px; height: 40px;" />
-      <ThemeSwitch />
+       <profile />
     </div>
     <div class="flex justify-between  p-2 px-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
@@ -267,7 +267,8 @@ const sendemailotp = async (resend) => {
       else if(data.payload.status == 'ok' && data.payload.otpStatus==1){
        
         emailbox.value=false
-        router.push('/main')
+         pagestatus('main')
+    emit('updateDiv', 'main');
       }
       else if(data.payload.status == 'error'){
           erroremail.value=true
@@ -311,7 +312,8 @@ const otpverfication = async () => {
     else {
       const data = await response.json()
       if(data.payload.status=='ok'){
-       router.push('/main')
+        pagestatus('main')
+    emit('updateDiv', 'main');
       }
        else if(data.payload.status==='error'){
     otperror.value = true

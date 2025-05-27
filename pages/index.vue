@@ -6,12 +6,7 @@
  </div>
 
   <transition name="fade-slide" mode="out-in">
-  <div v-if="currentForm === 'mobile'">
-    <form2 :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
-  <div v-else-if="currentForm === 'email'">
-    <form3 :data="data" @updateDiv="handleUpdateDiv" />
-  </div>
+ 
   </transition>
 </template>
 
@@ -19,8 +14,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import form1 from '~/components/signup/form1.vue';
-import form2 from '~/components/signup/form2.vue';
-import form3 from '~/components/signup/form3.vue';
+
 import { getServerData } from '~/utils/serverdata.js';
 
 
@@ -28,7 +22,7 @@ const router = useRouter();
 
 const data = ref({});
 const currentForm = ref('pan');
-const logauth = ref(true);
+const logauth = ref(false);
 
 
 const handleUpdateDiv = (value, newData = {}) => {
@@ -40,7 +34,7 @@ const handleUpdateDiv = (value, newData = {}) => {
 
 onMounted(async () => {
   const userkey = localStorage.getItem('userkey');
-  const pagetext = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
+  const pagetext = ['pan'];
 
   if (userkey) {
     logauth.value = false;
@@ -53,6 +47,9 @@ onMounted(async () => {
     }
 
     currentForm.value = activepage;
+  }
+  else{
+    logauth.value = true;
   }
 
  

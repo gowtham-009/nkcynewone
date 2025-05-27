@@ -2,7 +2,7 @@
   <div class="primary_color">
     <div class="flex justify-between primary_color items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
       <logo style="width: 40px; height: 40px;" />
-      <ThemeSwitch />
+       <profile />
     </div>
     <div class="flex justify-between  p-1 px-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
@@ -52,15 +52,15 @@
       </div>
 
       <div class="w-full flex gap-2">
-        <Button ref="rippleBtnback" @click="back()"
+        <!-- <Button ref="rippleBtnback" @click="back()"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
+        </Button> -->
         <Button
   ref="rippleBtn"
   type="button"
   label="Verify OTP"
-  class="primary_color text-white w-5/6 py-3 text-xl border-0"
+  class="primary_color text-white w-full py-3 text-xl border-0"
   @click="mobile_signup"
   :disabled="isButtonDisabled"
 >
@@ -356,7 +356,7 @@ const back = () => {
     localStorage.removeItem('userkey')
     pagestatus('pan')
     emit('updateDiv', 'pan');
-     window.location.reload()
+     
   }, 600)
 
 }

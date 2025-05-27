@@ -67,6 +67,7 @@ import { encryptionrequestdata } from '~/utils/globaldata.js';
 import { kradatares } from '~/utils/kradata.js';
 
 const router=useRouter()
+
 const { baseurl } = globalurl();
 const panerror = ref(false);
 const panvalue = ref('');
@@ -244,7 +245,7 @@ const handleButtonClick = async () => {
         const mydata = await getServerData();
         const statuscheck = mydata?.payload?.metaData?.profile?.pageStatus;
 
-        const pagetext = ['pan', 'mobile', 'mobileotp', 'email', 'emailotp'];
+        const pagetext = ['pan'];
 
         if (statuscheck) {
           const matchedPage = pagetext.find(page =>
@@ -271,7 +272,8 @@ const handleButtonClick = async () => {
 
         if (kycData?.APP_KRA_INFO || kycData?.APP_ERROR_DESC === 'PAN NOT FOUND') {
           localStorage.setItem('userkey', data.payload.userKey);
-          emit('updateDiv', 'mobile');
+          
+          router.push('/main'); // Redirect to main page
         } else if (metaData?.loginStatus === 0) {
           // Start OTP timer
           timer = setInterval(() => {

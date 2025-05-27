@@ -57,22 +57,7 @@ async function logout() {
       localStorage.removeItem('userkey')
        router.push('/');
 
-//   try {
-//     const cache = await caches.open("my-cache");
-//     const success = await cache.delete("/my-value");
 
-//     if (success) {
-//       router.push('/');
-//       localStorage.removeItem('userkey')
-    
-//     } else {
-//       console.log("Cache entry not found or couldn't be removed.");
-    
-//     }
-//   } catch (error) {
-//     console.error("An error occurred while clearing the cache:", error);
-//     // Do not redirect on error
-//   }
 }
 
 </script>

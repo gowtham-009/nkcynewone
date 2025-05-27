@@ -184,7 +184,7 @@ function back() {
   setTimeout(() => {
     circle.remove()
 pagestatus('email')
- router.push('/');
+ emit('updateDiv', 'email');
   }, 600)
    
 }
