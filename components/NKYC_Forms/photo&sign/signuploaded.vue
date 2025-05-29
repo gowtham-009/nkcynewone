@@ -32,6 +32,10 @@
                     <p class="text-blue-950 font-normal text-sm text-center dark:text-gray-400">Signature looking different?</p>
                     <p @click="fileUpload()" class="text-center font-medium text-blue-600 mt-3 text-lg py-2 border-2 rounded-lg">Upload Photo</p>
                 </div>
+
+                <div class="w-full p-1" style="border: 2px solid red;">
+
+                </div>
             </div>
             <div class="w-full flex gap-2" >
                 <Button @click="back()" ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">

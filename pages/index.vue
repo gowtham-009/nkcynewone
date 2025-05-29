@@ -11,26 +11,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import form1 from '~/components/signup/form1.vue';
-
 import { getServerData } from '~/utils/serverdata.js';
-
+import useGeolocation from '~/composables/useGeolocation.js'; // ⬅️ Import composable
 
 const router = useRouter();
-
 const data = ref({});
 const currentForm = ref('pan');
 const logauth = ref(false);
 
+// Get location when component mounts
+const { latitude, longitude, errorMessage } = useGeolocation(); // ⬅️ Use composable
 
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value;
   data.value = newData;
 };
-
-
 
 onMounted(async () => {
   const userkey = localStorage.getItem('userkey');
@@ -47,14 +45,12 @@ onMounted(async () => {
     }
 
     currentForm.value = activepage;
-  }
-  else{
+  } else {
     logauth.value = true;
   }
-
- 
 });
 </script>
+
 <style scoped>
 .fade-slide-enter-active,
 .fade-slide-leave-active {

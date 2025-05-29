@@ -30,7 +30,7 @@
                 </div>
 
 
-                <div v-if="cmabox" class="w-full p-1 mt-2 flex justify-center">
+                <div  class="w-full p-1 mt-2 flex justify-center">
                     <CMAIDENTIFY @captured="onImageCaptured"/>
                 </div>
 
@@ -66,7 +66,6 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const imageCaptured = ref(null);
 const photoprogress = ref(false);
-const cmabox=ref(false)
 
 
 
@@ -81,9 +80,7 @@ watch([latitude, longitude], ([lat, lng]) => {
   if (lat !== null && lng !== null) {
     locationloading.value = false;
     location.value = true;
-    if(location.value){
-      cmabox.value=true
-    }
+   
     getCountry(); 
   }
 });
