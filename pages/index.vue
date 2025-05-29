@@ -1,12 +1,15 @@
 <template>
- <div v-if="logauth">
-   <div v-if="currentForm === 'pan'">
-    <form1 @updateDiv="handleUpdateDiv" />
+  <div v-if="logauth">
+    <div v-if="currentForm === 'pan'">
+      <form1 @updateDiv="handleUpdateDiv" />
+    </div>
   </div>
- </div>
+
+  <!-- You can add error display if needed -->
+  <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
   <transition name="fade-slide" mode="out-in">
- 
+    <!-- Your transition content here -->
   </transition>
 </template>
 
@@ -15,7 +18,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import form1 from '~/components/signup/form1.vue';
 import { getServerData } from '~/utils/serverdata.js';
-import useGeolocation from '~/composables/useGeolocation.js'; // ⬅️ Import composable
+import useGeolocation from '~/composables/useGeolocation.js';
 
 const router = useRouter();
 const data = ref({});
@@ -23,7 +26,7 @@ const currentForm = ref('pan');
 const logauth = ref(false);
 
 // Get location when component mounts
-const { latitude, longitude, errorMessage } = useGeolocation(); // ⬅️ Use composable
+const { latitude, longitude, errorMessage } = useGeolocation();
 
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value;
@@ -63,5 +66,9 @@ onMounted(async () => {
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateY(-20px);
+}
+.error {
+  color: red;
+  padding: 1rem;
 }
 </style>
