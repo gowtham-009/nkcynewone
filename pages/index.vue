@@ -1,20 +1,20 @@
 <template>
-  <div v-if="logauth">
+  <!-- Show error if location is denied -->
+  <div v-if="errorMessage">
+    <p class="text-red-600 text-center">{{ errorMessage }}</p>
+  </div>
+
+  <!-- Show form only when location is granted and logauth is true -->
+  <div v-if="locationReady && logauth">
     <div v-if="currentForm === 'pan'">
       <form1 @updateDiv="handleUpdateDiv" />
     </div>
   </div>
 
-  <!-- You can add error display if needed -->
-  <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
-
-  <transition name="fade-slide" mode="out-in">
-    <!-- Your transition content here -->
-  </transition>
+ 
 </template>
-
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import form1 from '~/components/signup/form1.vue';
 import { getServerData } from '~/utils/serverdata.js';
@@ -25,8 +25,17 @@ const data = ref({});
 const currentForm = ref('pan');
 const logauth = ref(false);
 
-// Get location when component mounts
+// Import geolocation state
 const { latitude, longitude, errorMessage } = useGeolocation();
+
+// Helper: check if geolocation is granted
+const locationReady = ref(false);
+
+watch([latitude, longitude], ([lat, long]) => {
+  if (lat !== null && long !== null) {
+    locationReady.value = true;
+  }
+});
 
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value;
@@ -53,22 +62,3 @@ onMounted(async () => {
   }
 });
 </script>
-
-<style scoped>
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.4s ease;
-}
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
-}
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-.error {
-  color: red;
-  padding: 1rem;
-}
-</style>
