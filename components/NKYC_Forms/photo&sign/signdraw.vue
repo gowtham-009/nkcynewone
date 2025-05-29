@@ -21,6 +21,10 @@
                   <Button  @click="triggerUpload" class="primary_color text-white" icon="pi pi-plus" label="Upload Signature"></Button>
                   <input type="file" accept="image/*" ref="fileInput" @change="uploadImage" style="display: none" />
                 </div>
+
+                <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2" >
+                  <p class="text-sm text-blue-500">Please Wait...</p>
+                </div>
               </div>
 
             
@@ -49,6 +53,7 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const canvasRef = ref(null);
+const loading=ref(false)
 let ctx = null;
 let isDrawing = false;
 const isImageUploaded = ref(false);
@@ -214,6 +219,7 @@ const emit = defineEmits(['updateDiv']);
 
 
 const uploadsign = async () => {
+  loading.value=true
   const apiurl = `${baseurl.value}proofupload`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),

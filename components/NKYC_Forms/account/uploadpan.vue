@@ -23,6 +23,10 @@
               </div>
             </div>
           </div>
+
+            <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2" >
+                  <p class="text-sm text-blue-500">Please Wait...</p>
+                </div>
         </div>
       </div>
 
@@ -56,7 +60,7 @@ const buttonText = ref('Next');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const imageSrcpan = ref( null);
-
+const loading=ref(false)
 
 const getsegmentdata = async () => {
   const mydata = await getServerData();
@@ -103,7 +107,7 @@ const proofupload = async () => {
     console.error('No image to upload');
     return;
   }
-
+loading.value=true
   const base64value = await urlToBase64(imageSrcpan.value);
   const apiurl = `${baseurl.value}proofupload`;
 
