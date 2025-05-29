@@ -1,10 +1,28 @@
 <template>
-  <div class=" flex flex-col justify-center items-center">
-    <div class="camera-wrapper" :class="{ captured: imageCaptured }">
-      <video ref="video" autoplay playsinline v-if="!imageCaptured && cameraActive" class="camera-video" />
-      <img v-if="imageCaptured" :src="capturedImage" alt="Captured Face" class="camera-image" />
+  <div class="flex flex-col justify-center items-center">
+    <div
+      class="camera-wrapper"
+      :class="{
+        captured: imageCaptured,
+        'centered-capture-ready': faceProperlyVisible && isNoseCenteredFlag,
+      }"
+    >
+      <video
+        ref="video"
+        autoplay
+        playsinline
+        v-if="!imageCaptured && cameraActive"
+        class="camera-video"
+      />
+      <img
+        v-if="imageCaptured"
+        :src="capturedImage"
+        alt="Captured Face"
+        class="camera-image"
+      />
       <canvas ref="canvas" class="hidden"></canvas>
     </div>
+
     <span class="mt-3 dark:text-gray-400">
       Face distance score: {{ faceDistanceScore.toFixed(2) }}%
     </span>
@@ -16,9 +34,11 @@
     </span>
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import * as faceapi from 'face-api.js'
+
 const emit = defineEmits(['captured'])
 
 const video = ref(null)
@@ -29,32 +49,38 @@ const cameraActive = ref(true)
 const faceDistanceScore = ref(0)
 const faceProperlyVisible = ref(false)
 const eyesClosed = ref(false)
+const blinkDetected = ref(false)
+const isNoseCenteredFlag = ref(false)
+
 const lastLeftEyeDistance = ref(0)
 const lastRightEyeDistance = ref(0)
-const blinkDetected = ref(false)
 
 let mediaStream = null
 
-// 📐 Adjustable frame size and center logic
+// Frame settings
 const FRAME_WIDTH = 320
 const FRAME_HEIGHT = 320
-const FRAME_CENTER = { x: FRAME_WIDTH / 2, y: FRAME_HEIGHT / 2 }
-const MAX_ALLOWED_DISTANCE =100
-const CAPTURE_DISTANCE_THRESHOLD = 75
+const FRAME_CENTER = ref({ x: FRAME_WIDTH / 2, y: FRAME_HEIGHT / 2 })
+const MAX_ALLOWED_DISTANCE = 100
+const CAPTURE_CENTER_TOLERANCE = 15 // nose must be within 15px of center
 const MIN_DETECTION_SCORE = 0.5
-const EYE_CLOSED_THRESHOLD = 2 // Threshold for eyes being closed (in pixels)
-const BLINK_THRESHOLD = 1 // Threshold for detecting a sudden blink
+const EYE_CLOSED_THRESHOLD = 2
+const BLINK_THRESHOLD = 1
 
-// Load models for face detection and landmarks
 const loadModels = async () => {
   await faceapi.nets.tinyFaceDetector.loadFromUri('/models/tiny_face_detector')
   await faceapi.nets.faceLandmark68Net.loadFromUri('/models/face_landmark_68')
 }
 
-// Calculate Euclidean distance
 const distance = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y)
 
-// Detect faces and eyes
+const isNoseCentered = (nosePos, center) => {
+  return (
+    Math.abs(nosePos.x - center.x) <= CAPTURE_CENTER_TOLERANCE &&
+    Math.abs(nosePos.y - center.y) <= CAPTURE_CENTER_TOLERANCE
+  )
+}
+
 const detectFaces = async () => {
   if (!video.value || video.value.readyState !== 4 || imageCaptured.value) return
 
@@ -75,35 +101,27 @@ const detectFaces = async () => {
 
   const detection = detections[0]
   const landmarks = detection.landmarks
-  const nose = landmarks.getNose()[3] // Nose tip
+  const nose = landmarks.getNose()[3]
   const leftEye = landmarks.getLeftEye()
   const rightEye = landmarks.getRightEye()
 
-  // Calculate the distance between upper and lower eyelids for both eyes
   const leftEyeDistance = distance(leftEye[1], leftEye[5])
   const rightEyeDistance = distance(rightEye[1], rightEye[5])
 
-  // Check for sudden blink (sharp change in distance)
-  if (Math.abs(leftEyeDistance - lastLeftEyeDistance.value) > BLINK_THRESHOLD || 
-      Math.abs(rightEyeDistance - lastRightEyeDistance.value) > BLINK_THRESHOLD) {
-    if (!blinkDetected.value) {
-    //  alert('❌Please keep your eyes open for capture.')
-      blinkDetected.value = true
-    }
+  if (
+    Math.abs(leftEyeDistance - lastLeftEyeDistance.value) > BLINK_THRESHOLD ||
+    Math.abs(rightEyeDistance - lastRightEyeDistance.value) > BLINK_THRESHOLD
+  ) {
+    blinkDetected.value = true
   } else {
     blinkDetected.value = false
   }
 
-  // Store the previous eye distances for comparison
   lastLeftEyeDistance.value = leftEyeDistance
   lastRightEyeDistance.value = rightEyeDistance
 
-  // Check if eyes are closed
-  if (leftEyeDistance < EYE_CLOSED_THRESHOLD && rightEyeDistance < EYE_CLOSED_THRESHOLD) {
-    eyesClosed.value = true
-  } else {
-    eyesClosed.value = false
-  }
+  eyesClosed.value =
+    leftEyeDistance < EYE_CLOSED_THRESHOLD && rightEyeDistance < EYE_CLOSED_THRESHOLD
 
   const videoBox = video.value.getBoundingClientRect()
   const scaleX = video.value.videoWidth / videoBox.width
@@ -111,42 +129,46 @@ const detectFaces = async () => {
 
   const nosePosition = {
     x: nose.x / scaleX,
-    y: nose.y / scaleY
+    y: nose.y / scaleY,
   }
 
-  const distToCenter = distance(nosePosition, FRAME_CENTER)
+  const distToCenter = distance(nosePosition, FRAME_CENTER.value)
+  faceDistanceScore.value = Math.max(
+    0,
+    Math.min(100, 100 - (distToCenter / MAX_ALLOWED_DISTANCE) * 100)
+  )
 
-  const normalizedScore = Math.max(0, Math.min(100, 100 - (distToCenter / MAX_ALLOWED_DISTANCE) * 100))
-  faceDistanceScore.value = normalizedScore
   faceProperlyVisible.value = detection.detection.score > MIN_DETECTION_SCORE
+  isNoseCenteredFlag.value = isNoseCentered(nosePosition, FRAME_CENTER.value)
 
-  if (normalizedScore >= CAPTURE_DISTANCE_THRESHOLD && faceProperlyVisible.value && !eyesClosed.value) {
+  if (
+    isNoseCenteredFlag.value &&
+    faceProperlyVisible.value &&
+    !eyesClosed.value &&
+    !blinkDetected.value
+  ) {
     captureImage()
   }
 }
 
-// Capture the image from the video stream
 const captureImage = () => {
   const ctx = canvas.value.getContext('2d')
   canvas.value.width = video.value.videoWidth
   canvas.value.height = video.value.videoHeight
   ctx.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height)
   capturedImage.value = canvas.value.toDataURL('image/png')
-  emit('captured', capturedImage.value) // 👈 Emit to parent
+  emit('captured', capturedImage.value)
   imageCaptured.value = true
   stopCamera()
 }
 
-
-// Stop the camera stream
 const stopCamera = () => {
   if (mediaStream) {
-    mediaStream.getTracks().forEach(track => track.stop())
+    mediaStream.getTracks().forEach((track) => track.stop())
     cameraActive.value = false
   }
 }
 
-// Start the face detection loop
 const startDetectionLoop = () => {
   const loop = async () => {
     await detectFaces()
@@ -158,7 +180,9 @@ const startDetectionLoop = () => {
 onMounted(async () => {
   await loadModels()
   try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({ video: { width: FRAME_WIDTH, height: FRAME_HEIGHT } })
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: { width: FRAME_WIDTH, height: FRAME_HEIGHT },
+    })
     video.value.srcObject = mediaStream
     video.value.onloadeddata = () => startDetectionLoop()
   } catch (err) {
@@ -166,8 +190,6 @@ onMounted(async () => {
   }
 })
 </script>
-
-
 
 <style scoped>
 .camera-wrapper {
@@ -179,7 +201,6 @@ onMounted(async () => {
   box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
   position: relative;
 }
-
 .camera-wrapper::before {
   content: "";
   position: absolute;
@@ -198,19 +219,19 @@ onMounted(async () => {
   width: 2px;
   background: rgba(0, 0, 0, 0.3);
 }
-
-.camera-wrapper.captured {
+.camera-wrapper.centered-capture-ready {
   border-color: #00FF00;
   box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
 }
-
+.camera-wrapper.captured {
+  border-color: #00FF00;
+}
 .camera-video,
 .camera-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-
 canvas.hidden {
   display: none;
 }
