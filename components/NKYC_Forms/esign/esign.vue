@@ -117,7 +117,7 @@ const esignStatusCheck = async (requestId) => {
   const apiurl = `${baseurl.value}esign`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-    pageCode: 'bankfile',
+
     esignId: requestId,
     esignAction: 'checkEsignStatus',
   });
@@ -170,9 +170,11 @@ if (statuscheck) {
     mseCD !== 'YES';
 
   if (onlyCashYes) {
+   
     pagestatus('thankyou');
     emit('updateDiv', 'thankyou');
   } else {
+    
     pagestatus('bankfile');
     emit('updateDiv', 'bankfile');
   }

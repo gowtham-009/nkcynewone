@@ -59,6 +59,10 @@
             <Address v-model="address" class="mt-1" />
           </div>
 
+            <div v-if="errorbox" class="w-full px-2 py-2 mt-1 rounded-lg bg-red-50">
+              <p class=" text-sm text-red-600 leading-4 text-center">{{ errormsg }}</p>
+          </div>
+
           <div v-if="waitingbox" class="w-full px-2 py-2 mt-1 rounded-lg bg-blue-50">
               <p class=" text-sm text-blue-600 leading-4 text-center">Please wait. We're depositing ₹1 to your account to verify your bank details</p>
           </div>
@@ -115,9 +119,9 @@ const ifsc = ref("");
 const micr = ref("");
 const address = ref("");
 const selected = ref('SAVING')
-
+const errorbox=ref(false)
 const waitingbox=ref(false)
-
+const errormsg=ref('')
 
 const profilesetinfo = async () => {
   const mydata = await getServerData();
@@ -195,7 +199,16 @@ const getbankaddress = async (ifscval) => {
 
 
 const bankvalidation = async () => {
-      waitingbox.value=true
+
+    const mydata = await getServerData();
+  const statuscheck = mydata.payload.metaData.bank?.bank1AccNo
+  if(statuscheck==accno.value){
+     waitingbox.value=false
+  }
+  else{
+    waitingbox.value=true
+  }
+     
    const apiurl = `${baseurl.value}bank`;
    const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -230,13 +243,17 @@ const bankvalidation = async () => {
     const data = await response.json();
  
     if (data?.payload?.metaData?.bankVerifyStatus==1) {
-      
+          errorbox.value=false
       emit('updateDiv', 'bank4');
 
     }
-    else {
-     
-      emit('updateDiv', 'bank4');
+    else if(data.payload.status=='error') {
+      errorbox.value=true
+      errormsg.value=data.payload.message
+      waitingbox.value=false
+    }
+    else{
+       emit('updateDiv', 'bank4');
     }
 
 

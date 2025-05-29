@@ -129,9 +129,9 @@ if (statuscheck) {
     pagestatus('esign');
     emit('updateDiv', 'esign');
   } else {
-    const mydata= await pagestatus('csmspdf')
+    const mydata= await pagestatus('bankfile')
        if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'csmspdf');
+         emit('updateDiv', 'bankfile');
        }
   }
 }

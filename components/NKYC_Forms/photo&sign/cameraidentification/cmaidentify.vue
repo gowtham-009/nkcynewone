@@ -41,7 +41,7 @@ const FRAME_HEIGHT = 320
 const FRAME_CENTER = { x: FRAME_WIDTH / 2, y: FRAME_HEIGHT / 2 }
 const MAX_ALLOWED_DISTANCE =100
 const CAPTURE_DISTANCE_THRESHOLD = 75
-const MIN_DETECTION_SCORE = 0.7
+const MIN_DETECTION_SCORE = 0.5
 const EYE_CLOSED_THRESHOLD = 2 // Threshold for eyes being closed (in pixels)
 const BLINK_THRESHOLD = 1 // Threshold for detecting a sudden blink
 
@@ -171,8 +171,8 @@ onMounted(async () => {
 
 <style scoped>
 .camera-wrapper {
-  width: 300px;
-  height: 300px;
+  width: 370px;
+  height: 370px;
   border-radius: 50%;
   overflow: hidden;
   border: 4px solid #00BFFF;

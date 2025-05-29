@@ -88,9 +88,7 @@
       <div v-else-if="currentForm === 'bankfile'">
         <BANKFILE @updateDiv="handleUpdateDiv" />
       </div>
-      <div v-else-if="currentForm === 'csmspdf'">
-        <CSMSPDF @updateDiv="handleUpdateDiv" />
-      </div>
+     
       <div v-else-if="currentForm === 'thankyou'">
         <THANKYOU @updateDiv="handleUpdateDiv" />
       </div>
@@ -122,7 +120,7 @@ import INCOME from '~/components/NKYC_Forms/profiledetails/incomestatus.vue'
 import NOMINEE from '~/components/NKYC_Forms/profiledetails/nominee.vue'
 import BANK1 from '~/components/NKYC_Forms/bankdetails/bank1.vue'
 import BANK4 from '~/components/NKYC_Forms/bankdetails/bank4.vue'
-import TRADINGSEGMENT from '~/components/NKYC_Forms/account/tradingsegment.vue'
+
 import SEGMENT from '~/components/NKYC_Forms/account/segment.vue'
 import BROKERAGE from '~/components/NKYC_Forms/account/brokerage.vue'
 import UPLOADPROOF from '~/components/NKYC_Forms/account/uploadpan.vue'
@@ -136,7 +134,7 @@ import SIGNDRAWING from '~/components/NKYC_Forms/photo&sign/signdraw.vue'
 import ADDITIONALINFO from '~/components/NKYC_Forms/photo&sign/documentconfirmation.vue'
 import ESIGN from '~/components/NKYC_Forms/esign/esign.vue'
 import BANKFILE from '~/components/NKYC_Forms/finalstatementpage/bankfile.vue'
-import CSMSPDF from '~/components/NKYC_Forms/finalstatementpage/csms&pdf.vue'
+
 import THANKYOU from '~/components/NKYC_Forms/thankyou.vue'
 
 const authenticated = ref(true) // Assuming you have a way to check if the user is authenticated

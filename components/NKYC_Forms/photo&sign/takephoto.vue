@@ -15,12 +15,22 @@
                 <p class="text-sm text-gray-500 font-normal leading-5">
                     Ensure your face appears clearly within the frame
                 </p>
-                <div>
-                    <p class="text-sm mt-2 text-gray-500 font-normal leading-6" v-if="latitude && longitude">Latitude: {{ latitude }}, Longitude: {{ longitude }}</p>
-                    <p v-if="errorMessage" class="text-red-500">{{ errorMessage }}</p>
+
+                <!-- While fetching geolocation -->
+                <div v-if="locationloading" class="w-full bg-blue-50 flex items-center rounded-lg h-12 px-2">
+                  <p class="text-blue-500 text-sm">Fetching Geolocation...</p>
                 </div>
 
-                <div class="w-full p-1 mt-2 flex justify-center">
+                <!-- Show latitude and longitude after fetching -->
+                <div v-if="location && !locationloading" class=" flex flex-col justify-center  rounded h-12 ">
+                  <p class="text-sm text-gray-500 font-normal leading-6">
+                    Latitude: {{ latitude }}, Longitude: {{ longitude }}
+                  </p>
+                  <p v-if="errorMessage" class="text-red-500">{{ errorMessage }}</p>
+                </div>
+
+
+                <div v-if="cmabox" class="w-full p-1 mt-2 flex justify-center">
                     <CMAIDENTIFY @captured="onImageCaptured"/>
                 </div>
 
@@ -44,7 +54,8 @@
 </template>
 <script setup>
 
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted } from 'vue';
+import { watch } from 'vue'
 import useGeolocation from '~/composables/useGeolocation'
 import CMAIDENTIFY from '~/components/NKYC_Forms/photo&sign/cameraidentification/cmaidentify.vue'
 const deviceHeight = ref(0);
@@ -55,33 +66,27 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const imageCaptured = ref(null);
 const photoprogress = ref(false);
-import { watch } from 'vue'
+const cmabox=ref(false)
 
 
-const setPermanentAddress = async () => {
-  const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || ' '
-  if (statuscheck) {
-   
-  }
-  else {
 
-  }
 
-}
 
-await setPermanentAddress();
+const location = ref(false); // starts as false
+const locationloading = ref(true); // true while fetching
 
 const { latitude, longitude, errorMessage } = useGeolocation()
 
-watch(latitude, (newLat) => {
-  if (newLat !== null && longitude.value !== null) {
-    console.log('Latitude:', newLat)
-    console.log('Longitude:', longitude.value)
-    getCountry()
+watch([latitude, longitude], ([lat, lng]) => {
+  if (lat !== null && lng !== null) {
+    locationloading.value = false;
+    location.value = true;
+    if(location.value){
+      cmabox.value=true
+    }
+    getCountry(); 
   }
-})
-
+});
 const getCountry = async () => {
   if (!latitude.value || !longitude.value) {
     console.error('Latitude or longitude is missing')
