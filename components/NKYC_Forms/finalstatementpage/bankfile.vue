@@ -152,6 +152,7 @@ const initPage = async () => {
       console.log('Using CAMS bank statement:', statuscheck2Result);
     } else {
       selected.value = 'Upload Last 6 Months Bank Statement PDF';
+       buttonText.value = 'Upload Bank Statement';
       console.log('Using uploaded bank statement:', statuscheckResult);
     }
   }
