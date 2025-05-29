@@ -193,8 +193,8 @@ onMounted(async () => {
 
 <style scoped>
 .camera-wrapper {
-  width: 370px;
-  height: 370px;
+  width: 350px;
+  height: 350px;
   border-radius: 50%;
   overflow: hidden;
   border: 4px solid #00BFFF;
