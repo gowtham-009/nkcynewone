@@ -193,14 +193,16 @@ onMounted(async () => {
 
 <style scoped>
 .camera-wrapper {
-  width: 350px;
-  height: 350px;
-  border-radius: 50%;
+  width: 85vw; /* Responsive width */
+  max-width: 350px;
+  aspect-ratio: 1 / 1; /* Ensures it's a square */
+  border-radius: 50%; /* Makes it a circle */
   overflow: hidden;
   border: 4px solid #00BFFF;
   box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
   position: relative;
 }
+
 .camera-wrapper::before {
   content: "";
   position: absolute;
@@ -210,6 +212,7 @@ onMounted(async () => {
   height: 2px;
   background: rgba(0, 0, 0, 0.3);
 }
+
 .camera-wrapper::after {
   content: "";
   position: absolute;
@@ -219,19 +222,23 @@ onMounted(async () => {
   width: 2px;
   background: rgba(0, 0, 0, 0.3);
 }
+
 .camera-wrapper.centered-capture-ready {
   border-color: #00FF00;
   box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
 }
+
 .camera-wrapper.captured {
   border-color: #00FF00;
 }
+
 .camera-video,
 .camera-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 canvas.hidden {
   display: none;
 }
