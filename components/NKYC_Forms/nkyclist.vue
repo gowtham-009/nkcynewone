@@ -28,7 +28,7 @@
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center gap-3">
+                        <div class="w-full flex items-center gap-3 mt-1">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
                                 <i class="pi pi-user text-blue-900 text-lg"></i>
@@ -39,7 +39,7 @@
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center gap-3">
+                        <div class="w-full flex items-center gap-3 mt-1">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
                                <i class="pi pi-credit-card text-blue-900 text-lg"></i>
@@ -51,7 +51,7 @@
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center gap-3">
+                        <div class="w-full flex items-center gap-3 mt-1">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
                                <i class="pi pi-building-columns text-blue-900 text-lg"></i>
@@ -63,7 +63,7 @@
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center gap-3">
+                        <div class="w-full flex items-center gap-3 mt-1">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
                                 <i class="pi pi-verified text-blue-900 text-lg"></i>
@@ -75,7 +75,7 @@
                             </div>
                         </div>
 
-                        <div class="w-full flex items-center gap-3">
+                        <div class="w-full flex items-center gap-3 mt-1">
                             <div
                                 class="p-2 px-2 flex justify-center items-center static w-12 h-12 bg-blue-200 dark:bg-slate-900  rounded-full  flex-shrink-0">
                                 <i class="pi pi-pen-to-square text-blue-900 text-lg"></i>

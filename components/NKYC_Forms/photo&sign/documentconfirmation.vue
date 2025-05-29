@@ -59,7 +59,10 @@
                     </div>
                     <div class="flex justify-end gap-2">
                         <Button type="button" label="Cancel" severity="secondary" ref="rippleBtnback" @click="back"></Button>
-                        <Button type="button" label="Save" class="text-white" @click="handleButtonClick" ></Button>
+<Button type="button" label="Save" 
+  :disabled="!question1 || !question2 || !question3 || !question4 || !question5 || !question6 || !question7 || !question8" 
+  class="text-white" 
+  @click="handleButtonClick" />
                     </div>
                 </Dialog>
 
