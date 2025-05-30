@@ -28,14 +28,11 @@ const data = ref({});
 const currentForm = ref('pan');
 const logauth = ref(false);
 
-// Import geolocation state
 const { latitude, longitude, errorMessage } = useGeolocation();
 
-// Flags to track permission status
 const locationReady = ref(false);
 const locationChecked = ref(false);
 
-// Watch geolocation and set flags once permission is resolved
 const stopWatcher = watch([latitude, longitude, errorMessage], ([lat, long, err]) => {
   if (lat !== null && long !== null) {
     locationReady.value = true;
