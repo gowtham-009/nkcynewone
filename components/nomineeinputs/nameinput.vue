@@ -6,7 +6,7 @@
       type="text"
       v-model="name"
       variant="filled"
-      class="w-full py-2 uppercase prime-input"
+      class="w-full py-2 uppercase prime-input dark:!bg-gray-800"
       @input="formatName"
       inputmode="text"
       autocomplete="off"

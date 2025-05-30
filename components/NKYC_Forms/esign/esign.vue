@@ -13,7 +13,7 @@
           You will receive OTP to Aadhaar Linked Mobile No
         </p>
 
-        <div class="w-full mt-2 rounded-lg bg-blue-50 gap-1 p-2">
+        <div class="w-full mt-2 rounded-lg bg-blue-50 gap-1 p-2 dark:!bg-gray-800">
           <div v-for="(step, index) in steps" :key="index" class="w-full flex ">
             <div class="font-normal text-sm text-gray-500">{{ step.label }}</div>
             <div class="font-normal text-sm text-gray-500">{{ step.text }}</div>

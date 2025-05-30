@@ -6,7 +6,7 @@
         type="text"
         v-model="state"
         variant="filled"
-        class=" uppercase prime-input"
+        class=" uppercase prime-input dark:!bg-gray-800"
         @input="formatstate"
         inputmode="text"
         autocomplete="off"

@@ -30,7 +30,7 @@
         <!-- Upload Income Proof -->
         <div class="w-full mt-4">
           <span class="text-gray-500 text-xl font-medium">Upload Income Documents (Only PDF)</span>
-          <div class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white">
+          <div class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white dark:bg-gray-800">
             <div class="px-2 py-2">
               <Income v-model:pdfUrl="pdfUrl" />
             </div>

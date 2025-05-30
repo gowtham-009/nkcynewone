@@ -8,7 +8,7 @@
         @input="handleInput"
         placeholder="ABCDE1234F"
         maxlength="13"
-        class="pan-input"
+        class="pan-input dark:!text-gray-100"
         autocapitalize="characters"
         autocomplete="off"
         spellcheck="false"

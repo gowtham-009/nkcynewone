@@ -98,7 +98,7 @@
           <span class="block text-gray-500 text-lg font-normal mt-2">{{ prooftype }}</span>
 
           <div class="input-wrapper dark:!bg-gray-800 mt-2">
-            <InputText id="proof_input" class="w-full py-2 prime-input" :value="inputval" variant="filled" size="large"
+            <InputText id="proof_input" class="w-full py-2 prime-input dark:!bg-gray-800" :value="inputval" variant="filled" size="large"
               @keypress="handleKeyPress" @input="handleInput" />
             <span class="bottom-border"></span>
           </div>

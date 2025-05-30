@@ -12,8 +12,8 @@
 
         <div class="w-full mt-3">
           <span class="text-gray-500 text-md font-medium">Upload Bank</span>
-          <div class="grid grid-cols-1 gap-3">
-            <div class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white">
+          <div class="grid grid-cols-1 gap-3 dark:bg-gray-800">
+            <div class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white dark:bg-gray-800">
               <div class="px-2 py-2">
                 <Bankupload v-model:src="imageSrcbank" />
               </div>

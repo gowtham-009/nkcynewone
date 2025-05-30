@@ -3,7 +3,7 @@
       <span class="text-md text-gray-500">Pincode</span>
       <div class="input-wrapper dark:!bg-gray-800">
       <InputText
-        class="prime-input"
+        class="prime-input dark:!bg-gray-800"
         v-model="pincode"
         inputmode="numeric"
         type="text" 
