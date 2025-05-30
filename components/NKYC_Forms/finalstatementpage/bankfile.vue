@@ -82,15 +82,14 @@ const loading = ref(false);
 const fileInput = ref(null);
 const selected = ref('');
 const route = useRoute();
-const pdferrorbox=ref(false)
+const pdferrorbox = ref(false);
 let intervalId = null;
 
 const options = [
   {
     label: 'CAMS',
     value: 'CAMS',
-    subtext:
-      'Automatically fetch last 6 months of bank statement.'
+    subtext: 'Automatically fetch last 6 months of bank statement.'
   },
   {
     label: 'Upload Last 6 Months Bank Statement PDF',
@@ -109,10 +108,10 @@ const toggleSelection = (value) => {
 };
 
 function extractTimestamp(filename) {
-  const match = filename?.match(/(\d+)\.pdf$/)
+  const match = filename?.match(/(\d+)\.pdf$/);
   if (match && match[1]) {
-    const timestamp = parseInt(match[1], 10)
-    const date = new Date(timestamp * 1000) // Convert seconds to ms
+    const timestamp = parseInt(match[1], 10);
+    const date = new Date(timestamp * 1000);
     const formattedDate = date.toLocaleString('en-GB', {
       day: '2-digit',
       month: '2-digit',
@@ -120,12 +119,13 @@ function extractTimestamp(filename) {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-    })
-    return { timestamp, formattedDate }
+    });
+    return { timestamp, formattedDate };
   } else {
-    return { timestamp: null, formattedDate: 'Invalid filename' }
+    return { timestamp: null, formattedDate: 'Invalid filename' };
   }
 }
+
 const initPage = async () => {
   const queryval = route.query.ecres;
   const mydata = await getServerData();
@@ -143,21 +143,17 @@ const initPage = async () => {
       camsbankdatacheck();
     }, 5000);
   } else if (statuscheck2 || statuscheck) {
-    // Compare timestamps to decide which one is more recent
     const time1 = statuscheckResult.timestamp || 0;
     const time2 = statuscheck2Result.timestamp || 0;
 
     if (time2 >= time1) {
       selected.value = 'CAMS';
-      console.log('Using CAMS bank statement:', statuscheck2Result);
     } else {
       selected.value = 'Upload Last 6 Months Bank Statement PDF';
-       buttonText.value = 'Upload Bank Statement';
-      console.log('Using uploaded bank statement:', statuscheckResult);
+      buttonText.value = 'Upload Bank Statement';
     }
   }
 };
-
 
 onMounted(() => {
   window.addEventListener('resize', () => {
@@ -190,6 +186,7 @@ const camsbankdatacheck = async () => {
     if (data.payload.status === 'ok') {
       const clienttrnxid1 = meta?.cams_create?.clienttrnxid;
       const clienttrnxid2 = meta?.cams_data?.clienttxnid;
+      const camsData = meta?.cams_data;
 
       if (
         clienttrnxid1 === clienttrnxid2 &&
@@ -197,13 +194,17 @@ const camsbankdatacheck = async () => {
         meta?.cams_data?.bankStatementFile
       ) {
         clearInterval(intervalId);
-        pagestatus('thankyou');
+        await pagestatus('thankyou');
         emit('updateDiv', 'thankyou');
-      } else if (meta?.cams_create?.consentStatus === 'REJECTED') {
+      } else if (
+        meta?.cams_create?.consentStatus === 'REJECTED' &&
+        Array.isArray(camsData) &&
+        camsData.length === 0
+      ) {
         clearInterval(intervalId);
         loading.value = false;
         content.value = true;
-        pdferrorbox.value=true
+        pdferrorbox.value = true;
       }
     }
   } catch (error) {
@@ -262,8 +263,6 @@ const uploadPDF = (event) => {
     }
   };
   reader.readAsDataURL(file);
-
-  // Clear file input so same file can be re-selected later
   event.target.value = '';
 };
 
@@ -289,7 +288,7 @@ const bankstatement = async (pdfval) => {
     if (data.payload.status === 'ok') {
       const pageroute = await pagestatus('thankyou');
       if (pageroute.payload.status === 'ok') {
-        pdferrorbox.value=false
+        pdferrorbox.value = false;
         emit('updateDiv', 'thankyou');
       }
     }
@@ -318,7 +317,7 @@ const handleButtonClick = (event) => {
   }, 600);
 };
 
-const back = async () => {
+const back = async (event) => {
   const button = rippleBtnback.value;
   const circle = document.createElement('span');
   circle.classList.add('ripple');
