@@ -161,6 +161,7 @@ onMounted(() => {
   });
   initPage();
 });
+let checkCount = 0; // Declare this globally to track attempts
 
 const camsbankdatacheck = async () => {
   const apiurl = `${baseurl.value}cams`;
@@ -186,31 +187,37 @@ const camsbankdatacheck = async () => {
     if (data.payload.status === 'ok') {
       const clienttrnxid1 = meta?.cams_create?.clienttrnxid;
       const clienttrnxid2 = meta?.cams_data?.clienttxnid;
+      const consentStatus = meta?.cams_create?.consentStatus;
+      const bankStatementFile = meta?.cams_data?.bankStatementFile;
       const camsData = meta?.cams_data;
 
       if (
         clienttrnxid1 === clienttrnxid2 &&
-        meta?.cams_create?.consentStatus === 'ACTIVE' &&
-        meta?.cams_data?.bankStatementFile
+        consentStatus === 'ACTIVE' &&
+        bankStatementFile
       ) {
         clearInterval(intervalId);
         await pagestatus('thankyou');
         emit('updateDiv', 'thankyou');
-      } else if (
-        meta?.cams_create?.consentStatus === 'REJECTED' &&
-        Array.isArray(camsData) &&
-        camsData.length === 0
-      ) {
-        clearInterval(intervalId);
-        loading.value = false;
-        content.value = true;
-        pdferrorbox.value = true;
+      } else {
+        checkCount++; // Increment attempt counter
+
+        const isCamsDataEmpty =
+          Array.isArray(camsData) && camsData.length === 0;
+
+        if (checkCount >= 5 && (consentStatus === 'REJECTED' || isCamsDataEmpty)) {
+          clearInterval(intervalId);
+          loading.value = false;
+          content.value = true;
+          pdferrorbox.value = true;
+        }
       }
     }
   } catch (error) {
     console.error('camsbankdatacheck error:', error.message);
   }
 };
+
 
 const camsbankdata = async () => {
   const mydata = await getServerData();
