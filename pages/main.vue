@@ -22,9 +22,7 @@
       <div v-else-if="currentForm === 'communicationaddress'">
         <COMMUNICATIONADDRESS :data="data" @updateDiv="handleUpdateDiv" />
       </div>
-      <div v-else-if="currentForm === 'submission'">
-        <SUBMISSIONFORM :data="data" @updateDiv="handleUpdateDiv" />
-      </div>
+      
       <div v-else-if="currentForm === 'info'">
         <MARRIEDSTATUS @updateDiv="handleUpdateDiv" />
       </div>
@@ -110,7 +108,6 @@ import EKYC from '~/components/NKYC_Forms/pandetails/e-kyc.vue'
 import PARMANENTADDRESS from '~/components/NKYC_Forms/pandetails/parmanentaddress.vue'
 import FAILEDSTATUS from '~/components/NKYC_Forms/pandetails/faildstatus.vue'
 import COMMUNICATIONADDRESS from '~/components/NKYC_Forms/pandetails/communicationaddress.vue'
-import SUBMISSIONFORM from '~/components/NKYC_Forms/submissionpage.vue'
 import MARRIEDSTATUS from '~/components/NKYC_Forms/profiledetails/marridestatus.vue'
 import CLIENTINFO from '~/components/NKYC_Forms/profiledetails/clientinfo.vue'
 import QUALIFICATION from '~/components/NKYC_Forms/profiledetails/qualification.vue'
@@ -124,7 +121,6 @@ import BANK4 from '~/components/NKYC_Forms/bankdetails/bank4.vue'
 import SEGMENT from '~/components/NKYC_Forms/account/segment.vue'
 import BROKERAGE from '~/components/NKYC_Forms/account/brokerage.vue'
 import UPLOADPROOF from '~/components/NKYC_Forms/account/uploadpan.vue'
-import UPLOADINCOME from '~/components/NKYC_Forms/account/uploadincome.vue'
 import UPLOADBANK from '~/components/NKYC_Forms/account/uploadbank.vue'
 import PHOTOSIGN1 from '~/components/NKYC_Forms/photo&sign/photosign.vue'
 import TAKEPHOTO from '~/components/NKYC_Forms/photo&sign/takephoto.vue'
