@@ -214,9 +214,9 @@ const handleButtonClick = async (event) => {
 const back = async (event) => {
   createRipple(event, rippleBtnback);
   setTimeout(async () => {
-    const myData = await pagestatus('submission', '5');
+    const myData = await pagestatus('additionalinformation');
     if (myData?.payload?.status === 'ok') {
-      emit('updateDiv', 'submission');
+      emit('updateDiv', 'additionalinformation');
     }
   }, 600);
 };

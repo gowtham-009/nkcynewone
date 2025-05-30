@@ -311,9 +311,9 @@ function back() {
   setTimeout(async() => {
     circle.remove()
 
-     const mydata= await pagestatus('submission', '2')
+     const mydata= await pagestatus('nominee')
        if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'submission');
+         emit('updateDiv', 'nominee');
        }
  
   }, 600)

@@ -16,8 +16,9 @@
     </div>
   </div>
 </template>
+
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import form1 from '~/components/signup/form1.vue';
 import { getServerData } from '~/utils/serverdata.js';
@@ -28,13 +29,19 @@ const data = ref({});
 const currentForm = ref('pan');
 const logauth = ref(false);
 
+// Get geolocation data
 const { latitude, longitude, errorMessage } = useGeolocation();
 
 const locationReady = ref(false);
 const locationChecked = ref(false);
 
+// Watch for location changes
 const stopWatcher = watch([latitude, longitude, errorMessage], ([lat, long, err]) => {
   if (lat !== null && long !== null) {
+    // ✅ Store latitude and longitude in localStorage
+    localStorage.setItem('latitude', lat.toString());
+    localStorage.setItem('longitude', long.toString());
+
     locationReady.value = true;
     locationChecked.value = true;
     stopWatcher(); // Stop watching once resolved
@@ -44,11 +51,13 @@ const stopWatcher = watch([latitude, longitude, errorMessage], ([lat, long, err]
   }
 });
 
+// Handle form update
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value;
   data.value = newData;
 };
 
+// Check user login and page access
 onMounted(async () => {
   const userkey = localStorage.getItem('userkey');
   const pagetext = ['pan'];

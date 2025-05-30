@@ -112,9 +112,9 @@ const handleButtonClick = () => {
      const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName 
     if(statuscheck && statuscheck1){
 
-          const mydata= await pagestatus('submission', '4')
+          const mydata= await pagestatus('photosign1')
        if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'submission');
+         emit('updateDiv', 'photosign1');
        }
    
     }

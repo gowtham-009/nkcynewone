@@ -166,9 +166,11 @@ const permanentaddressdata = async () => {
         const isConfirmed = commAddressRef.value?.confirm;
         if (isConfirmed) {
 
-          const mydata = await pagestatus('submission', '1')
+        
+
+          const mydata = await pagestatus('info')
           if (mydata.payload.status == 'ok') {
-            emit('updateDiv', 'submission');
+             emit('updateDiv', 'info');
           }
 
         } else {

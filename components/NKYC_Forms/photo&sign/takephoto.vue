@@ -16,13 +16,10 @@
                     Ensure your face appears clearly within the frame
                 </p>
 
-                <!-- While fetching geolocation -->
-                <div v-if="locationloading" class="w-full bg-blue-50 flex items-center rounded-lg h-12 px-2">
-                  <p class="text-blue-500 text-sm">Fetching Geolocation...</p>
-                </div>
+               
 
                 <!-- Show latitude and longitude after fetching -->
-                <div v-if="location && !locationloading" class=" flex flex-col justify-center  rounded h-12 ">
+                <div  class=" flex flex-col justify-center  rounded h-12 ">
                   <p class="text-sm text-gray-500 font-normal leading-6">
                     Latitude: {{ latitude }}, Longitude: {{ longitude }}
                   </p>
@@ -30,7 +27,7 @@
                 </div>
 
 
-                <div v-if="cmabox" class="w-full p-1 mt-2 flex justify-center">
+                <div  class="w-full p-1 mt-2 flex justify-center">
                     <CMAIDENTIFY @captured="onImageCaptured"/>
                 </div>
 
@@ -66,27 +63,29 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const imageCaptured = ref(null);
 const photoprogress = ref(false);
-const cmabox=ref(false)
+
+
+const latitude=ref(localStorage.getItem('latitude'))
+const longitude=ref(localStorage.getItem('longitude'))
 
 
 
 
 
-const location = ref(false); // starts as false
-const locationloading = ref(true); // true while fetching
 
-const { latitude, longitude, errorMessage } = useGeolocation()
 
-watch([latitude, longitude], ([lat, lng]) => {
-  if (lat !== null && lng !== null) {
-    locationloading.value = false;
-    location.value = true;
-    if(location.value){
-      cmabox.value=true
-    }
-    getCountry(); 
-  }
-});
+
+// watch([latitude, longitude], ([lat, lng]) => {
+//   if (lat !== null && lng !== null) {
+//     locationloading.value = false;
+//     location.value = true;
+//     if(location.value){
+//       cmabox.value=true
+//     }
+//     getCountry(); 
+//   }
+// });
+
 const getCountry = async () => {
   if (!latitude.value || !longitude.value) {
     console.error('Latitude or longitude is missing')

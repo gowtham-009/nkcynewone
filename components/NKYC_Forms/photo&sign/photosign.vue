@@ -135,10 +135,27 @@ const back = () => {
 
   setTimeout(async() => {
     circle.remove()
-     const mydata= await pagestatus('submission', '4')
-       if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'submission');
-       }
+    const mydata = await getServerData();
+
+    const statuscheck = mydata.payload.metaData.kraPan.APP_KRA_INFO ;
+    const statuscheck1 = mydata.payload.metaData.bank.bank1HolderName ;
+
+    if(statuscheck && statuscheck1){
+      pagestatus('brokerage')
+      emit('updateDiv', 'brokerage');
+    }
+    else if(statuscheck && !statuscheck1){
+      pagestatus('uploadbank')
+      emit('updateDiv', 'uploadbank');
+    }
+    else if(!statuscheck && statuscheck1) {
+      pagestatus('uploadproof')
+      emit('updateDiv', 'uploadproof');
+    }
+    else if(!statuscheck && !statuscheck1) {
+      pagestatus('uploadbank')
+      emit('updateDiv', 'uploadbank');
+    }
   }, 600)
 }
 

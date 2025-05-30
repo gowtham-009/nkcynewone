@@ -152,10 +152,11 @@ const communicateaddressdata = async () => {
       if (data.payload.status == 'ok') {
      const mydata= await pagestatus('submission', '2')
      if(mydata.payload.status=='ok'){
-          const mydata = await pagestatus('submission', '1')
+           const mydata = await pagestatus('info')
           if (mydata.payload.status == 'ok') {
-            emit('updateDiv', 'submission');
+             emit('updateDiv', 'info');
           }
+
      
      }
       }

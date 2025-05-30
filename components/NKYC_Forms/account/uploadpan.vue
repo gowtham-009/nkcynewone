@@ -140,9 +140,11 @@ loading.value=true
     const mydata = await getServerData();
      const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName
      if(statuscheck1){
-      alert('hi')
-      pagestatus('submission', '4'),
-      emit('updateDiv', 'submission');
+   
+          const mydata= await pagestatus('photosign1')
+       if(mydata.payload.status=='ok'){
+         emit('updateDiv', 'photosign1');
+       }
      }
      else{
       pagestatus('uploadbank'),

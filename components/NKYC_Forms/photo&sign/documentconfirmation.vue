@@ -192,9 +192,9 @@ const additionaldocument = async () => {
     const data = await response.json();
     if (data.payload.status === 'ok') {
       createunsignedDocument()
-     const mydata= await pagestatus('submission', '5')
+     const mydata= await pagestatus('esign')
      if(mydata.payload.status=='ok'){
-       emit('updateDiv', 'submission');
+       emit('updateDiv', 'esign');
      }
 
         

@@ -198,9 +198,9 @@ const handleButtonClick = () => {
   setTimeout(async() => {
     circle.remove()
 
-    const mydata= await pagestatus('submission', '3')
+    const mydata= await pagestatus('segment1')
      if(mydata.payload.status=='ok'){
-       emit('updateDiv', 'submission');
+       emit('updateDiv', 'segment1');
      }
 
  

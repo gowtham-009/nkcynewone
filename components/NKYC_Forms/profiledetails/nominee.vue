@@ -533,11 +533,13 @@ const handleButtonClick = (event) => {
 
   setTimeout(async() => {
     circle.remove();
+
+     const mydata= await pagestatus('bank1')
+       if(mydata.payload.status=='ok'){
+         emit('updateDiv', 'bank1');
+       }
    
-     const mydata= await pagestatus('submission', '2')
-     if(mydata.payload.status=='ok'){
-       emit('updateDiv', 'submission');
-     }
+     
 
    
   }, 600);

@@ -151,7 +151,7 @@ const profilesetinfo = async () => {
     const marriedstatus = mydata?.payload?.metaData?.kraPan?.APP_MAR_STATUS || '';
     selected.value = marriedstatus === '01' ? 'married' : marriedstatus === '02' ? 'unmarried' : 'other';
 
-    clientselected.value=mydata?.payload?.metaData?.personal?.pep || ''
+    clientselected.value=mydata?.payload?.metaData?.personal?.pep || 'No, I am Not'
   }
    else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
   const gender = mydata?.payload?.metaData?.digi_info?.gender || ''
@@ -195,9 +195,9 @@ const back = () => {
  
 
 
-     const mydata= await pagestatus('submission', '1')
+     const mydata= await pagestatus('parmanentaddress')
        if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'submission');
+         emit('updateDiv', 'parmanentaddress');
        }
   }, 600)
    
