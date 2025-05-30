@@ -206,7 +206,9 @@ const bankvalidation = async () => {
      waitingbox.value=false
   }
   else{
+    
     waitingbox.value=true
+    errorbox.value=false
   }
      
    const apiurl = `${baseurl.value}bank`;
