@@ -44,7 +44,7 @@
 
         <Button type="button" @click="handleButtonClick" ref="rippleBtn"
           :disabled="!address || !state || !city || !pincode"
-          class="primary_color wave-btn text-white w-5/6 py-4 text-xl border-0 relative overflow-hidden">
+          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
           {{ buttonText }}
           <span v-if="isAnimating" class="wave"></span>
         </Button>

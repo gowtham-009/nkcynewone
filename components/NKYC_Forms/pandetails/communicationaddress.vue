@@ -39,7 +39,7 @@
                 <i class="pi pi-angle-left text-3xl dark:text-white"></i>
             </Button>
                 <Button type="button"  ref="rippleBtn"  @click="handleButtonClick" :disabled="!address || !state || !city || !pincode" 
-                    class=" primary_color wave-btn text-white w-5/6 py-4 text-xl border-0  ">
+                    class=" primary_color wave-btn text-white w-5/6 py-3 text-xl border-0  ">
                     {{ buttonText }}
                     <span v-if="isAnimating" class="wave"></span>
                 </Button>

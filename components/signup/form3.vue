@@ -59,7 +59,6 @@
           class="primary_color text-white w-5/6 py-3 text-xl border-0" @click="handleButtonClick()"
           :disabled="isButtonDisabled">
           {{ buttonText }}
-
         </Button>
       </div>
     </div>
