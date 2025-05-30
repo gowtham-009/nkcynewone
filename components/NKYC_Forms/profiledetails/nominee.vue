@@ -98,7 +98,7 @@
           <span class="block text-gray-500 text-lg font-normal mt-2">{{ prooftype }}</span>
 
           <div class="input-wrapper dark:!bg-gray-800 mt-2">
-            <InputText id="proof_input" class="w-full py-2 prime-input dark:!bg-gray-800" :value="inputval" variant="filled" size="large"
+            <InputText id="proof_input" class="w-full py-2 prime-input" :value="inputval" variant="filled" size="large"
               @keypress="handleKeyPress" @input="handleInput" />
             <span class="bottom-border"></span>
           </div>
@@ -113,7 +113,7 @@
         </div>
         <div class="w-full mt-2">
           <Sharevalue v-model="shareval" />
-          <p class="text-right text-gray-500 text-md">Maximum limit: 100</p>
+          <p class="text-right text-gray-500 text-md">Maximum limit: {{ availabilelimit }}</p>
         </div>
         <div class="w-full mt-3">
          <Button
@@ -170,6 +170,7 @@ const nomineetext = ref("Add Nominee");
 const nomineeCount = ref(0);
 
 const selectedStatement = ref('')
+
 
 const statementOptions = ref([
    {value:'Son',name: 'Son' },
@@ -285,7 +286,20 @@ const nomineedetails = async () => {
 
 await nomineedetails()
 
+const availabilelimit = computed(() => {
+  let total = 0;
+  nomine.value.forEach(n => {
+    // Exclude the current nominee when editing
+    if (n.id !== idval.value) {
+      total += parseFloat(n.share);
+    }
+  });
+  return Math.max(100 - total, 0); // Prevent going below 0
+});
+
+
 const isSaveDisabled = computed(() => {
+  const share = parseFloat(shareval.value) || 0;
   return (
     !selectedStatement.value ||
     !dob.value ||
@@ -294,10 +308,11 @@ const isSaveDisabled = computed(() => {
     !inputval.value ||
     !address.value ||
     !mobileNo.value ||
-    !isValidEmail.value 
-  
+    !isValidEmail.value ||
+    share > availabilelimit.value // ✅ Block if share exceeds remaining
   );
 });
+
 
 const dialogbox = (editdata) => {
 
