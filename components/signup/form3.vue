@@ -117,7 +117,7 @@ const setEmailData = async () => {
     const kraEmail = myData?.payload?.metaData?.kraPan?.APP_EMAIL;
 
     const rawEmail =  profileEmail || appKraEmail|| kraEmail || '';
-    console.log("krares:", appKraEmail, "nkycdata1:",profileEmail, "nkycdata2:",kraEmail)
+  
     emailid.value = rawEmail;
 
      if (myData?.payload?.metaData?.otpVerification?.email?.otpVerifiedStatus=='0') {
