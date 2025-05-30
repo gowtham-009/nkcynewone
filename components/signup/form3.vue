@@ -71,10 +71,10 @@
 </template>
 
 <script setup>
-import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
+
 import emailOTP from '~/components/forminputs/emailotp.vue'
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+
 import EmailInput from '~/components/forminputs/emailinput.vue';
 
 import { encryptionrequestdata } from '~/utils/globaldata.js'
@@ -133,7 +133,7 @@ const setEmailData = async () => {
 
 await setEmailData()
 
-const router = useRouter()
+
 const isSending = ref(false);
 
 
