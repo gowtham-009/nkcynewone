@@ -1,7 +1,7 @@
 <template>
   <!-- Show loading message until location is granted -->
   <div v-if="!locationReady">
-    <p>Requesting location permission...</p>
+    <p></p>
   </div>
 
   <!-- Show form only after location is granted and logauth is true -->
