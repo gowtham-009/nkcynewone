@@ -234,17 +234,8 @@ function back() {
   setTimeout(async() => {
     circle.remove()
 
-       const mydata = await getServerData();
-        const statuscheck=mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO
-    if (statuscheck) {
-      
-      pagestatus('main')
+     pagestatus('main')
       emit('updateDiv', 'main');
-    }
-    else {
-     pagestatus('ekyc')
-      emit('updateDiv', 'ekyc');
-    }
   }, 600)
    
 }
