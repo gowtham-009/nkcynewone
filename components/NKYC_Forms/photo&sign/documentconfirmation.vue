@@ -17,44 +17,44 @@
 
                     <div class="w-full p-1"   :style="{ height: deviceHeight * 0.65 + 'px' }" style=" overflow-y: scroll;">
                         
-                       <div class="w-full mt-1">
+                       <div class="w-full ">
                         <p class="text-gray-500 font-medium text-sm">I/We herby voluntarily accord my/our consent to receive the aforesaid documents in:</p>
-                        <Option1 class="mt-2" v-model:selected="question1" />
+                        <Option1 class="mt-1" v-model:selected="question1" />
                     </div>
 
-                    <div class="w-full mt-1">
+                    <div class="w-full">
                         <p class="text-gray-500 font-medium text-sm">Mode of communication:</p>
                         <p class="text-gray-500 font-medium text-sm">I/We wish to receive Contract Note:</p>
 
-                        <Option2 class="mt-2" v-model:selected="question2" />
+                        <Option2 class="mt-1" v-model:selected="question2" />
                     </div>
 
-                    <div class="w-full mt-1">
+                    <div class="w-full ">
                         <p class="text-gray-500 font-medium text-sm">I/We wish to receive standard documents - Rights & Oblications, Risk Disclosure document, Guidance note and polices & procedures:</p>
-                        <Option3 class="mt-2" v-model:selected="question3" />
+                        <Option3 class="mt-1" v-model:selected="question3" />
                     </div>
-                    <div class="w-full mt-1">
+                    <div class="w-full">
                         <p class="text-gray-500 font-medium text-sm">I/We wish to avail facility of internet trading/wireless technology:</p>
-                        <Option4 class="mt-2" v-model:selected="question4" />
+                        <Option4 class="mt-1" v-model:selected="question4" />
                     </div>
-                    <div class="w-full mt-1">
+                    <div class="w-full ">
                         <p class="text-gray-500 font-medium text-sm">Past Action: Details of any action / Proceedings initiated / pending / taken by SEBI / Stock Exchange / any other authority against the applicant / constituent or its patners / promoters / whole time directors / authorised persons in charge of dealing in securities during last 3 years.</p>
-                        <Option5 class="mt-2" v-model:selected="question5" />
+                        <Option5 class="mt-1" v-model:selected="question5" />
                     </div>
-                    <div class="w-full mt-1">
+                    <div class="w-full ">
                         <p class="text-gray-500 font-medium text-sm">I/We Whether dealing with any Other stock Broker /AP:</p>
-                        <Option6 class="mt-2" v-model:selected="question6" />
+                        <Option6 class="mt-1" v-model:selected="question6" />
                     </div>
-                    <div class="w-full mt-1">
+                    <div class="w-full ">
                         <p class="text-gray-500 font-medium text-sm">OTHER DP DETAILS:</p>
-                        <Option7 class="mt-2"v-model:selected="question7" />
+                        <Option7 class="mt-1"v-model:selected="question7" />
                     </div>
-                    <div class="w-full mt-1">
+                    <div class="w-full">
                         <p class="text-gray-500 font-medium text-sm">I/We further wish to have settlement of my account (funds and securities):</p>
-                        <Option8 class="mt-2" v-model:selected="question8" />
+                        <Option8 class="mt-1" v-model:selected="question8" />
                     </div>
 
-                    <div class="w-full mt-1">
+                    <div class="w-full ">
                         <p class="text-gray-500 font-medium text-sm">I understand that settlement amount shall be subject to retention of requisite securities / funds towards outstanding obligations and margins in my account calculated in the manner specified by SEBI / Exchange and details mentioned in the  "Statement of Account" at the time of settlement. I authorize you to send the statement of account on funds and securities as on the date of settelement to my e-mail id registered with you. I understand that i can obtain a copy of the same from your Head office.</p>
                       
                     </div>
