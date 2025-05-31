@@ -8,15 +8,16 @@
         <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full mt-1 px-2 p-1">
-                <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
+                <div>
+                  <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
                     Additional information
                 </p>
                 <p class="text-gray-500 leading-5 font-normal text-sm mt-2">These details are required by SEBI to open
                     your Demat Account Document</p>
 
-
-                <Dialog v-model:visible="visible" modal header="Document" >
-                    <div class="w-full mt-2">
+                    <div class="w-full p-1"   :style="{ height: deviceHeight * 0.68 + 'px' }" style=" overflow-y: scroll;">
+                        
+                       <div class="w-full mt-2">
                         <p class="text-gray-500 font-medium text-sm">I/We herby voluntarily accord my/our consent to receive the aforesaid documents in:</p>
                         <Option1 class="mt-2" v-model:selected="question1" />
                     </div>
@@ -57,25 +58,23 @@
                         <p class="text-gray-500 font-medium text-sm">I understand that settlement amount shall be subject to retention of requisite securities / funds towards outstanding obligations and margins in my account calculated in the manner specified by SEBI / Exchange and details mentioned in the  "Statement of Account" at the time of settlement. I authorize you to send the statement of account on funds and securities as on the date of settelement to my e-mail id registered with you. I understand that i can obtain a copy of the same from your Head office.</p>
                       
                     </div>
-                    <div class="flex justify-end gap-2">
-                        <Button type="button" label="Cancel" severity="secondary" ref="rippleBtnback" @click="back"></Button>
-<Button type="button" label="Save" 
-  :disabled="!question1 || !question2 || !question3 || !question4 || !question5 || !question6 || !question7 || !question8" 
-  class="text-white" 
-  @click="handleButtonClick" />
+
                     </div>
-                </Dialog>
+
+                      <div v-if="loading" class="w-full p-1 flex justify-center rounded-lg bg-blue-50 text-blue-500" >
+                  <p class=" text-blue-500">please Wait...</p>
+                </div>
+                </div>
 
 
-
-
+             
             </div>
 
             <div class="w-full flex gap-2" >
                 <Button @click="back()" ref="rippleBtnback"  class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                 <i class="pi pi-angle-left text-3xl dark:text-white"></i>
             </Button>
-                <Button type="button" ref="rippleBtn"  @click="handleButton"
+                <Button type="button" ref="rippleBtn"  @click="handleButton"  :disabled="!question1 || !question2 || !question3 || !question4 || !question5 || !question6 || !question7 || !question8" 
                     class=" primary_color wave-btn text-white w-5/6 py-3 text-xl border-0  ">
                     {{ buttonText }}
                 </Button>
@@ -83,7 +82,7 @@
 
         </div>
         </div>
-   
+
 </template>
 <script setup>
 
@@ -100,7 +99,7 @@ const emit = defineEmits(['updateDiv']);
 
 const deviceHeight = ref(0);
 const { baseurl } = globalurl();
-const visible = ref(true)
+
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
@@ -112,6 +111,8 @@ const question5=ref('')
 const question6=ref('')
 const question7=ref('')
 const question8=ref('')
+
+const loading=ref(false)
 
 const getsegmentdata = async () => {
   const mydata = await getServerData();
@@ -157,6 +158,8 @@ onMounted(async() => {
 
 const additionaldocument = async () => {
 
+  loading.value=true
+
   const apiurl = `${baseurl.value}additional_docs`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -192,13 +195,6 @@ const additionaldocument = async () => {
     const data = await response.json();
     if (data.payload.status === 'ok') {
       createunsignedDocument()
-     const mydata= await pagestatus('esign')
-     if(mydata.payload.status=='ok'){
-       emit('updateDiv', 'esign');
-     }
-
-        
-
     }
   } catch (error) {
     console.error(error.message);
@@ -229,6 +225,12 @@ const createunsignedDocument = async () => {
     }
 
     const data = await response.json();
+    if(data.payload.status=='ok'){
+       const mydata= await pagestatus('esign')
+     if(mydata.payload.status=='ok'){
+       emit('updateDiv', 'esign');
+     }
+    }
   
   } catch (error) {
     console.error(error.message);
@@ -259,11 +261,7 @@ const back = () => {
 
 
 
-const handleButtonClick = () => {
-    visible.value=false
-    additionaldocument()
- 
-};
+
 
 
 const handleButton = () => {
@@ -280,13 +278,10 @@ const handleButton = () => {
 
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(() => {
     circle.remove()
-
-     const mydata= await pagestatus('submission', '5')
-     if(mydata.payload.status=='ok'){
-       emit('updateDiv', 'submission');
-     }
+additionaldocument()
+        
       
   }, 600)
 };
