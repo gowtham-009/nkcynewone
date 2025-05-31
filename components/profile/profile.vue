@@ -57,6 +57,7 @@ async function logout() {
       localStorage.removeItem('userkey')
        localStorage.removeItem('latitude')
         localStorage.removeItem('longitude')
+        localStorage.removeItem('location_granted')
        router.push('/');
 
 
