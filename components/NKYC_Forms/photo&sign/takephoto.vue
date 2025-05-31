@@ -12,7 +12,7 @@
                 <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
                     Take a selfie
                 </p>
-                <p class="text-sm text-gray-500 font-normal leading-5">
+                <p class="text-sm text-gray-500 font-normal leading-4">
                     Ensure your face appears clearly within the frame
                 </p>
 
@@ -27,7 +27,7 @@
                 </div>
 
 
-                <div  class="w-full p-1  flex justify-center">
+                <div  class="w-full  flex justify-center">
                     <CMAIDENTIFY @captured="onImageCaptured"/>
                 </div>
 
