@@ -58,8 +58,8 @@ const lastRightEyeDistance = ref(0)
 let mediaStream = null
 
 // Frame settings
-const FRAME_WIDTH = 320
-const FRAME_HEIGHT = 320
+const FRAME_WIDTH = 300
+const FRAME_HEIGHT = 300
 const FRAME_CENTER = ref({ x: FRAME_WIDTH / 2, y: FRAME_HEIGHT / 2 })
 const MAX_ALLOWED_DISTANCE = 100
 const CAPTURE_CENTER_TOLERANCE = 15 // nose must be within 15px of center

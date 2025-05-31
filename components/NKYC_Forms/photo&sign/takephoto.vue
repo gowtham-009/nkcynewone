@@ -8,7 +8,7 @@
         </div>
         <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
-            <div class="w-full mt-1 px-2 p-1">
+            <div class="w-full  px-2 p-1">
                 <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
                     Take a selfie
                 </p>
@@ -19,7 +19,7 @@
                
 
                 <!-- Show latitude and longitude after fetching -->
-                <div  class=" flex flex-col justify-center  rounded h-8 ">
+                <div  class=" flex flex-col justify-center  rounded ">
                   <p class="text-sm text-gray-500 font-normal leading-6">
                     Latitude: {{ latitude }}, Longitude: {{ longitude }}
                   </p>
@@ -27,12 +27,12 @@
                 </div>
 
 
-                <div  class="w-full p-1 mt-2 flex justify-center">
+                <div  class="w-full p-1  flex justify-center">
                     <CMAIDENTIFY @captured="onImageCaptured"/>
                 </div>
 
-                <div class="w-full p-1" >
-                  <p class="font-semibold text-gray-500">"Ensure your nose is positioned at the center of the cross (+). Your face should be straight and centered within the frame"</p>
+                <div class="w-full " >
+                  <p class="font-semibold text-gray-500 text-sm leading-4">"Ensure your nose is positioned at the center of the cross (+). Your face should be straight and centered within the frame"</p>
                 </div>
                 
 
