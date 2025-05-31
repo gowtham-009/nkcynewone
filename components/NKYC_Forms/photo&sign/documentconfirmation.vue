@@ -15,7 +15,7 @@
                 <p class="text-gray-500 leading-5 font-normal text-sm mt-2">These details are required by SEBI to open
                     your Demat Account Document</p>
 
-                    <div class="w-full p-1"   :style="{ height: deviceHeight * 0.68 + 'px' }" style=" overflow-y: scroll;">
+                    <div class="w-full p-1"   :style="{ height: deviceHeight * 0.65 + 'px' }" style=" overflow-y: scroll;">
                         
                        <div class="w-full mt-2">
                         <p class="text-gray-500 font-medium text-sm">I/We herby voluntarily accord my/our consent to receive the aforesaid documents in:</p>
