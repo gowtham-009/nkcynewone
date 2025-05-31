@@ -57,8 +57,7 @@
 <script setup>
 
 import { ref, onMounted } from 'vue';
-import { watch } from 'vue'
-import useGeolocation from '~/composables/useGeolocation'
+
 import CMAIDENTIFY from '~/components/NKYC_Forms/photo&sign/cameraidentification/cmaidentify.vue'
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
@@ -70,8 +69,9 @@ const imageCaptured = ref(null);
 const photoprogress = ref(false);
 
 
-const latitude=ref(localStorage.getItem('latitude'))
-const longitude=ref(localStorage.getItem('longitude'))
+const latitude = ref('');
+const longitude = ref('');
+const errorMessage = ref('');
 
 
 
@@ -165,6 +165,16 @@ const user = encryptionrequestdata({
 }
 
 onMounted(() => {
+   const storedLat = localStorage.getItem('latitude');
+  const storedLng = localStorage.getItem('longitude');
+
+  if (storedLat && storedLng) {
+    latitude.value = storedLat;
+    longitude.value = storedLng;
+  } else {
+    errorMessage.value = 'Location not found in localStorage.';
+  }
+  
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
