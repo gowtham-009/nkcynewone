@@ -52,7 +52,7 @@
           <Name v-model="name" />
         </div>
         <div class="w-full mt-4">
-          <span class="text-gray-500 text-xl font-medium">Relationship</span>
+          <span class="text-gray-500 text-xl ">Relationship*</span>
           <div class="input-wrapper dark:!bg-gray-800">
             <Select
               v-model="selectedStatement"
