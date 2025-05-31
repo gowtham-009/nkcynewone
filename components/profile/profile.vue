@@ -55,6 +55,8 @@ onBeforeUnmount(() => {
 
 async function logout() {
       localStorage.removeItem('userkey')
+       localStorage.removeItem('latitude')
+        localStorage.removeItem('longitude')
        router.push('/');
 
 
