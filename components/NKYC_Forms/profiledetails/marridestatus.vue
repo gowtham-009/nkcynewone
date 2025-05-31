@@ -157,10 +157,10 @@ const profilesetinfo = async () => {
   const gender = mydata?.payload?.metaData?.digi_info?.gender || ''
     selectedgender.value = gender === 'MALE' ? 'Male' : gender === 'FEMALE' ? 'Female' : 'Other';
 
-       const marriedstatus = mydata?.payload?.metaData?.personal?.maritalStatus || '';
+    const marriedstatus = mydata?.payload?.metaData?.personal?.maritalStatus || '';
     selected.value = marriedstatus
 
-clientselected.value=mydata?.payload?.metaData?.personal?.pep
+clientselected.value=mydata?.payload?.metaData?.personal?.pep || 'No, I am Not'
 }
   else{
    
