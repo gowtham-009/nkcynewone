@@ -31,6 +31,11 @@
                     <CMAIDENTIFY @captured="onImageCaptured"/>
                 </div>
 
+                <div class="w-full p-1" >
+                  <p class="font-semibold text-gray-500">"Ensure your nose is positioned at the center of the cross (+). Your face should be straight and centered within the frame"</p>
+                </div>
+                
+
                 <div v-if="photoprogress" class="w-full p-1 flex justify-center rounded-lg bg-blue-50 text-blue-500" >
                   <p class=" text-blue-500">please Wait...</p>
                 </div>
@@ -75,16 +80,7 @@ const longitude=ref(localStorage.getItem('longitude'))
 
 
 
-// watch([latitude, longitude], ([lat, lng]) => {
-//   if (lat !== null && lng !== null) {
-//     locationloading.value = false;
-//     location.value = true;
-//     if(location.value){
-//       cmabox.value=true
-//     }
-//     getCountry(); 
-//   }
-// });
+
 
 const getCountry = async () => {
   if (!latitude.value || !longitude.value) {

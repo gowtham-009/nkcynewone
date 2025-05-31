@@ -74,7 +74,8 @@ import { ref, onMounted } from 'vue';
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
 
-const selected = ref([]);
+const selected = ref(['equity', 'fno', 'commodities']);
+
 
 const options = [
   {
@@ -107,10 +108,8 @@ const toggleSelection = (value) => {
 const getsegmentdata = async () => {
   const mydata = await getServerData();
 
-  // Raw segment YES/NO values
   const segments = mydata?.payload?.metaData?.segments || {};
 
-  // These map individual segment flags to internal values
   const segmentToInternalMap = {
     nseCASH: 'equity',
     bseCASH: 'equity',
@@ -124,7 +123,8 @@ const getsegmentdata = async () => {
   const internalSelectionSet = new Set();
 
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
-  const hasAadhaar = mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument;
+  const hasAadhaar = mydata?.payload?.metaData?.digi_info?.aadhaarUID &&
+                     mydata?.payload?.metaData?.digi_docs?.aadhaarDocument;
 
   if (statuscheck || hasAadhaar) {
     Object.entries(segments).forEach(([key, value]) => {
@@ -133,11 +133,13 @@ const getsegmentdata = async () => {
       }
     });
 
-    selected.value = Array.from(internalSelectionSet);
-  } else {
-    selected.value = [];
+    // Override only if there's data; otherwise keep the default
+    if (internalSelectionSet.size > 0) {
+      selected.value = Array.from(internalSelectionSet);
+    }
   }
 };
+
 
 await getsegmentdata()
 const deviceHeight = ref(0);
