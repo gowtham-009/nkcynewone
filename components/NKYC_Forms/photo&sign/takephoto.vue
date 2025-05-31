@@ -19,7 +19,7 @@
                
 
                 <!-- Show latitude and longitude after fetching -->
-                <div  class=" flex flex-col justify-center  rounded h-12 ">
+                <div  class=" flex flex-col justify-center  rounded h-8 ">
                   <p class="text-sm text-gray-500 font-normal leading-6">
                     Latitude: {{ latitude }}, Longitude: {{ longitude }}
                   </p>
@@ -174,7 +174,7 @@ onMounted(() => {
   } else {
     errorMessage.value = 'Location not found in localStorage.';
   }
-  
+
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
