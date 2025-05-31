@@ -214,10 +214,23 @@ const handleButtonClick = async (event) => {
 const back = async (event) => {
   createRipple(event, rippleBtnback);
   setTimeout(async () => {
-    const myData = await pagestatus('additionalinformation');
+
+      const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.additional_docs?.documentConsentMode
+  if(statuscheck){
+     const myData = await pagestatus('additionalinformation');
     if (myData?.payload?.status === 'ok') {
       emit('updateDiv', 'additionalinformation');
     }
+  }
+  else{
+     const myData = await pagestatus('signdraw');
+    if (myData?.payload?.status === 'ok') {
+      emit('updateDiv', 'signdraw');
+    }
+  }
+
+   
   }, 600);
 };
 </script>

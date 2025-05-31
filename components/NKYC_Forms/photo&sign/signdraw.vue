@@ -63,7 +63,7 @@ const buttonText = ref("Continue");
 const canvasRef = ref(null);
 const loading = ref(false)
 
-const additionaldoc=ref('')
+const additionaldoc = ref('')
 let ctx = null;
 let isDrawing = false;
 const isImageUploaded = ref(false);
@@ -227,6 +227,39 @@ const emit = defineEmits(['updateDiv']);
 
 
 
+const createunsignedDocument = async () => {
+  const apiurl = `${baseurl.value}nkyc_document`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status == 'ok') {
+      pagestatus('esign')
+     emit('updateDiv', 'esign');
+    }
+
+  } catch (error) {
+    console.error(error.message);
+  }
+};
 
 const uploadsign = async () => {
   loading.value = true
@@ -257,10 +290,14 @@ const uploadsign = async () => {
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
-      emit('updateDiv', 'additionalinformation');
-
-
-
+      if(!additionaldoc.value){
+          createunsignedDocument()
+      }
+      else{
+           pagestatus('additionalinformation')
+     emit('updateDiv', 'additionalinformation');
+      }
+   
     }
   } catch (error) {
     console.error(error.message);
@@ -326,6 +363,9 @@ const uploadImage = (event) => {
   };
   reader.readAsDataURL(file);
 };
+
+
+
 
 const handleButtonClick = () => {
   const canvas = canvasRef.value;
