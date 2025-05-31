@@ -6,7 +6,7 @@
     </div>
   </div>
 
-  <!-- Optional: Loading state -->
+  <!-- Loading state -->
   <div v-else>
     <p>Requesting location permission...</p>
   </div>
@@ -24,17 +24,16 @@ const logauth = ref(false);
 const locationReady = ref(false);
 const data = ref({});
 
-// Update form state
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value;
   data.value = newData;
 };
 
-// Request location and store in localStorage
-const requestLocation = () => {
+// Use cached location to return result quickly
+const requestFastLocation = () => {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      return reject('Geolocation is not supported by your browser.');
+      return reject('Geolocation not supported');
     }
 
     navigator.geolocation.getCurrentPosition(
@@ -46,18 +45,17 @@ const requestLocation = () => {
       },
       (error) => reject(error),
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
+        enableHighAccuracy: false,  // use Wi-Fi or cellular
+        timeout: 1000,              // only wait 1 second
+        maximumAge: 60000           // allow cached data (1 minute old)
       }
     );
   });
 };
 
-// On component mount
 onMounted(async () => {
   try {
-    await requestLocation();
+    await requestFastLocation();
     locationReady.value = true;
 
     const userkey = localStorage.getItem('userkey');
@@ -78,7 +76,7 @@ onMounted(async () => {
       logauth.value = true;
     }
   } catch (err) {
-    alert('Location permission denied. Please enable location services to continue.');
+    alert('Location request failed or timed out. Please enable location.');
     locationReady.value = false;
   }
 });
