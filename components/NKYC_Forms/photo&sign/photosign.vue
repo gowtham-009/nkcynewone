@@ -24,7 +24,7 @@
 
                     <div class="w-full flex items-center  gap-1 ">
                         <div
-                            class="p-2 px-2 flex justify-center items-center  w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
+                            class="p-2 px-2 flex justify-center items-center  w-8 h-8 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
                            <i class="pi pi-hourglass text-md text-blue-600"></i>
                         </div>
                         <div class="p-2">
@@ -36,7 +36,7 @@
 
                     <div class="w-full flex items-center gap-1 mt-1">
                         <div
-                            class="p-2 px-2 flex justify-center items-center  w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
+                            class="p-2 px-2 flex justify-center items-center  w-8 h-8 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
                       <i class="pi pi-face-smile text-md text-blue-600"></i>
                         </div>
                         <div class="p-2">
@@ -47,7 +47,7 @@
                     </div>
                     <div class="w-full flex items-center gap-1 mt-1">
                         <div
-                            class="p-2 px-2 flex justify-center items-center  w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
+                            class="p-2 px-2 flex justify-center items-center  w-8 h-8 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
                             <i class="pi pi-sparkles text-md text-blue-600"></i>
                         </div>
                         <div class="p-2">
@@ -58,7 +58,7 @@
                     </div>
                     <div class="w-full flex items-center gap-1 mt-1">
                         <div
-                            class="p-2 px-2 flex justify-center items-center  w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
+                            class="p-2 px-2 flex justify-center items-center  w-8 h-8 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
                            <i class="pi pi-sun text-md text-blue-600"></i>
                         </div>
                         <div class="p-2">
@@ -69,7 +69,7 @@
                     </div>
                     <div class="w-full flex items-center gap-1 mt-1">
                         <div
-                            class="p-2 px-2 flex justify-center items-center  w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
+                            class="p-2 px-2 flex justify-center items-center  w-8 h-8 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
                            <i class="pi pi-map-marker text-md text-blue-600"></i>
                         </div>
                         <div class="p-2">
