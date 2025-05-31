@@ -7,7 +7,7 @@
         </div>
         <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
-            <div class="w-full mt-1 px-2 p-1">
+            <div class="w-full px-2 p-1">
                 <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
                     Take a selfie
                 </p>
@@ -16,7 +16,7 @@
                 </p>
 
                 <div class="w-full flex justify-center">
-                    <img src="~/assets/image/imgrule.jpg" alt="">
+                    <img src="~/assets/image/imgrule.jpg" alt="" class="h-60 w-full">
                 </div>
 
                 <div class="w-full mt-2 rounded-lg px-3 py-2 bg-blue-50 dark:bg-slate-900">
