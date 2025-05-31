@@ -1,10 +1,10 @@
 <template>
-  <!-- Show loading message until location is granted -->
+  
   <div v-if="!locationReady">
     <p></p>
   </div>
 
-  <!-- Show form only after location is granted and logauth is true -->
+  
   <div v-else-if="logauth">
     <div v-if="currentForm === 'pan'">
       <form1 @updateDiv="handleUpdateDiv" />

@@ -356,6 +356,9 @@ const nomineesavedata = async () => {
     return;
   }
 
+  const date = new Date(dob.value).toISOString().slice(0, 10);
+
+
   const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
 
   const user = encryptionrequestdata({
@@ -368,7 +371,7 @@ const nomineesavedata = async () => {
     nomineeEmail: email.value,
     nomineeIdType: selected.value,
     nomineeIdNo: inputval.value,
-    nomineeDob: dob.value,
+    nomineeDob: date,
     nomineeGuardianName: guardian.value,
     nomineeShare: shareval.value,
     nomineeId: nomineeId,
