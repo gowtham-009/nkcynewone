@@ -324,7 +324,7 @@ const handleButtonClick = (event) => {
   }, 600);
 };
 
-const back = async (event) => {
+const back = async () => {
   const button = rippleBtnback.value;
   const circle = document.createElement('span');
   circle.classList.add('ripple');
