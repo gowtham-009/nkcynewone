@@ -15,7 +15,7 @@
           Use the signature box to sign
         </p>
   <canvas ref="canvasRef" class="signature-canvas" />        <div class="w-full mt-1 flex gap-2 justify-center">
-          <Button @click="erase" icon="pi pi-trash" label="Clear" class="px-2 py-1 text-white bg border-0"></Button>
+          <Button @click="erase" icon="pi pi-trash" label="Clear" class="px-2 py-1 text-white bg-red-500 border-0"></Button>
           <Button @click="triggerUpload" class="primary_color text-white" icon="pi pi-plus"
             label="Upload Signature"></Button>
           <input type="file" accept="image/*" ref="fileInput" @change="uploadImage" style="display: none" />
