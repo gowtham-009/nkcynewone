@@ -159,21 +159,21 @@ const handleButtonClick = () => {
         const mydata = await getServerData();
         const statuscheck = mydata?.payload?.metaData?.digi_info
         if (statuscheck.length == 0) {
-            alert('o1')
+          
             const pan = mydata?.payload?.metaData?.kraPan?.APP_ERROR_DESC
             if(pan=='PAN NOT FOUND') {
-                alert('pan not found')
+               
                  pagestatus('ekyc')
                  emit('updateDiv', 'ekyc');
             }
             else{
-                alert('parmanentaddress')
+               
               pagestatus('parmanentaddress')
                emit('updateDiv', 'parmanentaddress');
             }
         }
         else {
-             alert('parmanentaddress2')
+           
              pagestatus('parmanentaddress')
              emit('updateDiv', 'parmanentaddress');
         }

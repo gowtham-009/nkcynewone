@@ -153,7 +153,7 @@ watch(isValidEmail, (newValue) => {
     erroremail.value = false
   } else {
     isSending.value = false
-    buttonText.value = "verify"
+    buttonText.value = "Next"
   }
 });
 onMounted(() => {
