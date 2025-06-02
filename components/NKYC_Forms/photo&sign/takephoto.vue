@@ -36,8 +36,9 @@
                 </div>
                 
 
-                <div v-if="photoprogress" class="w-full p-1 flex justify-center rounded-lg bg-blue-50 text-blue-500" >
+                <div v-if="photoprogress" class="w-full p-1 flex justify-center  bg-blue-50 text-blue-500" >
                   <p class=" text-blue-500">please Wait...</p>
+                  <p class=" text-blue-500">{{ timing }}</p>
                 </div>
             </div>
 
@@ -68,7 +69,7 @@ const buttonText = ref("Continue");
 const imageCaptured = ref(null);
 const photoprogress = ref(false);
 
-
+const timing = ref(30)
 const latitude = ref('');
 const longitude = ref('');
 const errorMessage = ref('');
@@ -114,6 +115,18 @@ const getCountry = async () => {
   }
 }
 
+const startTimer = () => {
+  timing.value = 30
+  const timer = setInterval(() => {
+    if (timing.value > 0) {
+      timing.value--
+    } else {
+      clearInterval(timer)
+    }
+  }, 1000)
+  return timer
+}
+
 
 const ipvfunction = async () => {
 photoprogress.value = true;
@@ -131,6 +144,8 @@ const user = encryptionrequestdata({
 
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
+
+  const timer = startTimer()
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
@@ -141,6 +156,7 @@ const user = encryptionrequestdata({
       body: jsonString,
     })
 
+     clearInterval(timer)
     if (!response.ok) {
       throw new Error("Network is error", response.status);
 
@@ -160,6 +176,7 @@ const user = encryptionrequestdata({
     }
 
   } catch (error) {
+     clearInterval(timer)
     console.log(error.message)
   }
 }
