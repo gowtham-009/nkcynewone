@@ -42,7 +42,7 @@
         </span>
       </div>
       
-      <div class="mb-1">
+      <div>
         <span class="font-medium">Distance: </span>
         <span :class="{
           'text-red-500': faceDistanceScore < 70 && !imageCaptured,
@@ -56,7 +56,7 @@
     </div>
 
     <!-- Instructions -->
-    <div class="instructions mt-1 text-sm text-center max-w-xs">
+    <div class="instructions text-sm text-center max-w-xs">
       <p v-if="imageCaptured" class="text-green-500 font-medium">
         ✓ Image captured successfully!
       </p>
