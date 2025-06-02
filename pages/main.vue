@@ -133,7 +133,7 @@ import BANKFILE from '~/components/NKYC_Forms/finalstatementpage/bankfile.vue'
 
 import THANKYOU from '~/components/NKYC_Forms/thankyou.vue'
 
-const authenticated = ref(true) // Assuming you have a way to check if the user is authenticated
+const authenticated = ref(true) 
 const route = useRoute()
 const router = useRouter()
 const currentForm = ref('nkyclist')
@@ -141,14 +141,13 @@ const data = ref({})
 
 
 const formMap = {
-   '$@mobile1': 'mobile',
+  '$@mobile1': 'mobile',
   '$@email1': 'email',
   '$@main1': 'main',
   '$@ekyc1': 'ekyc',
   '$@parmanent1': 'parmanentaddress',
   '$@failed1': 'failedstatus',
   '$@comm1': 'communicationaddress',
-  '$@submit1': 'submission',
   '$@info1': 'info',
   '$@clientinfo1': 'clientinfo',
   '$@qual1': 'qualification',
@@ -172,7 +171,6 @@ const formMap = {
   '$@additional1': 'additionalinformation',
   '$@esign1': 'esign',
   '$@bankfile1': 'bankfile',
-  '$@csmspdf1': 'csmspdf',
   '$@thankyou1': 'thankyou',
 }
 
