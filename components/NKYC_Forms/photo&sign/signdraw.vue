@@ -161,18 +161,22 @@ const stopDrawing = () => {
 
 // Get Mouse/Tap Position
 const getMousePos = (event) => {
-  const rect = canvasRef.value.getBoundingClientRect();
-  let x, y;
+  const canvas = canvasRef.value;
+  const rect = canvas.getBoundingClientRect();
 
-  if (event.touches) {
-    x = event.touches[0].clientX - rect.left;
-    y = event.touches[0].clientY - rect.top;
+  let clientX, clientY;
+  if (event.touches && event.touches.length > 0) {
+    clientX = event.touches[0].clientX;
+    clientY = event.touches[0].clientY;
   } else {
-    x = event.clientX - rect.left;
-    y = event.clientY - rect.top;
+    clientX = event.clientX;
+    clientY = event.clientY;
   }
 
-  return { x, y };
+  return {
+    x: clientX - rect.left,
+    y: clientY - rect.top
+  };
 };
 
 
