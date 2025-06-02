@@ -132,18 +132,18 @@ const getsegmentdata = async () => {
 
 
 // 🖊️ Start drawing
-const startDrawing = (event) => {
+const startDrawing = (e) => {
   if (isImageUploaded.value) return; // 🔒 Prevent drawing on uploaded image
   isDrawing = true;
-  const { x, y } = getMousePos(event);
+   const pos = getMousePos(e);
   ctx.beginPath();
-  ctx.moveTo(x, y);
+  ctx.moveTo(pos.x, pos.y);
 };
 
-const draw = (event) => {
+const draw = (e) => {
   if (!isDrawing || isImageUploaded.value) return;
-  const { x, y } = getMousePos(event);
-  ctx.lineTo(x, y);
+  const pos = getMousePos(e);
+  ctx.lineTo(pos.x, pos.y);
   ctx.stroke();
 };
 
@@ -187,25 +187,22 @@ onMounted(async () => {
     deviceHeight.value = window.innerHeight;
   });
 
-  const canvas = canvasRef.value;
+   const canvas = canvasRef.value;
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+
   ctx = canvas.getContext('2d');
-
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight * 0.3;
-
+  ctx.strokeStyle = 'black';
+  ctx.lineWidth = 2;
   ctx.lineCap = 'round';
-  ctx.strokeStyle = 'black'; // Default black color
-  ctx.lineWidth = 3; // Default stroke thickness
 
-  // Attach event listeners
   canvas.addEventListener('mousedown', startDrawing);
   canvas.addEventListener('mousemove', draw);
   canvas.addEventListener('mouseup', stopDrawing);
   canvas.addEventListener('mouseleave', stopDrawing);
 
-  // Mobile touch support
-  canvas.addEventListener('touchstart', startDrawing);
-  canvas.addEventListener('touchmove', draw);
+  canvas.addEventListener('touchstart', startDrawing, { passive: true });
+  canvas.addEventListener('touchmove', draw, { passive: true });
   canvas.addEventListener('touchend', stopDrawing);
 });
 
@@ -219,7 +216,6 @@ onUnmounted(() => {
   canvas.removeEventListener('mousemove', draw);
   canvas.removeEventListener('mouseup', stopDrawing);
   canvas.removeEventListener('mouseleave', stopDrawing);
-
   canvas.removeEventListener('touchstart', startDrawing);
   canvas.removeEventListener('touchmove', draw);
   canvas.removeEventListener('touchend', stopDrawing);
