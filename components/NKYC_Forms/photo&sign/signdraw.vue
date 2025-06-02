@@ -160,67 +160,51 @@ const stopDrawing = () => {
 };
 
 
+// Get Mouse/Tap Position
 const getMousePos = (event) => {
   const rect = canvasRef.value.getBoundingClientRect();
-  let clientX, clientY;
+  let x, y;
 
   if (event.touches) {
-    clientX = event.touches[0].clientX;
-    clientY = event.touches[0].clientY;
+    x = event.touches[0].clientX - rect.left;
+    y = event.touches[0].clientY - rect.top;
   } else {
-    clientX = event.clientX;
-    clientY = event.clientY;
+    x = event.clientX - rect.left;
+    y = event.clientY - rect.top;
   }
-
-  const scaleX = canvasRef.value.width / rect.width;
-  const scaleY = canvasRef.value.height / rect.height;
-
-  const x = (clientX - rect.left) * scaleX;
-  const y = (clientY - rect.top) * scaleY;
 
   return { x, y };
 };
 
 
-
 onMounted(async () => {
-  await getsegmentdata();
+  await getsegmentdata()
   deviceHeight.value = window.innerHeight;
-
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
 
   const canvas = canvasRef.value;
-  const dpr = window.devicePixelRatio || 1;
-
-  // Set the actual canvas size with scaling
-  canvas.width = window.innerWidth * dpr;
-  canvas.height = window.innerHeight * 0.3 * dpr;
-
-  // Scale the context
   ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
 
-  // Set canvas CSS size (unscaled)
-  canvas.style.width = `${window.innerWidth}px`;
-  canvas.style.height = `${window.innerHeight * 0.3}px`;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight * 0.3;
 
   ctx.lineCap = 'round';
-  ctx.strokeStyle = 'black';
-  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'black'; // Default black color
+  ctx.lineWidth = 3; // Default stroke thickness
 
-  // Attach events
+  // Attach event listeners
   canvas.addEventListener('mousedown', startDrawing);
   canvas.addEventListener('mousemove', draw);
   canvas.addEventListener('mouseup', stopDrawing);
   canvas.addEventListener('mouseleave', stopDrawing);
 
+  // Mobile touch support
   canvas.addEventListener('touchstart', startDrawing);
   canvas.addEventListener('touchmove', draw);
   canvas.addEventListener('touchend', stopDrawing);
 });
-
 
 
 // Cleanup on Unmount
