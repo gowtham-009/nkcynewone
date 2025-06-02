@@ -30,8 +30,8 @@
     </div>
 
     <!-- Status indicators -->
-    <div class="status-indicators mt-4 text-center">
-      <div class="mb-2">
+    <div class="status-indicators mt-1  text-center">
+      <div class="">
         <span class="font-medium">Position: </span>
         <span :class="{
           'text-red-500': !isFaceCentered && !imageCaptured,
@@ -42,7 +42,7 @@
         </span>
       </div>
       
-      <div class="mb-2">
+      <div class="mb-1">
         <span class="font-medium">Distance: </span>
         <span :class="{
           'text-red-500': faceDistanceScore < 70 && !imageCaptured,
@@ -56,7 +56,7 @@
     </div>
 
     <!-- Instructions -->
-    <div class="instructions mt-2 text-sm text-center max-w-xs">
+    <div class="instructions mt-1 text-sm text-center max-w-xs">
       <p v-if="imageCaptured" class="text-green-500 font-medium">
         ✓ Image captured successfully!
       </p>
@@ -318,7 +318,7 @@ onMounted(async () => {
 .status-indicators {
   min-width: 250px;
   background: rgba(0, 0, 0, 0.05);
-  padding: 12px;
+  padding: 1%;
   border-radius: 8px;
 }
 
