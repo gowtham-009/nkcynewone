@@ -324,7 +324,7 @@ onMounted(async () => {
 
 .instructions p {
   margin: 0.3rem 0;
-  padding: 0.3rem;
+  padding: 0.2rem;
   border-radius: 4px;
 }
 </style>
