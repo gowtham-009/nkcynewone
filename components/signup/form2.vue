@@ -284,6 +284,7 @@ const otpverfication = async () => {
 };
 
 function otpclear(){
+  buttonText.value='Next'
   p_otp.value=''
     mobileotp.value = false;
    isSending.value=false

@@ -328,6 +328,7 @@ const otpverfication = async () => {
 }
 
 function otpclear() {
+  buttonText.value='Next'
   emailbox.value = false
       isSending.value = false;;
   e_otp.value=''
