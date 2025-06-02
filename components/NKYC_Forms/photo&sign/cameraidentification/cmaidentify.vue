@@ -3,8 +3,8 @@
     <div
       class="camera-wrapper"
       :class="{
-        captured: imageCaptured,
-        'centered-capture-ready': faceProperlyVisible && isNoseCenteredFlag,
+        'border-blue-400': !readyToCapture && !imageCaptured,
+        'border-green-500': readyToCapture || imageCaptured,
       }"
     >
       <video
@@ -21,22 +21,66 @@
         class="camera-image"
       />
       <canvas ref="canvas" class="hidden"></canvas>
+      
+      <!-- Visual guides -->
+      <div class="center-guide" v-if="!imageCaptured">
+        <div class="crosshair"></div>
+        <div class="distance-ring" :class="{ 'ring-green': readyToCapture }"></div>
+      </div>
     </div>
 
-    <span class="mt-1 dark:text-gray-400">
-      Face distance score: {{ faceDistanceScore.toFixed(2) }}%
-    </span>
-    <span class="dark:text-gray-400">
-      Face Visible:
-      <span :class="{ 'text-green-500': faceProperlyVisible, 'text-red-500': !faceProperlyVisible }">
-        {{ faceProperlyVisible ? '✅ Yes' : '❌ No' }}
-      </span>
-    </span>
+    <!-- Status indicators -->
+    <div class="status-indicators mt-4 text-center">
+      <div class="mb-2">
+        <span class="font-medium">Position: </span>
+        <span :class="{
+          'text-red-500': !isFaceCentered && !imageCaptured,
+          'text-yellow-500': isFaceCentered && faceDistanceScore < 70 && !imageCaptured,
+          'text-green-500': readyToCapture || imageCaptured
+        }">
+          {{ facePositionStatus }}
+        </span>
+      </div>
+      
+      <div class="mb-2">
+        <span class="font-medium">Distance: </span>
+        <span :class="{
+          'text-red-500': faceDistanceScore < 70 && !imageCaptured,
+          'text-green-500': faceDistanceScore >= 70 || imageCaptured
+        }">
+          {{ faceDistanceScore.toFixed(0) }}%
+          <span v-if="faceDistanceScore >= 70 || imageCaptured">✅</span>
+          <span v-else>❌ (Need 70%+)</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions mt-2 text-sm text-center max-w-xs">
+      <p v-if="imageCaptured" class="text-green-500 font-medium">
+        ✓ Image captured successfully!
+      </p>
+      <p v-else-if="multipleFacesDetected" class="text-red-500 font-medium">
+        ❌ Multiple faces detected! Only one face allowed.
+      </p>
+      <p v-else-if="!faceDetected" class="text-red-500">
+        ❌ No face detected
+      </p>
+      <p v-else-if="!isFaceCentered" class="text-yellow-500">
+        ⬆️ Center your face in the circle
+      </p>
+      <p v-else-if="faceDistanceScore < 70" class="text-yellow-500">
+        📏 Move slightly closer
+      </p>
+      <p v-else class="text-green-500 font-medium">
+        ✓ Perfect! Capturing...
+      </p>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import * as faceapi from 'face-api.js'
 
 const emit = defineEmits(['captured'])
@@ -47,25 +91,17 @@ const capturedImage = ref(null)
 const imageCaptured = ref(false)
 const cameraActive = ref(true)
 const faceDistanceScore = ref(0)
-const faceProperlyVisible = ref(false)
-const eyesClosed = ref(false)
-const blinkDetected = ref(false)
-const isNoseCenteredFlag = ref(false)
-
-const lastLeftEyeDistance = ref(0)
-const lastRightEyeDistance = ref(0)
+const isFaceCentered = ref(false)
+const faceDetected = ref(false)
+const multipleFacesDetected = ref(false)
 
 let mediaStream = null
+let alertShown = false
 
 // Frame settings
-const FRAME_WIDTH = 300
-const FRAME_HEIGHT = 300
-const FRAME_CENTER = ref({ x: FRAME_WIDTH / 2, y: FRAME_HEIGHT / 2 })
-const MAX_ALLOWED_DISTANCE = 100
-const CAPTURE_CENTER_TOLERANCE = 15 // nose must be within 15px of center
-const MIN_DETECTION_SCORE = 0.5
-const EYE_CLOSED_THRESHOLD = 2
-const BLINK_THRESHOLD = 1
+const FRAME_SIZE = 300
+const CENTER_TOLERANCE = 20
+const MIN_DISTANCE_SCORE = 70
 
 const loadModels = async () => {
   await faceapi.nets.tinyFaceDetector.loadFromUri('/models/tiny_face_detector')
@@ -74,13 +110,6 @@ const loadModels = async () => {
 
 const distance = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y)
 
-const isNoseCentered = (nosePos, center) => {
-  return (
-    Math.abs(nosePos.x - center.x) <= CAPTURE_CENTER_TOLERANCE &&
-    Math.abs(nosePos.y - center.y) <= CAPTURE_CENTER_TOLERANCE
-  )
-}
-
 const detectFaces = async () => {
   if (!video.value || video.value.readyState !== 4 || imageCaptured.value) return
 
@@ -88,65 +117,59 @@ const detectFaces = async () => {
     .detectAllFaces(video.value, new faceapi.TinyFaceDetectorOptions())
     .withFaceLandmarks()
 
+  // Handle multiple faces
   if (detections.length > 1) {
-    alert('❌ Multiple faces detected. Please ensure only one face is in frame.')
-    faceProperlyVisible.value = false
+    faceDetected.value = false
+    isFaceCentered.value = false
+    faceDistanceScore.value = 0
+    multipleFacesDetected.value = true
+    
+    if (!alertShown) {
+      alert('❌ Multiple faces detected. Please ensure only one face is visible.')
+      alertShown = true
+      setTimeout(() => { alertShown = false }, 3000)
+    }
     return
   }
 
+  multipleFacesDetected.value = false
+
+  // No face detected
   if (detections.length === 0) {
-    faceProperlyVisible.value = false
+    faceDetected.value = false
+    isFaceCentered.value = false
+    faceDistanceScore.value = 0
     return
   }
 
+  faceDetected.value = true
   const detection = detections[0]
   const landmarks = detection.landmarks
   const nose = landmarks.getNose()[3]
-  const leftEye = landmarks.getLeftEye()
-  const rightEye = landmarks.getRightEye()
 
-  const leftEyeDistance = distance(leftEye[1], leftEye[5])
-  const rightEyeDistance = distance(rightEye[1], rightEye[5])
-
-  if (
-    Math.abs(leftEyeDistance - lastLeftEyeDistance.value) > BLINK_THRESHOLD ||
-    Math.abs(rightEyeDistance - lastRightEyeDistance.value) > BLINK_THRESHOLD
-  ) {
-    blinkDetected.value = true
-  } else {
-    blinkDetected.value = false
-  }
-
-  lastLeftEyeDistance.value = leftEyeDistance
-  lastRightEyeDistance.value = rightEyeDistance
-
-  eyesClosed.value =
-    leftEyeDistance < EYE_CLOSED_THRESHOLD && rightEyeDistance < EYE_CLOSED_THRESHOLD
-
-  const videoBox = video.value.getBoundingClientRect()
-  const scaleX = video.value.videoWidth / videoBox.width
-  const scaleY = video.value.videoHeight / videoBox.height
+  // Calculate position
+  const videoRect = video.value.getBoundingClientRect()
+  const scaleX = video.value.videoWidth / videoRect.width
+  const scaleY = video.value.videoHeight / videoRect.height
 
   const nosePosition = {
     x: nose.x / scaleX,
-    y: nose.y / scaleY,
+    y: nose.y / scaleY
   }
 
-  const distToCenter = distance(nosePosition, FRAME_CENTER.value)
-  faceDistanceScore.value = Math.max(
-    0,
-    Math.min(100, 100 - (distToCenter / MAX_ALLOWED_DISTANCE) * 100)
-  )
+  // Calculate distance from center
+  const center = { x: FRAME_SIZE / 2, y: FRAME_SIZE / 2 }
+  const distToCenter = distance(nosePosition, center)
+  
+  // Calculate score (100% when perfectly centered)
+  const maxDistance = FRAME_SIZE / 2
+  faceDistanceScore.value = Math.max(0, 100 - (distToCenter / maxDistance) * 100)
 
-  faceProperlyVisible.value = detection.detection.score > MIN_DETECTION_SCORE
-  isNoseCenteredFlag.value = isNoseCentered(nosePosition, FRAME_CENTER.value)
+  // Check if face is centered enough
+  isFaceCentered.value = distToCenter <= CENTER_TOLERANCE
 
-  if (
-    isNoseCenteredFlag.value &&
-    faceProperlyVisible.value &&
-    !eyesClosed.value &&
-    !blinkDetected.value
-  ) {
+  // Auto-capture when conditions are met
+  if (readyToCapture.value && !imageCaptured.value) {
     captureImage()
   }
 }
@@ -164,7 +187,7 @@ const captureImage = () => {
 
 const stopCamera = () => {
   if (mediaStream) {
-    mediaStream.getTracks().forEach((track) => track.stop())
+    mediaStream.getTracks().forEach(track => track.stop())
     cameraActive.value = false
   }
 }
@@ -177,11 +200,30 @@ const startDetectionLoop = () => {
   loop()
 }
 
+// Computed properties
+const readyToCapture = computed(() => {
+  return faceDetected.value && 
+         isFaceCentered.value && 
+         faceDistanceScore.value >= MIN_DISTANCE_SCORE
+})
+
+const facePositionStatus = computed(() => {
+  if (imageCaptured.value) return 'Captured!'
+  if (!faceDetected.value) return 'No face'
+  if (!isFaceCentered.value) return 'Off center'
+  if (faceDistanceScore.value < MIN_DISTANCE_SCORE) return 'Too far'
+  return 'Perfect!'
+})
+
 onMounted(async () => {
   await loadModels()
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: { width: FRAME_WIDTH, height: FRAME_HEIGHT },
+      video: { 
+        width: FRAME_SIZE, 
+        height: FRAME_SIZE,
+        facingMode: 'user'
+      }
     })
     video.value.srcObject = mediaStream
     video.value.onloadeddata = () => startDetectionLoop()
@@ -193,43 +235,22 @@ onMounted(async () => {
 
 <style scoped>
 .camera-wrapper {
-  width: 85vw; /* Responsive width */
-  max-width: 350px;
-  aspect-ratio: 1 / 1; /* Ensures it's a square */
-  border-radius: 50%; /* Makes it a circle */
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
   overflow: hidden;
-  border: 4px solid #00BFFF;
-  box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+  border: 4px solid;
   position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
 }
 
-.camera-wrapper::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: rgba(0, 0, 0, 0.3);
+.camera-wrapper.border-blue-400 {
+  border-color: #60a5fa;
 }
 
-.camera-wrapper::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.camera-wrapper.centered-capture-ready {
-  border-color: #00FF00;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
-}
-
-.camera-wrapper.captured {
-  border-color: #00FF00;
+.camera-wrapper.border-green-500 {
+  border-color: #10b981;
 }
 
 .camera-video,
@@ -239,7 +260,71 @@ onMounted(async () => {
   object-fit: cover;
 }
 
-canvas.hidden {
-  display: none;
+.center-guide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+}
+
+.crosshair:before,
+.crosshair:after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.crosshair:before {
+  width: 2px;
+  height: 20px;
+  left: 9px;
+  top: 0;
+}
+
+.crosshair:after {
+  width: 20px;
+  height: 2px;
+  left: 0;
+  top: 9px;
+}
+
+.distance-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border: 2px dashed rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  transition: border-color 0.3s ease;
+}
+
+.distance-ring.ring-green {
+  border-color: rgba(0, 255, 0, 0.7);
+}
+
+.status-indicators {
+  min-width: 250px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.instructions p {
+  margin: 0.3rem 0;
+  padding: 0.3rem;
+  border-radius: 4px;
 }
 </style>
