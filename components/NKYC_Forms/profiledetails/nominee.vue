@@ -36,7 +36,7 @@
           </div>
 
        <div class="w-full" v-if="nomineecontainer">
-           <Button @click="visible = true" class="w-full py-3 primary_color text-white">
+           <Button  @click="openNomineeDialog"  class="w-full py-3 primary_color text-white">
             {{ nomineetext }}
           </Button>
 
@@ -205,8 +205,26 @@ const inputval = ref('')
 
 const guardian = ref('')
 
+const resetFormFields = () => {
+  idval.value = '';
+  name.value = '';
+  selectedStatement.value = '';
+  dob.value = '';
+  address.value = '';
+  mobileNo.value = '';
+  email.value = '';
+  selected.value = 'PAN';
+  inputval.value = '';
+  guardian.value = '';
+  shareval.value = '';
+  prooftype.value = 'PAN';
+};
 
 
+const openNomineeDialog = () => {
+  resetFormFields(); // Reset all form fields
+  visible.value = true; // Open the dialog
+};
 const nomineedetails = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
@@ -329,7 +347,7 @@ const dialogbox = (editdata) => {
   idval.value = editdata.id;
   name.value = editdata.name;
   
-  // Fix: Find the matching option object from statementOptions
+ 
   selectedStatement.value = statementOptions.value.find(
     option => option.value === editdata.relation || option.name === editdata.relation
   ) || statementOptions.value[0]; // Fallback to first option if not found
