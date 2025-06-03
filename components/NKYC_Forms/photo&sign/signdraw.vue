@@ -37,6 +37,8 @@
 
         <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
           <p class="text-sm text-blue-500">Please Wait...</p>
+                            <p class=" text-blue-500">{{ timing }}</p>
+
         </div>
       </div>
 
@@ -68,7 +70,7 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const canvasRef = ref(null);
 const loading = ref(false)
-
+const timing = ref(30)
 const additionaldoc = ref('')
 let ctx = null;
 let isDrawing = false;
@@ -281,6 +283,19 @@ const createunsignedDocument = async () => {
   }
 };
 
+
+const startTimer = () => {
+  timing.value = 30
+  const timer = setInterval(() => {
+    if (timing.value > 0) {
+      timing.value--
+    } else {
+      clearInterval(timer)
+    }
+  }, 1000)
+  return timer
+}
+
 const uploadsign = async () => {
   loading.value = true
   const apiurl = `${baseurl.value}proofupload`;
@@ -293,7 +308,7 @@ const uploadsign = async () => {
 
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
-
+ const timer = startTimer()
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
@@ -303,7 +318,7 @@ const uploadsign = async () => {
       },
       body: jsonString,
     });
-
+ clearInterval(timer)
     if (!response.ok) {
       throw new Error(`Network error: ${response.status}`);
     }
@@ -320,6 +335,7 @@ const uploadsign = async () => {
    
     }
   } catch (error) {
+    clearInterval(timer)
     console.error(error.message);
   }
 };

@@ -63,6 +63,8 @@
 
                       <div v-if="loading" class="w-full p-1 flex justify-center rounded-lg bg-blue-50 text-blue-500" >
                   <p class=" text-blue-500">please Wait...</p>
+                  <p class=" text-blue-500">{{ timing }}</p>
+
                 </div>
                 </div>
 
@@ -111,7 +113,7 @@ const question5=ref('')
 const question6=ref('')
 const question7=ref('')
 const question8=ref('')
-
+const timing = ref(30)
 const loading=ref(false)
 
 const getsegmentdata = async () => {
@@ -152,6 +154,17 @@ onMounted(async() => {
 
 
 
+const startTimer = () => {
+  timing.value = 30
+  const timer = setInterval(() => {
+    if (timing.value > 0) {
+      timing.value--
+    } else {
+      clearInterval(timer)
+    }
+  }, 1000)
+  return timer
+}
 
 
 
@@ -177,7 +190,7 @@ const additionaldocument = async () => {
 
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
-
+const timer = startTimer()
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
@@ -187,7 +200,7 @@ const additionaldocument = async () => {
       },
       body: jsonString,
     });
-
+clearInterval(timer)
     if (!response.ok) {
       throw new Error(`Network error: ${response.status}`);
     }
@@ -197,6 +210,7 @@ const additionaldocument = async () => {
       createunsignedDocument()
     }
   } catch (error) {
+    clearInterval(timer)
     console.error(error.message);
   }
 };

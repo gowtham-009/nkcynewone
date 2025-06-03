@@ -22,6 +22,8 @@
 
         <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2" >
                   <p class="text-sm text-blue-500">Please Wait...</p>
+                                    <p class=" text-blue-500">{{ timing }}</p>
+
                 </div>
         </div>
       </div>
@@ -58,6 +60,7 @@ const rippleBtnback = ref(null);
 const { baseurl } = globalurl();
 const loading=ref(false)
 const imageSrcbank = ref( null);
+const timing = ref(30)
 
 const getsegmentdata = async () => {
   const mydata = await getServerData();
@@ -97,6 +100,17 @@ const urlToBase64 = async (url) => {
   });
 };
 
+const startTimer = () => {
+  timing.value = 30
+  const timer = setInterval(() => {
+    if (timing.value > 0) {
+      timing.value--
+    } else {
+      clearInterval(timer)
+    }
+  }, 1000)
+  return timer
+}
 
 
 const proofupload = async () => {
@@ -118,7 +132,7 @@ const proofupload = async () => {
 
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
-
+const timer = startTimer()
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
@@ -128,6 +142,8 @@ const proofupload = async () => {
       },
       body: jsonString,
     });
+
+    clearInterval(timer)
 
     if (!response.ok) {
       throw new Error(`Network error: ${response.status}`);
@@ -141,6 +157,7 @@ const proofupload = async () => {
        }
     }
   } catch (error) {
+    clearInterval(timer)
     console.error(error.message);
   }
 };
