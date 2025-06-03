@@ -111,14 +111,14 @@ const setPermanentAddress = async () => {
     city.value = mydata?.payload?.metaData?.kraPan?.APP_PER_CITY || ''
     pincode.value = mydata?.payload?.metaData?.kraPan?.APP_PER_PINCD || ''
   }
-  else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument ) {
-  address.value = mydata?.payload?.metaData?.address?.perAddress || ''
-   
+  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+    address.value = mydata?.payload?.metaData?.address?.perAddress || ''
+
     state.value = mydata?.payload?.metaData?.address.perState || ''
     city.value = mydata?.payload?.metaData?.address.perCity || ''
     pincode.value = mydata?.payload?.metaData?.address.perPincode || ''
   }
-  else{
+  else {
 
   }
 
@@ -166,11 +166,11 @@ const permanentaddressdata = async () => {
         const isConfirmed = commAddressRef.value?.confirm;
         if (isConfirmed) {
 
-        
+
 
           const mydata = await pagestatus('info')
           if (mydata.payload.status == 'ok') {
-             emit('updateDiv', 'info');
+            emit('updateDiv', 'info');
           }
 
         } else {
@@ -195,8 +195,8 @@ const permanentaddressdata = async () => {
 // Handle continue button click
 const handleButtonClick = (event) => {
 
- 
-    const button = rippleBtn.value
+
+  const button = rippleBtn.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
 
@@ -211,15 +211,15 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove()
-     
-   permanentaddressdata()
+
+    permanentaddressdata()
   }, 600)
 };
 
 
 
 function back() {
-    const button = rippleBtnback.value
+  const button = rippleBtnback.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
 
@@ -231,24 +231,19 @@ function back() {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
 
-     pagestatus('main')
-      emit('updateDiv', 'main');
+    pagestatus('main')
+    emit('updateDiv', 'main');
   }, 600)
-   
+
 }
-
- 
-
 
 </script>
 
 
 <style scoped>
-
-
 .p-checkbox-checked .p-checkbox-icon {
   color: white !important;
 }

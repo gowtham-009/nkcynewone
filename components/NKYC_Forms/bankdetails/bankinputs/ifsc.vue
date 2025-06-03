@@ -1,47 +1,41 @@
 <template>
-    <div class="flex gap-3">
-      <div class="input-wrapper w-full dark:!bg-gray-800">
-      <InputText
-        class="w-full font-normal prime-input"
-        v-model="ifsc"
-        type="text"
-      
-        @input="validateInput"
-        maxlength="17"
-      />
+  <div class="flex gap-3">
+    <div class="input-wrapper w-full dark:!bg-gray-800">
+      <InputText class="w-full font-normal prime-input" v-model="ifsc" type="text" @input="validateInput"
+        maxlength="17" />
       <span class="bottom-border"></span>
     </div>
-    </div>
-  </template>
-  
-  <script setup>
-  import { ref, watch } from 'vue';
-  
-  const props = defineProps(['modelValue']);
-  const emit = defineEmits(['update:modelValue']);
-  
-  const ifsc = ref(props.modelValue || '');
-  
-  // Allow only alphanumeric, convert to uppercase, and limit to 17 characters
-  const validateInput = (e) => {
-    let value = e.target.value
-      .toUpperCase()            // Convert to uppercase
-      .replace(/[^A-Z0-9]/g, '') // Remove non-alphanumeric characters
-      .slice(0, 17);             // Limit to 17 characters
-    ifsc.value = value;
-    e.target.value = value;
-  };
-  
-  watch(ifsc, (newValue) => {
-    emit('update:modelValue', newValue);
-  });
-  </script>
-  <style scoped>
-  .uppercase {
-    text-transform: uppercase;
-  }
+  </div>
+</template>
 
-  .input-wrapper {
+<script setup>
+import { ref, watch } from 'vue';
+
+const props = defineProps(['modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+const ifsc = ref(props.modelValue || '');
+
+// Allow only alphanumeric, convert to uppercase, and limit to 17 characters
+const validateInput = (e) => {
+  let value = e.target.value
+    .toUpperCase()            // Convert to uppercase
+    .replace(/[^A-Z0-9]/g, '') // Remove non-alphanumeric characters
+    .slice(0, 17);             // Limit to 17 characters
+  ifsc.value = value;
+  e.target.value = value;
+};
+
+watch(ifsc, (newValue) => {
+  emit('update:modelValue', newValue);
+});
+</script>
+<style scoped>
+.uppercase {
+  text-transform: uppercase;
+}
+
+.input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -91,4 +85,4 @@
   width: 100%;
   height: 4px;
 }
-  </style>
+</style>

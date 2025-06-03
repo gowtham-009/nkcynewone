@@ -2,10 +2,10 @@
     <div class="primary_color">
         <div class="flex justify-between primary_color items-center px-3"
             :style="{ height: deviceHeight * 0.08 + 'px' }">
-            <logo style="width: 40px; height: 40px;"/>
-            <profile/>
+            <logo style="width: 40px; height: 40px;" />
+            <profile />
         </div>
-        <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black" 
+        <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full mt-1 px-2 p-1">
                 <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
@@ -25,35 +25,35 @@
                         </div>
                         <div class="p-2">
                             <p class="text-gray-500 leading-6 font-normal text-sm">
-                               Choose the option to upload an image of your signature for accuracy.
+                                Choose the option to upload an image of your signature for accuracy.
                             </p>
                         </div>
                     </div>
 
                     <div class="w-full flex items-center  gap-2 mt-1">
                         <div
-                        class="p-2 px-2 flex justify-center items-center w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
-                          <i class="pi pi-clone text-md text-blue-600"></i>
+                            class="p-2 px-2 flex justify-center items-center w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
+                            <i class="pi pi-clone text-md text-blue-600"></i>
                         </div>
                         <div class="p-2">
                             <p class="text-gray-500 leading-6 font-normal text-sm">
-                               This signature will be used to match any future offline transaction.
+                                This signature will be used to match any future offline transaction.
                             </p>
                         </div>
                     </div>
                     <div class="w-full flex items-center gap-2 mt-1">
                         <div
-                        class="p-2 px-2 flex justify-center items-center  w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
-                      <i class="pi pi-upload text-md text-blue-600"></i>
+                            class="p-2 px-2 flex justify-center items-center  w-10 h-10 bg-gray-200 dark:bg-gray-800 rounded-md flex-shrink-0">
+                            <i class="pi pi-upload text-md text-blue-600"></i>
                         </div>
                         <div class="p-2">
                             <p class="text-gray-500 leading-6 font-normal text-sm">
-                               signature mismatch will require resubmission as per regulations.
+                                signature mismatch will require resubmission as per regulations.
                             </p>
                         </div>
                     </div>
 
-                   
+
                 </div>
 
                 <p class="text-gray-500 mt-1 text-sm font-normal text-left">
@@ -63,15 +63,16 @@
             </div>
 
             <div class="w-full flex gap-2">
-                <Button @click="back()" ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-                <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-            </Button>
-                <Button type="button"  ref="rippleBtn" @click="handleButtonClick"  
+                <Button @click="back()" ref="rippleBtnback"
+                    class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+                    <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+                </Button>
+                <Button type="button" ref="rippleBtn" @click="handleButtonClick"
                     class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
                     {{ buttonText }}
                 </Button>
 
-               
+
             </div>
 
         </div>
@@ -105,46 +106,46 @@ onMounted(() => {
 const emit = defineEmits(['updateDiv']);
 const back = () => {
     const button = rippleBtnback.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
+    const circle = document.createElement('span')
+    circle.classList.add('ripple')
 
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+    const rect = button.$el.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
 
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-  button.$el.appendChild(circle)
+    circle.style.left = `${x}px`
+    circle.style.top = `${y}px`
+    button.$el.appendChild(circle)
 
-  setTimeout(() => {
-    circle.remove()
-     pagestatus('photoproceed')
-    emit('updateDiv', 'photoproceed');
-  }, 600)
-    
+    setTimeout(() => {
+        circle.remove()
+        pagestatus('photoproceed')
+        emit('updateDiv', 'photoproceed');
+    }, 600)
+
 }
 
 
 
 const handleButtonClick = () => {
     const button = rippleBtn.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
+    const circle = document.createElement('span')
+    circle.classList.add('ripple')
 
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+    const rect = button.$el.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
 
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
+    circle.style.left = `${x}px`
+    circle.style.top = `${y}px`
 
-  button.$el.appendChild(circle)
+    button.$el.appendChild(circle)
 
-  setTimeout(() => {
-    circle.remove()
-      pagestatus('signdraw')
-    emit('updateDiv', 'signdraw');
-}, 600)
+    setTimeout(() => {
+        circle.remove()
+        pagestatus('signdraw')
+        emit('updateDiv', 'signdraw');
+    }, 600)
 };
 
 </script>

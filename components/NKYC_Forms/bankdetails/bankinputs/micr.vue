@@ -1,14 +1,8 @@
 <template>
   <div class="flex gap-3">
     <div class="input-wrapper w-full dark:!bg-gray-800">
-      <InputText
-        class="w-full font-normal prime-input"
-        :value="micr"
-        type="text"
-        @input="validateInput"
-        maxlength="17"
-       
-      />
+      <InputText class="w-full font-normal prime-input" :value="micr" type="text" @input="validateInput"
+        maxlength="17" />
       <span class="bottom-border"></span>
     </div>
   </div>

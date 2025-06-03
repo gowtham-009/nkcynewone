@@ -1,54 +1,44 @@
 <template>
-    <div class="w-full">
-      <span class="text-md text-gray-500">Father name</span>
-      <div class="input-wrapper dark:!bg-gray-800">
-      <InputText
-        type="text"
-        v-model="father"
-        variant="filled"
-        class="w-full py-2 uppercase prime-input dark:!bg-gray-800"
-        @input="formatfather"
-        
-        inputmode="text"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="characters"
-   
-      />
+  <div class="w-full">
+    <span class="text-md text-gray-500">Father name</span>
+    <div class="input-wrapper dark:!bg-gray-800">
+      <InputText type="text" v-model="father" variant="filled"
+        class="w-full py-2 uppercase prime-input dark:!bg-gray-800" @input="formatfather" inputmode="text"
+        autocomplete="off" autocorrect="off" autocapitalize="characters" />
       <span class="bottom-border"></span>
-      </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, watch } from 'vue';
-  
-  const props = defineProps(['modelValue']);
-  const emit = defineEmits(['update:modelValue']);
-  
-  const father = ref((props.modelValue || '').toUpperCase());
-  
-  // Clean and format input on each change
-  const formatfather = (event) => {
-    const raw = event.target.value;
-    const cleaned = raw.toUpperCase().replace(/[^A-Z.\s]/g, '');
-    father.value = cleaned;
-    event.target.value = cleaned; // ensures proper display on mobile
-  };
-  
-  // Emit value to parent
-  watch(father, (newVal) => {
-    emit('update:modelValue', newVal);
-  });
-  </script>
-  
-  
-  <style scoped>
-  .uppercase {
-    text-transform: uppercase;
-  }
+  </div>
+</template>
 
-  .input-wrapper {
+<script setup>
+import { ref, watch } from 'vue';
+
+const props = defineProps(['modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+const father = ref((props.modelValue || '').toUpperCase());
+
+// Clean and format input on each change
+const formatfather = (event) => {
+  const raw = event.target.value;
+  const cleaned = raw.toUpperCase().replace(/[^A-Z.\s]/g, '');
+  father.value = cleaned;
+  event.target.value = cleaned; // ensures proper display on mobile
+};
+
+// Emit value to parent
+watch(father, (newVal) => {
+  emit('update:modelValue', newVal);
+});
+</script>
+
+
+<style scoped>
+.uppercase {
+  text-transform: uppercase;
+}
+
+.input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -98,4 +88,4 @@
   width: 100%;
   height: 4px;
 }
-  </style>
+</style>

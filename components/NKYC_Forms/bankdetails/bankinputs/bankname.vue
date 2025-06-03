@@ -1,13 +1,8 @@
 <template>
   <div class="flex gap-3">
     <div class="input-wrapper w-full dark:!bg-gray-800">
-      <InputText
-        class="w-full font-normal prime-input"
-        v-model="bankname"
-        inputmode="text"
-        type="text"
-        @input="validateInput"
-      />
+      <InputText class="w-full font-normal prime-input" v-model="bankname" inputmode="text" type="text"
+        @input="validateInput" />
       <span class="bottom-border"></span>
     </div>
   </div>

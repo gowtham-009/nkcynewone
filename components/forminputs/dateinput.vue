@@ -2,14 +2,8 @@
   <span class="font-semibold text-lg">Date of Birth as per PAN</span>
 
   <div class="date-wrapper w-full">
-    <Calendar
-      v-model="internalDate"
-      dateFormat="dd/mm/yy"
-      placeholder="DD / MM / YYYY"
-      class="custom-calendar w-full dark:!bg-gray-800"
-      inputClass="custom-input"
-   
-    />
+    <Calendar v-model="internalDate" dateFormat="dd/mm/yy" placeholder="DD / MM / YYYY"
+      class="custom-calendar w-full dark:!bg-gray-800" inputClass="custom-input" />
   </div>
 </template>
 

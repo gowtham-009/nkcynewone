@@ -2,19 +2,9 @@
   <div class="card flex justify-center">
     <div class="flex flex-col items-center py-2">
       <div class="flex w-full" style="gap: 0">
-        <input
-  v-for="(digit, index) in otp"
-  :key="index"
-  ref="otpInputs"
-  type="tel"
-  inputmode="numeric"
-  maxlength="1"
-  class="custom-otp-input w-full dark:text-slate-100"
-  v-model="otp[index]"
-  @input="onInput(index, $event)"
-  @keydown.backspace="onBackspace(index)"
-  @paste="onPaste"
-/>
+        <input v-for="(digit, index) in otp" :key="index" ref="otpInputs" type="tel" inputmode="numeric" maxlength="1"
+          class="custom-otp-input w-full dark:text-slate-100" v-model="otp[index]" @input="onInput(index, $event)"
+          @keydown.backspace="onBackspace(index)" @paste="onPaste" />
 
       </div>
     </div>

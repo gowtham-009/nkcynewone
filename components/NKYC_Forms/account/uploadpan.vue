@@ -5,7 +5,8 @@
       <profile />
     </div>
 
-    <div class="flex justify-between p-2 flex-col bg-white rounded-t-3xl dark:bg-black" :style="{ height: deviceHeight * 0.92 + 'px' }">
+    <div class="flex justify-between p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
+      :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full mt-1 px-2 p-1">
         <p class="text-xl text-blue-900 font-medium dark:text-gray-400">Upload proofs</p>
         <p class="text-sm text-gray-500 font-normal leading-6">
@@ -19,31 +20,27 @@
               <div class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white">
                 <div class="px-2 py-2">
                   <PAN v-model:src="imageSrcpan" />
-                  
+
                 </div>
               </div>
             </div>
           </div>
 
-            <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2" >
-                    <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
+          <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
+            <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
 
-                </div>
+          </div>
         </div>
       </div>
 
       <!-- Submit Buttons -->
       <div class="w-full flex gap-2">
-        <Button @click="back" ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+        <Button @click="back" ref="rippleBtnback"
+          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button
-          type="button"
-          ref="rippleBtn"
-          @click="handleButtonClick"
-          :disabled="!imageSrcpan"
-          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0"
-        >
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrcpan"
+          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
       </div>
@@ -61,8 +58,8 @@ const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
-const imageSrcpan = ref( null);
-const loading=ref(false)
+const imageSrcpan = ref(null);
+const loading = ref(false)
 const timing = ref(30)
 
 const getsegmentdata = async () => {
@@ -79,8 +76,8 @@ const getsegmentdata = async () => {
     }
   }
 
-  else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument){
-      const segments = mydata?.payload?.metaData?.proofs?.pancard || '';
+  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+    const segments = mydata?.payload?.metaData?.proofs?.pancard || '';
     if (segments) {
       const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
       const userToken = localStorage.getItem('userkey');
@@ -122,7 +119,7 @@ const proofupload = async () => {
     console.error('No image to upload');
     return;
   }
-loading.value=true
+  loading.value = true
   const base64value = await urlToBase64(imageSrcpan.value);
   const apiurl = `${baseurl.value}proofupload`;
 
@@ -153,20 +150,20 @@ loading.value=true
     const data = await response.json();
     if (data.payload.status === 'ok') {
 
-    const mydata = await getServerData();
-     const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName
-     if(statuscheck1){
-   
-          const mydata= await pagestatus('photosign1')
-       if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'photosign1');
-       }
-     }
-     else{
-      pagestatus('uploadbank'),
-      emit('updateDiv', 'uploadbank');
-     }
-      
+      const mydata = await getServerData();
+      const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName
+      if (statuscheck1) {
+
+        const mydata = await pagestatus('photosign1')
+        if (mydata.payload.status == 'ok') {
+          emit('updateDiv', 'photosign1');
+        }
+      }
+      else {
+        pagestatus('uploadbank'),
+          emit('updateDiv', 'uploadbank');
+      }
+
     }
   } catch (error) {
     clearInterval(timer)
@@ -190,8 +187,8 @@ const back = (event) => {
 
   setTimeout(() => {
     circle.remove();
-     pagestatus('brokerage'),
-    emit('updateDiv', 'brokerage');
+    pagestatus('brokerage'),
+      emit('updateDiv', 'brokerage');
   }, 600);
 };
 
@@ -210,12 +207,12 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove();
-   proofupload()
- 
+    proofupload()
+
   }, 600);
 };
 
-onMounted(async() => {
+onMounted(async () => {
   await getsegmentdata();
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;

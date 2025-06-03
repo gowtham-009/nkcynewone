@@ -16,55 +16,56 @@
         </p>
 
         <div class="w-full ">
-            <div >
-          <span class="text-gray-500 text-sm mt-1">Account Type</span>
-             <div class="flex gap-2">
-            <div class="flex items-center gap-2">
-              <RadioButton v-model="selected" inputId="SAVING " name="id" value="SAVING " @change="emitSelection" />
-              <label for="SAVING " class="text-gray-500 text-sm">Saving</label>
+          <div>
+            <span class="text-gray-500 text-sm mt-1">Account Type</span>
+            <div class="flex gap-2">
+              <div class="flex items-center gap-2">
+                <RadioButton v-model="selected" inputId="SAVING " name="id" value="SAVING " @change="emitSelection" />
+                <label for="SAVING " class="text-gray-500 text-sm">Saving</label>
+              </div>
+              <div class="flex items-center gap-2">
+                <RadioButton v-model="selected" inputId="CURRENT " name="id" value="CURRENT " @change="emitSelection" />
+                <label for="CURRENT " class="text-gray-500  text-sm">Current </label>
+              </div>
+
             </div>
-            <div class="flex items-center gap-2">
-              <RadioButton v-model="selected" inputId="CURRENT " name="id" value="CURRENT " @change="emitSelection" />
-              <label for="CURRENT " class="text-gray-500  text-sm">Current </label>
-            </div>
-          
+
           </div>
 
-        </div>
-
-          <div >
+          <div>
             <span class="text-gray-500  text-sm">Account no</span>
             <Accno v-model="accno" />
           </div>
 
-      
-          <div >
+
+          <div>
             <span class="text-gray-500  text-sm">IFSC code</span>
             <IFSC v-model="ifsc" />
           </div>
 
 
-          <div >
+          <div>
             <span class="text-gray-500  text-sm">MICR code</span>
             <MICR v-model="micr" />
           </div>
 
-          <div >
+          <div>
             <span class="text-gray-500  text-sm">Bank name</span>
             <Bankname v-model="bankname" />
           </div>
 
-          <div >
+          <div>
             <p class="text-gray-500  text-sm font-normal leading-4">Bank Address</p>
             <Address v-model="address" class="mt-1" />
           </div>
 
-            <div v-if="errorbox" class="w-full px-2 py-2 mt-1 rounded-lg bg-red-50">
-              <p class=" text-sm text-red-600 leading-4 text-center">{{ errormsg }}</p>
+          <div v-if="errorbox" class="w-full px-2 py-2 mt-1 rounded-lg bg-red-50">
+            <p class=" text-sm text-red-600 leading-4 text-center">{{ errormsg }}</p>
           </div>
 
           <div v-if="waitingbox" class="w-full px-2 py-2 mt-1 rounded-lg bg-blue-50">
-              <p class=" text-sm text-blue-600 leading-4 text-center">Please wait. We're depositing ₹1 to your account to verify your bank details</p>
+            <p class=" text-sm text-blue-600 leading-4 text-center">Please wait. We're depositing ₹1 to your account to
+              verify your bank details</p>
           </div>
 
         </div>
@@ -110,8 +111,8 @@ const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
-const prooftype=ref('')
-const inputval=ref('')
+const prooftype = ref('')
+const inputval = ref('')
 
 const bankname = ref("");
 const accno = ref("");
@@ -119,32 +120,32 @@ const ifsc = ref("");
 const micr = ref("");
 const address = ref("");
 const selected = ref('SAVING')
-const errorbox=ref(false)
-const waitingbox=ref(false)
-const errormsg=ref('')
+const errorbox = ref(false)
+const waitingbox = ref(false)
+const errormsg = ref('')
 
 const profilesetinfo = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
 
   if (statuscheck) {
-  
-  selected.value= mydata?.payload?.metaData?.bank?.bank1AccType||''
-  accno.value=mydata?.payload?.metaData?.bank?.bank1AccNo||''
-  ifsc.value=mydata?.payload?.metaData?.bank?.bank1IFSC||''
-  micr.value=mydata?.payload?.metaData?.bank?.bank1MICR||''
-  address.value=mydata?.payload?.metaData?.bank?.bank1Address||''
-  bankname.value=mydata?.payload?.metaData?.bank?.bank1Name||''
-   
+
+    selected.value = mydata?.payload?.metaData?.bank?.bank1AccType || ''
+    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo || ''
+    ifsc.value = mydata?.payload?.metaData?.bank?.bank1IFSC || ''
+    micr.value = mydata?.payload?.metaData?.bank?.bank1MICR || ''
+    address.value = mydata?.payload?.metaData?.bank?.bank1Address || ''
+    bankname.value = mydata?.payload?.metaData?.bank?.bank1Name || ''
+
   }
-  else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
- selected.value= mydata?.payload?.metaData?.bank?.bank1AccType||''
-  accno.value=mydata?.payload?.metaData?.bank?.bank1AccNo||''
-  ifsc.value=mydata?.payload?.metaData?.bank?.bank1IFSC||''
-  micr.value=mydata?.payload?.metaData?.bank?.bank1MICR||''
-  address.value=mydata?.payload?.metaData?.bank?.bank1Address||''
-  bankname.value=mydata?.payload?.metaData?.bank?.bank1Name||''
-}
+  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+    selected.value = mydata?.payload?.metaData?.bank?.bank1AccType || ''
+    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo || ''
+    ifsc.value = mydata?.payload?.metaData?.bank?.bank1IFSC || ''
+    micr.value = mydata?.payload?.metaData?.bank?.bank1MICR || ''
+    address.value = mydata?.payload?.metaData?.bank?.bank1Address || ''
+    bankname.value = mydata?.payload?.metaData?.bank?.bank1Name || ''
+  }
 };
 await profilesetinfo()
 
@@ -200,19 +201,19 @@ const getbankaddress = async (ifscval) => {
 
 const bankvalidation = async () => {
 
-    const mydata = await getServerData();
+  const mydata = await getServerData();
   const statuscheck = mydata.payload.metaData.bank?.bank1AccNo
-  if(statuscheck==accno.value){
-     waitingbox.value=false
+  if (statuscheck == accno.value) {
+    waitingbox.value = false
   }
-  else{
-    
-    waitingbox.value=true
-    errorbox.value=false
+  else {
+
+    waitingbox.value = true
+    errorbox.value = false
   }
-     
-   const apiurl = `${baseurl.value}bank`;
-   const user = encryptionrequestdata({
+
+  const apiurl = `${baseurl.value}bank`;
+  const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "bank4",
     bankAccType: selected.value,
@@ -222,7 +223,7 @@ const bankvalidation = async () => {
     bankName: bankname.value,
     bankAddress: address.value
 
-   
+
   });
 
   const payload = { payload: user };
@@ -231,11 +232,11 @@ const bankvalidation = async () => {
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
-    
+
       headers: {
         'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
       },
-        body: jsonString,
+      body: jsonString,
     });
 
     if (!response.ok) {
@@ -243,28 +244,28 @@ const bankvalidation = async () => {
     }
 
     const data = await response.json();
- 
-    if (data?.payload?.metaData?.bankVerifyStatus==1) {
-          errorbox.value=false
+
+    if (data?.payload?.metaData?.bankVerifyStatus == 1) {
+      errorbox.value = false
       emit('updateDiv', 'bank4');
 
     }
-    else if(data.payload.status=='error') {
-      errorbox.value=true
-      errormsg.value=data.payload.message
-      waitingbox.value=false
+    else if (data.payload.status == 'error') {
+      errorbox.value = true
+      errormsg.value = data.payload.message
+      waitingbox.value = false
     }
-    else{
-       emit('updateDiv', 'bank4');
+    else {
+      emit('updateDiv', 'bank4');
     }
 
 
   } catch (error) {
     console.error('Error:', error);
-    waitingbox.value=false
+    waitingbox.value = false
   }
-  finally{
-    waitingbox.value=false
+  finally {
+    waitingbox.value = false
   }
 };
 
@@ -308,14 +309,14 @@ function back() {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
 
-     const mydata= await pagestatus('nominee')
-       if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'nominee');
-       }
- 
+    const mydata = await pagestatus('nominee')
+    if (mydata.payload.status == 'ok') {
+      emit('updateDiv', 'nominee');
+    }
+
   }, 600)
 
 }

@@ -1,27 +1,13 @@
 <template>
   <div class="flex flex-col justify-center items-center">
-    <div
-      class="camera-wrapper"
-      :class="{
-        'border-blue-400': !readyToCapture && !imageCaptured,
-        'border-green-500': readyToCapture || imageCaptured,
-      }"
-    >
-      <video
-        ref="video"
-        autoplay
-        playsinline
-        v-if="!imageCaptured && cameraActive"
-        class="camera-video"
-      />
-      <img
-        v-if="imageCaptured"
-        :src="capturedImage"
-        alt="Captured Face"
-        class="camera-image"
-      />
+    <div class="camera-wrapper" :class="{
+      'border-blue-400': !readyToCapture && !imageCaptured,
+      'border-green-500': readyToCapture || imageCaptured,
+    }">
+      <video ref="video" autoplay playsinline v-if="!imageCaptured && cameraActive" class="camera-video" />
+      <img v-if="imageCaptured" :src="capturedImage" alt="Captured Face" class="camera-image" />
       <canvas ref="canvas" class="hidden"></canvas>
-      
+
       <!-- Visual guides -->
       <div class="center-guide" v-if="!imageCaptured">
         <div class="crosshair"></div>
@@ -41,7 +27,7 @@
           {{ facePositionStatus }}
         </span>
       </div>
-      
+
       <div>
         <span class="font-medium">Distance: </span>
         <span :class="{
@@ -123,7 +109,7 @@ const detectFaces = async () => {
     isFaceCentered.value = false
     faceDistanceScore.value = 0
     multipleFacesDetected.value = true
-    
+
     if (!alertShown) {
       alert('❌ Multiple faces detected. Please ensure only one face is visible.')
       alertShown = true
@@ -160,7 +146,7 @@ const detectFaces = async () => {
   // Calculate distance from center
   const center = { x: FRAME_SIZE / 2, y: FRAME_SIZE / 2 }
   const distToCenter = distance(nosePosition, center)
-  
+
   // Calculate score (100% when perfectly centered)
   const maxDistance = FRAME_SIZE / 2
   faceDistanceScore.value = Math.max(0, 100 - (distToCenter / maxDistance) * 100)
@@ -202,9 +188,9 @@ const startDetectionLoop = () => {
 
 // Computed properties
 const readyToCapture = computed(() => {
-  return faceDetected.value && 
-         isFaceCentered.value && 
-         faceDistanceScore.value >= MIN_DISTANCE_SCORE
+  return faceDetected.value &&
+    isFaceCentered.value &&
+    faceDistanceScore.value >= MIN_DISTANCE_SCORE
 })
 
 const facePositionStatus = computed(() => {
@@ -219,8 +205,8 @@ onMounted(async () => {
   await loadModels()
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: { 
-        width: FRAME_SIZE, 
+      video: {
+        width: FRAME_SIZE,
         height: FRAME_SIZE,
         facingMode: 'user'
       }

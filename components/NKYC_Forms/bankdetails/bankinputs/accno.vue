@@ -1,48 +1,40 @@
 <template>
-    <div class="flex gap-3">
+  <div class="flex gap-3">
 
-      <div class="input-wrapper w-full dark:!bg-gray-800">
-      <InputText
-       
-        class="w-full font-normal prime-input"
-        v-model="accno"
-        inputmode="numeric"
-        type="text" 
-      
-        @input="validateInput"
-        maxlength="18"
-      />
+    <div class="input-wrapper w-full dark:!bg-gray-800">
+      <InputText class="w-full font-normal prime-input" v-model="accno" inputmode="numeric" type="text"
+        @input="validateInput" maxlength="18" />
       <span class="bottom-border"></span>
-      </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, watch } from 'vue';
-  
+  </div>
+</template>
 
-  const props = defineProps(['modelValue']);
-  const emit = defineEmits(['update:modelValue']);
-  
-  const accno = ref(props.modelValue || '');
-  
-  // Keep only numbers and limit to 10 digits
-  const validateInput = (e) => {
-    let value = e.target.value.replace(/\D/g, '').slice(0, 18);
-    accno.value = value;
-    e.target.value = value;
-  };
-  
-  watch(accno, (newValue) => {
-    emit('update:modelValue', newValue);
-  });
-  </script>
-  <style scoped>
-  .uppercase {
-    text-transform: uppercase;
-  }
+<script setup>
+import { ref, watch } from 'vue';
 
-  .input-wrapper {
+
+const props = defineProps(['modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+const accno = ref(props.modelValue || '');
+
+// Keep only numbers and limit to 10 digits
+const validateInput = (e) => {
+  let value = e.target.value.replace(/\D/g, '').slice(0, 18);
+  accno.value = value;
+  e.target.value = value;
+};
+
+watch(accno, (newValue) => {
+  emit('update:modelValue', newValue);
+});
+</script>
+<style scoped>
+.uppercase {
+  text-transform: uppercase;
+}
+
+.input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -92,4 +84,4 @@
   width: 100%;
   height: 4px;
 }
-  </style>
+</style>

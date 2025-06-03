@@ -79,17 +79,17 @@
 
         </div>
 
-          <div v-if="loading" class="flex justify-center items-center  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
-        :style="{ height: deviceHeight * 0.92 + 'px' }">
-        <ProgressSpinner />
+        <div v-if="loading" class="flex justify-center items-center  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
+            :style="{ height: deviceHeight * 0.92 + 'px' }">
+            <ProgressSpinner />
+
+        </div>
+
+
 
     </div>
 
 
-
-    </div>
-
-  
 </template>
 <script setup>
 
@@ -104,8 +104,8 @@ const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Start e-KYC");
-const content=ref(true)
-const loading=ref(false)
+const content = ref(true)
+const loading = ref(false)
 
 
 onMounted(() => {
@@ -113,10 +113,10 @@ onMounted(() => {
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
     });
-    if (route.query.requestId) { 
-     digilocker_request()
-     content.value=false
-     loading.value=true
+    if (route.query.requestId) {
+        digilocker_request()
+        content.value = false
+        loading.value = true
     }
 });
 
@@ -150,7 +150,7 @@ const digilocker_create = async () => {
     const user = encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "createUrl",
-        redirecUrl:"https://nkcynewone.vercel.app/main"
+        redirecUrl: "https://nkcynewone.vercel.app/main"
     });
 
     const payload = { payload: user };
@@ -175,17 +175,17 @@ const digilocker_create = async () => {
             const url = data.payload.metaData.url
             window.location.href = url;
         }
-      
+
     } catch (error) {
         console.error('Error:', error.message);
-       
+
     }
 
-    finally{
-        content.value=true
-        loading.value=false
+    finally {
+        content.value = true
+        loading.value = false
     }
-   
+
 };
 
 
@@ -195,7 +195,7 @@ const digilocker_request = async () => {
     const user = encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "getDetails",
-        digilockerReqId:route.query.requestId
+        digilockerReqId: route.query.requestId
     });
 
     const payload = { payload: user };
@@ -217,21 +217,21 @@ const digilocker_request = async () => {
         const data = await response.json();
         if (data.payload.status == 'ok') {
             digilocker_getfiles(data)
-           
+
         }
 
-        else{
-            content.value=true
-            loading.value=false
+        else {
+            content.value = true
+            loading.value = false
         }
-        
+
 
 
     } catch (error) {
         console.error('Error:', error.message);
     }
-    finally{
-      
+    finally {
+
     }
 };
 
@@ -239,7 +239,7 @@ const digilocker_request = async () => {
 const digilocker_getfiles = async (requestid) => {
     const apiurl = baseurl.value + 'digilocker';
     const authorization = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
-const files = requestid.payload.metaData.fileIds;
+    const files = requestid.payload.metaData.fileIds;
 
 
 
@@ -247,8 +247,8 @@ const files = requestid.payload.metaData.fileIds;
     const user = encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "getFiles",
-        digilockerReqId:requestid.payload.metaData.requestId,
-        filesIds:files
+        digilockerReqId: requestid.payload.metaData.requestId,
+        filesIds: files
     });
 
     const payload = { payload: user };
@@ -270,14 +270,14 @@ const files = requestid.payload.metaData.fileIds;
         const data = await response.json();
         if (data.payload.status == 'ok') {
 
-           digilocker_getaadhardoc(requestid.payload.metaData.requestId)
+            digilocker_getaadhardoc(requestid.payload.metaData.requestId)
         }
 
     } catch (error) {
         console.error('Error:', error.message);
     }
-    finally{
-      
+    finally {
+
     }
 };
 
@@ -292,8 +292,8 @@ const digilocker_getaadhardoc = async (requestid) => {
     const user = encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "createAadhaar",
-        digilockerReqId:requestid,
-       
+        digilockerReqId: requestid,
+
     });
 
     const payload = { payload: user };
@@ -315,15 +315,15 @@ const digilocker_getaadhardoc = async (requestid) => {
         const data = await response.json();
         if (data.payload.status == 'ok') {
 
-             pagestatus('parmanentaddress')
-               emit('updateDiv', 'parmanentaddress');
+            pagestatus('parmanentaddress')
+            emit('updateDiv', 'parmanentaddress');
         }
 
     } catch (error) {
         console.error('Error:', error.message);
     }
-    finally{
-      
+    finally {
+
     }
 };
 
@@ -346,7 +346,7 @@ const handleButtonClick = () => {
 
     setTimeout(() => {
         circle.remove()
-          digilocker_create()
+        digilocker_create()
     }, 600)
 };
 

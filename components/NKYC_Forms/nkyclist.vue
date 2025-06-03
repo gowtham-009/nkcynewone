@@ -159,25 +159,25 @@ const handleButtonClick = () => {
         const mydata = await getServerData();
         const statuscheck = mydata?.payload?.metaData?.digi_info
         if (statuscheck.length == 0) {
-          
+
             const pan = mydata?.payload?.metaData?.kraPan?.APP_ERROR_DESC
-            if(pan=='PAN NOT FOUND') {
-               
-                 pagestatus('ekyc')
-                 emit('updateDiv', 'ekyc');
+            if (pan == 'PAN NOT FOUND') {
+
+                pagestatus('ekyc')
+                emit('updateDiv', 'ekyc');
             }
-            else{
-               
-              pagestatus('parmanentaddress')
-               emit('updateDiv', 'parmanentaddress');
+            else {
+
+                pagestatus('parmanentaddress')
+                emit('updateDiv', 'parmanentaddress');
             }
         }
         else {
-           
-             pagestatus('parmanentaddress')
-             emit('updateDiv', 'parmanentaddress');
+
+            pagestatus('parmanentaddress')
+            emit('updateDiv', 'parmanentaddress');
         }
- 
+
 
 
     }, 600)

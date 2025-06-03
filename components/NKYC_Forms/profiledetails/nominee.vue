@@ -18,30 +18,31 @@
         <div class="w-full flex flex-col gap-2 mt-2">
           <div v-if="nomineescard">
             <div class="w-full p-2  cursor-pointer mb-2  bg-gray-200 rounded-lg " v-for="nomineeshare in nomine">
-            <div class="w-full">
+              <div class="w-full">
                 <div class="w-4/5">
-                <span class="text-gray-500">Nominee Name: {{ nomineeshare.name  }}</span><br>
-                <span class="text-gray-500">Nominee's relationship: {{ nomineeshare.relation }}</span>
+                  <span class="text-gray-500">Nominee Name: {{ nomineeshare.name }}</span><br>
+                  <span class="text-gray-500">Nominee's relationship: {{ nomineeshare.relation }}</span>
+                </div>
+                <div class="w-1/5">
+                  <p class="text-gray-700 font-bold text-2xl flex">{{ nomineeshare.share }} %</p>
+                </div>
               </div>
-              <div class="w-1/5" >
-                <p class="text-gray-700 font-bold text-2xl flex">{{ nomineeshare.share }} %</p>
-              </div>
-            </div>
               <div class="w-full p-1 flex gap-2">
-                  <Button @click="dialogbox(nomineeshare)" type="button" class="w-full text-white">Edit</Button>
-                  <Button @click="nomineedelete(nomineeshare)" type="button" class="w-full text-white bg-red-500">Delete</Button>
+                <Button @click="dialogbox(nomineeshare)" type="button" class="w-full text-white">Edit</Button>
+                <Button @click="nomineedelete(nomineeshare)" type="button"
+                  class="w-full text-white bg-red-500">Delete</Button>
               </div>
             </div>
 
           </div>
 
-       <div class="w-full" v-if="nomineecontainer">
-           <Button  @click="openNomineeDialog"  class="w-full py-3 primary_color text-white">
-            {{ nomineetext }}
-          </Button>
+          <div class="w-full" v-if="nomineecontainer">
+            <Button @click="openNomineeDialog" class="w-full py-3 primary_color text-white">
+              {{ nomineetext }}
+            </Button>
 
-        
-       </div>
+
+          </div>
         </div>
       </div>
 
@@ -54,13 +55,8 @@
         <div class="w-full mt-4">
           <span class="text-gray-500 ">Relationship*</span>
           <div class="input-wrapper dark:!bg-gray-800">
-            <Select
-              v-model="selectedStatement"
-              :options="statementOptions"
-              optionLabel="name"
-             
-              class="w-full prime-input "
-            />
+            <Select v-model="selectedStatement" :options="statementOptions" optionLabel="name"
+              class="w-full prime-input " />
             <span class="bottom-border"></span>
           </div>
         </div>
@@ -116,12 +112,8 @@
           <p class="text-right text-gray-500 text-md">Maximum limit: {{ availabilelimit }}</p>
         </div>
         <div class="w-full mt-3">
-         <Button
-  :disabled="isSaveDisabled"
-  label="Save"
-  @click="nomineesavedata"
-  class="primary_color w-full text-white py-2"
-/>
+          <Button :disabled="isSaveDisabled" label="Save" @click="nomineesavedata"
+            class="primary_color w-full text-white py-2" />
 
         </div>
       </Dialog>
@@ -156,8 +148,8 @@ import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
 const emit = defineEmits(['updateDiv']);
 const isDisabled = ref(true)
-const nomineecontainer=ref(true)
-const idval=ref('')
+const nomineecontainer = ref(true)
+const idval = ref('')
 // States
 const shareval = ref('');
 
@@ -173,12 +165,12 @@ const selectedStatement = ref('')
 
 
 const statementOptions = ref([
-   {value:'Son',name: 'Son' },
-  { value:'Daughter',name: 'Daughter' },
-  { value:'Spouse',name: 'Spouse' },
-  { value:'Father',name: 'Father' },
-  { value:'Mother',name: 'Mother' },
-   { value:'Brother',name: 'Brother' }
+  { value: 'Son', name: 'Son' },
+  { value: 'Daughter', name: 'Daughter' },
+  { value: 'Spouse', name: 'Spouse' },
+  { value: 'Father', name: 'Father' },
+  { value: 'Mother', name: 'Mother' },
+  { value: 'Brother', name: 'Brother' }
 
 ])
 
@@ -221,8 +213,8 @@ const resetFormFields = () => {
 };
 
 const openNomineeDialog = () => {
-  resetFormFields(); 
-  visible.value = true; 
+  resetFormFields();
+  visible.value = true;
 };
 const nomineedetails = async () => {
   const mydata = await getServerData();
@@ -243,13 +235,13 @@ const nomineedetails = async () => {
 
           nomineeList.push({
             name,
-            id:i,
+            id: i,
             relation: nominee[`nominee${i}Relation`],
             address: nominee[`nominee${i}Address`],
             share,
             email: nominee[`nominee${i}Email`],
             mobile: nominee[`nominee${i}Mobile`],
-           
+
             dob: nominee[`nominee${i}Dob`],
             idType: nominee[`nominee${i}IdType`],
             idNo: nominee[`nominee${i}IdNo`],
@@ -263,7 +255,7 @@ const nomineedetails = async () => {
       nomineecontainer.value = totalShare < 100;
     }
   }
-  else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument){
+  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
     const nominee = mydata?.payload?.metaData?.nominee;
     if (nominee) {
       nomineescard.value = true;
@@ -278,13 +270,13 @@ const nomineedetails = async () => {
 
           nomineeList.push({
             name,
-            id:i,
+            id: i,
             relation: nominee[`nominee${i}Relation`],
             address: nominee[`nominee${i}Address`],
             share,
             email: nominee[`nominee${i}Email`],
             mobile: nominee[`nominee${i}Mobile`],
-           
+
             dob: nominee[`nominee${i}Dob`],
             idType: nominee[`nominee${i}IdType`],
             idNo: nominee[`nominee${i}IdNo`],
@@ -333,7 +325,7 @@ const isSaveDisabled = computed(() => {
 
 const dialogbox = (editdata) => {
   let formattedDOB = '';
-  
+
   if (editdata.dob) {
     const isoDateMatch = editdata.dob.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (isoDateMatch) {
@@ -345,12 +337,12 @@ const dialogbox = (editdata) => {
   visible.value = true;
   idval.value = editdata.id;
   name.value = editdata.name;
-  
- 
+
+
   selectedStatement.value = statementOptions.value.find(
     option => option.value === editdata.relation || option.name === editdata.relation
   ) || statementOptions.value[0]; // Fallback to first option if not found
-  
+
   dob.value = formattedDOB;
   address.value = editdata.address;
   mobileNo.value = editdata.mobile;
@@ -377,14 +369,14 @@ const nomineesavedata = async () => {
 
   const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
   const relationship = selectedStatement.value.name;
- 
+
 
 
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "nominee",
     nomineeName: name.value,
-    nomineeRelation:relationship,
+    nomineeRelation: relationship,
     nomineeAddress: address.value,
     nomineeMobile: mobileNo.value,
     nomineeEmail: email.value,
@@ -425,14 +417,14 @@ const nomineesavedata = async () => {
 
 
 const nomineedelete = async (deleteid) => {
- 
+
 
 
 
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "nominee",
-   removeNominee:deleteid.id
+    removeNominee: deleteid.id
 
   });
 
@@ -455,7 +447,7 @@ const nomineedelete = async (deleteid) => {
     }
 
     const data = await response.json();
-  
+
     nomineedetails(); // Refresh the nominee list or details
   } catch (error) {
     console.error("Error saving nominee:", error.message);
@@ -553,23 +545,23 @@ const handleButtonClick = (event) => {
 
   button.$el.appendChild(circle);
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove();
 
-     const mydata= await pagestatus('bank1')
-       if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'bank1');
-       }
-   
-     
+    const mydata = await pagestatus('bank1')
+    if (mydata.payload.status == 'ok') {
+      emit('updateDiv', 'bank1');
+    }
 
-   
+
+
+
   }, 600);
 };
 
 // Lifecycle
-onMounted(async() => {
- await nomineedetails()
+onMounted(async () => {
+  await nomineedetails()
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -591,9 +583,9 @@ watch(dob, (newval) => {
     }
 
     if (age < 18) {
-   
+
       isDisabled.value = false;
-    
+
 
     } else {
       isDisabled.value = true;
@@ -618,10 +610,10 @@ watch(dob, (newval) => {
 }
 
 .uppercase {
-    text-transform: uppercase;
-  }
+  text-transform: uppercase;
+}
 
-  .input-wrapper {
+.input-wrapper {
   position: relative;
   display: flex;
   align-items: center;

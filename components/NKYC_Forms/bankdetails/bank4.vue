@@ -8,25 +8,22 @@
     <div class="flex justify-between p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full mt-1 px-2 ">
-       <div class="w-full flex">
-         <div class="w-full flex justify-center" >
-          <img src="https://cdn-icons-png.flaticon.com/128/2830/2830289.png" class="w-20 h-20" alt="" />
+        <div class="w-full flex">
+          <div class="w-full flex justify-center">
+            <img src="https://cdn-icons-png.flaticon.com/128/2830/2830289.png" class="w-20 h-20" alt="" />
+          </div>
         </div>
-       </div>
 
-          <h1
-            class="text-center mt-3 text-lg font-medium flex items-center justify-center gap-2"
-            :class="{
-              'text-red-500': bankerror,
-              'text-blue-950 dark:text-gray-400': !bankerror
-            }"
-          >
-            {{ successtext }}
-            <span v-if="bankerror">
-              <i class="pi pi-times-circle text-xl"></i>
-            </span>
-          </h1>
-        <p class="text-sm text-center mt-1 font-normal text-gray-500">{{verifiedtext}}</p>
+        <h1 class="text-center mt-3 text-lg font-medium flex items-center justify-center gap-2" :class="{
+          'text-red-500': bankerror,
+          'text-blue-950 dark:text-gray-400': !bankerror
+        }">
+          {{ successtext }}
+          <span v-if="bankerror">
+            <i class="pi pi-times-circle text-xl"></i>
+          </span>
+        </h1>
+        <p class="text-sm text-center mt-1 font-normal text-gray-500">{{ verifiedtext }}</p>
 
         <div class="mt-1 w-full px-2 py-3 bg-gray-100 rounded-lg dark:bg-gray-900">
           <div class="w-full flex items-center gap-2">
@@ -93,7 +90,7 @@ import { ref, onMounted } from 'vue';
 
 const emit = defineEmits(['updateDiv']);
 
-const bankerror=ref(false)
+const bankerror = ref(false)
 
 const bankname = ref("");
 const accno = ref("");
@@ -101,8 +98,8 @@ const ifsccode = ref("");
 const MICR = ref("");
 const address = ref("");
 
-const successtext=ref('')
-const verifiedtext=ref('')
+const successtext = ref('')
+const verifiedtext = ref('')
 
 const buttonText = ref('Continue');
 
@@ -115,56 +112,56 @@ const deviceHeight = ref(window.innerHeight);
 const profilesetinfo = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.bank || '';
-if(statuscheck){
-  const holdername = mydata?.payload?.metaData?.bank?.bank1HolderName || '';
-   if (holdername) {
-   successtext.value='Bank account added'
-    verifiedtext.value='Your bank details have been verified.'
+  if (statuscheck) {
+    const holdername = mydata?.payload?.metaData?.bank?.bank1HolderName || '';
+    if (holdername) {
+      successtext.value = 'Bank account added'
+      verifiedtext.value = 'Your bank details have been verified.'
 
 
-    bankname.value = mydata?.payload?.metaData?.bank?.bank1Name||''
-    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo||''
-     ifsccode.value = mydata?.payload?.metaData?.bank?.bank1IFSC||''
-     MICR.value = mydata?.payload?.metaData?.bank?.bank1MICR||''
-    address.value = mydata?.payload?.metaData?.bank?.bank1Address||''
+      bankname.value = mydata?.payload?.metaData?.bank?.bank1Name || ''
+      accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo || ''
+      ifsccode.value = mydata?.payload?.metaData?.bank?.bank1IFSC || ''
+      MICR.value = mydata?.payload?.metaData?.bank?.bank1MICR || ''
+      address.value = mydata?.payload?.metaData?.bank?.bank1Address || ''
+    }
+    else {
+      successtext.value = 'Bank account failed'
+      verifiedtext.value = ''
+      bankerror.value = true
+      bankname.value = mydata?.payload?.metaData?.bank?.bank1Name || ''
+      accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo || ''
+      ifsccode.value = mydata?.payload?.metaData?.bank?.bank1IFSC || ''
+      MICR.value = mydata?.payload?.metaData?.bank?.bank1MICR || ''
+      address.value = mydata?.payload?.metaData?.bank?.bank1Address || ''
+    }
   }
-  else{
-     successtext.value='Bank account failed'
-    verifiedtext.value=''
-    bankerror.value=true
-   bankname.value = mydata?.payload?.metaData?.bank?.bank1Name||''
-    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo||''
-     ifsccode.value = mydata?.payload?.metaData?.bank?.bank1IFSC||''
-     MICR.value = mydata?.payload?.metaData?.bank?.bank1MICR||''
-    address.value = mydata?.payload?.metaData?.bank?.bank1Address||''
-  }
-}
 
-  else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
-      const holdername = mydata?.payload?.metaData?.bank?.bank1HolderName || '';
-  if (holdername) {
-   successtext.value='Bank account added'
-    verifiedtext.value='Your bank details have been verified.'
+  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+    const holdername = mydata?.payload?.metaData?.bank?.bank1HolderName || '';
+    if (holdername) {
+      successtext.value = 'Bank account added'
+      verifiedtext.value = 'Your bank details have been verified.'
 
 
-    bankname.value = mydata?.payload?.metaData?.bank?.bank1Name||''
-    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo||''
-     ifsccode.value = mydata?.payload?.metaData?.bank?.bank1IFSC||''
-     MICR.value = mydata?.payload?.metaData?.bank?.bank1MICR||''
-    address.value = mydata?.payload?.metaData?.bank?.bank1Address||''
+      bankname.value = mydata?.payload?.metaData?.bank?.bank1Name || ''
+      accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo || ''
+      ifsccode.value = mydata?.payload?.metaData?.bank?.bank1IFSC || ''
+      MICR.value = mydata?.payload?.metaData?.bank?.bank1MICR || ''
+      address.value = mydata?.payload?.metaData?.bank?.bank1Address || ''
+    }
+    else {
+      successtext.value = 'Bank account failed'
+      verifiedtext.value = ''
+      bankerror.value = true
+      bankname.value = mydata?.payload?.metaData?.bank?.bank1Name || ''
+      accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo || ''
+      ifsccode.value = mydata?.payload?.metaData?.bank?.bank1IFSC || ''
+      MICR.value = mydata?.payload?.metaData?.bank?.bank1MICR || ''
+      address.value = mydata?.payload?.metaData?.bank?.bank1Address || ''
+    }
   }
-  else{
-     successtext.value='Bank account failed'
-    verifiedtext.value=''
-    bankerror.value=true
-   bankname.value = mydata?.payload?.metaData?.bank?.bank1Name||''
-    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo||''
-     ifsccode.value = mydata?.payload?.metaData?.bank?.bank1IFSC||''
-     MICR.value = mydata?.payload?.metaData?.bank?.bank1MICR||''
-    address.value = mydata?.payload?.metaData?.bank?.bank1Address||''
-  }
-}
- 
+
 };
 await profilesetinfo()
 
@@ -195,23 +192,23 @@ const handleButtonClick = () => {
 
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
 
-    const mydata= await pagestatus('segment1')
-     if(mydata.payload.status=='ok'){
-       emit('updateDiv', 'segment1');
-     }
+    const mydata = await pagestatus('segment1')
+    if (mydata.payload.status == 'ok') {
+      emit('updateDiv', 'segment1');
+    }
 
- 
+
   }, 600)
 };
 
 
 
 
- const back = () => {
-    const button = rippleBtnback.value
+const back = () => {
+  const button = rippleBtnback.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
 
@@ -225,14 +222,13 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-       pagestatus('bank1')
-      emit('updateDiv', 'bank1') 
+    pagestatus('bank1')
+    emit('updateDiv', 'bank1')
   }, 600)
-   
+
 };
 
 
 
 
 </script>
-

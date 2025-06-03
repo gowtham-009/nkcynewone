@@ -14,15 +14,11 @@
         <p class="text-gray-500 leading-5 font-normal text-sm">
           Use the signature box to sign
         </p>
-  <canvas
-  ref="canvasRef"
-  class="signature-canvas rounded-lg"
-  @touchstart.prevent
-  @touchmove.prevent
-/>
+        <canvas ref="canvasRef" class="signature-canvas rounded-lg" @touchstart.prevent @touchmove.prevent />
 
-         <div class="w-full mt-1 flex gap-2 justify-center">
-          <Button @click="erase" icon="pi pi-trash" label="Clear" class="px-2 py-1 text-white !bg-red-500 border-0"></Button>
+        <div class="w-full mt-1 flex gap-2 justify-center">
+          <Button @click="erase" icon="pi pi-trash" label="Clear"
+            class="px-2 py-1 text-white !bg-red-500 border-0"></Button>
           <Button @click="triggerUpload" class="primary_color text-white" icon="pi pi-plus"
             label="Upload Signature"></Button>
           <input type="file" accept="image/*" ref="fileInput" @change="uploadImage" style="display: none" />
@@ -36,7 +32,7 @@
         </div>
 
         <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
-            <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
+          <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
 
         </div>
       </div>
@@ -274,7 +270,7 @@ const createunsignedDocument = async () => {
     const data = await response.json();
     if (data.payload.status == 'ok') {
       pagestatus('esign')
-     emit('updateDiv', 'esign');
+      emit('updateDiv', 'esign');
     }
 
   } catch (error) {
@@ -307,7 +303,7 @@ const uploadsign = async () => {
 
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
- const timer = startTimer()
+  const timer = startTimer()
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
@@ -317,21 +313,21 @@ const uploadsign = async () => {
       },
       body: jsonString,
     });
- clearInterval(timer)
+    clearInterval(timer)
     if (!response.ok) {
       throw new Error(`Network error: ${response.status}`);
     }
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
-      if(!additionaldoc.value){
-          createunsignedDocument()
+      if (!additionaldoc.value) {
+        createunsignedDocument()
       }
-      else{
-           pagestatus('additionalinformation')
-     emit('updateDiv', 'additionalinformation');
+      else {
+        pagestatus('additionalinformation')
+        emit('updateDiv', 'additionalinformation');
       }
-   
+
     }
   } catch (error) {
     clearInterval(timer)
@@ -434,7 +430,4 @@ const handleButtonClick = () => {
   touch-action: none;
   background-color: white;
 }
-
-
-
 </style>

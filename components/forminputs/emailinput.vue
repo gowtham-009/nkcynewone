@@ -1,16 +1,7 @@
 <template>
   <div class="input-wrapper">
-    <InputText
-      id="email"
-      class="prime-input w-full border-2  dark:!bg-gray-800" 
-      v-model="email"
-     
-      variant="filled"
-      placeholder="Your Email ID"
-      
-      @blur="validateEmail"
-       autocomplete="off"
-    />
+    <InputText id="email" class="prime-input w-full border-2  dark:!bg-gray-800" v-model="email" variant="filled"
+      placeholder="Your Email ID" @blur="validateEmail" autocomplete="off" />
     <span class="bottom-border"></span>
   </div>
 </template>
@@ -46,7 +37,7 @@ const validateEmail = () => {
   align-items: center;
   background-color: #e0e0e0;
   border-radius: 10px;
- 
+
   overflow: hidden;
 }
 

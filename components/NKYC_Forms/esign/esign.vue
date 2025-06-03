@@ -140,47 +140,47 @@ const esignStatusCheck = async (requestId) => {
       loading.value = true;
       route.query.documentId = null;
 
-  const mydata = await getServerData();  
-const statuscheck = mydata?.payload?.metaData?.segments;
+      const mydata = await getServerData();
+      const statuscheck = mydata?.payload?.metaData?.segments;
 
-if (statuscheck) {
-  const {
-    nseCASH, bseCASH,
-    nseFO, bseFO,
-    nseCOM, bseCOM, MCX,
-    nseCD, nseMF,
-    bseCD, bseMF,
-    MCXcategory, ICEX, mseCD
-  } = statuscheck;
+      if (statuscheck) {
+        const {
+          nseCASH, bseCASH,
+          nseFO, bseFO,
+          nseCOM, bseCOM, MCX,
+          nseCD, nseMF,
+          bseCD, bseMF,
+          MCXcategory, ICEX, mseCD
+        } = statuscheck;
 
-  const onlyCashYes =
-    nseCASH === 'YES' &&
-    bseCASH === 'YES' &&
-    nseFO !== 'YES' &&
-    bseFO !== 'YES' &&
-    nseCOM !== 'YES' &&
-    bseCOM !== 'YES' &&
-    MCX !== 'YES' &&
-    nseCD !== 'YES' &&
-    bseCD !== 'YES' &&
-    nseMF !== 'YES' &&
-    bseMF !== 'YES' &&
-    MCXcategory !== 'YES' &&
-    ICEX !== 'YES' &&
-    mseCD !== 'YES';
+        const onlyCashYes =
+          nseCASH === 'YES' &&
+          bseCASH === 'YES' &&
+          nseFO !== 'YES' &&
+          bseFO !== 'YES' &&
+          nseCOM !== 'YES' &&
+          bseCOM !== 'YES' &&
+          MCX !== 'YES' &&
+          nseCD !== 'YES' &&
+          bseCD !== 'YES' &&
+          nseMF !== 'YES' &&
+          bseMF !== 'YES' &&
+          MCXcategory !== 'YES' &&
+          ICEX !== 'YES' &&
+          mseCD !== 'YES';
 
-  if (onlyCashYes) {
-   
-    pagestatus('thankyou');
-    emit('updateDiv', 'thankyou');
-  } else {
-    
-    pagestatus('bankfile');
-    emit('updateDiv', 'bankfile');
-  }
-}
+        if (onlyCashYes) {
 
-    
+          pagestatus('thankyou');
+          emit('updateDiv', 'thankyou');
+        } else {
+
+          pagestatus('bankfile');
+          emit('updateDiv', 'bankfile');
+        }
+      }
+
+
     }
   } catch (error) {
     console.error('Status check failed:', error.message);
@@ -215,22 +215,22 @@ const back = async (event) => {
   createRipple(event, rippleBtnback);
   setTimeout(async () => {
 
-      const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.additional_docs?.documentConsentMode
-  if(statuscheck){
-     const myData = await pagestatus('additionalinformation');
-    if (myData?.payload?.status === 'ok') {
-      emit('updateDiv', 'additionalinformation');
+    const mydata = await getServerData();
+    const statuscheck = mydata?.payload?.metaData?.additional_docs?.documentConsentMode
+    if (statuscheck) {
+      const myData = await pagestatus('additionalinformation');
+      if (myData?.payload?.status === 'ok') {
+        emit('updateDiv', 'additionalinformation');
+      }
     }
-  }
-  else{
-     const myData = await pagestatus('signdraw');
-    if (myData?.payload?.status === 'ok') {
-      emit('updateDiv', 'signdraw');
+    else {
+      const myData = await pagestatus('signdraw');
+      if (myData?.payload?.status === 'ok') {
+        emit('updateDiv', 'signdraw');
+      }
     }
-  }
 
-   
+
   }, 600);
 };
 </script>

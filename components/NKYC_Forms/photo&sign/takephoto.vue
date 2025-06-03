@@ -1,58 +1,59 @@
 <template>
-    <div class="primary_color">
+  <div class="primary_color">
 
-        <div class="flex justify-between primary_color items-center px-3"
-            :style="{ height: deviceHeight * 0.08 + 'px' }">
-            <logo style="width: 40px; height: 40px;"/>
-            <profile/>
-        </div>
-        <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
-            :style="{ height: deviceHeight * 0.92 + 'px' }">
-            <div class="w-full  px-2 p-1">
-                <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
-                    Take a selfie
-                </p>
-                <p class="text-sm text-gray-500 font-normal leading-4">
-                    Ensure your face appears clearly within the frame
-                </p>
-
-               
-
-                <!-- Show latitude and longitude after fetching -->
-                <div  class=" flex flex-col justify-center  rounded ">
-                  <p class="text-sm text-gray-500 font-normal leading-6">
-                    Latitude: {{ latitude }}, Longitude: {{ longitude }}
-                  </p>
-                  <p v-if="errorMessage" class="text-red-500">{{ errorMessage }}</p>
-                </div>
-
-
-                <div  class="w-full  flex justify-center">
-                    <CMAIDENTIFY @captured="onImageCaptured"/>
-                </div>
-
-                <div class="w-full " >
-                  <p class="font-semibold text-gray-500 text-sm leading-4">"Ensure your nose is positioned at the center of the cross (+). Your face should be straight and centered within the frame"</p>
-                </div>
-                
-
-                <div v-if="photoprogress" class="w-full p-1 flex justify-center  bg-blue-50 text-blue-500" >
-                  <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
-                </div>
-            </div>
-
-            <div class="w-full flex gap-2">
-                <Button @click="back()" ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-                <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-            </Button>
-                <Button type="button" :disabled="!imageCaptured"  ref="rippleBtn"  @click="handleButtonClick"
-                    class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-                    {{ buttonText }}
-                </Button>
-            </div>
-        </div>
-
+    <div class="flex justify-between primary_color items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
+      <logo style="width: 40px; height: 40px;" />
+      <profile />
     </div>
+    <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
+      :style="{ height: deviceHeight * 0.92 + 'px' }">
+      <div class="w-full  px-2 p-1">
+        <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
+          Take a selfie
+        </p>
+        <p class="text-sm text-gray-500 font-normal leading-4">
+          Ensure your face appears clearly within the frame
+        </p>
+
+
+
+        <!-- Show latitude and longitude after fetching -->
+        <div class=" flex flex-col justify-center  rounded ">
+          <p class="text-sm text-gray-500 font-normal leading-6">
+            Latitude: {{ latitude }}, Longitude: {{ longitude }}
+          </p>
+          <p v-if="errorMessage" class="text-red-500">{{ errorMessage }}</p>
+        </div>
+
+
+        <div class="w-full  flex justify-center">
+          <CMAIDENTIFY @captured="onImageCaptured" />
+        </div>
+
+        <div class="w-full ">
+          <p class="font-semibold text-gray-500 text-sm leading-4">"Ensure your nose is positioned at the center of the
+            cross (+). Your face should be straight and centered within the frame"</p>
+        </div>
+
+
+        <div v-if="photoprogress" class="w-full p-1 flex justify-center  bg-blue-50 text-blue-500">
+          <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
+        </div>
+      </div>
+
+      <div class="w-full flex gap-2">
+        <Button @click="back()" ref="rippleBtnback"
+          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+        </Button>
+        <Button type="button" :disabled="!imageCaptured" ref="rippleBtn" @click="handleButtonClick"
+          class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
+          {{ buttonText }}
+        </Button>
+      </div>
+    </div>
+
+  </div>
 </template>
 <script setup>
 
@@ -98,16 +99,16 @@ const getCountry = async () => {
     }
 
     const data = await response.json()
-    if(data){
-          const geolocation={
-        latitute:data.items[0].position.lat,
-        longitude:data.items[0].position.lng,
-        conuntryname:data.items[0].address.countryName,
-        countrycode:data.items[0].address.countryCode,
+    if (data) {
+      const geolocation = {
+        latitute: data.items[0].position.lat,
+        longitude: data.items[0].position.lng,
+        conuntryname: data.items[0].address.countryName,
+        countrycode: data.items[0].address.countryCode,
+      }
+      return geolocation
     }
-    return geolocation
-    }
-  
+
     console.log('Reverse Geocoding Data:', data)
   } catch (error) {
     console.error('Error fetching location:', error.message)
@@ -128,17 +129,17 @@ const startTimer = () => {
 
 
 const ipvfunction = async () => {
-photoprogress.value = true;
+  photoprogress.value = true;
   const apiurl = `${baseurl.value}ipv`;
-    const location=await getCountry()
- 
-const user = encryptionrequestdata({
-  userToken: localStorage.getItem('userkey'),
-  pageCode: "ipv",
-  ipvImage: imageCaptured.value,
-  location: `${location.latitute},${location.longitude}`,
-  country: location.conuntryname
-})
+  const location = await getCountry()
+
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "ipv",
+    ipvImage: imageCaptured.value,
+    location: `${location.latitute},${location.longitude}`,
+    country: location.conuntryname
+  })
 
 
   const payload = { payload: user };
@@ -155,7 +156,7 @@ const user = encryptionrequestdata({
       body: jsonString,
     })
 
-     clearInterval(timer)
+    clearInterval(timer)
     if (!response.ok) {
       throw new Error("Network is error", response.status);
 
@@ -164,24 +165,24 @@ const user = encryptionrequestdata({
       const data = await response.json()
 
       if (data.payload.metaData.is_real == 'true') {
-         pagestatus('photoproceed')
-       emit('updateDiv', 'photoproceed');
+        pagestatus('photoproceed')
+        emit('updateDiv', 'photoproceed');
       }
-      else{
+      else {
         pagestatus('takephoto')
-         emit('updateDiv', 'takephoto');
+        emit('updateDiv', 'takephoto');
       }
 
     }
 
   } catch (error) {
-     clearInterval(timer)
+    clearInterval(timer)
     console.log(error.message)
   }
 }
 
 onMounted(() => {
-   const storedLat = localStorage.getItem('latitude');
+  const storedLat = localStorage.getItem('latitude');
   const storedLng = localStorage.getItem('longitude');
 
   if (storedLat && storedLng) {
@@ -191,18 +192,18 @@ onMounted(() => {
     errorMessage.value = 'Location not found in localStorage.';
   }
 
+  deviceHeight.value = window.innerHeight;
+  window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
-    window.addEventListener('resize', () => {
-        deviceHeight.value = window.innerHeight;
-    });
+  });
 });
 
 const onImageCaptured = (imageData) => {
-    imageCaptured.value=imageData
- 
+  imageCaptured.value = imageData
+
 }
 const back = () => {
-    const button = rippleBtnback.value
+  const button = rippleBtnback.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
 
@@ -219,10 +220,10 @@ const back = () => {
     pagestatus('photosign1')
     emit('updateDiv', 'photosign1');
   }, 600)
-   
+
 };
 const handleButtonClick = () => {
- 
+
   const button = rippleBtn.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
@@ -239,8 +240,8 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
     ipvfunction()
-  
-}, 600)
+
+  }, 600)
 };
 
 </script>

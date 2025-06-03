@@ -1,16 +1,8 @@
 <template>
   <div class="input-wrapper dark:!bg-gray-800">
     <span class="country-code">{{ countryphonenocode }}</span>
-    <InputText
-      class="prime-input "
-      v-model="localPhoneNo"
-      inputmode="numeric"
-      type="text"
-      placeholder="Your Mobile Number"
-      @input="validateInput"
-      maxlength="10"
-       autocomplete="off"
-    />
+    <InputText class="prime-input " v-model="localPhoneNo" inputmode="numeric" type="text"
+      placeholder="Your Mobile Number" @input="validateInput" maxlength="10" autocomplete="off" />
     <span class="bottom-border"></span>
   </div>
 </template>

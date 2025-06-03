@@ -1,14 +1,8 @@
 <template>
   <div class="w-full">
     <div class="input-wrapper dark:!bg-gray-800">
-      <Textarea
-        class="w-full prime-input dark:!bg-gray-800"
-        v-model="address"
-        variant="filled"
-        rows="2"
-        cols="10"
-        @input="onInput"
-      />
+      <Textarea class="w-full prime-input dark:!bg-gray-800" v-model="address" variant="filled" rows="2" cols="10"
+        @input="onInput" />
       <span class="bottom-border"></span>
     </div>
   </div>

@@ -5,10 +5,12 @@
       <profile />
     </div>
 
-    <div class="flex flex-col justify-between p-2 bg-white rounded-t-3xl dark:bg-black" :style="{ height: deviceHeight * 0.92 + 'px' }">
+    <div class="flex flex-col justify-between p-2 bg-white rounded-t-3xl dark:bg-black"
+      :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full mt-1 px-2 p-1">
         <p class="text-md text-blue-900 font-medium dark:text-gray-400">Upload proofs</p>
-        <p class="text-sm text-gray-500 font-normal leading-5">These details are required by SEBI to open your Demat account.</p>
+        <p class="text-sm text-gray-500 font-normal leading-5">These details are required by SEBI to open your Demat
+          account.</p>
 
         <div class="w-full mt-3">
           <span class="text-gray-500 text-md font-medium">Upload Bank</span>
@@ -20,26 +22,22 @@
             </div>
           </div>
 
-        <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2" >
-                  <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
-                                    
+          <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
+            <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
 
-                </div>
+
+          </div>
         </div>
       </div>
 
       <!-- Buttons -->
       <div class="w-full flex gap-2">
-        <Button @click="back" ref="rippleBtnback" class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+        <Button @click="back" ref="rippleBtnback"
+          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button
-          type="button"
-          ref="rippleBtn"
-          @click="handleButtonClick"
-          :disabled="!imageSrcbank"
-          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0"
-        >
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrcbank"
+          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
       </div>
@@ -58,8 +56,8 @@ const buttonText = ref('Next');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const { baseurl } = globalurl();
-const loading=ref(false)
-const imageSrcbank = ref( null);
+const loading = ref(false)
+const imageSrcbank = ref(null);
 const timing = ref(30)
 
 const getsegmentdata = async () => {
@@ -71,20 +69,20 @@ const getsegmentdata = async () => {
       const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
       const userToken = localStorage.getItem('userkey');
       const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
-     
+
       imageSrcbank.value = imgSrc; // ✅ Set image to component
     }
   }
-   else if(mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument){
-     const segments = mydata?.payload?.metaData?.proofs?.bank || '';
+  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+    const segments = mydata?.payload?.metaData?.proofs?.bank || '';
     if (segments) {
       const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
       const userToken = localStorage.getItem('userkey');
       const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
-     
+
       imageSrcbank.value = imgSrc; // ✅ Set image to component
     }
-   }
+  }
 };
 
 
@@ -115,24 +113,24 @@ const startTimer = () => {
 
 const proofupload = async () => {
 
-    if (!imageSrcbank.value) {
+  if (!imageSrcbank.value) {
     console.error('No image to upload');
     return;
   }
 
-  loading.value=true
+  loading.value = true
 
-    const base64value = await urlToBase64(imageSrcbank.value);
+  const base64value = await urlToBase64(imageSrcbank.value);
   const apiurl = `${baseurl.value}proofupload`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "submission",
-   bank:base64value
+    bank: base64value
   });
 
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
-const timer = startTimer()
+  const timer = startTimer()
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
@@ -150,11 +148,11 @@ const timer = startTimer()
     }
 
     const data = await response.json();
-    if(data.payload.status=='ok'){
-            const mydata= await pagestatus('photosign1')
-       if(mydata.payload.status=='ok'){
-         emit('updateDiv', 'photosign1');
-       }
+    if (data.payload.status == 'ok') {
+      const mydata = await pagestatus('photosign1')
+      if (mydata.payload.status == 'ok') {
+        emit('updateDiv', 'photosign1');
+      }
     }
   } catch (error) {
     clearInterval(timer)
@@ -173,18 +171,18 @@ const back = (event) => {
 
   button.$el.appendChild(circle);
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove();
-     const mydata = await getServerData();
-    const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO ;
-    if(statuscheck){
-        pagestatus('brokerage'),
-    emit('updateDiv', 'brokerage');
-    
+    const mydata = await getServerData();
+    const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
+    if (statuscheck) {
+      pagestatus('brokerage'),
+        emit('updateDiv', 'brokerage');
+
     }
-    else{
-     pagestatus('uploadproof'),
-    emit('updateDiv', 'uploadproof');
+    else {
+      pagestatus('uploadproof'),
+        emit('updateDiv', 'uploadproof');
     }
   }, 600);
 };
@@ -206,7 +204,7 @@ const handleButtonClick = (event) => {
   }, 600);
 };
 
-onMounted(async() => {
+onMounted(async () => {
   await getsegmentdata();
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
