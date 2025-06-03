@@ -16,9 +16,7 @@
       <div v-else-if="currentForm === 'parmanentaddress'">
         <PARMANENTADDRESS :data="data" @updateDiv="handleUpdateDiv" />
       </div>
-      <div v-else-if="currentForm === 'failedstatus'">
-        <FAILEDSTATUS @updateDiv="handleUpdateDiv" />
-      </div>
+     
       <div v-else-if="currentForm === 'communicationaddress'">
         <COMMUNICATIONADDRESS :data="data" @updateDiv="handleUpdateDiv" />
       </div>
@@ -106,7 +104,6 @@ import form3 from '~/components/signup/form3.vue';
 import NKYCList from '~/components/NKYC_Forms/nkyclist.vue'
 import EKYC from '~/components/NKYC_Forms/pandetails/e-kyc.vue'
 import PARMANENTADDRESS from '~/components/NKYC_Forms/pandetails/parmanentaddress.vue'
-import FAILEDSTATUS from '~/components/NKYC_Forms/pandetails/faildstatus.vue'
 import COMMUNICATIONADDRESS from '~/components/NKYC_Forms/pandetails/communicationaddress.vue'
 import MARRIEDSTATUS from '~/components/NKYC_Forms/profiledetails/marridestatus.vue'
 import CLIENTINFO from '~/components/NKYC_Forms/profiledetails/clientinfo.vue'
@@ -146,7 +143,6 @@ const formMap = {
   '$@main1': 'main',
   '$@ekyc1': 'ekyc',
   '$@parmanent1': 'parmanentaddress',
-  '$@failed1': 'failedstatus',
   '$@comm1': 'communicationaddress',
   '$@info1': 'info',
   '$@clientinfo1': 'clientinfo',
