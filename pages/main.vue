@@ -153,7 +153,6 @@ const formMap = {
   '$@nominee1': 'nominee',
   '$@bank1': 'bank1',
   '$@bank4': 'bank4',
-  '$@segment1': 'tradingsegment',
   '$@segments1': 'segment1',
   '$@brokerage1': 'brokerage',
   '$@uploadproof1': 'uploadproof',
