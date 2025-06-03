@@ -16,7 +16,7 @@
         </p>
   <canvas
   ref="canvasRef"
-  class="signature-canvas"
+  class="signature-canvas rounded-lg"
   @touchstart.prevent
   @touchmove.prevent
 />
