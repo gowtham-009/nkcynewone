@@ -222,8 +222,8 @@ const resetFormFields = () => {
 
 
 const openNomineeDialog = () => {
-  resetFormFields(); // Reset all form fields
-  visible.value = true; // Open the dialog
+  resetFormFields(); 
+  visible.value = true; 
 };
 const nomineedetails = async () => {
   const mydata = await getServerData();
