@@ -37,8 +37,7 @@
                 
 
                 <div v-if="photoprogress" class="w-full p-1 flex justify-center  bg-blue-50 text-blue-500" >
-                  <p class=" text-blue-500">please Wait...</p>
-                  <p class=" text-blue-500">{{ timing }}</p>
+                  <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
                 </div>
             </div>
 

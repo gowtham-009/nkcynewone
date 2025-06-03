@@ -36,8 +36,7 @@
         </div>
 
         <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
-          <p class="text-sm text-blue-500">Please Wait...</p>
-                            <p class=" text-blue-500">{{ timing }}</p>
+            <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
 
         </div>
       </div>

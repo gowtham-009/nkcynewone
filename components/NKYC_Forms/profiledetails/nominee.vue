@@ -220,7 +220,6 @@ const resetFormFields = () => {
   prooftype.value = 'PAN';
 };
 
-
 const openNomineeDialog = () => {
   resetFormFields(); 
   visible.value = true; 
