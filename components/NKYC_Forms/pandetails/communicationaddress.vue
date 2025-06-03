@@ -123,7 +123,7 @@ const communicateaddressdata = async () => {
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
 
-    pageCode: "submission",
+    pageCode: "info",
     communicationAddress: address.value,
     communicationCity: city.value,
     communicationState: state.value,
@@ -151,7 +151,7 @@ const communicateaddressdata = async () => {
     else {
       const data = await response.json()
       if (data.payload.status == 'ok') {
-        const mydata = await pagestatus('submission', '2')
+        const mydata = await pagestatus('info')
         if (mydata.payload.status == 'ok') {
           const mydata = await pagestatus('info')
           if (mydata.payload.status == 'ok') {

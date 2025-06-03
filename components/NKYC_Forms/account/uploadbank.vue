@@ -124,7 +124,7 @@ const proofupload = async () => {
   const apiurl = `${baseurl.value}proofupload`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-    pageCode: "submission",
+    pageCode: "photosign1",
     bank: base64value
   });
 

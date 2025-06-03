@@ -187,7 +187,7 @@ const additionaldocument = async () => {
   const apiurl = `${baseurl.value}additional_docs`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-    pageCode: "submission",
+    pageCode: "esign",
     documentConsentMode: question1.value,
     contractNoteMode: question2.value,
     standardDocsConsent: question3.value,

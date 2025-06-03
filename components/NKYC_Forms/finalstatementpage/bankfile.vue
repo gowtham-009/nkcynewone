@@ -161,7 +161,7 @@ onMounted(() => {
   });
   initPage();
 });
-let checkCount = 0; // Declare this globally to track attempts
+let checkCount = 0; 
 
 const camsbankdatacheck = async () => {
   const apiurl = `${baseurl.value}cams`;
