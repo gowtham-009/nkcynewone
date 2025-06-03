@@ -315,25 +315,25 @@ const isSaveDisabled = computed(() => {
 
 
 const dialogbox = (editdata) => {
-
   let formattedDOB = '';
-
+  
   if (editdata.dob) {
-    // Handle ISO format and avoid NaN
     const isoDateMatch = editdata.dob.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (isoDateMatch) {
       const [, year, month, day] = isoDateMatch;
-      formattedDOB = `${day}/${month}/${year}`; // e.g., "06/05/2025"
-    } else {
-      console.warn('Invalid DOB format:', editdata.dob);
+      formattedDOB = `${day}/${month}/${year}`;
     }
   }
 
   visible.value = true;
   idval.value = editdata.id;
   name.value = editdata.name;
-  selectedStatement.value = editdata.relation
-
+  
+  // Fix: Find the matching option object from statementOptions
+  selectedStatement.value = statementOptions.value.find(
+    option => option.value === editdata.relation || option.name === editdata.relation
+  ) || statementOptions.value[0]; // Fallback to first option if not found
+  
   dob.value = formattedDOB;
   address.value = editdata.address;
   mobileNo.value = editdata.mobile;
@@ -344,7 +344,6 @@ const dialogbox = (editdata) => {
   shareval.value = editdata.share;
   prooftype.value = editdata.idType;
 };
-
 
 
 const nomineesavedata = async () => {
@@ -360,12 +359,15 @@ const nomineesavedata = async () => {
 
 
   const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
+  const relationship = selectedStatement.value.name;
+ 
+
 
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "nominee",
     nomineeName: name.value,
-    nomineeRelation: selectedStatement.value.name,
+    nomineeRelation:relationship,
     nomineeAddress: address.value,
     nomineeMobile: mobileNo.value,
     nomineeEmail: email.value,

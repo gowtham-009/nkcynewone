@@ -129,14 +129,11 @@ import ESIGN from '~/components/NKYC_Forms/esign/esign.vue'
 import BANKFILE from '~/components/NKYC_Forms/finalstatementpage/bankfile.vue'
 
 import THANKYOU from '~/components/NKYC_Forms/thankyou.vue'
-
 const authenticated = ref(true) 
 const route = useRoute()
 const router = useRouter()
 const currentForm = ref('nkyclist')
 const data = ref({})
-
-
 const formMap = {
   '$@mobile1': 'mobile',
   '$@email1': 'email',
