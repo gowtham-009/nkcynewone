@@ -1,17 +1,27 @@
 <template>
   <div class="primary_color">
+    <!-- Top Bar -->
     <div class="flex justify-between primary_color items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
       <logo style="width: 40px; height: 40px;" />
       <profile />
     </div>
-    <div class="flex  justify-between items-center px-2 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
+
+    <!-- Main Content -->
+    <div class="flex justify-between items-center px-2 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full p-1"></div>
+
+      <!-- GIF -->
       <div class="w-full p-1 flex flex-col justify-center items-center">
- <img :src="gifSrc" alt="Loading animation" />      </div>
+        <img :src="gifSrc" alt="Loading animation" class="w-32 h-32" />
+       
+      </div>
+
+
+      <!-- Buttons -->
       <div class="w-full flex gap-2">
-        <Button ref="rippleBtnback" @click="back()"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+        <Button ref="rippleBtnback" @click="back"
+          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900 relative overflow-hidden">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" @click="handleButtonClick" ref="rippleBtn"
@@ -19,78 +29,86 @@
           {{ buttonText }}
         </Button>
       </div>
-
-
     </div>
 
+    <!-- Audio element (hidden) -->
+    <audio ref="audioElement" :src="soundSrc" preload="auto"></audio>
   </div>
-
-
-
 </template>
-<script setup>
 
+<script setup>
 import { ref, onMounted } from 'vue';
+
 const emit = defineEmits(['updateDiv']);
 const deviceHeight = ref(0);
 const buttonText = ref('Back to Home');
+const gifSrc = ref('');
+const soundSrc = ref('');
 const rippleBtn = ref(null);
-const rippleBtnback = ref(null)
+const rippleBtnback = ref(null);
+const audioElement = ref(null);
 
+
+
+// Sound function using the audio element
 const playSound = () => {
-  const audio = new Audio('/sound.mp3'); // path inside /public
-  audio.play().catch(err => {
-    console.warn('Audio play failed:', err);
-  });
+  if (audioElement.value) {
+    audioElement.value.currentTime = 0; // Reset audio to start
+    audioElement.value.play().catch(err => {
+      console.warn('Audio play failed:', err);
+      // Fallback for browsers that might block autoplay
+      document.addEventListener('click', () => {
+        audioElement.value.play().catch(e => console.warn('Fallback play failed:', e));
+      }, { once: true });
+    });
+  }
 };
 
-const gifSrc = ref('');
-
 onMounted(() => {
+
+  const timestamp = Date.now();
+  gifSrc.value = `/image/completetic.gif?t=${timestamp}`;
+  soundSrc.value = `/sound.mp3?t=${timestamp}`;
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
 
-  
-  gifSrc.value = `/image/completetic.gif?t=${Date.now()}`;
-
+  // Auto-run clickbtn after 1s (to simulate user interaction workaround)
   setTimeout(() => {
-    playSound();
-  }, 1000); // Play sound after 1 second
+playSound()
+  }, 1000);
 });
 
+// Ripple effect utility
+const createRipple = (event, el) => {
+  const circle = document.createElement('span');
+  circle.classList.add('ripple');
 
+  const rect = el.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
 
+  circle.style.left = `${x}px`;
+  circle.style.top = `${y}px`;
 
-const handleButtonClick = (event) => {
-const button = rippleBtnback.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
-
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
-
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-  button.$el.appendChild(circle)
+  el.appendChild(circle);
+  setTimeout(() => circle.remove(), 600);
 };
 
-const back = async () => {
-const button = rippleBtnback.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
+// Button click
+const handleButtonClick = (event) => {
+  createRipple(event, rippleBtn.value.$el);
+  // Logic goes here
+};
 
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+// Back button logic
+const back = async (event) => {
+  createRipple(event, rippleBtnback.value.$el);
 
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-  button.$el.appendChild(circle)
   setTimeout(async () => {
-    const mydata = await getServerData(); // assume this is defined somewhere
+    const mydata = await getServerData(); // assume function exists
     const statuscheck = mydata?.payload?.metaData?.segments;
 
     if (statuscheck) {
@@ -106,7 +124,7 @@ const button = rippleBtnback.value
           .includes('YES');
 
       if (onlyCashYes) {
-        pagestatus('esign'); // assume this is defined
+        pagestatus('esign'); // assume function exists
         emit('updateDiv', 'esign');
       } else {
         const next = await pagestatus('bankfile');
@@ -117,7 +135,24 @@ const button = rippleBtnback.value
     }
   }, 600);
 };
-
-
-
 </script>
+
+<style scoped>
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  width: 100px;
+  height: 100px;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+</style>

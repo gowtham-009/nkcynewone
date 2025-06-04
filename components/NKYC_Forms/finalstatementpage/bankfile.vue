@@ -197,8 +197,10 @@ const camsbankdatacheck = async () => {
         bankStatementFile
       ) {
         clearInterval(intervalId);
-        await pagestatus('thankyou');
-        emit('updateDiv', 'thankyou');
+         const mydata = await pagestatus('thankyou');
+  if (mydata.payload.status === 'ok') {
+    emit('updateDiv', 'thankyou');
+  }
       } else {
         checkCount++; // Increment attempt counter
 
@@ -250,6 +252,9 @@ const camsbankdata = async () => {
     console.error('camsbankdata error:', error.message);
   }
 };
+
+
+
 
 const triggerUpload = () => {
   fileInput.value?.click();

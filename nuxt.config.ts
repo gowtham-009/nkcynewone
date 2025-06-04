@@ -16,6 +16,8 @@ export default defineNuxtConfig({
       imports: {
     dirs: ['utils']
   },
+
+ 
       modules: [
         '@primevue/nuxt-module'
       ],
