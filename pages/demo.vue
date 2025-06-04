@@ -52,6 +52,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
 h2 {
   font-family: Helvetica;
   font-size: 36px;
