@@ -14,30 +14,26 @@
       class="flex flex-col justify-between items-center p-2 bg-white dark:bg-black rounded-t-3xl flex-grow"
       :style="{ height: deviceHeight * 0.92 + 'px' }"
     >
+    <div class="w-full"></div>
       <div class="flex flex-col justify-center items-center w-full flex-grow">
         <img :src="gifSrc" alt="Loading animation" />
 
       </div>
 
       <!-- Buttons -->
-      <div class="w-full flex gap-2">
-        <button
-          ref="rippleBtnback"
-          @click="(e) => back(e)"
-          class="primary_color cursor-pointer border-0 text-white w-1/4 py-3 rounded-lg text-lg dark:bg-slate-900 relative overflow-hidden"
-        >
-          <i class="pi pi-angle-left text-2xl"></i>
-        </button>
 
-        <button
-          type="button"
-          @click="(e) => handleButtonClick(e)"
-          ref="rippleBtn"
-          class="primary_color wave-btn text-white w-3/4 py-3 rounded-lg text-lg border-0 relative overflow-hidden"
-        >
-          {{ buttonText }}
-        </button>
-      </div>
+        <div class="w-full flex gap-2">
+                <Button @click="back()" ref="rippleBtnback"
+                    class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+                    <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+                </Button>
+                <Button type="button" ref="rippleBtn" label="Continue" @click="handleButtonClick"
+                    class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
+                    {{ buttonText }}
+                </Button>
+            </div>
+
+      
     </div>
   </div>
 </template>
@@ -75,32 +71,33 @@ onMounted(() => {
 
 
 
-const createRipple = (event, element) => {
-  const circle = document.createElement('span');
-  circle.classList.add('ripple');
-
-  const rect = element.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
-
-  circle.style.left = `${x}px`;
-  circle.style.top = `${y}px`;
-
-  element.appendChild(circle);
-
-  setTimeout(() => {
-    circle.remove();
-  }, 600);
-};
 
 const handleButtonClick = (event) => {
-  createRipple(event, rippleBtn.value);
-  // Your logic here, e.g. navigation or state update
+const button = rippleBtnback.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+  button.$el.appendChild(circle)
 };
 
-const back = async (event) => {
-  createRipple(event, rippleBtnback.value);
+const back = async () => {
+const button = rippleBtnback.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
 
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+  button.$el.appendChild(circle)
   setTimeout(async () => {
     const mydata = await getServerData(); // assume this is defined somewhere
     const statuscheck = mydata?.payload?.metaData?.segments;
