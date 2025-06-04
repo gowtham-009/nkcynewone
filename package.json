@@ -16,10 +16,12 @@
         "postcss-import": "^16.1.0"
     },
     "dependencies": {
+        "@lottiefiles/dotlottie-vue": "^0.7.0",
         "crypto-js": "^4.2.0",
         "face-api.js": "^0.22.2",
         "fast-xml-parser": "^5.2.2",
         "fs-extra": "^11.3.0",
+        "lottie-web": "^5.13.0",
         "node-fetch": "^3.3.2",
         "primeicons": "^7.0.0",
         "primevue": "^4.1.1",
