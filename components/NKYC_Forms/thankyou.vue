@@ -1,52 +1,41 @@
 <template>
-  <div class="primary_color min-h-screen flex flex-col">
-    <!-- Top Bar -->
-    <div
-      class="flex justify-between items-center px-3"
-      :style="{ height: deviceHeight * 0.08 + 'px' }"
-    >
-      <logo class="w-10 h-10" />
+  <div class="primary_color">
+    <div class="flex justify-between primary_color items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
+      <logo style="width: 40px; height: 40px;" />
       <profile />
     </div>
-
-    <!-- Main Content -->
-    <div
-      class="flex flex-col justify-between items-center p-2 bg-white dark:bg-black rounded-t-3xl flex-grow"
-      :style="{ height: deviceHeight * 0.92 + 'px' }"
-    >
-    <div class="w-full"></div>
-      <div class="flex flex-col justify-center items-center w-full flex-grow">
-        <img :src="gifSrc" alt="Loading animation" />
-
+    <div class="flex  justify-between items-center px-2 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
+      :style="{ height: deviceHeight * 0.92 + 'px' }">
+      <div class="w-full p-1"></div>
+      <div class="w-full p-1 flex flex-col justify-center items-center">
+ <img :src="gifSrc" alt="Loading animation" />      </div>
+      <div class="w-full flex gap-2">
+        <Button ref="rippleBtnback" @click="back()"
+          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+        </Button>
+        <Button type="button" @click="handleButtonClick" ref="rippleBtn"
+          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
+          {{ buttonText }}
+        </Button>
       </div>
 
-      <!-- Buttons -->
 
-        <div class="w-full flex gap-2">
-                <Button @click="back()" ref="rippleBtnback"
-                    class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-                    <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-                </Button>
-                <Button type="button" ref="rippleBtn" label="Continue" @click="handleButtonClick"
-                    class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-                    {{ buttonText }}
-                </Button>
-            </div>
-
-      
     </div>
+
   </div>
+
+
+
 </template>
-
 <script setup>
-import { ref, onMounted } from 'vue';
 
+import { ref, onMounted } from 'vue';
 const emit = defineEmits(['updateDiv']);
 const deviceHeight = ref(0);
 const buttonText = ref('Back to Home');
 const rippleBtn = ref(null);
-const rippleBtnback = ref(null);
-
+const rippleBtnback = ref(null)
 
 const playSound = () => {
   const audio = new Audio('/sound.mp3'); // path inside /public
@@ -126,26 +115,7 @@ const button = rippleBtnback.value
     }
   }, 600);
 };
+
+
+
 </script>
-
-<style scoped>
-.ripple {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  transform: scale(0);
-  animation: ripple 0.6s linear;
-  width: 100px;
-  height: 100px;
-  pointer-events: none;
-}
-
-@keyframes ripple {
-  to {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
-
-
-</style>
