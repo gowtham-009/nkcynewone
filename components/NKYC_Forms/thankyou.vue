@@ -55,7 +55,9 @@ onMounted(() => {
   
   gifSrc.value = `/image/completetic.gif?t=${Date.now()}`;
 
-  playSound();
+  setTimeout(() => {
+    playSound();
+  }, 1000); // Play sound after 1 second
 });
 
 
