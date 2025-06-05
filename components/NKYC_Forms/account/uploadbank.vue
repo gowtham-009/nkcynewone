@@ -17,20 +17,17 @@
           <div class="grid grid-cols-1 gap-3 dark:bg-gray-800">
             <div class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white dark:bg-gray-800">
               <div class="px-2 py-2">
-                <Bankupload v-model:src="imageSrcbank"  v-model:valid="isImageValid" />
+                <Bankupload v-model:modelValue="imageSrcbank" v-model:valid="isImageValid" />
               </div>
             </div>
           </div>
 
           <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
             <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
-
-
           </div>
         </div>
       </div>
 
-      <!-- Buttons -->
       <div class="w-full flex gap-2">
         <Button @click="back" ref="rippleBtnback"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
@@ -57,36 +54,25 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const { baseurl } = globalurl();
 const loading = ref(false)
-const imageSrcbank = ref(null);
+const imageSrcbank = ref(null); // format: { src: URL, isPdf: Boolean }
 const timing = ref(30)
 const isImageValid = ref(false);
+
 const getsegmentdata = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
-  if (statuscheck) {
-    const segments = mydata?.payload?.metaData?.proofs?.bank || '';
-    if (segments) {
-      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
-      const userToken = localStorage.getItem('userkey');
-      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+  const segments = mydata?.payload?.metaData?.proofs?.bank || '';
 
-      imageSrcbank.value = imgSrc; // ✅ Set image to component
-    }
-  }
-  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
-    const segments = mydata?.payload?.metaData?.proofs?.bank || '';
-    if (segments) {
-      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
-      const userToken = localStorage.getItem('userkey');
-      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+  if (segments) {
+    const isPdfFile = segments.toLowerCase().endsWith('.pdf');
+    const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+    const userToken = localStorage.getItem('userkey');
+    const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
 
-      imageSrcbank.value = imgSrc; // ✅ Set image to component
-        isImageValid.value = true;
-    }
+    imageSrcbank.value = { src: imgSrc, isPdf: isPdfFile };
+    isImageValid.value = true;
   }
 };
-
-
 
 const urlToBase64 = async (url) => {
   const response = await fetch(url);
@@ -111,18 +97,16 @@ const startTimer = () => {
   return timer
 }
 
-
 const proofupload = async () => {
-
   if (!imageSrcbank.value) {
     console.error('No image to upload');
     return;
   }
 
   loading.value = true
-
-  const base64value = await urlToBase64(imageSrcbank.value);
+  const base64value = await urlToBase64(imageSrcbank.value.src);
   const apiurl = `${baseurl.value}proofupload`;
+
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "photosign1",
@@ -131,7 +115,8 @@ const proofupload = async () => {
 
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
-  const timer = startTimer()
+  const timer = startTimer();
+
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
@@ -144,14 +129,12 @@ const proofupload = async () => {
 
     clearInterval(timer)
 
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`Network error: ${response.status}`);
 
     const data = await response.json();
-    if (data.payload.status == 'ok') {
+    if (data.payload.status === 'ok') {
       const mydata = await pagestatus('photosign1')
-      if (mydata.payload.status == 'ok') {
+      if (mydata.payload.status === 'ok') {
         emit('updateDiv', 'photosign1');
       }
     }
@@ -161,7 +144,7 @@ const proofupload = async () => {
   }
 };
 
-const back = (event) => {
+const back = async (event) => {
   const button = rippleBtnback.value;
   const circle = document.createElement('span');
   circle.classList.add('ripple');
@@ -169,7 +152,6 @@ const back = (event) => {
   const rect = button.$el.getBoundingClientRect();
   circle.style.left = `${event.clientX - rect.left}px`;
   circle.style.top = `${event.clientY - rect.top}px`;
-
   button.$el.appendChild(circle);
 
   setTimeout(async () => {
@@ -179,9 +161,7 @@ const back = (event) => {
     if (statuscheck) {
       pagestatus('brokerage'),
         emit('updateDiv', 'brokerage');
-
-    }
-    else {
+    } else {
       pagestatus('uploadproof'),
         emit('updateDiv', 'uploadproof');
     }
@@ -196,12 +176,11 @@ const handleButtonClick = (event) => {
   const rect = button.$el.getBoundingClientRect();
   circle.style.left = `${event.clientX - rect.left}px`;
   circle.style.top = `${event.clientY - rect.top}px`;
-
   button.$el.appendChild(circle);
 
   setTimeout(() => {
     circle.remove();
-    proofupload()
+    proofupload();
   }, 600);
 };
 
