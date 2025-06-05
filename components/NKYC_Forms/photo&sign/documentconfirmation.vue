@@ -283,12 +283,6 @@ const back = () => {
 
 }
 
-
-
-
-
-
-
 const handleButton = () => {
   const button = rippleBtn.value
   const circle = document.createElement('span')
