@@ -84,7 +84,6 @@
       <div v-else-if="currentForm === 'bankfile'">
         <BANKFILE @updateDiv="handleUpdateDiv" />
       </div>
-     
       <div v-else-if="currentForm === 'thankyou'">
         <THANKYOU @updateDiv="handleUpdateDiv" />
       </div>

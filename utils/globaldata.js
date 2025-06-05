@@ -9,9 +9,6 @@ export function encryptionrequestdata(newData) {
 }
 
 
-
-
-
 export function decryptdatadata(newData) {
   const mergedData = {
     ...data,
