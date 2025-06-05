@@ -160,20 +160,19 @@ const handleButtonClick = () => {
         const statuscheck = mydata?.payload?.metaData?.digi_info
         if (statuscheck.length == 0) {
 
-            const pan = mydata?.payload?.metaData?.kraPan?.APP_ERROR_DESC
-            if (pan == 'PAN NOT FOUND') {
+            const pan = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO
 
-                pagestatus('ekyc')
-                emit('updateDiv', 'ekyc');
-            }
-            else {
-
-                pagestatus('parmanentaddress')
+            if(pan){
+                 pagestatus('parmanentaddress')
                 emit('updateDiv', 'parmanentaddress');
             }
+           else{
+             pagestatus('ekyc')
+            emit('updateDiv', 'ekyc');
+           }
+            
         }
         else {
-
             pagestatus('parmanentaddress')
             emit('updateDiv', 'parmanentaddress');
         }
