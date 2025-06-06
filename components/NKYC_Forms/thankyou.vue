@@ -31,8 +31,7 @@
       </div>
     </div>
 
-    <!-- Audio element (hidden) -->
-    <audio ref="audioElement" :src="soundSrc" preload="auto"></audio>
+  
   </div>
 </template>
 
@@ -50,35 +49,19 @@ const audioElement = ref(null);
 
 
 
-// Sound function using the audio element
-const playSound = () => {
-  if (audioElement.value) {
-    audioElement.value.currentTime = 0; // Reset audio to start
-    audioElement.value.play().catch(err => {
-      console.warn('Audio play failed:', err);
-      // Fallback for browsers that might block autoplay
-      document.addEventListener('click', () => {
-        audioElement.value.play().catch(e => console.warn('Fallback play failed:', e));
-      }, { once: true });
-    });
-  }
-};
+
 
 onMounted(() => {
 
   const timestamp = Date.now();
   gifSrc.value = `/image/completetic.gif?t=${timestamp}`;
-  soundSrc.value = `/sound.mp3?t=${timestamp}`;
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
 
-  // Auto-run clickbtn after 1s (to simulate user interaction workaround)
-  setTimeout(() => {
-playSound()
-  }, 1000);
+
 });
 
 // Ripple effect utility
