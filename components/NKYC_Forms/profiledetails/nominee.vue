@@ -34,35 +34,23 @@
               </div>
             </div>
 
-            <div v-if="nomineescard2 && nomine.length > 0" class="w-full p-1 flex gap-2" style="border: 1px solid red;">
-              <div class="relative inline-block text-left">
-                <!-- Dropdown Button -->
-                <div>
-                  <button @click="toggle" type="button"
-                    class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-3 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
-                    {{ selectedm || 'Please Select Major Nominee Name' }}
-                    <svg class="ml-2 -mr-1 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd"
-                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
-                        clip-rule="evenodd" />
-                    </svg>
-                  </button>
-                </div>
+            <div v-if="nomineescard2" class="w-full p-1 flex justify-between gap-2" >
+<div>
+  <p class="text-gray-500 text-md font-medium">On my Incapacitation</p>
+  <Select
+  v-model="selectedmajornominee"
+  :options="nominees"
+  optionLabel="name"
+  placeholder="Select"
+  class="w-full md:w-56"
+/>
+</div>
 
-                <!-- Dropdown Menu -->
-                <div v-if="isOpen"
-                  class="origin-top-right absolute mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
-                  style="z-index: 10;">
-                  <div class="py-1">
-                    <button v-for="option in options" :key="option" @click="select(option)"
-                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                      {{ option }}
-                    </button>
-                  </div>
-                </div>
-              </div>
+<div>
+  <p class="text-gray-500 text-md font-medium">TO ENCASH %</p>
+  <InputText type="text" v-model="sharevalue" class="w-14" placeholder="0%" />
 
-              <InputText type="text" v-model="sharevalue" class="w-14" placeholder="0%" />
+</div>
             </div>
 
           </div>
@@ -71,8 +59,6 @@
             <Button @click="openNomineeDialog" class="w-full py-3 primary_color text-white">
               {{ nomineetext }}
             </Button>
-
-
           </div>
         </div>
       </div>
@@ -181,9 +167,9 @@ const emit = defineEmits(['updateDiv']);
 const isDisabled = ref(true)
 const nomineecontainer = ref(true)
 const idval = ref('')
-// States
+
 const shareval = ref('');
-const nomineescard2 = ref(false);
+
 const visible = ref(false);
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
@@ -191,24 +177,19 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const nomineetext = ref("Add Nominee");
 const nomineeCount = ref(0);
-
+const nomineescard2=ref(false)
 const sharevalue = ref('0')
 
 const isOpen = ref(false)
-const selectedm = ref('')
-const options = ['Option 1', 'Option 2', 'Option 3']
+const selectedm = ref('Please Select Major Nominee Name')
 
-function toggle() {
-  isOpen.value = !isOpen.value
-}
 
-function select(option) {
-  selectedm.value = option
-  isOpen.value = false
-}
+
 
 const selectedStatement = ref('')
+const selectedmajornominee = ref('')
 
+const nominees = ref([])
 
 const statementOptions = ref([
   { value: 'Son', name: 'Son' },
@@ -298,6 +279,46 @@ const nomineedetails = async () => {
         }
       }
 
+     
+ if (nomineeList.length > 0) {
+  console.log("Nominee List:", nomineeList);
+  nomineescard2.value = true;
+  const majornnomineelist = [];
+
+nomineeList.forEach(nominee => {
+  const dob = new Date(nominee.dob);
+  const today = new Date();
+
+  const age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  const dayDiff = today.getDate() - dob.getDate();
+
+  const is18OrOlder =
+    age > 18 ||
+    (age === 18 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)));
+
+  if (is18OrOlder) {
+    majornnomineelist.push({
+      name: nominee.name,
+      id: nominee.id,
+      share: nominee.share,
+     
+    });
+  }
+});
+
+
+nominees.value = majornnomineelist;
+
+
+
+ 
+}
+
+
+       else {
+        nomineescard2.value = false;
+      }
       nomine.value = nomineeList;
       nomineeCount.value = nomineeList.length;
       nomineecontainer.value = totalShare < 100;
@@ -342,6 +363,16 @@ const nomineedetails = async () => {
 
 
 await nomineedetails()
+
+
+
+
+
+watch(selectedmajornominee, (val) => {
+  if (val) {
+   sharevalue.value = val.share;
+  }
+});
 
 const availabilelimit = computed(() => {
   let total = 0;
@@ -458,7 +489,7 @@ const nomineesavedata = async () => {
     if( data.payload.status== 'ok') {
       
        visible.value = false;
-    nomineedetails(); // Refresh the nominee list or details
+    nomineedetails();
     }
    
   } catch (error) {
@@ -579,6 +610,44 @@ const back = () => {
 };
 
 
+const nomineeadddata = async () => {
+
+ 
+
+  const apiurl = `${baseurl.value}nominee`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "esign",
+   
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+  const timer = startTimer()
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+    clearInterval(timer)
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+      createunsignedDocument()
+    }
+  } catch (error) {
+    clearInterval(timer)
+    console.error(error.message);
+  }
+};
 
 
 const handleButtonClick = (event) => {
@@ -613,7 +682,7 @@ const handleButtonClick = (event) => {
 
 // Lifecycle
 onMounted(async () => {
-  await nomineedetails()
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
