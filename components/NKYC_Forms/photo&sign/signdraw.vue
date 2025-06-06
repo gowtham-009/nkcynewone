@@ -41,10 +41,7 @@
         </div>
 
         <div class="w-full mt-1">
-          <div class="flex items-center gap-2">
-            <Checkbox v-model="additionaldoc" inputId="additionaldoc" name="additionaldoc" value="additionaldoc" />
-            <label for="additionaldoc"> Additional Document </label>
-          </div>
+          <a class="cursor-pointer text-blue-500" @click="additionaldoc" style="text-decoration: underline;">Additional Document</a>
         </div>
 
         <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
@@ -82,7 +79,7 @@ const buttonText = ref("Continue");
 const canvasRef = ref(null);
 const loading = ref(false)
 const timing = ref(30)
-const additionaldoc = ref('')
+
 let ctx = null;
 let isDrawing = false;
 const isImageUploaded = ref(false);
@@ -336,14 +333,7 @@ const uploadsign = async () => {
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
-      if (!additionaldoc.value) {
-        createunsignedDocument()
-      }
-      else {
-        pagestatus('additionalinformation')
-        emit('updateDiv', 'additionalinformation');
-      }
-
+       createunsignedDocument()
     }
   } catch (error) {
     clearInterval(timer)
@@ -436,6 +426,11 @@ const handleButtonClick = () => {
     circle.remove()
     uploadsign()
   }, 600)
+}
+
+const additionaldoc=()=>{
+  pagestatus('additionalinformation')
+  emit('updateDiv', 'additionalinformation');
 }
 </script>
 <style>

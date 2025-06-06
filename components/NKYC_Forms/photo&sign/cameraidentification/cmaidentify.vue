@@ -12,11 +12,14 @@
       <div class="center-guide" v-if="!imageCaptured">
         <div class="crosshair"></div>
         <div class="distance-ring" :class="{ 'ring-green': readyToCapture }"></div>
+        <!-- Axis lines -->
+        <div class="axis-line x-axis"></div>
+        <div class="axis-line y-axis"></div>
       </div>
     </div>
 
     <!-- Status indicators -->
-    <div class="status-indicators mt-1  text-center">
+    <div class="status-indicators mt-1 text-center">
       <div class="">
         <span class="font-medium">Position: </span>
         <span :class="{
@@ -262,6 +265,7 @@ onMounted(async () => {
   transform: translate(-50%, -50%);
   width: 20px;
   height: 20px;
+  z-index: 2;
 }
 
 .crosshair:before,
@@ -295,10 +299,34 @@ onMounted(async () => {
   border: 2px dashed rgba(255, 255, 255, 0.6);
   border-radius: 50%;
   transition: border-color 0.3s ease;
+  z-index: 1;
 }
 
 .distance-ring.ring-green {
   border-color: rgba(0, 255, 0, 0.7);
+}
+
+/* Axis lines */
+.axis-line {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+}
+
+.x-axis {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.y-axis {
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  transform: translateX(-50%);
 }
 
 .status-indicators {

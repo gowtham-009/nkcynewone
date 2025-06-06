@@ -34,6 +34,37 @@
               </div>
             </div>
 
+            <div v-if="nomineescard2 && nomine.length > 0" class="w-full p-1 flex gap-2" style="border: 1px solid red;">
+              <div class="relative inline-block text-left">
+                <!-- Dropdown Button -->
+                <div>
+                  <button @click="toggle" type="button"
+                    class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-3 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+                    {{ selectedm || 'Please Select Major Nominee Name' }}
+                    <svg class="ml-2 -mr-1 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd"
+                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                        clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Dropdown Menu -->
+                <div v-if="isOpen"
+                  class="origin-top-right absolute mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+                  style="z-index: 10;">
+                  <div class="py-1">
+                    <button v-for="option in options" :key="option" @click="select(option)"
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      {{ option }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <InputText type="text" v-model="sharevalue" class="w-14" placeholder="0%" />
+            </div>
+
           </div>
 
           <div class="w-full" v-if="nomineecontainer">
@@ -152,7 +183,7 @@ const nomineecontainer = ref(true)
 const idval = ref('')
 // States
 const shareval = ref('');
-
+const nomineescard2 = ref(false);
 const visible = ref(false);
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
@@ -160,6 +191,21 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const nomineetext = ref("Add Nominee");
 const nomineeCount = ref(0);
+
+const sharevalue = ref('0')
+
+const isOpen = ref(false)
+const selectedm = ref('')
+const options = ['Option 1', 'Option 2', 'Option 3']
+
+function toggle() {
+  isOpen.value = !isOpen.value
+}
+
+function select(option) {
+  selectedm.value = option
+  isOpen.value = false
+}
 
 const selectedStatement = ref('')
 
@@ -223,7 +269,9 @@ const nomineedetails = async () => {
   if (statuscheck) {
     const nominee = mydata?.payload?.metaData?.nominee;
     if (nominee) {
+   
       nomineescard.value = true;
+     
       const nomineeList = [];
       let totalShare = 0;
 
@@ -407,8 +455,12 @@ const nomineesavedata = async () => {
     }
 
     const data = await response.json();
-    visible.value = false;
+    if( data.payload.status== 'ok') {
+      
+       visible.value = false;
     nomineedetails(); // Refresh the nominee list or details
+    }
+   
   } catch (error) {
     console.error("Error saving nominee:", error.message);
     visible.value = false;
