@@ -131,24 +131,24 @@ const getsegmentdata = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.additional_docs || '';
   if (statuscheck) {
-    question1.value = mydata?.payload?.metaData?.additional_docs?.documentConsentMode || ''
-    question2.value = mydata?.payload?.metaData?.additional_docs?.contractNoteMode || ''
-    question3.value = mydata?.payload?.metaData?.additional_docs?.standardDocsConsent || ''
-    question4.value = mydata?.payload?.metaData?.additional_docs?.internetTradingOpted || ''
-    question5.value = mydata?.payload?.metaData?.additional_docs?.pastActionsDetails || ''
-    question6.value = mydata?.payload?.metaData?.additional_docs?.otherBrokerDetails || ''
-    question7.value = mydata?.payload?.metaData?.additional_docs?.accountSettlementPreference || ''
-    question8.value = mydata?.payload?.metaData?.additional_docs?.settlementStatementConsent || ''
+    question1.value = mydata?.payload?.metaData?.additional_docs?.documentConsentMode || 'Electronic'
+    question2.value = mydata?.payload?.metaData?.additional_docs?.contractNoteMode || 'Electronic'
+    question3.value = mydata?.payload?.metaData?.additional_docs?.standardDocsConsent || 'Electronic'
+    question4.value = mydata?.payload?.metaData?.additional_docs?.internetTradingOpted || 'Yes'
+    question5.value = mydata?.payload?.metaData?.additional_docs?.pastActionsDetails || 'No'
+    question6.value = mydata?.payload?.metaData?.additional_docs?.otherBrokerDetails || 'No'
+    question7.value = mydata?.payload?.metaData?.additional_docs?.accountSettlementPreference || 'CDSL'
+    question8.value = mydata?.payload?.metaData?.additional_docs?.settlementStatementConsent || 'Once in Quarter'
   }
   else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
-    question1.value = mydata?.payload?.metaData?.additional_docs?.documentConsentMode || ''
-    question2.value = mydata?.payload?.metaData?.additional_docs?.contractNoteMode || ''
-    question3.value = mydata?.payload?.metaData?.additional_docs?.standardDocsConsent || ''
-    question4.value = mydata?.payload?.metaData?.additional_docs?.internetTradingOpted || ''
-    question5.value = mydata?.payload?.metaData?.additional_docs?.pastActionsDetails || ''
-    question6.value = mydata?.payload?.metaData?.additional_docs?.otherBrokerDetails || ''
-    question7.value = mydata?.payload?.metaData?.additional_docs?.accountSettlementPreference || ''
-    question8.value = mydata?.payload?.metaData?.additional_docs?.settlementStatementConsent || ''
+    question1.value = mydata?.payload?.metaData?.additional_docs?.documentConsentMode || 'Electronic'
+    question2.value = mydata?.payload?.metaData?.additional_docs?.contractNoteMode || 'Electronic'
+    question3.value = mydata?.payload?.metaData?.additional_docs?.standardDocsConsent || 'Electronic'
+    question4.value = mydata?.payload?.metaData?.additional_docs?.internetTradingOpted || 'Yes'
+    question5.value = mydata?.payload?.metaData?.additional_docs?.pastActionsDetails || 'No'
+    question6.value = mydata?.payload?.metaData?.additional_docs?.otherBrokerDetails || 'No'
+    question7.value = mydata?.payload?.metaData?.additional_docs?.accountSettlementPreference || 'CDSL'
+    question8.value = mydata?.payload?.metaData?.additional_docs?.settlementStatementConsent || 'Once in Quarter'
   }
 };
 

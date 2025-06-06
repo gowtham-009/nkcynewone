@@ -14,7 +14,23 @@
         <p class="text-gray-500 leading-5 font-normal text-sm">
           Use the signature box to sign
         </p>
-        <canvas ref="canvasRef" class="signature-canvas rounded-lg" @touchstart.prevent @touchmove.prevent />
+        <div class="w-full mt-1 rounded-lg   bg-blue-50 dark:bg-slate-900">
+                  
+
+                    <div class="w-full flex items-center  gap-2 mt-1 ">
+                        
+                        <div class="p-2">
+                            <p class="text-gray-500 leading-5 font-normal text-sm">
+                                Choose the option to upload an image of your signature for accuracy.
+                            </p>
+                        </div>
+                    </div>
+
+                  
+
+
+                </div>
+        <canvas ref="canvasRef" class="signature-canvas rounded-lg mt-1" @touchstart.prevent @touchmove.prevent />
 
         <div class="w-full mt-1 flex gap-2 justify-center">
           <Button @click="erase" icon="pi pi-trash" label="Clear"
@@ -350,8 +366,8 @@ const back = () => {
 
   setTimeout(() => {
     circle.remove()
-    pagestatus('signature')
-    emit('updateDiv', 'signature');
+    pagestatus('photoproceed')
+    emit('updateDiv', 'photoproceed');
   }, 600)
 
 }

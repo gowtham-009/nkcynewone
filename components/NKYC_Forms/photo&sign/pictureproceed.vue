@@ -146,8 +146,8 @@ const handleButtonClick = () => {
 
     setTimeout(() => {
         circle.remove()
-        pagestatus('signature')
-        emit('updateDiv', 'signature');
+        pagestatus('signdraw')
+        emit('updateDiv', 'signdraw');
     }, 600)
 };
 

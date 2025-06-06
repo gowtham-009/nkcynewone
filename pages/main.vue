@@ -69,9 +69,7 @@
       <div v-else-if="currentForm === 'photoproceed'">
         <PHOTOPROCEED :data="data" @updateDiv="handleUpdateDiv" />
       </div>
-      <div v-else-if="currentForm === 'signature'">
-        <SIGNATURE @updateDiv="handleUpdateDiv" />
-      </div>
+     
       <div v-else-if="currentForm === 'signdraw'">
         <SIGNDRAWING :data="data" @updateDiv="handleUpdateDiv" />
       </div>
@@ -121,7 +119,6 @@ import UPLOADBANK from '~/components/NKYC_Forms/account/uploadbank.vue'
 import PHOTOSIGN1 from '~/components/NKYC_Forms/photo&sign/photosign.vue'
 import TAKEPHOTO from '~/components/NKYC_Forms/photo&sign/takephoto.vue'
 import PHOTOPROCEED from '~/components/NKYC_Forms/photo&sign/pictureproceed.vue'
-import SIGNATURE from '~/components/NKYC_Forms/photo&sign/signature.vue'
 import SIGNDRAWING from '~/components/NKYC_Forms/photo&sign/signdraw.vue'
 import ADDITIONALINFO from '~/components/NKYC_Forms/photo&sign/documentconfirmation.vue'
 import ESIGN from '~/components/NKYC_Forms/esign/esign.vue'
@@ -157,7 +154,6 @@ const formMap = {
   '$@photosign1': 'photosign1',
   '$@takephoto1': 'takephoto',
   '$@photoproceed1': 'photoproceed',
-  '$@signature1': 'signature',
   '$@signdraw1': 'signdraw',
   '$@additional1': 'additionalinformation',
   '$@esign1': 'esign',
