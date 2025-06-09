@@ -9,7 +9,7 @@
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full mt-1 px-2 p-1">
                 <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
-                    Looking good, Client
+                    Looking good, {{ clientname }}
                 </p>
 
                 <p class="text-sm text-gray-500 font-normal leading-5">
@@ -18,7 +18,7 @@
 
                 <div class="w-full  p-1 flex justify-center items-center flex-col mt-20 h-64 ">
 
-                    <img :src="srcUrl" alt="Base64 Image" class="rounded-xl w-64 h-64 object-cover" />
+                    <img :src="srcUrl" alt="Base64 Image" class="rounded-full w-80 h-80 object-cover " />
 
                     <div class="w-full flex justify-center mt-2">
                         <Chip @click="retake" class="px-5 bg-blue-50 text-blue-500" label="Retake" />
@@ -69,10 +69,13 @@ const deviceHeight = ref(0);
 const srcUrl = ref(null)
 const isBack = ref(true); // Assuming you have a way to determine if the back button should be enabled
 const isStatusValid = ref(true); // Assuming you have a way to determine if the status is valid
+
+const clientname=ref('')
 const getsegmentdata = async () => {
     const mydata = await getServerData();
     const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
     if (statuscheck) {
+        clientname.value=mydata?.payload?.metaData?.profile?.clientName
         const segments = mydata?.payload?.metaData?.proofs?.ipvImg || '';
         if (segments) {
             const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
