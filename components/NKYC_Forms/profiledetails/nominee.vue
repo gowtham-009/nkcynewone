@@ -340,7 +340,7 @@ const nomineedetails = async () => {
       })
 
       if (sharepercentage == 100) {
-        console.log("Share percentage is 100%:", selectedmajornominee.value);
+       
         canContinue.value = true;
       }
       else {
