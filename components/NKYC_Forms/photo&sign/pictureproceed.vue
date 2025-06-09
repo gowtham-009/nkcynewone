@@ -35,8 +35,7 @@
 
 
                 <div class="w-full flex gap-2">
-                    <Button @click="back()" ref="rippleBtnback" :disabled="!isBack">
-                        class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+                    <Button @click="back()" ref="rippleBtnback"  class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900" :disabled="!isBack">
                         <i class="pi pi-angle-left text-3xl dark:text-white"></i>
                     </Button>
                     <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!isStatusValid"
@@ -126,7 +125,7 @@ const back = () => {
         circle.remove()
         pagestatus('photosign1')
         emit('updateDiv', 'photosign1');
-        isBack.value = false;
+        isBack
     }, 600)
 
 }
