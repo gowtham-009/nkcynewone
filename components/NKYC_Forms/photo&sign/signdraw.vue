@@ -56,7 +56,7 @@
 
 
       <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback"
+        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
@@ -84,6 +84,7 @@ const loading = ref(false)
 const esigngen = ref(false);
 const timing = ref(30)
 const isStatusValid = ref(true);
+const isBack = ref(true);
 
 let ctx = null;
 let isDrawing = false;
@@ -382,6 +383,7 @@ const back = () => {
     circle.remove()
     pagestatus('photoproceed')
     emit('updateDiv', 'photoproceed');
+    isBack.value = false;
   }, 600)
 
 }

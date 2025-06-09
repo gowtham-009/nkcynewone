@@ -72,7 +72,7 @@
       </div>
 
       <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback"
+        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
@@ -106,7 +106,7 @@ const emit = defineEmits(['updateDiv']);
 
 import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
-
+const isBack = ref(true);
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
@@ -318,7 +318,7 @@ function back() {
     if (mydata.payload.status == 'ok') {
       emit('updateDiv', 'nominee');
     }
-
+isBack.value = false;
   }, 600)
 
 }

@@ -29,7 +29,7 @@
       </div>
 
       <div class="w-full flex gap-2">
-        <Button @click="back" ref="rippleBtnback"
+        <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
@@ -58,6 +58,7 @@ const imageSrcbank = ref(null); // format: { src: URL, isPdf: Boolean }
 const timing = ref(30)
 const isImageValid = ref(false);
 const isStatusValid = ref(true);
+const isBack = ref(true);
 
 const getsegmentdata = async () => {
   const mydata = await getServerData();
@@ -75,16 +76,6 @@ const getsegmentdata = async () => {
   }
 };
 
-const urlToBase64 = async (url) => {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
 
 const startTimer = () => {
   timing.value = 30
@@ -175,6 +166,7 @@ const back = async (event) => {
       pagestatus('uploadproof'),
         emit('updateDiv', 'uploadproof');
     }
+    isBack.value = false;
   }, 600);
 };
 

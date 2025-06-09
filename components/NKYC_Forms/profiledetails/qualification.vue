@@ -38,7 +38,7 @@
 
 
       <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback"
+        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
@@ -65,6 +65,7 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const activebox = ref('marriedbox');
 const isStatusValid = ref(true);
+const isBack = ref(true);
 const emit = defineEmits(['updateDiv']);
 
 
@@ -129,6 +130,7 @@ const back = () => {
     circle.remove()
     pagestatus('clientinfo')
     emit('updateDiv', 'clientinfo');
+    isBack.value = false;
   }, 600)
 
 };

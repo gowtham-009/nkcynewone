@@ -132,7 +132,7 @@
 
       <!-- Navigation Buttons -->
       <div class="w-full flex gap-2 mt-4">
-        <Button @click="back" ref="rippleBtnback"
+        <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
@@ -179,8 +179,7 @@ const nomineeCount = ref(0);
 const sharevalue = ref('0')
 const canContinue = ref(false)
 
-
-
+const isBack = ref(true)
 
 const selectedStatement = ref('')
 
@@ -600,7 +599,9 @@ const back = () => {
     circle.remove()
     pagestatus('income')
     emit('updateDiv', 'income');
-  }, 600)
+  },
+  isBack.value = false,
+  600)
 
 };
 

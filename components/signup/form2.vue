@@ -155,7 +155,7 @@ onUnmounted(() => {
 
 
 const sendmobileotp = async (resend) => {
-
+  isStatusValid.value = false;
   const apiurl = `${baseurl.value}validateMobile`;
   phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
     const user = encryptionrequestdata({
@@ -230,7 +230,7 @@ const sendmobileotp = async (resend) => {
 
 
 const otpverfication = async () => {
-
+ isStatusValid.value = false;
   errormobile.value = '';
   const usekey=localStorage.getItem('userkey')
   const apiurl = `${baseurl.value}validateMobile`;
@@ -325,6 +325,8 @@ const mobile_signup = async (event) => {
 
 watch(p_otp, (newval) => {
   if (newval.length === 4) {
+    isStatusValid.value = true;
+
    isSending.value=false
   }
   else {

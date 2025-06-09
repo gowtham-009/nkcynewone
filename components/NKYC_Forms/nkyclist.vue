@@ -96,7 +96,7 @@
                 </div>
             </div>
             <div class="w-full flex gap-2">
-                <Button @click="back()" ref="rippleBtnback"
+                <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
                     class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                     <i class="pi pi-angle-left text-3xl dark:text-white"></i>
                 </Button>
@@ -130,7 +130,7 @@ const buttonText = ref("Continue");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const deviceHeight = ref(0);
-
+const isBack = ref(true); // Assuming the back button is enabled by default
 const isFormValid = ref(true); // Assuming the form is valid by default
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
@@ -204,6 +204,7 @@ function back() {
         circle.remove()
         pagestatus('email')
         emit('updateDiv', 'email');
+        isBack.value = false;
     }, 600)
 
 }

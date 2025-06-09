@@ -51,13 +51,13 @@
       </div>
 
       <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback"
+        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" ref="rippleBtn" label="Verify OTP"
           class="primary_color text-white w-5/6 py-3 text-xl border-0" @click="handleButtonClick()"
-          :disabled="isButtonDisabled">
+          :disabled="isButtonDisabled ||  !isStatusValid">
           {{ buttonText }}
         </Button>
       </div>
@@ -94,9 +94,9 @@ const buttonText = ref("Next");
 const emailbox = ref(false)
 const emailidtext = ref('')
 const otperror = ref(false)
-
+const isBack = ref(true);
 const errorotp = ref('')
-
+const isStatusValid = ref(true);
 const erroremail = ref(false)
 const emailerror = ref('')
 let timer = null;
@@ -186,11 +186,13 @@ const back = () => {
     circle.remove()
     pagestatus('mobile')
     emit('updateDiv', 'mobile');
+    isBack.value = false;
   }, 600)
 
 }
 
 const sendemailotp = async (resend) => {
+  isStatusValid.value = false; 
   isSending.value = true; // Disable button
   const apiurl = baseurl.value + 'validateEmail'
 
@@ -283,6 +285,7 @@ const sendemailotp = async (resend) => {
 
 const otpverfication = async () => {
   isSending.value = true; // Disable button
+  isStatusValid.value = false; 
   const apiurl = baseurl.value + 'validateEmail'
     const user = encryptionrequestdata({
     userToken:localStorage.getItem('userkey'),
@@ -337,7 +340,7 @@ function otpclear() {
 
 watch(e_otp, (newval) => {
   if (newval.length === 5) {
-  
+   isStatusValid.value = true; 
     isSending.value = false;
     otperror.value = false
   }

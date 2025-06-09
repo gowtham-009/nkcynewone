@@ -20,7 +20,7 @@
 
       <!-- Buttons -->
       <div class="w-full flex gap-2">
-        <Button ref="rippleBtnback" @click="back"
+        <Button ref="rippleBtnback" @click="back" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900 relative overflow-hidden">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
@@ -42,12 +42,12 @@ const emit = defineEmits(['updateDiv']);
 const deviceHeight = ref(0);
 const buttonText = ref('Back to Home');
 const gifSrc = ref('');
-const soundSrc = ref('');
+
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
-const audioElement = ref(null);
 
 
+const isBack = ref(true);
 
 
 
@@ -64,7 +64,7 @@ onMounted(() => {
 
 });
 
-// Ripple effect utility
+
 const createRipple = (event, el) => {
   const circle = document.createElement('span');
   circle.classList.add('ripple');
@@ -114,6 +114,7 @@ const back = async (event) => {
         if (next?.payload?.status === 'ok') {
           emit('updateDiv', 'bankfile');
         }
+        isBack.value = false;
       }
     }
   }, 600);

@@ -23,7 +23,7 @@
 
       <div class="w-full flex gap-2">
         <!-- Buttons -->
-        <button @click="back($event)" ref="rippleBtnback"
+        <button @click="back($event)" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer rounded-lg border-0 text-white w-1/6 py-3 dark:bg-slate-900 relative overflow-hidden">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </button>
@@ -57,7 +57,7 @@ const rippleBtnback = ref(null);
 const content = ref(true);
 const loading = ref(false);
 const isStatusValid = ref(true);
-
+const isBack = ref(true);
 const route = useRoute();
 
 const steps = [
@@ -218,7 +218,6 @@ isStatusValid.value = false,
 const back = async (event) => {
   createRipple(event, rippleBtnback);
   setTimeout(async () => {
-
     const mydata = await getServerData();
     const statuscheck = mydata?.payload?.metaData?.additional_docs?.documentConsentMode
     if (statuscheck) {
@@ -235,6 +234,7 @@ const back = async (event) => {
     }
 
 
+      isBack.value = false;
   }, 600);
 };
 </script>

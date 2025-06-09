@@ -37,7 +37,7 @@
 
       <!-- Submit Buttons -->
       <div class="w-full flex gap-2">
-        <Button @click="back" ref="rippleBtnback"
+        <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
@@ -64,7 +64,7 @@ const imageSrcpan = ref(null);
 const loading = ref(false)
 const timing = ref(30)
 const isStatusValid = ref(true); // Assuming this is set based on some validation logic
-
+const isBack = ref(true); // Assuming you have some logic to enable/disable back button
 const isImageValid = ref(false)
 
 
@@ -189,6 +189,7 @@ const back = (event) => {
     circle.remove();
     pagestatus('brokerage'),
       emit('updateDiv', 'brokerage');
+      isBack.value = false; 
   }, 600);
 };
 

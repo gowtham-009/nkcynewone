@@ -52,7 +52,7 @@
         </Button>
 
         <Button type="button" @click="handleButtonClick"
-          :disabled="selected !== 'Upload Last 6 Months Bank Statement PDF' || !isStatusValid" ref="rippleBtn"
+          :disabled="selected !== 'Upload Last 6 Months Bank Statement PDF' || !isStatusValid || !isBack" ref="rippleBtn"
           class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
           {{ buttonText }}
         </Button>
@@ -83,6 +83,7 @@ const fileInput = ref(null);
 const selected = ref('');
 const route = useRoute();
 const pdferrorbox = ref(false);
+const isBack = ref(true); // Assuming this is a placeholder for actual back navigation logic
 const isStatusValid = ref(true); // Assuming this is a placeholder for actual status validation logic
 let intervalId = null;
 
@@ -361,6 +362,7 @@ const back = async () => {
     if (mydata.payload.status === 'ok') {
       emit('updateDiv', 'esign');
     }
+    isBack.value = false;
   }, 600);
 };
 </script>

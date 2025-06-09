@@ -65,7 +65,7 @@
             </div>
 
             <div class="w-full flex gap-2">
-                <Button @click="back()" ref="rippleBtnback"
+                <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
                     class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                     <i class="pi pi-angle-left text-3xl dark:text-white"></i>
                 </Button>
@@ -107,7 +107,7 @@ const buttonText = ref("Start e-KYC");
 const content = ref(true)
 const loading = ref(false)
 const isFormdisabled = ref(true)
-
+const isBack = ref(true);
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
@@ -139,6 +139,7 @@ const back = () => {
         circle.remove()
         pagestatus('main')
         emit('updateDiv', 'main');
+        isBack.value = false
     }, 600)
 
 }

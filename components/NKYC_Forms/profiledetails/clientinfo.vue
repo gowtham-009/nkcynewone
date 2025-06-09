@@ -28,7 +28,7 @@
       </div>
 
       <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback"
+        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
@@ -66,6 +66,7 @@ const rippleBtnback = ref(null)
 const father = ref("");
 const mother = ref("");
 const isStatusValid = ref(true);
+const isBack = ref(true);
 const profilesetinfo = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
@@ -177,6 +178,7 @@ const back = () => {
     circle.remove()
     pagestatus('info')
     emit('updateDiv', 'info');
+    isBack.value = false;
   }, 600)
 
 };
