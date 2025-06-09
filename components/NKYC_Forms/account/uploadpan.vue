@@ -121,57 +121,65 @@ const proofupload = async () => {
     console.error('No image to upload');
     return;
   }
-  loading.value = true
-  const base64value = await urlToBase64(imageSrcpan.value);
-  const apiurl = `${baseurl.value}proofupload`;
 
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: 'uploadbank',
-    pancard: base64value,
-  });
+  loading.value = true;
+  const apiurl = `${baseurl.value}proofFormUpload`;
 
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-  const timer = startTimer()
   try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
-      },
-      body: jsonString,
+    // Convert URL to binary Blob
+    const response = await fetch(imageSrcpan.value);
+    const blob = await response.blob();
+
+    // Create encrypted JSON payload
+    const encryptedPayload = encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: 'uploadbank',
     });
 
-    clearInterval(timer)
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`);
+    const formData = new FormData();
+    formData.append('pancard', blob, 'pancard.jpg'); // or 'pancard.pdf' if PDF
+    formData.append('payload', JSON.stringify({ payload: encryptedPayload }));
+
+    const timer = startTimer();
+
+    const uploadResponse = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+        // Do NOT manually set 'Content-Type'
+      },
+      body: formData,
+    });
+
+    clearInterval(timer);
+
+    if (!uploadResponse.ok) {
+      throw new Error(`Network error: ${uploadResponse.status}`);
     }
 
-    const data = await response.json();
+    const data = await uploadResponse.json();
     if (data.payload.status === 'ok') {
-
       const mydata = await getServerData();
-      const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName
-      if (statuscheck1) {
+      const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
 
-        const mydata = await pagestatus('photosign1')
-        if (mydata.payload.status == 'ok') {
+      if (statuscheck1) {
+        const nextPage = await pagestatus('photosign1');
+        if (nextPage.payload.status === 'ok') {
           emit('updateDiv', 'photosign1');
         }
+      } else {
+        await pagestatus('uploadbank');
+        emit('updateDiv', 'uploadbank');
       }
-      else {
-        pagestatus('uploadbank'),
-          emit('updateDiv', 'uploadbank');
-      }
-
     }
   } catch (error) {
-    clearInterval(timer)
+    clearInterval(timer);
     console.error('Upload failed:', error.message);
+  } finally {
+    loading.value = false;
   }
 };
+
 
 
 const back = (event) => {

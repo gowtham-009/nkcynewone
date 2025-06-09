@@ -1,5 +1,5 @@
 <template>
-      <span class="text-md text-gray-500">Email ID</span>
+      <span class="text-md text-gray-500">Email ID*</span>
   <div class="input-wrapper dark:!bg-gray-800">
     <InputText
       id="email"

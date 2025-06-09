@@ -78,7 +78,7 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" ref="rippleBtn" @click="handleButtonClick"
-          :disabled="!selectedgender || !selected || !clientselected"
+          :disabled="!selectedgender || !selected || !clientselected || !isStatusValid"
           class=" primary_color text-white w-5/6 py-3 text-xl border-0  ">
           {{ buttonText }}
         </Button>
@@ -100,7 +100,7 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const activebox = ref('marriedbox');
 const emit = defineEmits(['updateDiv']);
-
+const isStatusValid = ref(true);
 
 // gender status
 const selectedgender = ref("");
@@ -258,7 +258,7 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
     personalinfo()
-
+    isStatusValid.value=false
   }, 600)
 };
 </script>

@@ -46,7 +46,10 @@
 
         <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
           <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
+        </div>
 
+        <div v-if="esigngen" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
+          <p class="text-sm text-blue-500">E-sign Generating...</p>
         </div>
       </div>
 
@@ -78,6 +81,7 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const canvasRef = ref(null);
 const loading = ref(false)
+const esigngen = ref(false);
 const timing = ref(30)
 
 let ctx = null;
@@ -258,6 +262,8 @@ const emit = defineEmits(['updateDiv']);
 
 
 const createunsignedDocument = async () => {
+  loading.value = false
+  esigngen.value = true
   const apiurl = `${baseurl.value}nkyc_document`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -305,41 +311,58 @@ const startTimer = () => {
 }
 
 const uploadsign = async () => {
-  loading.value = true
-  const apiurl = `${baseurl.value}proofupload`;
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: "additionalinformation",
-    signature: imageSrc.value,
+  loading.value = true;
+  const apiurl = `${baseurl.value}proofFormUpload`;
 
-  });
+  let timer; // Declare timer here
 
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-  const timer = startTimer()
   try {
-    const response = await fetch(apiurl, {
+    // Fetch the image as a Blob (binary)
+    const response = await fetch(imageSrc.value);
+    const blob = await response.blob();
+
+    // Create encrypted metadata (excluding image)
+    const user = encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: "additionalinformation"
+    });
+
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append('signature', blob, 'signature.jpg'); // Binary file
+    formData.append('payload', JSON.stringify({ payload: user }));
+
+    timer = startTimer();
+
+    const uploadResponse = await fetch(apiurl, {
       method: 'POST',
       headers: {
         'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
+        // Content-Type must NOT be set manually for FormData
       },
-      body: jsonString,
+      body: formData,
     });
-    clearInterval(timer)
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`);
+
+    clearInterval(timer);
+
+    if (!uploadResponse.ok) {
+      throw new Error(`Network error: ${uploadResponse.status}`);
     }
 
-    const data = await response.json();
+    const data = await uploadResponse.json();
+
     if (data.payload.status === 'ok') {
-       createunsignedDocument()
+      createunsignedDocument();
     }
+
   } catch (error) {
-    clearInterval(timer)
-    console.error(error.message);
+    if (timer) clearInterval(timer);
+    console.error('Upload failed:', error.message);
+  } finally {
+    loading.value = false;
   }
 };
+
 
 const back = () => {
   const button = rippleBtnback.value

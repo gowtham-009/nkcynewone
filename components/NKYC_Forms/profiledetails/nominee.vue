@@ -11,56 +11,51 @@
       :style="{ height: deviceHeight * 0.92 + 'px' }">
 
       <!-- Nominee Info -->
-      <div class="w-full mt-1 px-2 p-1">
+      <div class="w-full mt-1 px-2 ">
         <p class="text-xl text-blue-900 font-medium dark:text-gray-400">Add nominee</p>
         <p class="text-sm text-gray-500 font-normal leading-5">Relationship with nominee</p>
 
-        <div class="w-full flex flex-col gap-2 mt-2">
-          <div v-if="nomineescard">
-            <div class="w-full p-2  cursor-pointer mb-2  bg-gray-200 rounded-lg " v-for="nomineeshare in nomine">
-              <div class="w-full">
-                <div class="w-4/5">
-                  <span class="text-gray-500">Nominee Name: {{ nomineeshare.name }}</span><br>
-                  <span class="text-gray-500">Nominee's relationship: {{ nomineeshare.relation }}</span>
-                </div>
-                <div class="w-1/5">
-                  <p class="text-gray-700 font-bold text-2xl flex">{{ nomineeshare.share }} %</p>
-                </div>
-              </div>
-              <div class="w-full p-1 flex gap-2">
-                <Button @click="dialogbox(nomineeshare)" type="button" class="w-full text-white">Edit</Button>
-                <Button @click="nomineedelete(nomineeshare)" type="button"
-                  class="w-full text-white bg-red-500">Delete</Button>
-              </div>
-            </div>
-
-            <div v-if="nomineescard2" class="w-full p-1 flex justify-between gap-2" >
-<div>
-  <p class="text-gray-500 text-md font-medium">On my Incapacitation</p>
-  <Select
-  v-model="selectedmajornominee"
-  :options="nominees"
-  optionLabel="name"
-  placeholder="Select"
-  class="w-full md:w-56"
-/>
-</div>
-
-<div>
-  <p class="text-gray-500 text-md font-medium">TO ENCASH %</p>
-  <InputText type="text" v-model="sharevalue" class="w-14" placeholder="0%" />
-
-</div>
-            </div>
-
-          </div>
-
-          <div class="w-full" v-if="nomineecontainer">
-            <Button @click="openNomineeDialog" class="w-full py-3 primary_color text-white">
+        <!-- Outer container (fixed height, rounded border) -->
+        <div class="w-full flex flex-col justify-end gap-2 mt-1 rounded-lg h-[450px]">
+          <!-- Scrollable content only inside this div -->
+          <div  v-if="nomineescard" class="flex-1 overflow-y-auto ">
+            <div class="w-full py-1" v-if="nomineecontainer">
+            <Button @click="openNomineeDialog" class="w-full py-2 primary_color text-white" size="small">
               {{ nomineetext }}
             </Button>
           </div>
+            <div>
+              <!-- Nominee list -->
+              <div class="w-full p-1 cursor-pointer mb-1 bg-blue-50 rounded-lg" v-for="nomineeshare in nomine">
+                <div class="w-full flex">
+                  <div class="w-4/5">
+                    <span class="text-blue-500 text-sm">
+                      Nominee Name: {{ nomineeshare.name }}
+                    </span><br>
+                    <span class="text-blue-500 text-sm">
+                      Relationship: {{ nomineeshare.relation }}
+                    </span>
+                  </div>
+                  <div class="w-1/5 flex justify-center items-center">
+                    <p class="text-blue-700 font-bold text-lg">{{ nomineeshare.share }} %</p>
+                  </div>
+                </div>
+                <div class="w-full flex gap-2 mt-1">
+                  <Button @click="dialogbox(nomineeshare)" type="button" class="w-full text-white"
+                    size="small">Edit</Button>
+                  <Button @click="nomineedelete(nomineeshare)" type="button" class="w-full text-white bg-red-500"
+                    size="small">Delete</Button>
+                </div>
+              </div>
+
+        
+            </div>
+          </div>
+
+        
+          
         </div>
+
       </div>
 
       <!-- Dialog Modal -->
@@ -141,9 +136,12 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button ref="rippleBtn" @click="handleButtonClick" class="primary_color w-5/6 text-white py-3 text-xl border-0">
+        <Button ref="rippleBtn" @click="handleButtonClick"
+          :disabled="!canContinue ||  !sharevalue"
+          class="primary_color w-5/6 text-white py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
+
       </div>
     </div>
   </div>
@@ -177,17 +175,15 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const nomineetext = ref("Add Nominee");
 const nomineeCount = ref(0);
-const nomineescard2=ref(false)
+const nomineescard2 = ref(false)
 const sharevalue = ref('0')
-
-const isOpen = ref(false)
-const selectedm = ref('Please Select Major Nominee Name')
+const canContinue = ref(false)
 
 
 
 
 const selectedStatement = ref('')
-const selectedmajornominee = ref('')
+
 
 const nominees = ref([])
 
@@ -245,14 +241,16 @@ const openNomineeDialog = () => {
 };
 const nomineedetails = async () => {
   const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO ;
 
   if (statuscheck) {
     const nominee = mydata?.payload?.metaData?.nominee;
     if (nominee) {
-   
+
       nomineescard.value = true;
-     
+
+      
+
       const nomineeList = [];
       let totalShare = 0;
 
@@ -279,52 +277,33 @@ const nomineedetails = async () => {
         }
       }
 
-     
- if (nomineeList.length > 0) {
-  console.log("Nominee List:", nomineeList);
-  nomineescard2.value = true;
-  const majornnomineelist = [];
+      const nomineeid = mydata?.payload?.metaData?.nominee?.IncapacitationNominee;
+      sharevalue.value = nominee[`nominee${nomineeid}Share`] || 0;
 
-nomineeList.forEach(nominee => {
-  const dob = new Date(nominee.dob);
-  const today = new Date();
-
-  const age = today.getFullYear() - dob.getFullYear();
-  const monthDiff = today.getMonth() - dob.getMonth();
-  const dayDiff = today.getDate() - dob.getDate();
-
-  const is18OrOlder =
-    age > 18 ||
-    (age === 18 && (monthDiff > 0 || (monthDiff === 0 && dayDiff >= 0)));
-
-  if (is18OrOlder) {
-    majornnomineelist.push({
-      name: nominee.name,
-      id: nominee.id,
-      share: nominee.share,
-     
-    });
-  }
-});
-
-
-nominees.value = majornnomineelist;
-
-
-
+      
  
-}
+      
+      let sharepercentage = 0
+      nomineeList.forEach(item => {
+        sharepercentage += item.share
+      })
 
-
-       else {
-        nomineescard2.value = false;
+      if (sharepercentage == 100) {
+    
+        canContinue.value = true;
       }
+      else {
+        canContinue.value = false;
+      }
+
+
       nomine.value = nomineeList;
       nomineeCount.value = nomineeList.length;
       nomineecontainer.value = totalShare < 100;
     }
   }
-  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+  else  {
+  
     const nominee = mydata?.payload?.metaData?.nominee;
     if (nominee) {
       nomineescard.value = true;
@@ -352,6 +331,21 @@ nominees.value = majornnomineelist;
             guardian: nominee[`nominee${i}GuardianName`],
           });
         }
+      }
+
+
+
+      let sharepercentage = 0
+      nomineeList.forEach(item => {
+        sharepercentage += item.share
+      })
+
+      if (sharepercentage == 100) {
+        console.log("Share percentage is 100%:", selectedmajornominee.value);
+        canContinue.value = true;
+      }
+      else {
+        canContinue.value = false;
       }
 
       nomine.value = nomineeList;
@@ -368,11 +362,7 @@ await nomineedetails()
 
 
 
-watch(selectedmajornominee, (val) => {
-  if (val) {
-   sharevalue.value = val.share;
-  }
-});
+
 
 const availabilelimit = computed(() => {
   let total = 0;
@@ -443,7 +433,16 @@ const nomineesavedata = async () => {
     return;
   }
 
-  const date = new Date(dob.value).toISOString().slice(0, 10);
+  const date = new Date(dob.value);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+  const dd = String(date.getDate()).padStart(2, '0');
+
+  const formattedDate = `${yyyy}-${mm}-${dd}`;
+  console.log(formattedDate); // 👉 "2025-06-04"
+
+
+
 
 
   const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
@@ -461,7 +460,7 @@ const nomineesavedata = async () => {
     nomineeEmail: email.value,
     nomineeIdType: selected.value,
     nomineeIdNo: inputval.value,
-    nomineeDob: date,
+    nomineeDob: formattedDate,
     nomineeGuardianName: guardian.value,
     nomineeShare: shareval.value,
     nomineeId: nomineeId,
@@ -486,17 +485,18 @@ const nomineesavedata = async () => {
     }
 
     const data = await response.json();
-    if( data.payload.status== 'ok') {
-      
-       visible.value = false;
-    nomineedetails();
+    if (data.payload.status == 'ok') {
+
+      visible.value = false;
+      nomineedetails();
     }
-   
+
   } catch (error) {
     console.error("Error saving nominee:", error.message);
     visible.value = false;
   }
 };
+
 
 
 const nomineedelete = async (deleteid) => {
@@ -537,11 +537,6 @@ const nomineedelete = async (deleteid) => {
     visible.value = false;
   }
 };
-
-
-
-
-
 
 
 const emitSelection = () => {
@@ -610,46 +605,6 @@ const back = () => {
 };
 
 
-const nomineeadddata = async () => {
-
- 
-
-  const apiurl = `${baseurl.value}nominee`;
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: "esign",
-   
-
-  });
-
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-  const timer = startTimer()
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
-      },
-      body: jsonString,
-    });
-    clearInterval(timer)
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data.payload.status === 'ok') {
-      createunsignedDocument()
-    }
-  } catch (error) {
-    clearInterval(timer)
-    console.error(error.message);
-  }
-};
-
-
 const handleButtonClick = (event) => {
   const button = rippleBtn.value;
   if (!button) return;
@@ -668,7 +623,7 @@ const handleButtonClick = (event) => {
 
   setTimeout(async () => {
     circle.remove();
-
+   
     const mydata = await pagestatus('bank1')
     if (mydata.payload.status == 'ok') {
       emit('updateDiv', 'bank1');

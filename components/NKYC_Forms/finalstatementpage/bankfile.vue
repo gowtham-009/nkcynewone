@@ -279,24 +279,34 @@ const uploadPDF = (event) => {
 };
 
 const bankstatement = async (pdfval) => {
-  const apiurl = `${baseurl.value}proofupload`;
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: 'thankyou',
-    bankStatement: pdfval,
-  });
+  const apiurl = `${baseurl.value}proofFormUpload`;
 
   try {
-    const response = await fetch(apiurl, {
+    // Convert URL or file input to Blob (binary)
+    const response = await fetch(pdfval);
+    const blob = await response.blob();
+
+    // Encrypt metadata
+    const user = encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: 'thankyou'
+    });
+
+    // Prepare FormData with binary PDF + payload
+    const formData = new FormData();
+    formData.append('bankStatement', blob, 'bankstatement.pdf');
+    formData.append('payload', JSON.stringify({ payload: user }));
+
+    const uploadResponse = await fetch(apiurl, {
       method: 'POST',
       headers: {
         Authorization: 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
+        // Don't manually set Content-Type for FormData
       },
-      body: JSON.stringify({ payload: user }),
+      body: formData,
     });
 
-    const data = await response.json();
+    const data = await uploadResponse.json();
     if (data.payload.status === 'ok') {
       const pageroute = await pagestatus('thankyou');
       if (pageroute.payload.status === 'ok') {

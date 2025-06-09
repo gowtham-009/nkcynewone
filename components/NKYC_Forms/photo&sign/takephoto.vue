@@ -127,59 +127,61 @@ const startTimer = () => {
   return timer
 }
 
-
 const ipvfunction = async () => {
   photoprogress.value = true;
   const apiurl = `${baseurl.value}ipv`;
-  const location = await getCountry()
+  const location = await getCountry();
 
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: "ipv",
-    ipvImage: imageCaptured.value,
-    location: `${location.latitute},${location.longitude}`,
-    country: location.conuntryname
-  })
-
-
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-
-  const timer = startTimer()
   try {
-    const response = await fetch(apiurl, {
+    // Fetch binary blob of the captured image
+    const response = await fetch(imageCaptured.value); // imageCaptured should be a blob URL (e.g., from canvas)
+    const blob = await response.blob();
+
+    // Encrypt metadata
+    const user = encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: "ipv",
+      location: `${location.latitute},${location.longitude}`,
+      country: location.conuntryname
+    });
+
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append('ipvImage', blob, 'ipv.jpg'); // Binary image file
+    formData.append('payload', JSON.stringify({ payload: user }));
+
+    const timer = startTimer();
+
+    const uploadResponse = await fetch(apiurl, {
       method: 'POST',
       headers: {
         'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
+        // DO NOT set Content-Type for FormData
       },
-      body: jsonString,
-    })
+      body: formData,
+    });
 
-    clearInterval(timer)
-    if (!response.ok) {
-      throw new Error("Network is error", response.status);
+    clearInterval(timer);
 
+    if (!uploadResponse.ok) {
+      throw new Error(`Network error: ${uploadResponse.status}`);
     }
-    else {
-      const data = await response.json()
 
-      if (data.payload.metaData.is_real == 'true') {
-        pagestatus('photoproceed')
-        emit('updateDiv', 'photoproceed');
-      }
-      else {
-        pagestatus('takephoto')
-        emit('updateDiv', 'takephoto');
-      }
+    const data = await uploadResponse.json();
 
+    if (data.payload.metaData.is_real === 'true') {
+      pagestatus('photoproceed');
+      emit('updateDiv', 'photoproceed');
+    } else {
+      pagestatus('takephoto');
+      emit('updateDiv', 'takephoto');
     }
 
   } catch (error) {
-    clearInterval(timer)
-    console.log(error.message)
+    console.error('IPv Upload Failed:', error.message);
   }
-}
+};
+
 
 onMounted(() => {
   const storedLat = localStorage.getItem('latitude');

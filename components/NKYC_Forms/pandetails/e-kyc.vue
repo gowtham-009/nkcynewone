@@ -69,7 +69,7 @@
                     class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                     <i class="pi pi-angle-left text-3xl dark:text-white"></i>
                 </Button>
-                <Button type="button" ref="rippleBtn" @click="handleButtonClick"
+                <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!isFormdisabled"
                     class=" primary_color text-white w-5/6 py-3 text-xl border-0  ">
                     {{ buttonText }}
 
@@ -106,7 +106,7 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Start e-KYC");
 const content = ref(true)
 const loading = ref(false)
-
+const isFormdisabled = ref(true)
 
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
@@ -347,6 +347,7 @@ const handleButtonClick = () => {
     setTimeout(() => {
         circle.remove()
         digilocker_create()
+        isFormdisabled.value = false
     }, 600)
 };
 

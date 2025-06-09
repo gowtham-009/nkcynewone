@@ -103,46 +103,55 @@ const proofupload = async () => {
     return;
   }
 
-  loading.value = true
-  const base64value = await urlToBase64(imageSrcbank.value.src);
-  const apiurl = `${baseurl.value}proofupload`;
-
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: "photosign1",
-    bank: base64value
-  });
-
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-  const timer = startTimer();
+  loading.value = true;
+  const apiurl = `${baseurl.value}proofFormUpload`;
 
   try {
-    const response = await fetch(apiurl, {
+    // Fetch the file as Blob
+    const response = await fetch(imageSrcbank.value.src);
+    const blob = await response.blob();
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append('bank', blob, imageSrcbank.value.isPdf ? 'document.pdf' : 'image.jpg');
+
+    // Add additional JSON metadata (if needed, encrypt and stringify)
+    const metadata = encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: "photosign1"
+    });
+    formData.append('payload', JSON.stringify({ payload: metadata }));
+
+    const timer = startTimer();
+
+    // Send POST request
+    const uploadResponse = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+        // DO NOT set Content-Type for multipart/form-data — browser handles it automatically
       },
-      body: jsonString,
+      body: formData
     });
 
-    clearInterval(timer)
+    clearInterval(timer);
 
-    if (!response.ok) throw new Error(`Network error: ${response.status}`);
+    if (!uploadResponse.ok) throw new Error(`Network error: ${uploadResponse.status}`);
 
-    const data = await response.json();
+    const data = await uploadResponse.json();
     if (data.payload.status === 'ok') {
-      const mydata = await pagestatus('photosign1')
+      const mydata = await pagestatus('photosign1');
       if (mydata.payload.status === 'ok') {
         emit('updateDiv', 'photosign1');
       }
     }
   } catch (error) {
-    clearInterval(timer)
     console.error(error.message);
+  } finally {
+    loading.value = false;
   }
 };
+
 
 const back = async (event) => {
   const button = rippleBtnback.value;

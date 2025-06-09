@@ -39,7 +39,7 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" ref="rippleBtn" @click="handleButtonClick"
-          :disabled="!address || !state || !city || !pincode"
+          :disabled="!address || !state || !city || !pincode || !isaddress"
           class=" primary_color wave-btn text-white w-5/6 py-3 text-xl border-0  ">
           {{ buttonText }}
           <span v-if="isAnimating" class="wave"></span>
@@ -73,13 +73,11 @@ const buttonText = ref("Continue");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const address = ref('');
-const address2 = ref('');
+
 const state = ref('');
 const city = ref('');
 const pincode = ref('');
-
-
-
+const isaddress = ref(true);
 
 const setCommunicationAddress = async () => {
   const mydata = await getServerData();
@@ -187,6 +185,7 @@ const handleButtonClick = () => {
     circle.remove()
 
     communicateaddressdata()
+    isaddress.value = false;
   }, 600)
 };
 

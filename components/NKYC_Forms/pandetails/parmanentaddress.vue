@@ -43,7 +43,7 @@
         </Button>
 
         <Button type="button" @click="handleButtonClick" ref="rippleBtn"
-          :disabled="!address || !state || !city || !pincode"
+          :disabled="!address || !state || !city || !pincode || !isaddress"
           class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
           {{ buttonText }}
           <span v-if="isAnimating" class="wave"></span>
@@ -79,6 +79,7 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const buttonText = ref('Continue');
 const isAnimating = ref(false);
+const isaddress = ref(true);
 
 // Device height
 const deviceHeight = ref(window.innerHeight);
@@ -213,6 +214,8 @@ const handleButtonClick = (event) => {
     circle.remove()
 
     permanentaddressdata()
+    isaddress.value=false
+
   }, 600)
 };
 

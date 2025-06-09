@@ -100,7 +100,7 @@
                     class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                     <i class="pi pi-angle-left text-3xl dark:text-white"></i>
                 </Button>
-                <Button type="button" ref="rippleBtn" label="Continue" @click="handleButtonClick"
+                <Button type="button" ref="rippleBtn" :disabled="!isFormValid" label="Continue" @click="handleButtonClick"
                     class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
                     {{ buttonText }}
                 </Button>
@@ -130,6 +130,8 @@ const buttonText = ref("Continue");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const deviceHeight = ref(0);
+
+const isFormValid = ref(true); // Assuming the form is valid by default
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
@@ -139,7 +141,7 @@ onMounted(() => {
 
 
 const handleButtonClick = () => {
-
+    isFormValid.value = false; 
     const button = rippleBtn.value
     const circle = document.createElement('span')
     circle.classList.add('ripple')

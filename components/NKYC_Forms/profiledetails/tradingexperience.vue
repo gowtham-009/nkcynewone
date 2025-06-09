@@ -42,7 +42,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!selected"
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!selected || !isStatusValid"
           class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
           {{ buttonText }}
         </Button>
@@ -63,7 +63,7 @@ const rippleBtn = ref(null);
 const activebox = ref('marriedbox');
 const emit = defineEmits(['updateDiv']);
 const rippleBtnback = ref(null)
-
+const isStatusValid = ref(true);
 
 
 // qualification Status
@@ -181,7 +181,7 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
     personalinfo()
-
+    isStatusValid.value = false;
   }, 600)
 };
 </script>
