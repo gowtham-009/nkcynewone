@@ -41,7 +41,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrcpan ||  !isImageValid"
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrcpan ||  !isImageValid || !isStatusValid"
           class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
@@ -63,7 +63,7 @@ const rippleBtnback = ref(null);
 const imageSrcpan = ref(null);
 const loading = ref(false)
 const timing = ref(30)
-
+const isStatusValid = ref(true); // Assuming this is set based on some validation logic
 
 const isImageValid = ref(false)
 
@@ -93,16 +93,6 @@ const getsegmentdata = async () => {
 
 
 
-const urlToBase64 = async (url) => {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-};
 
 
 const startTimer = () => {
@@ -218,7 +208,10 @@ const handleButtonClick = (event) => {
   setTimeout(() => {
     circle.remove();
     proofupload()
+isStatusValid.value = false;
 
+    // Start the timer when button is clicked
+    startTimer();
   }, 600);
 };
 

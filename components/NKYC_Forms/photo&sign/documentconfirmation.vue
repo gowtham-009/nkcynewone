@@ -75,6 +75,10 @@
             <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
 
           </div>
+
+           <div v-if="esigngen" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
+          <p class="text-sm text-blue-500">E-sign Generating...</p>
+        </div>
         </div>
 
 
@@ -87,7 +91,7 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" ref="rippleBtn" @click="handleButton"
-          :disabled="!question1 || !question2 || !question3 || !question4 || !question5 || !question6 || !question7 || !question8"
+          :disabled="!question1 || !question2 || !question3 || !question4 || !question5 || !question6 || !question7 || !question8 || !isStatusValid"  
           class=" primary_color wave-btn text-white w-5/6 py-3 text-xl border-0  ">
           {{ buttonText }}
         </Button>
@@ -124,9 +128,10 @@ const question5 = ref('')
 const question6 = ref('')
 const question7 = ref('')
 const question8 = ref('')
+const esigngen = ref(false);
 const timing = ref(30)
 const loading = ref(false)
-
+const isStatusValid = ref(true); // Assuming this is set based on some validation logic
 const getsegmentdata = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.additional_docs || '';
@@ -183,7 +188,7 @@ const startTimer = () => {
 const additionaldocument = async () => {
 
   loading.value = true
-
+let timer;
   const apiurl = `${baseurl.value}additional_docs`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -201,7 +206,7 @@ const additionaldocument = async () => {
 
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
-  const timer = startTimer()
+   timer = startTimer()
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
@@ -227,6 +232,8 @@ const additionaldocument = async () => {
 };
 
 const createunsignedDocument = async () => {
+  loading.value = false
+esigngen.value = true
   const apiurl = `${baseurl.value}nkyc_document`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -300,7 +307,7 @@ const handleButton = () => {
   setTimeout(() => {
     circle.remove()
     additionaldocument()
-
+isStatusValid.value = false;
 
   }, 600)
 };

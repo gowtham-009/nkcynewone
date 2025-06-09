@@ -59,7 +59,7 @@
   label="Verify OTP"
   class="primary_color text-white w-full py-3 text-xl border-0"
   @click="mobile_signup"
-  :disabled="isButtonDisabled"
+  :disabled="isButtonDisabled || !isStatusValid"
 >
   {{ buttonText }}
 </Button>
@@ -95,7 +95,7 @@ let timer = null;
 const errormsg = ref(false)
 const errormobile = ref('')
 const p_otp = ref('')
-
+const isStatusValid = ref(true); // Assuming this is set based on some validation logic
 const isSending = ref(false);
 const mobileNo = ref(''); 
 
@@ -155,6 +155,7 @@ onUnmounted(() => {
 
 
 const sendmobileotp = async (resend) => {
+
   const apiurl = `${baseurl.value}validateMobile`;
   phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
     const user = encryptionrequestdata({
@@ -316,6 +317,7 @@ const mobile_signup = async (event) => {
     } else {
       await sendmobileotp();
     }
+    
   }, 600);
 };
 
@@ -333,30 +335,7 @@ watch(p_otp, (newval) => {
 
 
 
-const back = () => {
-  const button = rippleBtnback.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
 
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
-
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-  button.$el.appendChild(circle)
-
-  setTimeout(async() => {
-    circle.remove()
-
-    
-    localStorage.removeItem('userkey')
-    pagestatus('pan')
-    emit('updateDiv', 'pan');
-     
-  }, 600)
-
-}
 
 const resend_sh = ref(false)
 

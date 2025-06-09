@@ -50,7 +50,7 @@
                     class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                     <i class="pi pi-angle-left text-3xl dark:text-white"></i>
                 </Button>
-                <Button type="button" ref="rippleBtn" @click="handleButtonClick"
+                <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!isStatusValid"
                     class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
                     {{ buttonText }}
                 </Button>
@@ -70,7 +70,7 @@ const deviceHeight = ref(0);
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
-
+const isStatusValid = ref(true); // Assuming you have some validation logic
 
 const back = () => {
     const button = rippleBtnback.value
@@ -137,7 +137,7 @@ const handleButtonClick = () => {
                 emit('updateDiv', 'uploadproof');
         }
 
-
+isStatusValid.value = false;
     }, 600)
 };
 </script>

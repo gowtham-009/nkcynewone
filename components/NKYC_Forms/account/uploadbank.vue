@@ -33,7 +33,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrcbank || !isImageValid"
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrcbank || !isImageValid || !isStatusValid"
           class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
@@ -57,6 +57,7 @@ const loading = ref(false)
 const imageSrcbank = ref(null); // format: { src: URL, isPdf: Boolean }
 const timing = ref(30)
 const isImageValid = ref(false);
+const isStatusValid = ref(true);
 
 const getsegmentdata = async () => {
   const mydata = await getServerData();
@@ -190,6 +191,7 @@ const handleButtonClick = (event) => {
   setTimeout(() => {
     circle.remove();
     proofupload();
+    isStatusValid.value = false;
   }, 600);
 };
 

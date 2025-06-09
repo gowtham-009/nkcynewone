@@ -46,7 +46,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" :disabled="!imageCaptured" ref="rippleBtn" @click="handleButtonClick"
+        <Button type="button" :disabled="!imageCaptured || !isStatusValid" ref="rippleBtn" @click="handleButtonClick"
           class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
           {{ buttonText }}
         </Button>
@@ -68,7 +68,7 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const imageCaptured = ref(null);
 const photoprogress = ref(false);
-
+const isStatusValid = ref(true);
 const timing = ref(30)
 const latitude = ref('');
 const longitude = ref('');
@@ -242,7 +242,10 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
     ipvfunction()
+isStatusValid.value = false;
 
+    
+    startTimer();
   }, 600)
 };
 

@@ -28,7 +28,7 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </button>
 
-        <button @click="handleButtonClick($event)" ref="rippleBtn"
+        <button @click="handleButtonClick($event)" ref="rippleBtn" :disabled="!isStatusValid"
           class="primary_color wave-btn text-white w-5/6 py-3 rounded-lg text-xl border-0 relative overflow-hidden">
           {{ buttonText }}
         </button>
@@ -56,6 +56,7 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const content = ref(true);
 const loading = ref(false);
+const isStatusValid = ref(true);
 
 const route = useRoute();
 
@@ -208,7 +209,10 @@ const createRipple = (event, buttonRef) => {
 
 const handleButtonClick = async (event) => {
   createRipple(event, rippleBtn);
-  setTimeout(() => createEsign(), 600);
+  setTimeout(() =>
+   createEsign(),
+isStatusValid.value = false,
+    600);
 };
 
 const back = async (event) => {

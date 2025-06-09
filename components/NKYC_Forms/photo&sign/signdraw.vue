@@ -60,7 +60,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrc"
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrc || !isStatusValid"
           class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
           {{ buttonText }}
         </Button>
@@ -83,6 +83,7 @@ const canvasRef = ref(null);
 const loading = ref(false)
 const esigngen = ref(false);
 const timing = ref(30)
+const isStatusValid = ref(true);
 
 let ctx = null;
 let isDrawing = false;
@@ -448,6 +449,7 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
     uploadsign()
+    isStatusValid.value = false;
   }, 600)
 }
 

@@ -39,7 +39,7 @@
                         class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                         <i class="pi pi-angle-left text-3xl dark:text-white"></i>
                     </Button>
-                    <Button type="button" ref="rippleBtn" @click="handleButtonClick"
+                    <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!isStatusValid"
                         class=" primary_color wave-btn text-white w-5/6 py-3 text-xl border-0  ">
                         {{ buttonText }}
                     </Button>
@@ -68,6 +68,7 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Next");
 const deviceHeight = ref(0);
 const srcUrl = ref(null)
+const isStatusValid = ref(true); // Assuming you have a way to determine if the status is valid
 const getsegmentdata = async () => {
     const mydata = await getServerData();
     const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
@@ -148,6 +149,7 @@ const handleButtonClick = () => {
         circle.remove()
         pagestatus('signdraw')
         emit('updateDiv', 'signdraw');
+        isStatusValid.value = false;
     }, 600)
 };
 

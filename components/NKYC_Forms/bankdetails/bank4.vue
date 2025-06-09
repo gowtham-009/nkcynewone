@@ -77,7 +77,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button @click="handleButtonClick" ref="rippleBtn" class="primary_color text-white w-5/6 py-3 text-xl border-0">
+        <Button @click="handleButtonClick" ref="rippleBtn" :disabled="!isStatusValid" class="primary_color text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
       </div>
@@ -107,7 +107,7 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const deviceHeight = ref(window.innerHeight);
 
-
+const isStatusValid = ref(true);
 
 const profilesetinfo = async () => {
   const mydata = await getServerData();
@@ -199,7 +199,7 @@ const handleButtonClick = () => {
     if (mydata.payload.status == 'ok') {
       emit('updateDiv', 'segment1');
     }
-
+isStatusValid.value = false;
 
   }, 600)
 };

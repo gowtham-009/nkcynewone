@@ -43,7 +43,7 @@
                 <div class="w-full flex gap-2 mt-1">
                   <Button @click="dialogbox(nomineeshare)" type="button" class="w-full text-white"
                     size="small">Edit</Button>
-                  <Button @click="nomineedelete(nomineeshare)" type="button" class="w-full text-white bg-red-500"
+                  <Button @click="nomineedelete(nomineeshare)" type="button" class="w-full text-white border-red-500 bg-red-500"
                     size="small">Delete</Button>
                 </div>
               </div>
@@ -137,7 +137,7 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button ref="rippleBtn" @click="handleButtonClick"
-          :disabled="!canContinue ||  !sharevalue"
+          :disabled="!canContinue ||  !sharevalue || !isStatusValid"
           class="primary_color w-5/6 text-white py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
@@ -175,7 +175,7 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const nomineetext = ref("Add Nominee");
 const nomineeCount = ref(0);
-const nomineescard2 = ref(false)
+
 const sharevalue = ref('0')
 const canContinue = ref(false)
 
@@ -184,8 +184,8 @@ const canContinue = ref(false)
 
 const selectedStatement = ref('')
 
+const isStatusValid = ref(true);
 
-const nominees = ref([])
 
 const statementOptions = ref([
   { value: 'Son', name: 'Son' },
@@ -628,7 +628,7 @@ const handleButtonClick = (event) => {
     if (mydata.payload.status == 'ok') {
       emit('updateDiv', 'bank1');
     }
-
+isStatusValid.value=false
 
 
 

@@ -76,7 +76,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button @click="handleButtonClick" ref="rippleBtn" :disabled="!bankname || !accno || !ifsc || !micr || !address"
+        <Button @click="handleButtonClick" ref="rippleBtn" :disabled="!bankname || !accno || !ifsc || !micr || !address || !isStatusValid"
           class="primary_color  w-5/6 text-white  py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
@@ -123,6 +123,7 @@ const selected = ref('SAVING')
 const errorbox = ref(false)
 const waitingbox = ref(false)
 const errormsg = ref('')
+const isStatusValid = ref(true);
 
 const profilesetinfo = async () => {
   const mydata = await getServerData();
@@ -291,6 +292,7 @@ const handleButtonClick = () => {
 
 
     bankvalidation()
+    isStatusValid.value = false;
   }, 600)
 };
 

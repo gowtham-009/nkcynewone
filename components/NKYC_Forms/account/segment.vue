@@ -50,7 +50,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="selected.length === 0"
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="selected.length === 0 || !isStatusValid"
           class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
@@ -67,7 +67,7 @@ const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
 
 const selected = ref(['equity', 'fno', 'commodities']);
-
+const isStatusValid = ref(true); 
 
 const options = [
   {
@@ -259,7 +259,7 @@ const handleButtonClick = () => {
   setTimeout(async () => {
     circle.remove()
     segmentdata()
-
+    isStatusValid.value = false;
   }, 600)
 };
 </script>
