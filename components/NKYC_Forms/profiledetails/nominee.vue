@@ -137,7 +137,7 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button ref="rippleBtn" @click="handleButtonClick"
-          :disabled="!canContinue ||  !sharevalue || !isStatusValid"
+          :disabled="!canContinue || !isStatusValid"
           class="primary_color w-5/6 text-white py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
@@ -289,7 +289,7 @@ const nomineedetails = async () => {
       })
 
       if (sharepercentage == 100) {
-    
+  
         canContinue.value = true;
       }
       else {
