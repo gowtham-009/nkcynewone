@@ -108,6 +108,7 @@ const setMobileData = async () => {
     const profileMobile = mydata?.payload?.metaData?.profile?.mobileNo;
      const kraMobile = mydata?.payload?.metaData?.kraPan?.APP_MOB_NO;
     let rawMobile = profileMobile || appKraMobile || kraMobile || '';
+    console.log("profile:",profileMobile, "kra:",appKraMobile, "jkh:", kraMobile)
       
 
     if (rawMobile.startsWith('91') && rawMobile.length === 12) {

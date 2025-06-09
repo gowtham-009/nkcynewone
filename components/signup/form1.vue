@@ -29,6 +29,7 @@
 
         <div class="w-full mt-2" v-if="dobbox">
           <DOB v-model="visibleDate" />
+        
         </div>
 
         <div v-if="loginotpbox" class="w-full  mt-1">
@@ -88,6 +89,7 @@ const visibleDate = ref('');
 const isSending = ref(false);
 const buttonText = ref("Continue");
 const tokenval = ref('');
+
 
 const resend_sh = ref(false)
 const timeLeft = ref(10);
@@ -270,11 +272,14 @@ const handleButtonClick = async () => {
       if (status === 'ok') {
         const kycData = metaData?.KYC_DATA;
 
-        if (kycData?.APP_KRA_INFO || kycData?.APP_ERROR_DESC === 'PAN NOT FOUND') {
+        if (kycData?.APP_KRA_INFO || kycData?.APP_ERROR_DESC ) {
           localStorage.setItem('userkey', data.payload.userKey);
           
           router.push('/main'); // Redirect to main page
-        } else if (metaData?.loginStatus === 0) {
+        } 
+      
+        
+        else if (metaData?.loginStatus === 0) {
           // Start OTP timer
           timer = setInterval(() => {
             if (timeLeft.value > 0) {
