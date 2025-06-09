@@ -90,26 +90,38 @@
         <div class="w-full mt-2">
           <div class="flex gap-2">
             <div class="flex items-center gap-2">
-              <RadioButton v-model="selected" inputId="pan" name="id" value="PAN" @change="emitSelection" />
+                <RadioButton v-model="selected" inputId="pan" name="id" value="PAN" @change="emitSelection" />
               <label for="pan" class="text-gray-500">PAN</label>
             </div>
             <div class="flex items-center gap-2">
-              <RadioButton v-model="selected" inputId="aadhar" name="id" value="Aadhar" @change="emitSelection" />
+              <RadioButton v-model="selected" inputId="aadhar" name="id" value="Aadhar Last 4 Digits" @change="emitSelection" />
               <label for="aadhar" class="text-gray-500">Aadhar</label>
             </div>
             <div class="flex items-center gap-2">
-              <RadioButton v-model="selected" inputId="dl" name="id" value="Driving Licence" @change="emitSelection" />
+             <RadioButton v-model="selected" inputId="dl" name="id" value="Driving Licence" @change="emitSelection" />
               <label for="dl" class="text-gray-500">Driving Licence</label>
             </div>
           </div>
 
+        
+
+
+
           <span class="block text-gray-500 text-lg font-normal mt-2">{{ prooftype }}</span>
 
-          <div class="input-wrapper dark:!bg-gray-800 mt-2">
-            <InputText id="proof_input" class="w-full py-2 prime-input" :value="inputval" variant="filled" size="large"
-              @keypress="handleKeyPress" @input="handleInput" />
-            <span class="bottom-border"></span>
+          <div v-if="pan" class="w-full " >
+              <Pan v-model="paninput" />
+                        <span class="text-red-500" v-if="panerror">{{ error }}</span>
+
           </div>
+          <div v-if="aadhar" class="w-full " >
+              <Aadhar v-model="aadharinput" />
+          </div>
+          <div v-if="drivingLicence" class="w-full " >
+              <Driving v-model="drivinginput" />
+          </div>
+
+         
         </div>
 
 
@@ -154,6 +166,10 @@ import DOB from '~/components/nomineeinputs/dateinput.vue';
 import Address from '~/components/nomineeinputs/address.vue';
 import Mobile from '~/components/nomineeinputs/mobileinput.vue';
 import Email from '~/components/nomineeinputs/emailinput.vue';
+import Pan from '~/components/nomineeinputs/paninputn.vue';
+import Aadhar from '~/components/nomineeinputs/aadharn.vue';
+import Driving from '~/components/nomineeinputs/drivinglicencen.vue';
+
 import RadioButton from 'primevue/radiobutton'
 
 import Guardian from '~/components/nomineeinputs/guardian.vue';
@@ -176,6 +192,9 @@ const buttonText = ref("Continue");
 const nomineetext = ref("Add Nominee");
 const nomineeCount = ref(0);
 
+const panerror = ref(false)
+const error = ref('')
+
 const sharevalue = ref('0')
 const canContinue = ref(false)
 
@@ -185,6 +204,17 @@ const selectedStatement = ref('')
 
 const isStatusValid = ref(true);
 
+const pan=ref(true)
+const aadhar=ref(false)
+const drivingLicence=ref(false)
+
+const paninput = ref('')
+const aadharinput = ref('')
+const drivinginput = ref('')
+
+const isPanValid = ref(false);
+const isAadharValid = ref(false);
+const isDrivingLicenceValid = ref(false);
 
 const statementOptions = ref([
   { value: 'Son', name: 'Son' },
@@ -209,13 +239,15 @@ const isValidEmail = computed(() => {
 });
 
 
+
+
 // Confirmation data
 const nomineescard = ref(false);
 
 
 const selected = ref('PAN')
 const prooftype = ref('PAN')
-const inputval = ref('')
+
 
 const guardian = ref('')
 
@@ -228,10 +260,13 @@ const resetFormFields = () => {
   mobileNo.value = '';
   email.value = '';
   selected.value = 'PAN';
-  inputval.value = '';
+
   guardian.value = '';
   shareval.value = '';
   prooftype.value = 'PAN';
+  paninput.value=''
+  aadharinput.value=''
+  drivinginput.value=''
 };
 
 const openNomineeDialog = () => {
@@ -279,8 +314,7 @@ const nomineedetails = async () => {
       const nomineeid = mydata?.payload?.metaData?.nominee?.IncapacitationNominee;
       sharevalue.value = nominee[`nominee${nomineeid}Share`] || 0;
 
-      
- 
+  
       
       let sharepercentage = 0
       nomineeList.forEach(item => {
@@ -357,12 +391,6 @@ const nomineedetails = async () => {
 
 await nomineedetails()
 
-
-
-
-
-
-
 const availabilelimit = computed(() => {
   let total = 0;
   nomine.value.forEach(n => {
@@ -374,19 +402,53 @@ const availabilelimit = computed(() => {
   return Math.max(100 - total, 0); // Prevent going below 0
 });
 
+watch(paninput, (newVal) => {
+  if (newVal.length === 10) {
+    const pattern = /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/;
+    isPanValid.value = pattern.test(newVal);
+    panerror.value = !isPanValid.value;
+    error.value = isPanValid.value ? '' : 'Please enter a valid PAN no';
+  } else {
+    isPanValid.value = false;
+    panerror.value = false;
+  }
+});
 
+// Add Aadhar validation watcher
+watch(aadharinput, (newVal) => {
+  isAadharValid.value = newVal.length === 4 && /^\d+$/.test(newVal);
+});
+
+// Add Driving Licence validation watcher
+watch(drivinginput, (newVal) => {
+  // Basic validation - adjust according to your driving licence format requirements
+  isDrivingLicenceValid.value = newVal.length >= 16; // Example minimum length
+});
+
+// Modify the isSaveDisabled computed property to include ID validation
 const isSaveDisabled = computed(() => {
   const share = parseFloat(shareval.value) || 0;
+  
+  // Check ID validation based on selected type
+  let isIdValid = false;
+  if (selected.value === 'PAN') {
+    isIdValid = isPanValid.value;
+  } else if (selected.value === 'Aadhar Last 4 Digits') {
+    isIdValid = isAadharValid.value;
+  } else if (selected.value === 'Driving Licence') {
+    isIdValid = isDrivingLicenceValid.value;
+  }
+
   return (
     !selectedStatement.value ||
     !dob.value ||
     !selected.value ||
     !shareval.value ||
-    !inputval.value ||
     !address.value ||
-    !mobileNo.value ||
+    mobileNo.value.length !== 10 ||
     !isValidEmail.value ||
-    share > availabilelimit.value // ✅ Block if share exceeds remaining
+    share > availabilelimit.value ||
+    !isIdValid // Add ID validation check
   );
 });
 
@@ -411,15 +473,48 @@ const dialogbox = (editdata) => {
     option => option.value === editdata.relation || option.name === editdata.relation
   ) || statementOptions.value[0]; // Fallback to first option if not found
 
+
+
   dob.value = formattedDOB;
   address.value = editdata.address;
   mobileNo.value = editdata.mobile;
   email.value = editdata.email;
   selected.value = editdata.idType;
-  inputval.value = editdata.idNo;
+
+
+   if(selected.value === 'PAN') {
+    pan.value = true;
+    aadhar.value = false;
+    drivingLicence.value = false;
+   paninput.value=editdata.idNo
+    // Reset other validations
+    isAadharValid.value = false;
+    isDrivingLicenceValid.value = false;
+  }
+  else if(selected.value === 'Aadhar Last 4 Digits') {
+    pan.value = false;
+    aadhar.value = true;
+    drivingLicence.value = false;
+    aadharinput.value =editdata.idNo
+    // Reset other validations
+    isPanValid.value = false;
+    isDrivingLicenceValid.value = false;
+  }
+  else if(selected.value === 'Driving Licence') {
+    pan.value = false;
+    aadhar.value = false;
+    drivingLicence.value = true;
+    drivinginput.value=editdata.idNo
+    // Reset other validations
+    isPanValid.value = false;
+    isAadharValid.value = false;
+  }
+
+
+
   guardian.value = editdata.guardian;
   shareval.value = editdata.share;
-  prooftype.value = editdata.idType;
+  prooftype.value = editdata.idType ;
 };
 
 
@@ -458,7 +553,7 @@ const nomineesavedata = async () => {
     nomineeMobile: mobileNo.value,
     nomineeEmail: email.value,
     nomineeIdType: selected.value,
-    nomineeIdNo: inputval.value,
+    nomineeIdNo: paninput.value || aadharinput.value || drivinginput.value,
     nomineeDob: formattedDate,
     nomineeGuardianName: guardian.value,
     nomineeShare: shareval.value,
@@ -539,47 +634,37 @@ const nomineedelete = async (deleteid) => {
 
 
 const emitSelection = () => {
-  prooftype.value = selected.value
-  inputval.value = ''
-}
+  prooftype.value = selected.value;
 
-const handleKeyPress = (event) => {
-  const key = event.key
-  const currentValue = event.target.value
+  paninput.value=''
+  aadharinput.value=''
+  drivinginput.value=''
+  
+  if(selected.value === 'PAN') {
+    pan.value = true;
+    aadhar.value = false;
+    drivingLicence.value = false;
 
-  switch (selected.value) {
-    case 'PAN':
-      // Allow only alphanumeric, max 10 chars, all uppercase
-      if (!/[A-Z0-9]/i.test(key) || currentValue.length >= 10) {
-        event.preventDefault()
-      }
-      break
-
-    case 'Aadhar':
-      // Allow only digits, max 12 chars
-      if (!/\d/.test(key) || currentValue.length >= 4) {
-        event.preventDefault()
-      }
-      break
-
-    case 'Driving Licence':
-      // Allow only alphanumeric, max 13 chars, all uppercase
-      if (!/[A-Z0-9]/i.test(key) || currentValue.length >= 13) {
-        event.preventDefault()
-      }
-      break
+    isAadharValid.value = false;
+    isDrivingLicenceValid.value = false;
+  }
+  else if(selected.value === 'Aadhar Last 4 Digits') {
+    pan.value = false;
+    aadhar.value = true;
+    drivingLicence.value = false;
+ 
+    isPanValid.value = false;
+    isDrivingLicenceValid.value = false;
+  }
+  else if(selected.value === 'Driving Licence') {
+    pan.value = false;
+    aadhar.value = false;
+    drivingLicence.value = true;
+ 
+    isPanValid.value = false;
+    isAadharValid.value = false;
   }
 }
-
-const handleInput = (event) => {
-  // Convert to uppercase for PAN and Driving Licence
-  if (selected.value === 'PAN' || selected.value === 'Driving Licence') {
-    inputval.value = event.target.value.toUpperCase()
-  } else {
-    inputval.value = event.target.value
-  }
-}
-
 
 // Event Handlers
 const back = () => {
