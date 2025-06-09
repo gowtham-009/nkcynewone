@@ -9,7 +9,7 @@
             :style="{ height: deviceHeight * 0.92 + 'px' }">
             <div class="w-full mt-1 px-2 p-1">
                 <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
-                    Looking good, {{ clientname }}
+                    Looking good, <span class="text-md">{{ clientname }}</span>
                 </p>
 
                 <p class="text-sm text-gray-500 font-normal leading-5">
