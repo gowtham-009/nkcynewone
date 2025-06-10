@@ -1,6 +1,5 @@
 <template>
   <span class="font-semibold text-lg">Date of Birth as per PAN</span>
-
   <div class="date-wrapper w-full">
     <Calendar
       v-model="internalDate"
@@ -15,24 +14,20 @@
     />
   </div>
 </template>
-
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue';
+import { ref, watch, nextTick, onMounted } from 'vue';
 
 const props = defineProps({
-  modelValue: String, // Format: dd/mm/yyyy
+  modelValue: String, // Expected: dd/mm/yyyy
 });
 const emit = defineEmits(['update:modelValue']);
 
-// Convert string to Date
 const parseDate = (str) => {
   if (!str) return null;
   const [dd, mm, yyyy] = str.split('/');
-  if (!dd || !mm || !yyyy) return null;
   return new Date(`${yyyy}-${mm}-${dd}`);
 };
 
-// Convert Date to string
 const formatDate = (dateObj) => {
   if (!(dateObj instanceof Date) || isNaN(dateObj)) return '';
   const day = String(dateObj.getDate()).padStart(2, '0');
@@ -41,51 +36,61 @@ const formatDate = (dateObj) => {
   return `${day}/${month}/${year}`;
 };
 
-// Internal state
 const internalDate = ref(parseDate(props.modelValue));
-
-// Sync from parent
 watch(() => props.modelValue, (newVal) => {
   internalDate.value = parseDate(newVal);
 });
-
-// Sync to parent
 watch(internalDate, (newVal) => {
   emit('update:modelValue', formatDate(newVal));
 });
 
-// Slash-inserting input formatter
-const handleInput = (e) => {
-  let raw = e.target.value.replace(/\D/g, '').slice(0, 8); // only digits, max 8
-  let formatted = '';
+// --- Backspace Fix Implementation ---
+let lastValue = ''; // store last raw input
 
-  if (raw.length >= 2) {
-    formatted += raw.slice(0, 2) + '/';
-    if (raw.length >= 4) {
-      formatted += raw.slice(2, 4) + '/';
-      formatted += raw.slice(4);
-    } else {
-      formatted += raw.slice(2);
-    }
+const handleInput = (e) => {
+  const input = e.target;
+  let value = input.value;
+  const isBackspace = lastValue.length > value.length;
+
+  // Clean digits only
+  let raw = value.replace(/\D/g, '').slice(0, 8);
+
+  // Formatting logic
+  let formatted = '';
+  if (isBackspace) {
+    // Handle backspace: don't insert slash again immediately
+    if (raw.length >= 5) formatted = raw.slice(0, 2) + '/' + raw.slice(2, 4) + '/' + raw.slice(4);
+    else if (raw.length >= 3) formatted = raw.slice(0, 2) + '/' + raw.slice(2);
+    else formatted = raw;
   } else {
-    formatted = raw;
+    if (raw.length >= 2) {
+      formatted = raw.slice(0, 2) + '/';
+      if (raw.length >= 4) {
+        formatted += raw.slice(2, 4) + '/';
+        formatted += raw.slice(4);
+      } else {
+        formatted += raw.slice(2);
+      }
+    } else {
+      formatted = raw;
+    }
   }
 
-  e.target.value = formatted;
+  // Apply and update last value
+  input.value = formatted;
+  lastValue = formatted;
 
-  // Update model if full length
   if (formatted.length === 10) {
     internalDate.value = parseDate(formatted);
   }
 };
 
-// Mobile-friendly input (allow slashes)
 onMounted(() => {
   nextTick(() => {
     const input = document.querySelector('.custom-input');
     if (input) {
       input.setAttribute('maxlength', '10');
-      input.removeAttribute('inputmode'); // let mobile use normal keyboard (to type "/")
+      input.removeAttribute('inputmode'); // allow slash on mobile
     }
   });
 });
@@ -97,7 +102,6 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
 }
-
 .custom-input {
   font-size: 1.4rem;
   font-weight: bold;
