@@ -1,31 +1,35 @@
-// ~/composables/useGeolocation.js
-import { ref, onMounted } from 'vue';
-
-export default function useGeolocation() {
-  const latitude = ref(null);
-  const longitude = ref(null);
-  const errorMessage = ref('');
+export function useGeolocation() {
+  const coords = ref({ latitude: null, longitude: null })
+  const error = ref(null)
+  const isLoaded = ref(false)
 
   const getLocation = () => {
     if (!navigator.geolocation) {
-      errorMessage.value = 'Geolocation is not supported by your browser';
-      return;
+      error.value = 'Geolocation is not supported'
+      return
     }
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        latitude.value = position.coords.latitude;
-        longitude.value = position.coords.longitude;
+        coords.value.latitude = position.coords.latitude
+        coords.value.longitude = position.coords.longitude
+        isLoaded.value = true
       },
-      (error) => {
-        errorMessage.value = error.message || 'Unable to retrieve your location';
+      (err) => {
+        error.value = err.message
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
       }
-    );
-  };
+    )
+  }
 
-  onMounted(() => {
-    getLocation();
-  });
-
-  return { latitude, longitude, errorMessage };
+  return {
+    coords,
+    error,
+    isLoaded,
+    getLocation
+  }
 }
