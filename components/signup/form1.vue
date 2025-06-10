@@ -136,7 +136,7 @@ const kraaddresssubmission = async (resend) => {
 
   const apiurl = `${baseurl.value}kra_pan`;
   const userkey = localStorage.getItem('userkey') || '';
-  
+
   const encryptedPayload = await encryptionrequestdata({
     panNo: panvalue.value,
     dob: visibleDate.value,
@@ -144,7 +144,7 @@ const kraaddresssubmission = async (resend) => {
     userToken: userkey
   });
 
-  console.log("orji", encryptedPayload)
+ 
 
   try {
     const response = await fetch(apiurl, {
