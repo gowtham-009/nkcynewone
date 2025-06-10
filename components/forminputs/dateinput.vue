@@ -20,16 +20,16 @@
 import { ref, watch, nextTick, onMounted } from 'vue';
 
 const props = defineProps({
-  modelValue: String, // Expected: dd/mm/yyyy
+  modelValue: String, // format: dd/mm/yyyy
 });
 const emit = defineEmits(['update:modelValue']);
 
+// Parse and format utilities
 const parseDate = (str) => {
-  if (!str) return null;
+  if (!str || str.length !== 10) return null;
   const [dd, mm, yyyy] = str.split('/');
   return new Date(`${yyyy}-${mm}-${dd}`);
 };
-
 const formatDate = (dateObj) => {
   if (!(dateObj instanceof Date) || isNaN(dateObj)) return '';
   const day = String(dateObj.getDate()).padStart(2, '0');
@@ -39,71 +39,57 @@ const formatDate = (dateObj) => {
 };
 
 const internalDate = ref(parseDate(props.modelValue));
-watch(() => props.modelValue, (newVal) => {
-  internalDate.value = parseDate(newVal);
+watch(() => props.modelValue, (val) => {
+  internalDate.value = parseDate(val);
 });
-watch(internalDate, (newVal) => {
-  emit('update:modelValue', formatDate(newVal));
+watch(internalDate, (val) => {
+  emit('update:modelValue', formatDate(val));
 });
 
-let lastValue = '';
+// Flags
 let isDeleting = false;
+let isFormatting = false;
 
 const handleKeyDown = (e) => {
-  // Detect backspace or delete key
-  if (e.key === 'Backspace' || e.key === 'Delete') {
-    isDeleting = true;
-  } else {
-    isDeleting = false;
-  }
+  isDeleting = e.key === 'Backspace' || e.key === 'Delete';
 };
 
+// 💡 INPUT FORMATTER: dd/mm/yyyy with auto-slash & mobile-compatible
 const handleInput = (e) => {
+  if (isFormatting) return;
+  isFormatting = true;
+
   const input = e.target;
-  let value = input.value;
-  
-  // Store cursor position before any changes
-  const cursorPos = input.selectionStart;
-  
-  // Clean digits only
-  let raw = value.replace(/\D/g, '').slice(0, 8);
-  
-  // Formatting logic
+  let rawDigits = input.value.replace(/\D/g, '').slice(0, 8); // Only 8 digits
   let formatted = '';
-  if (raw.length > 0) {
-    if (raw.length <= 2) {
-      formatted = raw;
-    } else if (raw.length <= 4) {
-      formatted = `${raw.slice(0, 2)}/${raw.slice(2)}`;
-    } else {
-      formatted = `${raw.slice(0, 2)}/${raw.slice(2, 4)}/${raw.slice(4, 8)}`;
-    }
+
+  const dd = rawDigits.slice(0, 2);
+  const mm = rawDigits.slice(2, 4);
+  const yyyy = rawDigits.slice(4, 8);
+
+  // Validation
+  const validDay = +dd >= 1 && +dd <= 31;
+  const validMonth = +mm >= 1 && +mm <= 12;
+  const validYear = yyyy.length < 4 || /^(19|20)/.test(yyyy); // partial OK
+
+  if (rawDigits.length <= 2) {
+    formatted = dd;
+  } else if (rawDigits.length <= 4) {
+    formatted = `${dd}/${mm}`;
+  } else {
+    formatted = `${dd}/${mm}/${yyyy}`;
   }
-  
-  // Apply the formatted value
+
   input.value = formatted;
-  lastValue = formatted;
-  
-  // Adjust cursor position
+
+  // Restore cursor after slash insertions
+  let newCursor = formatted.length;
   nextTick(() => {
-    if (isDeleting) {
-      // When deleting, we want to maintain the cursor position unless it's after a slash
-      if (cursorPos > 0 && value[cursorPos - 1] === '/') {
-        input.setSelectionRange(cursorPos - 1, cursorPos - 1);
-      } else {
-        input.setSelectionRange(cursorPos, cursorPos);
-      }
-    } else {
-      // When adding characters, move cursor forward appropriately
-      if (formatted.length === 2 || formatted.length === 5) {
-        input.setSelectionRange(cursorPos + 1, cursorPos + 1);
-      } else {
-        input.setSelectionRange(cursorPos, cursorPos);
-      }
-    }
+    input.setSelectionRange(newCursor, newCursor);
+    isFormatting = false;
   });
-  
-  if (formatted.length === 10) {
+
+  if (formatted.length === 10 && validDay && validMonth && validYear) {
     internalDate.value = parseDate(formatted);
   }
 };
@@ -113,9 +99,8 @@ onMounted(() => {
     const input = document.querySelector('.custom-input');
     if (input) {
       input.setAttribute('maxlength', '10');
-      input.removeAttribute('inputmode');
-      // Ensure numeric keyboard shows on mobile
-      input.setAttribute('inputmode', 'numeric');
+      input.setAttribute('inputmode', 'numeric'); // forces number pad on mobile
+      input.setAttribute('pattern', '\\d{2}/\\d{2}/\\d{4}');
     }
   });
 });
