@@ -3,8 +3,18 @@
     <span class="font-semibold text-lg block ">Enter PAN</span>
     <div class="pan-input-wrapper w-full dark:!bg-gray-800">
       <i class="pi pi-id-card pan-icon"></i>
-      <input v-model="displayPan" @input="handleInput" placeholder="ABCDE1234F" maxlength="10"
-        class="pan-input dark:!text-gray-100" autocapitalize="characters" autocomplete="off" spellcheck="false" />
+      <input
+  v-model="displayPan"
+  @input="handleInput"
+  @keydown="restrictInputLength"
+  placeholder="ABCDE1234F"
+  maxlength="10"
+  class="pan-input dark:!text-gray-100"
+  autocapitalize="characters"
+  autocomplete="off"
+  spellcheck="false"
+/>
+
     </div>
   </div>
 </template>
@@ -43,6 +53,18 @@ watch(() => props.modelValue, (newVal) => {
     displayPan.value = formatPan(cleaned)
   }
 })
+
+function restrictInputLength(e) {
+  // Allow navigation keys like backspace, arrows, delete
+  const allowedKeys = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete', 'Tab'];
+  if (allowedKeys.includes(e.key)) return;
+
+  const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (value.length >= 10) {
+    e.preventDefault();
+  }
+}
+
 
 // Init display value
 displayPan.value = formatPan(rawPan.value)
