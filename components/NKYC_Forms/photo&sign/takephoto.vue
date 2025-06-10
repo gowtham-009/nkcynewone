@@ -186,7 +186,6 @@ const ipvfunction = async () => {
 onMounted(() => {
   const storedLat = localStorage.getItem('latitude');
   const storedLng = localStorage.getItem('longitude');
-
   if (storedLat && storedLng) {
     latitude.value = storedLat;
     longitude.value = storedLng;

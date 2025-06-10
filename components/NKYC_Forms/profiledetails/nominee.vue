@@ -26,7 +26,7 @@
           </div>
             <div>
               <!-- Nominee list -->
-              <div class="w-full p-1 cursor-pointer mb-1 bg-blue-50 rounded-lg" v-for="nomineeshare in nomine">
+              <div class="w-full p-1 cursor-pointer mb-1 bg-blue-50 rounded-lg dark:bg-gray-600"  v-for="nomineeshare in nomine">
                 <div class="w-full flex">
                   <div class="w-4/5">
                     <span class="text-blue-500 text-sm">
@@ -533,7 +533,6 @@ const nomineesavedata = async () => {
   const dd = String(date.getDate()).padStart(2, '0');
 
   const formattedDate = `${yyyy}-${mm}-${dd}`;
-  console.log(formattedDate); // 👉 "2025-06-04"
 
 
 
