@@ -1,7 +1,7 @@
 <template>
   <div class="w-full">
 
-    <div class="input-wrapper w-full dark:!bg-gray-800">
+    <div class="pan-input-wrapper input-wrapper w-full dark:!bg-gray-800">
      
       <InputText
         v-model="displayPan"
@@ -10,7 +10,7 @@
         @paste="handlePaste"
      
         maxlength="10"
-        class="prime-input dark:!text-gray-100"
+        class="pan-input prime-input dark:!text-gray-100"
         autocapitalize="characters"
         autocomplete="off"
         spellcheck="false"
@@ -117,6 +117,31 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.pan-input-wrapper {
+  display: flex;
+  align-items: center;
+ 
+  padding: 5px 5px;
+  border-radius: 8px;
+  background-color: white;
+  width: 100%;
+}
+
+.pan-icon {
+  font-size: 1.2rem;
+  color: #5b140c;
+  margin-right: 10px;
+}
+
+.pan-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1.2rem;
+  letter-spacing: 0.15em;
+  width: 100%;
+  color: inherit;
+}
 .uppercase {
     text-transform: uppercase;
   }
@@ -171,4 +196,5 @@ onMounted(() => {
   width: 100%;
   height: 4px;
 }
+
 </style>
