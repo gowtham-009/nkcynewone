@@ -107,7 +107,7 @@
 
 
 
-          <span class="block text-gray-500 text-lg font-normal mt-2">{{ prooftype }}</span>
+          <span class="block text-gray-500 text-md font-normal mt-2">{{ prooftype }}</span>
 
           <div v-if="pan" class="w-full " >
               <Pan v-model="paninput" />
