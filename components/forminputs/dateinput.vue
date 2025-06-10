@@ -8,18 +8,18 @@
       placeholder="DD / MM / YYYY"
       class="custom-calendar w-full dark:!bg-gray-800"
       inputClass="custom-input"
-      showIcon
-      showOnFocus
       :manualInput="true"
+      :showOnFocus="false"
+      showIcon
     />
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, nextTick } from 'vue';
 
 const props = defineProps({
-  modelValue: String, // Format: dd/mm/yyyy
+  modelValue: String,
 });
 const emit = defineEmits(['update:modelValue']);
 
@@ -45,6 +45,16 @@ watch(() => props.modelValue, (newVal) => {
 
 watch(internalDate, (newVal) => {
   emit('update:modelValue', formatDate(newVal));
+});
+
+// Optional: force numeric keypad for better mobile UX
+onMounted(() => {
+  nextTick(() => {
+    const input = document.querySelector('.custom-input');
+    if (input) {
+      input.setAttribute('inputmode', 'numeric');
+    }
+  });
 });
 </script>
 
