@@ -1,21 +1,22 @@
 <template>
   <div class="w-full">
 
-    <div class="pan-input-wrapper w-full dark:!bg-gray-800">
+    <div class="input-wrapper w-full dark:!bg-gray-800">
      
-      <input
+      <InputText
         v-model="displayPan"
         @input="handleInput"
         @keydown="handleKeyDown"
         @paste="handlePaste"
-        placeholder="ABCDE1234F"
+     
         maxlength="10"
-        class="pan-input dark:!text-gray-100"
+        class="prime-input dark:!text-gray-100"
         autocapitalize="characters"
         autocomplete="off"
         spellcheck="false"
         ref="panInput"
       />
+        <span class="bottom-border"></span>
     </div>
   </div>
 </template>
@@ -116,29 +117,58 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.pan-input-wrapper {
+.uppercase {
+    text-transform: uppercase;
+  }
+
+  .input-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
-  border: 2px solid #a4a4a4;
-  padding: 5px 5px;
-  border-radius: 8px;
-  background-color: white;
-  width: 100%;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  padding: 0 8px;
+  overflow: hidden;
 }
 
-.pan-icon {
-  font-size: 1.2rem;
-  color: #5b140c;
-  margin-right: 10px;
+.country-code {
+  font-size: 16px;
+  color: #333;
+  padding-right: 8px;
+  white-space: nowrap;
+  user-select: none;
 }
 
-.pan-input {
+.prime-input {
   border: none;
-  outline: none;
   background: transparent;
-  font-size: 1.2rem;
-  letter-spacing: 0.15em;
+  outline: none;
+  font-size: 16px;
+  flex: 1;
+  padding: 8px 0;
+  z-index: 1;
+  box-shadow: none !important;
+}
+
+.prime-input::placeholder {
+  color: #87909b;
+}
+
+.bottom-border {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 3px;
+  width: 0;
+  background-color: #007bff;
+  border-radius: 10px;
+  transition: width 0.4s ease-out, height 0.3s ease-in;
+  z-index: 0;
+}
+
+.input-wrapper:focus-within .bottom-border {
   width: 100%;
-  color: inherit;
+  height: 4px;
 }
 </style>
