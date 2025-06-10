@@ -2,28 +2,33 @@
   <span class="font-semibold text-lg">Date of Birth as per PAN</span>
 
   <div class="date-wrapper w-full">
-    <Calendar v-model="internalDate" dateFormat="dd/mm/yy" placeholder="DD / MM / YYYY"
-      class="custom-calendar w-full dark:!bg-gray-800" inputClass="custom-input" showIcon fluid :showOnFocus="false" />
+    <Calendar
+      v-model="internalDate"
+      dateFormat="dd/mm/yy"
+      placeholder="DD / MM / YYYY"
+      class="custom-calendar w-full dark:!bg-gray-800"
+      inputClass="custom-input"
+      showIcon
+      showOnFocus
+      :manualInput="true"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue';
 
-// Props and emit setup
 const props = defineProps({
-  modelValue: String, // Expected in dd/mm/yyyy format
+  modelValue: String, // Format: dd/mm/yyyy
 });
 const emit = defineEmits(['update:modelValue']);
 
-// Convert modelValue string (dd/mm/yyyy) to Date object
 const parseDate = (str) => {
   if (!str) return null;
   const [day, month, year] = str.split('/');
   return new Date(`${year}-${month}-${day}`);
 };
 
-// Convert Date object to dd/mm/yyyy string
 const formatDate = (dateObj) => {
   if (!(dateObj instanceof Date) || isNaN(dateObj)) return '';
   const day = String(dateObj.getDate()).padStart(2, '0');
@@ -32,15 +37,12 @@ const formatDate = (dateObj) => {
   return `${day}/${month}/${year}`;
 };
 
-// Reactive internal Date object
 const internalDate = ref(parseDate(props.modelValue));
 
-// Watch for parent updates to sync internal date
 watch(() => props.modelValue, (newVal) => {
   internalDate.value = parseDate(newVal);
 });
 
-// Watch internal date and emit formatted string to parent
 watch(internalDate, (newVal) => {
   emit('update:modelValue', formatDate(newVal));
 });
@@ -51,7 +53,6 @@ watch(internalDate, (newVal) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  letter-spacing: 4;
 }
 
 .custom-input {
@@ -64,5 +65,6 @@ watch(internalDate, (newVal) => {
   border-radius: 8px;
   height: 60px;
   box-sizing: border-box;
+  background-color: white;
 }
 </style>
