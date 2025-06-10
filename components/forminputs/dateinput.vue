@@ -11,6 +11,7 @@
       :manualInput="true"
       :showOnFocus="false"
       showIcon
+      @input="handleInput"
     />
   </div>
 </template>
@@ -23,6 +24,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['update:modelValue']);
 
+// Parse and format helpers
 const parseDate = (str) => {
   if (!str) return null;
   const [day, month, year] = str.split('/');
@@ -47,12 +49,39 @@ watch(internalDate, (newVal) => {
   emit('update:modelValue', formatDate(newVal));
 });
 
-// Optional: force numeric keypad for better mobile UX
+// Input masking logic
+const handleInput = (e) => {
+  let val = e.target.value.replace(/\D/g, ''); // Remove non-digits
+  if (val.length > 8) val = val.slice(0, 8); // Max 8 digits
+
+  let formatted = '';
+  if (val.length >= 2) {
+    formatted += val.slice(0, 2) + '/';
+    if (val.length >= 4) {
+      formatted += val.slice(2, 4) + '/';
+      formatted += val.slice(4);
+    } else {
+      formatted += val.slice(2);
+    }
+  } else {
+    formatted += val;
+  }
+
+  e.target.value = formatted;
+
+  // Manually update internalDate
+  if (formatted.length === 10) {
+    internalDate.value = parseDate(formatted);
+  }
+};
+
+// Force numeric keypad
 onMounted(() => {
   nextTick(() => {
     const input = document.querySelector('.custom-input');
     if (input) {
       input.setAttribute('inputmode', 'numeric');
+      input.setAttribute('maxlength', '10');
     }
   });
 });
