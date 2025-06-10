@@ -1,11 +1,20 @@
+<!-- pages/location.vue -->
 <template>
-  <div>
+  <div class="p-4">
+    <h2 class="text-xl font-bold mb-2">Location Permission Check</h2>
+
     <div v-if="locationAllowed">
-      <h2>Welcome! Location access granted. 🌍</h2>
-      <p>Your Location: {{ location }}</p>
+      ✅ Location access granted!  
+      <p>📍 Latitude: {{ coords.latitude }}</p>
+      <p>📍 Longitude: {{ coords.longitude }}</p>
     </div>
+
+    <div v-else-if="permissionDenied">
+      ❌ Location access denied. Please enable location permission in settings.
+    </div>
+
     <div v-else>
-      <h2>❌ Location access is required to proceed.</h2>
+      ⏳ Requesting location...
     </div>
   </div>
 </template>
@@ -13,29 +22,28 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
+const coords = ref({ latitude: null, longitude: null })
 const locationAllowed = ref(false)
-const location = ref('')
+const permissionDenied = ref(false)
 
 onMounted(() => {
-  if (!navigator.geolocation) {
-    alert('Geolocation is not supported by your browser')
-    return
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      locationAllowed.value = true
-      const { latitude, longitude } = pos.coords
-      location.value = `Latitude: ${latitude}, Longitude: ${longitude}`
-    },
-    (err) => {
-      locationAllowed.value = false
-      if (err.code === 1) {
-        alert('Permission denied. Please allow location access to continue.')
-      } else {
-        alert('Error getting location: ' + err.message)
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        coords.value = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        }
+        locationAllowed.value = true
+      },
+      (error) => {
+        console.warn('Location error:', error.message)
+        permissionDenied.value = true
       }
-    }
-  )
+    )
+  } else {
+    console.warn('Geolocation not supported')
+    permissionDenied.value = true
+  }
 })
 </script>
