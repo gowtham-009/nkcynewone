@@ -20,17 +20,19 @@
 import { ref, watch, onMounted, nextTick } from 'vue';
 
 const props = defineProps({
-  modelValue: String,
+  modelValue: String, // Format: dd/mm/yyyy
 });
 const emit = defineEmits(['update:modelValue']);
 
-// Parse and format helpers
+// Convert string to Date
 const parseDate = (str) => {
   if (!str) return null;
-  const [day, month, year] = str.split('/');
-  return new Date(`${year}-${month}-${day}`);
+  const [dd, mm, yyyy] = str.split('/');
+  if (!dd || !mm || !yyyy) return null;
+  return new Date(`${yyyy}-${mm}-${dd}`);
 };
 
+// Convert Date to string
 const formatDate = (dateObj) => {
   if (!(dateObj instanceof Date) || isNaN(dateObj)) return '';
   const day = String(dateObj.getDate()).padStart(2, '0');
@@ -39,49 +41,51 @@ const formatDate = (dateObj) => {
   return `${day}/${month}/${year}`;
 };
 
+// Internal state
 const internalDate = ref(parseDate(props.modelValue));
 
+// Sync from parent
 watch(() => props.modelValue, (newVal) => {
   internalDate.value = parseDate(newVal);
 });
 
+// Sync to parent
 watch(internalDate, (newVal) => {
   emit('update:modelValue', formatDate(newVal));
 });
 
-// Input masking logic
+// Slash-inserting input formatter
 const handleInput = (e) => {
-  let val = e.target.value.replace(/\D/g, ''); // Remove non-digits
-  if (val.length > 8) val = val.slice(0, 8); // Max 8 digits
-
+  let raw = e.target.value.replace(/\D/g, '').slice(0, 8); // only digits, max 8
   let formatted = '';
-  if (val.length >= 2) {
-    formatted += val.slice(0, 2) + '/';
-    if (val.length >= 4) {
-      formatted += val.slice(2, 4) + '/';
-      formatted += val.slice(4);
+
+  if (raw.length >= 2) {
+    formatted += raw.slice(0, 2) + '/';
+    if (raw.length >= 4) {
+      formatted += raw.slice(2, 4) + '/';
+      formatted += raw.slice(4);
     } else {
-      formatted += val.slice(2);
+      formatted += raw.slice(2);
     }
   } else {
-    formatted += val;
+    formatted = raw;
   }
 
   e.target.value = formatted;
 
-  // Manually update internalDate
+  // Update model if full length
   if (formatted.length === 10) {
     internalDate.value = parseDate(formatted);
   }
 };
 
-// Force numeric keypad
+// Mobile-friendly input (allow slashes)
 onMounted(() => {
   nextTick(() => {
     const input = document.querySelector('.custom-input');
     if (input) {
-      input.setAttribute('inputmode', 'numeric');
       input.setAttribute('maxlength', '10');
+      input.removeAttribute('inputmode'); // let mobile use normal keyboard (to type "/")
     }
   });
 });
