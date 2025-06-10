@@ -1,21 +1,22 @@
 <template>
-  <div class="input-wrapper dark:!bg-gray-800">
-    <InputText
-      
-      class="prime-input w-full border-2  dark:!bg-gray-800" 
-      v-model="displayPan"
-      @input="handleInput" 
-       @keydown="handleKeyDown"
+  <div class="w-full">
+
+    <div class="pan-input-wrapper w-full dark:!bg-gray-800">
+     
+      <input
+        v-model="displayPan"
+        @input="handleInput"
+        @keydown="handleKeyDown"
         @paste="handlePaste"
-      maxlength="10"
-      autocapitalize="characters"
-      autocomplete="off" 
-      spellcheck="false"
-      variant="filled"
-      size="large"
-       ref="panInput"
-    />
-    <span class="bottom-border"></span>
+        placeholder="ABCDE1234F"
+        maxlength="10"
+        class="pan-input dark:!text-gray-100"
+        autocapitalize="characters"
+        autocomplete="off"
+        spellcheck="false"
+        ref="panInput"
+      />
+    </div>
   </div>
 </template>
 
@@ -115,57 +116,29 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.uppercase {
-    text-transform: uppercase;
-  }
-
-  .input-wrapper {
-  position: relative;
+.pan-input-wrapper {
   display: flex;
   align-items: center;
-  background-color: #e0e0e0;
-  border-radius: 10px;
-  padding: 0 8px;
-  overflow: hidden;
-}
-
-.country-code {
-  font-size: 16px;
-  color: #333;
-  padding-right: 8px;
-  white-space: nowrap;
-  user-select: none;
-}
-
-.prime-input {
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 16px;
-  flex: 1;
-  padding: 8px 0;
-  z-index: 1;
-  box-shadow: none !important;
-}
-
-.prime-input::placeholder {
-  color: #87909b;
-}
-
-.bottom-border {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 3px;
-  width: 0;
-  background-color: #007bff;
-  border-radius: 10px;
-  transition: width 0.4s ease-out, height 0.3s ease-in;
-  z-index: 0;
-}
-
-.input-wrapper:focus-within .bottom-border {
+  border: 2px solid #a4a4a4;
+  padding: 5px 5px;
+  border-radius: 8px;
+  background-color: white;
   width: 100%;
-  height: 4px;
-}</style>
+}
+
+.pan-icon {
+  font-size: 1.2rem;
+  color: #5b140c;
+  margin-right: 10px;
+}
+
+.pan-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1.2rem;
+  letter-spacing: 0.15em;
+  width: 100%;
+  color: inherit;
+}
+</style>
