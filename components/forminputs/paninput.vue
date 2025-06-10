@@ -4,24 +4,24 @@
     <div class="pan-input-wrapper w-full dark:!bg-gray-800">
       <i class="pi pi-id-card pan-icon"></i>
       <input
+        ref="panInput"
         v-model="displayPan"
         @input="handleInput"
         @keydown="handleKeyDown"
-        @paste="handlePaste"
+        @paste.prevent="handlePaste"
         placeholder="ABCDE1234F"
         maxlength="10"
         class="pan-input dark:!text-gray-100"
         autocapitalize="characters"
         autocomplete="off"
         spellcheck="false"
-        ref="panInput"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 
 const props = defineProps({
   modelValue: String
@@ -33,35 +33,37 @@ const displayPan = ref('')
 const panInput = ref(null)
 
 function formatPan(value) {
-  return value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10)
+  return value.toUpperCase().replace(/[^A-Z0-9]/g, '')
 }
 
 function handleInput(e) {
   const input = e.target.value
-  // Format and limit to 10 characters
-  const formatted = formatPan(input)
-  rawPan.value = formatted
-  displayPan.value = formatted
+  const formatted = formatPan(input).slice(0, 10)
   
-  // Prevent exceeding 10 characters (mobile keyboards sometimes ignore maxlength)
+  // Update values only if different to prevent unnecessary re-renders
+  if (formatted !== rawPan.value) {
+    rawPan.value = formatted
+    displayPan.value = formatted
+  }
+  
+  // Immediately correct if somehow exceeded (mobile keyboards sometimes ignore maxlength)
   if (input.length > 10) {
-    displayPan.value = displayPan.value.slice(0, 10)
-    // Move cursor to end
-    setTimeout(() => {
+    nextTick(() => {
+      displayPan.value = displayPan.value.slice(0, 10)
       panInput.value.setSelectionRange(10, 10)
-    }, 0)
+    })
   }
 }
 
 function handleKeyDown(e) {
-  // Allow backspace, delete, tab, arrow keys, etc.
-  if ([8, 9, 37, 38, 39, 40, 46].includes(e.keyCode)) {
+  // Allow control keys
+  if ([8, 9, 13, 37, 38, 39, 40, 46].includes(e.keyCode) || e.ctrlKey || e.metaKey) {
     return
   }
   
-  // Prevent input if already 10 characters and not replacing selected text
-  const selectionLength = e.target.selectionEnd - e.target.selectionStart
-  if (e.target.value.length >= 10 && selectionLength === 0) {
+  // Prevent input if at max length and no text selected
+  const hasSelection = e.target.selectionStart !== e.target.selectionEnd
+  if (e.target.value.length >= 10 && !hasSelection) {
     e.preventDefault()
   }
   
@@ -72,27 +74,27 @@ function handleKeyDown(e) {
 }
 
 function handlePaste(e) {
-  e.preventDefault()
   const pasteData = e.clipboardData.getData('text/plain')
   const formatted = formatPan(pasteData).slice(0, 10)
   
-  // Get current selection
+  if (!formatted) return
+  
   const start = e.target.selectionStart
   const end = e.target.selectionEnd
+  const currentValue = displayPan.value
   
-  // Insert pasted text at cursor position
-  const before = displayPan.value.substring(0, start)
-  const after = displayPan.value.substring(end, displayPan.value.length)
-  const newValue = (before + formatted + after).slice(0, 10)
+  // Calculate new value with paste
+  const newValue = (currentValue.substring(0, start) + formatted + currentValue.substring(end)).slice(0, 10)
   
-  rawPan.value = formatPan(newValue)
-  displayPan.value = rawPan.value
+  // Update values
+  rawPan.value = newValue
+  displayPan.value = newValue
   
-  // Set cursor position after pasted text
-  setTimeout(() => {
+  // Set cursor position
+  nextTick(() => {
     const newCursorPos = Math.min(start + formatted.length, 10)
     panInput.value.setSelectionRange(newCursorPos, newCursorPos)
-  }, 0)
+  })
 }
 
 // Emit value to parent
@@ -102,17 +104,15 @@ watch(rawPan, (val) => {
 
 // Watch prop changes
 watch(() => props.modelValue, (newVal) => {
-  const cleaned = newVal?.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || ''
+  const cleaned = formatPan(newVal || '').slice(0, 10)
   if (cleaned !== rawPan.value) {
     rawPan.value = cleaned
-    displayPan.value = formatPan(cleaned)
+    displayPan.value = cleaned
   }
 })
 
-// Init display value
-onMounted(() => {
-  displayPan.value = formatPan(rawPan.value)
-})
+// Initialize
+displayPan.value = formatPan(rawPan.value).slice(0, 10)
 </script>
 
 <style scoped>
