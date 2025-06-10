@@ -5,9 +5,13 @@ export default defineNuxtConfig({
     app: {
         head: {
           title: 'NKYC', // default fallback title
+           meta: [
+        { name: 'google', content: 'notranslate' }
+      ],
           htmlAttrs: {
             lang: 'en',
           },
+
           link: [
             { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
           ]
