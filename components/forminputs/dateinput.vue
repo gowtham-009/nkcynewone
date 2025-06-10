@@ -11,9 +11,11 @@
       :showOnFocus="false"
       showIcon
       @input="handleInput"
+      @keydown="handleKeyDown"
     />
   </div>
 </template>
+
 <script setup>
 import { ref, watch, nextTick, onMounted } from 'vue';
 
@@ -44,42 +46,63 @@ watch(internalDate, (newVal) => {
   emit('update:modelValue', formatDate(newVal));
 });
 
-// --- Backspace Fix Implementation ---
-let lastValue = ''; // store last raw input
+let lastValue = '';
+let isDeleting = false;
+
+const handleKeyDown = (e) => {
+  // Detect backspace or delete key
+  if (e.key === 'Backspace' || e.key === 'Delete') {
+    isDeleting = true;
+  } else {
+    isDeleting = false;
+  }
+};
 
 const handleInput = (e) => {
   const input = e.target;
   let value = input.value;
-  const isBackspace = lastValue.length > value.length;
-
+  
+  // Store cursor position before any changes
+  const cursorPos = input.selectionStart;
+  
   // Clean digits only
   let raw = value.replace(/\D/g, '').slice(0, 8);
-
+  
   // Formatting logic
   let formatted = '';
-  if (isBackspace) {
-    // Handle backspace: don't insert slash again immediately
-    if (raw.length >= 5) formatted = raw.slice(0, 2) + '/' + raw.slice(2, 4) + '/' + raw.slice(4);
-    else if (raw.length >= 3) formatted = raw.slice(0, 2) + '/' + raw.slice(2);
-    else formatted = raw;
-  } else {
-    if (raw.length >= 2) {
-      formatted = raw.slice(0, 2) + '/';
-      if (raw.length >= 4) {
-        formatted += raw.slice(2, 4) + '/';
-        formatted += raw.slice(4);
-      } else {
-        formatted += raw.slice(2);
-      }
-    } else {
+  if (raw.length > 0) {
+    if (raw.length <= 2) {
       formatted = raw;
+    } else if (raw.length <= 4) {
+      formatted = `${raw.slice(0, 2)}/${raw.slice(2)}`;
+    } else {
+      formatted = `${raw.slice(0, 2)}/${raw.slice(2, 4)}/${raw.slice(4, 8)}`;
     }
   }
-
-  // Apply and update last value
+  
+  // Apply the formatted value
   input.value = formatted;
   lastValue = formatted;
-
+  
+  // Adjust cursor position
+  nextTick(() => {
+    if (isDeleting) {
+      // When deleting, we want to maintain the cursor position unless it's after a slash
+      if (cursorPos > 0 && value[cursorPos - 1] === '/') {
+        input.setSelectionRange(cursorPos - 1, cursorPos - 1);
+      } else {
+        input.setSelectionRange(cursorPos, cursorPos);
+      }
+    } else {
+      // When adding characters, move cursor forward appropriately
+      if (formatted.length === 2 || formatted.length === 5) {
+        input.setSelectionRange(cursorPos + 1, cursorPos + 1);
+      } else {
+        input.setSelectionRange(cursorPos, cursorPos);
+      }
+    }
+  });
+  
   if (formatted.length === 10) {
     internalDate.value = parseDate(formatted);
   }
@@ -90,7 +113,9 @@ onMounted(() => {
     const input = document.querySelector('.custom-input');
     if (input) {
       input.setAttribute('maxlength', '10');
-      input.removeAttribute('inputmode'); // allow slash on mobile
+      input.removeAttribute('inputmode');
+      // Ensure numeric keyboard shows on mobile
+      input.setAttribute('inputmode', 'numeric');
     }
   });
 });
