@@ -1,13 +1,4 @@
-<template>
-  <div>
-    <p>Encrypted Data is shown in the console.</p>
-  </div>
-</template>
-
-<script setup>
-import { onMounted } from 'vue'
-
-let data = {}; // your base object
+let data = {};
 
 function hexToBytes(hex) {
   return Uint8Array.from(hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
@@ -19,21 +10,17 @@ function bytesToHex(bytes) {
 
 const encKeyHex = "71EDFC7A15740605432CA4D6488367E264AC73A426C76A1C1AB0A87673BB5BF1";
 
-const newData = {
-  userToken: "F7A2F16DA0D782BB752B1B9403CA64D07C2550FE3DA9095CF58BCF96DB61B43F321522CCDEB15280241050B90239FC5943CA000CD468B9041F53EB03271F77613DE65A8EA4BCD0AF3E7042547F3883013728083B0894AAD8207A0D6D27E11460",
-  otpType: "mobile",
-  mobile: "6379058475",
-  resend: "true"
-}
+export async function encryptionrequestdata(newData) {
+  const mergedData = {
+    ...data,
+    ...newData
+  };
 
-async function encryptionrequestdata(newData) {
-  const mergedData = { ...data, ...newData };
   const jsonData = JSON.stringify(mergedData);
   const encoded = new TextEncoder().encode(jsonData);
-  const encKey = hexToBytes(encKeyHex); // 32-byte key
-  const iv = crypto.getRandomValues(new Uint8Array(16)); // 16-byte IV
+  const encKey = hexToBytes(encKeyHex);
+  const iv = crypto.getRandomValues(new Uint8Array(16));
 
-  // AES encryption
   const aesKey = await crypto.subtle.importKey(
     'raw',
     encKey,
@@ -48,7 +35,6 @@ async function encryptionrequestdata(newData) {
     encoded
   );
 
-  // HMAC SHA-256 signing
   const hmacKey = await crypto.subtle.importKey(
     'raw',
     encKey,
@@ -63,7 +49,6 @@ async function encryptionrequestdata(newData) {
     new Uint8Array([...iv, ...new Uint8Array(cipherBuffer)])
   );
 
-  // Combine IV + CipherText + HMAC
   const finalBuffer = new Uint8Array([
     ...iv,
     ...new Uint8Array(cipherBuffer),
@@ -74,16 +59,15 @@ async function encryptionrequestdata(newData) {
 }
 
 
-async function decryptionresponse(hexString) {
+export async function decryptionresponse(hexString) {
   const encKey = hexToBytes(encKeyHex);
   const fullData = hexToBytes(hexString);
 
-  // Split into iv (16), cipherText, hmac (last 32)
   const iv = fullData.slice(0, 16);
   const hmac = fullData.slice(-32); // SHA-256 = 32 bytes
   const cipherBytes = fullData.slice(16, -32);
 
-  // Recompute HMAC
+  // Validate HMAC
   const hmacKey = await crypto.subtle.importKey(
     'raw',
     encKey,
@@ -92,18 +76,18 @@ async function decryptionresponse(hexString) {
     ['verify']
   );
 
-  const valid = await crypto.subtle.verify(
+  const isValid = await crypto.subtle.verify(
     'HMAC',
     hmacKey,
     hmac,
     new Uint8Array([...iv, ...cipherBytes])
   );
 
-  if (!valid) {
-    throw new Error('❌ HMAC verification failed – data tampered!');
+  if (!isValid) {
+    throw new Error('HMAC verification failed – data may be tampered!');
   }
 
-  // Decrypt AES
+  // Decrypt AES-CBC
   const aesKey = await crypto.subtle.importKey(
     'raw',
     encKey,
@@ -121,14 +105,3 @@ async function decryptionresponse(hexString) {
   const decoded = new TextDecoder().decode(plainBuffer);
   return JSON.parse(decoded);
 }
-
-
-// Example usage
-onMounted(async () => {
-  const encryptedHex = await encryptionrequestdata(newData);
-  console.log("🔐 Encrypted Hex:", encryptedHex);
-
-  const decryptedData = await decryptionresponse(encryptedHex);
-  console.log("🔓 Decrypted:", decryptedData);
-});
-</script>

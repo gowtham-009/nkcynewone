@@ -2,13 +2,11 @@ export function useGeolocation() {
   const coords = ref({ latitude: null, longitude: null })
   const error = ref(null)
   const isLoaded = ref(false)
-
   const getLocation = () => {
     if (!navigator.geolocation) {
       error.value = 'Geolocation is not supported'
       return
     }
-
     navigator.geolocation.getCurrentPosition(
       (position) => {
         coords.value.latitude = position.coords.latitude

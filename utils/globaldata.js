@@ -1,4 +1,4 @@
-let data = {};
+let data = {}; 
 
 export function encryptionrequestdata(newData) {
   const mergedData = {
@@ -9,11 +9,4 @@ export function encryptionrequestdata(newData) {
 }
 
 
-export function decryptdatadata(newData) {
-  const mergedData = {
-    ...data,
-    ...newData
-  };
-  return mergedData;
-}
 
