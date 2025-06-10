@@ -3,7 +3,7 @@
 
   <div class="date-wrapper w-full">
     <Calendar v-model="internalDate" dateFormat="dd/mm/yy" placeholder="DD / MM / YYYY"
-      class="custom-calendar w-full dark:!bg-gray-800" inputClass="custom-input" />
+      class="custom-calendar w-full dark:!bg-gray-800" inputClass="custom-input" showIcon fluid :showOnFocus="false" />
   </div>
 </template>
 
