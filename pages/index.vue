@@ -5,11 +5,6 @@
       ⏳ Requesting location permission...
     </div>
 
-    <!-- Error if denied -->
-    <div v-else-if="error">
-      ❌ Location access denied: {{ error }}
-    </div>
-
     <!-- Show form only after location granted and auth passed -->
     <div v-else-if="logauth">
       <div v-if="currentForm === 'pan'">
@@ -33,7 +28,6 @@ const currentForm = ref('pan');
 const logauth = ref(false);
 const data = ref({});
 
-// Form switch handler
 const handleUpdateDiv = (value, newData = {}) => {
   currentForm.value = value;
   data.value = newData;
@@ -55,8 +49,9 @@ onMounted(async () => {
 
   await waitUntilResolved();
 
-  // Step 3: If denied → redirect
+  // Step 3: If denied → show alert and redirect
   if (error.value) {
+    alert('❌ Please enable location permission to continue.');
     router.push('/');
     return;
   }
