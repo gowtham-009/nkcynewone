@@ -177,7 +177,9 @@ const stopDrawing = (e) => {
 };
 
 const drawDot = (x, y) => {
+  if (isImageUploaded.value) return;
   ctx.beginPath();
+
   ctx.arc(x, y, 1.5, 0, Math.PI * 2); // reduced radius from 4 to 1.5
   ctx.fill();
 }

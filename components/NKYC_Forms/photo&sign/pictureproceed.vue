@@ -19,7 +19,6 @@
                 <div class="w-full  p-1 flex justify-center items-center flex-col mt-20 h-64 ">
 
                     <img :src="srcUrl" alt="Base64 Image" class="rounded-full w-80 h-80 object-cover " />
-
                     <div class="w-full flex justify-center mt-2">
                         <Chip @click="retake" class="px-5 bg-blue-50 text-blue-500" label="Retake" />
                     </div>
