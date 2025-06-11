@@ -90,6 +90,9 @@ watch([coords, isLoaded], ([newCoords, loaded]) => {
     visible.value = true; // Show dialog on success
     console.log("Location enabled:", newCoords);
   }
+  else{
+      getLocation()
+  }
 }, { deep: true });
 
 
