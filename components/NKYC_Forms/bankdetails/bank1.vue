@@ -252,10 +252,12 @@ const bankvalidation = async () => {
 
     }
     else if (data.payload.status == 'error') {
+       waitingbox.value = false
       errorbox.value = true
       errormsg.value = data.payload.message
-      waitingbox.value = false
-      isStatusValid=true
+     
+  
+     
     }
     else {
       emit('updateDiv', 'bank4');
@@ -268,6 +270,7 @@ const bankvalidation = async () => {
   }
   finally {
     waitingbox.value = false
+    isStatusValid.value=true
   }
 };
 
