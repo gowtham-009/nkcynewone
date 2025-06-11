@@ -15,7 +15,7 @@
           Ensure your face appears clearly within the frame
         </p>
 
-        <div v-if="loading" class="w-full p-4 flex flex-col items-center justify-center rounded-lg bg-blue-50 my-2">
+        <div v-if="loading" class="w-full p-1 flex flex-col items-center justify-center rounded-lg bg-blue-50 my-2">
           <div class="flex items-center justify-center mb-2">
             <i class="pi pi-spinner pi-spin text-2xl text-blue-500 mr-2"></i>
             <span class="text-blue-500">Please wait...{{ timer }}</span>
@@ -27,10 +27,20 @@
         <p class="text-gray-500 text-sm">latitude:{{ latitude }} longitude: {{ longitude }}</p>
         </div>
 
+        <div  v-if="locationpoint" class="w-full mt-1  flex justify-center flex-col">
+          <CMAIDENTIFY @captured="onImageCaptured" />
+          <div class="w-full ">
+          <p class="font-semibold text-gray-500 text-sm leading-4">"Ensure your nose is positioned at the center of the
+            cross (+). Your face should be straight and centered within the frame"</p>
+        </div>
 
+        </div>
 
+        
 
-
+       <div v-if="photoprogress" class="w-full p-1 flex justify-center  bg-blue-50 text-blue-500">
+          <p class="text-sm text-blue-500">Please Wait...{{ timer }}</p>
+        </div>
        
       </div>
 
@@ -62,6 +72,7 @@ const buttonText = ref("Continue");
 const imageCaptured = ref(null);
 const loading=ref(true)
 const isStatusValid = ref(true);
+const photoprogress = ref(false);
 const isBack = ref(true);
 const locationpoint=ref(false)
 const latitude = ref(null)
@@ -82,6 +93,8 @@ const startCountdown = () => {
     }
   }, 1000);
 };
+
+
 
 
 onMounted(() => {
@@ -108,6 +121,99 @@ watch([coords, isLoaded], ([newCoords, loaded]) => {
   }
 }, { deep: true });
 
+
+const getCountry = async () => {
+  if (!latitude.value || !longitude.value) {
+    console.error('Latitude or longitude is missing')
+    return
+  }
+
+  const apiKey = 'R2ey6sqmfP210eJgVXX-NvmoUgrKlDAW4JwVXgVEaHs'
+  const apiUrl = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${latitude.value},${longitude.value}&lang=en-US&apiKey=${apiKey}`
+
+  try {
+    const response = await fetch(apiUrl)
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`)
+    }
+
+    const data = await response.json()
+    if (data) {
+      const geolocation = {
+        latitute: data.items[0].position.lat,
+        longitude: data.items[0].position.lng,
+        conuntryname: data.items[0].address.countryName,
+        countrycode: data.items[0].address.countryCode,
+      }
+      return geolocation
+    }
+
+    console.log('Reverse Geocoding Data:', data)
+  } catch (error) {
+    console.error('Error fetching location:', error.message)
+  }
+}
+
+const ipvfunction = async () => {
+  photoprogress.value = true;
+  const apiurl = `${baseurl.value}ipv`;
+  const location = await getCountry();
+
+  try {
+    // Fetch binary blob of the captured image
+    const response = await fetch(imageCaptured.value); // imageCaptured should be a blob URL (e.g., from canvas)
+    const blob = await response.blob();
+
+    // Encrypt metadata
+    const user = encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: "ipv",
+      location: `${location.latitute},${location.longitude}`,
+      country: location.conuntryname
+    });
+
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append('ipvImage', blob, 'ipv.jpg'); // Binary image file
+    formData.append('payload', JSON.stringify({ payload: user }));
+
+  
+
+    const uploadResponse = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        // DO NOT set Content-Type for FormData
+      },
+      body: formData,
+    });
+
+
+
+    if (!uploadResponse.ok) {
+      throw new Error(`Network error: ${uploadResponse.status}`);
+    }
+
+    const data = await uploadResponse.json();
+
+    if (data.payload.metaData.is_real === 'true') {
+      pagestatus('photoproceed');
+      emit('updateDiv', 'photoproceed');
+    } else {
+      pagestatus('takephoto');
+      emit('updateDiv', 'takephoto');
+    }
+
+  } catch (error) {
+    console.error('IPv Upload Failed:', error.message);
+  }
+};
+
+
+const onImageCaptured = (imageData) => {
+  imageCaptured.value = imageData
+
+}
 
 const back = () => {
   const button = rippleBtnback.value
@@ -150,8 +256,9 @@ const handleButtonClick = () => {
     circle.remove()
  
 isStatusValid.value = false;
-    
-    startTimer();
+     ipvfunction()
+    isStatusValid.value = false;
+  startCountdown()
   }, 600)
 };
 
