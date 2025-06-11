@@ -46,13 +46,13 @@
       </div>
 
       <div class="w-full flex gap-2 mt-4">
-        <Button ref="rippleBtnback" @click="back()"
+        <Button ref="rippleBtnback" @click="back()" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
 
         <Button type="button" @click="handleButtonClick"
-          :disabled="selected !== 'Upload Last 6 Months Bank Statement PDF' || !isStatusValid || !isBack" ref="rippleBtn"
+          :disabled="selected !== 'Upload Last 6 Months Bank Statement PDF'  " ref="rippleBtn"
           class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
           {{ buttonText }}
         </Button>
@@ -105,6 +105,7 @@ const toggleSelection = (value) => {
   if (value === 'CAMS') {
     camsbankdata();
   } else if (value === 'Upload Last 6 Months Bank Statement PDF') {
+    pdferrorbox.value=false
     buttonText.value = 'Upload Bank Statement';
   }
 };
