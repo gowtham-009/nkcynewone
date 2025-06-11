@@ -99,12 +99,11 @@ onMounted(() => {
   getLocation()
 
   // Wait for location check result
-  setTimeout(() => {
-    if (permissionDenied.value) {
-      alert('❌ Please enable your GPS/location to proceed.')
-      visible.value = false
-    } else if (isLoaded.value) {
-      visible.value = true
+   setTimeout(() => {
+    if (!permissionDenied.value && coords.value.latitude && coords.value.longitude) {
+      visible.value = true // Show dialog only if location is ON
+    } else {
+      visible.value = false // Hide dialog if location denied/off
     }
   }, 1000)
 
