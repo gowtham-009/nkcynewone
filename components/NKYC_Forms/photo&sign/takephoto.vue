@@ -16,29 +16,28 @@
         </p>
 
 
-
-        <!-- Show latitude and longitude after fetching -->
+       
         <div class=" flex flex-col justify-center  rounded ">
-          <p class="text-sm text-gray-500 font-normal leading-6">
-            Latitude: {{ latitude }}, Longitude: {{ longitude }}
-          </p>
-          <p v-if="errorMessage" class="text-red-500">{{ errorMessage }}</p>
+        
+         
+
+            <Dialog v-model:visible="visible" modal header="Enable GPS Location" :style="{ width: '25rem' }">
+            
+           
+          <div class="w-full p-1 flex justify-center" style="border: 1px solid red;">
+              <Chip label="Refresh" class="bg-blue-50 text-blue-500" />
+               <p v-if="timeLeft > 0">Time left: {{ timeLeft }} seconds</p>
+          </div>
+          
+        </Dialog>
         </div>
 
 
-        <div class="w-full  flex justify-center">
-          <CMAIDENTIFY @captured="onImageCaptured" />
-        </div>
-
-        <div class="w-full ">
-          <p class="font-semibold text-gray-500 text-sm leading-4">"Ensure your nose is positioned at the center of the
-            cross (+). Your face should be straight and centered within the frame"</p>
-        </div>
+      
 
 
-        <div v-if="photoprogress" class="w-full p-1 flex justify-center  bg-blue-50 text-blue-500">
-          <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
-        </div>
+
+       
       </div>
 
       <div class="w-full flex gap-2">
@@ -67,15 +66,15 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const imageCaptured = ref(null);
-const photoprogress = ref(false);
+
 const isStatusValid = ref(true);
-const timing = ref(30)
-const latitude = ref('');
-const longitude = ref('');
-const errorMessage = ref('');
+
+
+const visible=ref(true)
 
 const isBack = ref(true);
 
+const { getLocation, error, isLoaded, permissionDenied } = useGeolocation()
 
 
 
@@ -83,126 +82,37 @@ const isBack = ref(true);
 
 
 
-const getCountry = async () => {
-  if (!latitude.value || !longitude.value) {
-    console.error('Latitude or longitude is missing')
-    return
-  }
 
-  const apiKey = 'R2ey6sqmfP210eJgVXX-NvmoUgrKlDAW4JwVXgVEaHs'
-  const apiUrl = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${latitude.value},${longitude.value}&lang=en-US&apiKey=${apiKey}`
 
-  try {
-    const response = await fetch(apiUrl)
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`)
-    }
 
-    const data = await response.json()
-    if (data) {
-      const geolocation = {
-        latitute: data.items[0].position.lat,
-        longitude: data.items[0].position.lng,
-        conuntryname: data.items[0].address.countryName,
-        countrycode: data.items[0].address.countryCode,
-      }
-      return geolocation
-    }
 
-    console.log('Reverse Geocoding Data:', data)
-  } catch (error) {
-    console.error('Error fetching location:', error.message)
-  }
-}
-
-const startTimer = () => {
-  timing.value = 30
-  const timer = setInterval(() => {
-    if (timing.value > 0) {
-      timing.value--
-    } else {
-      clearInterval(timer)
-    }
-  }, 1000)
-  return timer
-}
-
-const ipvfunction = async () => {
-  photoprogress.value = true;
-  const apiurl = `${baseurl.value}ipv`;
-  const location = await getCountry();
-
-  try {
-    // Fetch binary blob of the captured image
-    const response = await fetch(imageCaptured.value); // imageCaptured should be a blob URL (e.g., from canvas)
-    const blob = await response.blob();
-
-    // Encrypt metadata
-    const user = encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
-      pageCode: "ipv",
-      location: `${location.latitute},${location.longitude}`,
-      country: location.conuntryname
-    });
-
-    // Prepare FormData
-    const formData = new FormData();
-    formData.append('ipvImage', blob, 'ipv.jpg'); // Binary image file
-    formData.append('payload', JSON.stringify({ payload: user }));
-
-    const timer = startTimer();
-
-    const uploadResponse = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        // DO NOT set Content-Type for FormData
-      },
-      body: formData,
-    });
-
-    clearInterval(timer);
-
-    if (!uploadResponse.ok) {
-      throw new Error(`Network error: ${uploadResponse.status}`);
-    }
-
-    const data = await uploadResponse.json();
-
-    if (data.payload.metaData.is_real === 'true') {
-      pagestatus('photoproceed');
-      emit('updateDiv', 'photoproceed');
-    } else {
-      pagestatus('takephoto');
-      emit('updateDiv', 'takephoto');
-    }
-
-  } catch (error) {
-    console.error('IPv Upload Failed:', error.message);
-  }
-};
 
 
 onMounted(() => {
-  const storedLat = localStorage.getItem('latitude');
-  const storedLng = localStorage.getItem('longitude');
-  if (storedLat && storedLng) {
-    latitude.value = storedLat;
-    longitude.value = storedLng;
-  } else {
-    errorMessage.value = 'Location not found in localStorage.';
-  }
+ 
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
+
+  getLocation()
+
+  // Wait for location check result
+  setTimeout(() => {
+    if (permissionDenied.value) {
+      alert('❌ Please enable your GPS/location to proceed.')
+      visible.value = false
+    } else if (isLoaded.value) {
+      visible.value = true
+    }
+  }, 1000)
+
+ 
 });
 
-const onImageCaptured = (imageData) => {
-  imageCaptured.value = imageData
 
-}
+
 const back = () => {
   const button = rippleBtnback.value
   const circle = document.createElement('span')
@@ -224,6 +134,7 @@ const back = () => {
   }, 600)
 
 };
+
 const handleButtonClick = () => {
 
   const button = rippleBtn.value
@@ -241,7 +152,7 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-    ipvfunction()
+ 
 isStatusValid.value = false;
     
     startTimer();
