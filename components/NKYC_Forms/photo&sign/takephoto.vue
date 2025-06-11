@@ -90,6 +90,7 @@ watch(coords, (newCoords) => {
   if (newCoords.latitude && newCoords.longitude) {
     latitude.value = newCoords.latitude
     longitude.value = newCoords.longitude
+     visible.value = true
     console.log(`Latitude: ${newCoords.latitude}, Longitude: ${newCoords.longitude}`)
   }
 }, { deep: true })
@@ -98,7 +99,7 @@ watch(coords, (newCoords) => {
 watch(error, (newError) => {
   if (newError) {
     console.error("Geolocation error:", newError)
-    visible.value = true // Show dialog if there's an error
+    // Show dialog if there's an error
   }
 })
 
