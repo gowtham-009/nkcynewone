@@ -15,7 +15,6 @@
           Ensure your face appears clearly within the frame
         </p>
 
-
        
         <div class=" flex flex-col justify-center  rounded ">
         <p class="text-gray-500 text-sm">latitude:{{ latitude }} longitude: {{ longitude }}</p>
@@ -23,10 +22,6 @@
         </div>
 
 
-        <Dialog v-model:visible="visible" modal header="Enable GPS Location" :style="{ width: '25rem' }">
-   
-        </Dialog>
-      
 
 
 
@@ -66,7 +61,6 @@ const isBack = ref(true);
 const latitude = ref(null)
 const longitude = ref(null)
 
-const visible=ref(false)
 const { getLocation, error, isLoaded, coords } = useGeolocation()
 
 
@@ -87,8 +81,9 @@ onMounted(() => {
 });
 watch([coords, isLoaded], ([newCoords, loaded]) => {
   if (loaded && newCoords.latitude && newCoords.longitude) {
-    visible.value = true; // Show dialog on success
     console.log("Location enabled:", newCoords);
+    latitude.value=newCoords.latitude
+    longitude.value=newCoords.longitude
   }
   else{
       getLocation()
