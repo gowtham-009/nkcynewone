@@ -85,23 +85,12 @@ onMounted(() => {
 
  
 });
-watch(coords, (newCoords) => {
-  console.log("Coordinates updated:", newCoords)
-  if (newCoords.latitude && newCoords.longitude) {
-    latitude.value = newCoords.latitude
-    longitude.value = newCoords.longitude
-     visible.value = true
-    console.log(`Latitude: ${newCoords.latitude}, Longitude: ${newCoords.longitude}`)
+watch([coords, isLoaded], ([newCoords, loaded]) => {
+  if (loaded && newCoords.latitude && newCoords.longitude) {
+    visible.value = true; // Show dialog on success
+    console.log("Location enabled:", newCoords);
   }
-}, { deep: true })
-
-// Also watch for errors
-watch(error, (newError) => {
-  if (newError) {
-    console.error("Geolocation error:", newError)
-    // Show dialog if there's an error
-  }
-})
+}, { deep: true });
 
 
 const back = () => {
