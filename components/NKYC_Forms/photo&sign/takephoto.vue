@@ -21,15 +21,6 @@
         
          
 
-            <Dialog v-model:visible="visible" modal header="Enable GPS Location" :style="{ width: '25rem' }">
-            
-           
-          <div class="w-full p-1 flex justify-center" style="border: 1px solid red;">
-              <Chip label="Refresh" class="bg-blue-50 text-blue-500" />
-               <p v-if="timeLeft > 0">Time left: {{ timeLeft }} seconds</p>
-          </div>
-          
-        </Dialog>
         </div>
 
 
@@ -68,22 +59,9 @@ const buttonText = ref("Continue");
 const imageCaptured = ref(null);
 
 const isStatusValid = ref(true);
-
-
-const visible=ref(true)
-
 const isBack = ref(true);
 
 const { getLocation, error, isLoaded, permissionDenied } = useGeolocation()
-
-
-
-
-
-
-
-
-
 
 
 
@@ -98,14 +76,7 @@ onMounted(() => {
 
   getLocation()
 
-  // Wait for location check result
-   setTimeout(() => {
-    if (!permissionDenied.value && coords.value.latitude && coords.value.longitude) {
-      visible.value = true // Show dialog only if location is ON
-    } else {
-      visible.value = false // Hide dialog if location denied/off
-    }
-  }, 1000)
+ 
 
  
 });
