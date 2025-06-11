@@ -15,7 +15,7 @@
           Ensure your face appears clearly within the frame
         </p>
 
-        <div v-if="loading" class="w-full p-1 flex flex-col items-center justify-center rounded-lg bg-blue-50 my-2">
+        <div v-if="loading" class="w-full p-1  rounded-lg bg-blue-50 my-2">
           <div class="flex items-center justify-center mb-2">
             <i class="pi pi-spinner pi-spin text-2xl text-blue-500 mr-2"></i>
             <span class="text-blue-500">Please wait...{{ timer }}</span>

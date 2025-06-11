@@ -18,7 +18,6 @@
                   
 
                     <div class="w-full flex items-center  gap-2 mt-1 ">
-                        
                         <div class="p-2">
                             <p class="text-gray-500 leading-5 font-normal text-sm">
                                 Choose the option to upload an image of your signature for accuracy.
