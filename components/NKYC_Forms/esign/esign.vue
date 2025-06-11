@@ -154,7 +154,7 @@ const esignStatusCheck = async (requestId) => {
           bseCD, bseMF,
           MCXcategory, ICEX, mseCD
         } = statuscheck;
-
+        
         const onlyCashYes =
           nseCASH === 'YES' &&
           bseCASH === 'YES' &&
@@ -170,13 +170,10 @@ const esignStatusCheck = async (requestId) => {
           MCXcategory !== 'YES' &&
           ICEX !== 'YES' &&
           mseCD !== 'YES';
-
         if (onlyCashYes) {
-
           pagestatus('thankyou');
           emit('updateDiv', 'thankyou');
         } else {
-
           pagestatus('bankfile');
           emit('updateDiv', 'bankfile');
         }
