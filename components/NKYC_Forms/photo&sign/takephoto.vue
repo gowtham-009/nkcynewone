@@ -15,10 +15,16 @@
           Ensure your face appears clearly within the frame
         </p>
 
+        <div v-if="loading" class="w-full p-4 flex flex-col items-center justify-center rounded-lg bg-blue-50 my-2">
+          <div class="flex items-center justify-center mb-2">
+            <i class="pi pi-spinner pi-spin text-2xl text-blue-500 mr-2"></i>
+            <span class="text-blue-500">Please wait...{{ timer }}</span>
+          </div>
+        
+        </div>
        
-        <div class=" flex flex-col justify-center  rounded ">
+        <div v-if="locationpoint" class=" flex flex-col justify-center  rounded ">
         <p class="text-gray-500 text-sm">latitude:{{ latitude }} longitude: {{ longitude }}</p>
-         
         </div>
 
 
@@ -54,34 +60,45 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const imageCaptured = ref(null);
-
+const loading=ref(true)
 const isStatusValid = ref(true);
 const isBack = ref(true);
-
+const locationpoint=ref(false)
 const latitude = ref(null)
 const longitude = ref(null)
-
+const timer = ref(30);
+const timerInterval = ref(null);
 const { getLocation, error, isLoaded, coords } = useGeolocation()
 
+const startCountdown = () => {
+  clearInterval(timerInterval.value);
+  timer.value = 30;
+
+  
+  timerInterval.value = setInterval(() => {
+    timer.value--;
+    if (timer.value <= 0) {
+      clearInterval(timerInterval.value);
+    }
+  }, 1000);
+};
 
 
 onMounted(() => {
- 
-
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
-
   getLocation()
+  
 
-
-
- 
 });
 watch([coords, isLoaded], ([newCoords, loaded]) => {
+  startCountdown()
   if (loaded && newCoords.latitude && newCoords.longitude) {
     console.log("Location enabled:", newCoords);
+    loading.value=false
+    locationpoint.value=true
     latitude.value=newCoords.latitude
     longitude.value=newCoords.longitude
   }
@@ -138,3 +155,13 @@ isStatusValid.value = false;
 };
 
 </script>
+<style>
+.pi-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>
