@@ -86,7 +86,7 @@
       </div>
 
       <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="isBack"
+        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
@@ -253,7 +253,7 @@ const back = () => {
     circle.remove()
     pagestatus('signdraw')
     emit('updateDiv', 'signdraw');
-    
+    isBack.value=false
   }, 600)
 
 }
