@@ -23,6 +23,9 @@
         </div>
 
 
+        <Dialog v-model:visible="visible" modal header="Enable GPS Location" :style="{ width: '25rem' }">
+   
+        </Dialog>
       
 
 
@@ -60,8 +63,11 @@ const imageCaptured = ref(null);
 const isStatusValid = ref(true);
 const isBack = ref(true);
 
-const { getLocation, error, isLoaded, permissionDenied } = useGeolocation()
+const latitude = ref(null)
+const longitude = ref(null)
 
+const visible=ref(false)
+const { getLocation, error, isLoaded, coords } = useGeolocation()
 
 
 
@@ -75,11 +81,26 @@ onMounted(() => {
 
   getLocation()
 
- 
+
 
  
 });
+watch(coords, (newCoords) => {
+  console.log("Coordinates updated:", newCoords)
+  if (newCoords.latitude && newCoords.longitude) {
+    latitude.value = newCoords.latitude
+    longitude.value = newCoords.longitude
+    console.log(`Latitude: ${newCoords.latitude}, Longitude: ${newCoords.longitude}`)
+  }
+}, { deep: true })
 
+// Also watch for errors
+watch(error, (newError) => {
+  if (newError) {
+    console.error("Geolocation error:", newError)
+    visible.value = true // Show dialog if there's an error
+  }
+})
 
 
 const back = () => {
