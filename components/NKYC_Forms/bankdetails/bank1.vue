@@ -255,6 +255,7 @@ const bankvalidation = async () => {
       errorbox.value = true
       errormsg.value = data.payload.message
       waitingbox.value = false
+      isStatusValid=true
     }
     else {
       emit('updateDiv', 'bank4');
