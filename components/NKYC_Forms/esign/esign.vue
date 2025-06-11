@@ -81,6 +81,7 @@ onMounted(() => {
 });
 
 const createEsign = async () => {
+  isStatusValid.value = false
   const apiurl = `${baseurl.value}esign`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -211,7 +212,7 @@ const handleButtonClick = async (event) => {
   createRipple(event, rippleBtn);
   setTimeout(() =>
    createEsign(),
-isStatusValid.value = false,
+
     600);
 };
 
