@@ -18,8 +18,23 @@
 
        
         <div class=" flex flex-col justify-center  rounded ">
-        
-         
+        <div class="flex flex-col justify-center rounded">
+  <!-- ✅ Show coordinates when location is allowed -->
+  <template v-if="latitude && longitude">
+    <p class="text-green-600 text-sm">📍 Latitude: {{ latitude }}</p>
+    <p class="text-green-600 text-sm">📍 Longitude: {{ longitude }}</p>
+  </template>
+
+  <!-- ❌ Show error if location is denied or blocked -->
+  <template v-else-if="locationError">
+    <p class="text-red-500 text-sm">❌ {{ locationError }}</p>
+  </template>
+
+  <!-- ⏳ Show loading while waiting -->
+  <template v-else>
+    <p class="text-gray-500 text-sm">🔄 Getting location...</p>
+  </template>
+</div>
 
         </div>
 
@@ -61,9 +76,11 @@ const imageCaptured = ref(null);
 const isStatusValid = ref(true);
 const isBack = ref(true);
 
-const { getLocation, error, isLoaded, permissionDenied } = useGeolocation()
+const { getLocation, coords, error, isLoaded, permissionDenied } = useGeolocation()
 
-
+const latitude = ref(null)
+const longitude = ref(null)
+const locationError = ref(null)
 
 
 onMounted(() => {
@@ -75,7 +92,15 @@ onMounted(() => {
   });
 
   getLocation()
-
+ // Wait briefly to let the geolocation response arrive
+  setTimeout(() => {
+    if (!permissionDenied.value && coords.value.latitude && coords.value.longitude) {
+      latitude.value = coords.value.latitude
+      longitude.value = coords.value.longitude
+    } else {
+      locationError.value = error.value || 'Please enable location access to continue.'
+    }
+  }, 1000)
  
 
  
