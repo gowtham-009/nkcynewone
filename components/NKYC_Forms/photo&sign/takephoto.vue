@@ -90,11 +90,12 @@ onMounted(() => {
     deviceHeight.value = window.innerHeight;
   });
   getLocation()
+  startCountdown()
   
 
 });
 watch([coords, isLoaded], ([newCoords, loaded]) => {
-  startCountdown()
+  
   if (loaded && newCoords.latitude && newCoords.longitude) {
     console.log("Location enabled:", newCoords);
     loading.value=false
