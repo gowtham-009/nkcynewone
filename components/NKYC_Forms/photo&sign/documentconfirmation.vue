@@ -253,7 +253,7 @@ const back = () => {
     circle.remove()
     pagestatus('signdraw')
     emit('updateDiv', 'signdraw');
-    isBack.value = false;
+    
   }, 600)
 
 }
