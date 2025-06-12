@@ -177,7 +177,7 @@ watch(() => route.query.form, (newForm) => {
 
 onMounted(async () => {
   const token = localStorage.getItem('userkey');
-
+  
   // 🔴 No token? Redirect to "/"
   if (!token) {
     authenticated.value = false;
@@ -190,6 +190,16 @@ onMounted(async () => {
   const queryForm = route.query.form;
 
   try {
+    // First get the server data
+    const mydata = await getServerData();
+    
+    // Check if the server returned an error
+    if (mydata.payload && mydata.payload.status === 'error') {
+      localStorage.removeItem('userkey');
+      router.push('/');
+      return;
+    }
+
     // 🟢 If query param exists and is valid, show that form
     if (queryForm && formMap[queryForm]) {
       currentForm.value = formMap[queryForm];
@@ -198,19 +208,19 @@ onMounted(async () => {
     }
 
     // 🔵 Otherwise, load server data to get default page
-    const mydata = await getServerData();
     const activePage = mydata?.payload?.metaData?.profile?.pageStatus || 'main';
     currentForm.value = activePage;
+  
 
     // Optional: clean URL
     router.replace({ path: '/main' });
 
   } catch (error) {
     console.error('Error fetching server data:', error);
+    localStorage.removeItem('userkey');
     router.push('/');
   }
 });
-
 
 
 </script>
