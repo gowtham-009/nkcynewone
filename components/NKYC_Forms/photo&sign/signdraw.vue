@@ -47,12 +47,69 @@
           <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
         </div>
 
-        <div v-if="esigngen" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
-          <p class="text-sm text-blue-500">E-sign Generating...</p>
-        </div>
+       
       </div>
 
 
+         
+            <Dialog v-model:visible="visible" modal header="Additional Information" :style="{ width: '25rem' }">
+                 <div class="w-full ">
+              <p class="text-gray-500 font-medium text-sm">I/We herby voluntarily accord my/our consent to receive the
+                aforesaid documents in:</p>
+              <Option1 class="mt-1" v-model:selected="question1" />
+            </div>
+
+            <div class="w-full">
+              <p class="text-gray-500 font-medium text-sm">Mode of communication:</p>
+              <p class="text-gray-500 font-medium text-sm">I/We wish to receive Contract Note:</p>
+
+              <Option2 class="mt-1" v-model:selected="question2" />
+            </div>
+
+            <div class="w-full ">
+              <p class="text-gray-500 font-medium text-sm">I/We wish to receive standard documents - Rights &
+                Oblications, Risk Disclosure document, Guidance note and polices & procedures:</p>
+              <Option3 class="mt-1" v-model:selected="question3" />
+            </div>
+            <div class="w-full">
+              <p class="text-gray-500 font-medium text-sm">I/We wish to avail facility of internet trading/wireless
+                technology:</p>
+              <Option4 class="mt-1" v-model:selected="question4" />
+            </div>
+            <div class="w-full ">
+              <p class="text-gray-500 font-medium text-sm">Past Action: Details of any action / Proceedings initiated /
+                pending / taken by SEBI / Stock Exchange / any other authority against the applicant / constituent or
+                its patners / promoters / whole time directors / authorised persons in charge of dealing in securities
+                during last 3 years.</p>
+              <Option5 class="mt-1" v-model:selected="question5" />
+            </div>
+            <div class="w-full ">
+              <p class="text-gray-500 font-medium text-sm">I/We Whether dealing with any Other stock Broker /AP:</p>
+              <Option6 class="mt-1" v-model:selected="question6" />
+            </div>
+            <div class="w-full ">
+              <p class="text-gray-500 font-medium text-sm">OTHER DP DETAILS:</p>
+              <Option7 class="mt-1" v-model:selected="question7" />
+            </div>
+            <div class="w-full">
+              <p class="text-gray-500 font-medium text-sm">I/We further wish to have settlement of my account (funds and
+                securities):</p>
+              <Option8 class="mt-1" v-model:selected="question8" />
+            </div>
+
+            <div class="w-full ">
+              <p class="text-gray-500 font-medium text-sm">I understand that settlement amount shall be subject to
+                retention of requisite securities / funds towards outstanding obligations and margins in my account
+                calculated in the manner specified by SEBI / Exchange and details mentioned in the "Statement of
+                Account" at the time of settlement. I authorize you to send the statement of account on funds and
+                securities as on the date of settelement to my e-mail id registered with you. I understand that i can
+                obtain a copy of the same from your Head office.</p>
+            </div>
+             <Button type="button" ref="rippleBtn" @click="documentsavebtn"
+          class=" primary_color wave-btn text-white w-full py-2 text-lg border-0  ">
+         Save
+        </Button>
+        </Dialog>
 
       <div class="w-full flex gap-2">
         <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
@@ -73,18 +130,34 @@
 <script setup>
 
 import { ref, onMounted, onUnmounted } from 'vue';
+import Option1 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption1.vue'
+import Option2 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption2.vue'
+import Option3 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption3.vue'
+import Option4 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption4.vue'
+import Option5 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption5.vue'
+import Option6 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption6.vue'
+import Option7 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption7.vue'
+import Option8 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption8.vue'
 
+const question1 = ref('')
+const question2 = ref('')
+const question3 = ref('')
+const question4 = ref('')
+const question5 = ref('')
+const question6 = ref('')
+const question7 = ref('')
+const question8 = ref('')
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const canvasRef = ref(null);
 const loading = ref(false)
-const esigngen = ref(false);
 const timing = ref(30)
 const isStatusValid = ref(true);
 const isBack = ref(true);
 
+const visible=ref(false)
 let ctx = null;
 let isDrawing = false;
 const isImageUploaded = ref(false);
@@ -152,6 +225,32 @@ const getsegmentdata = async () => {
   }
 };
 
+
+
+const getsegmentdatadialog = async () => {
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.additional_docs || '';
+  if (statuscheck) {
+    question1.value = mydata?.payload?.metaData?.additional_docs?.documentConsentMode || 'Electronic'
+    question2.value = mydata?.payload?.metaData?.additional_docs?.contractNoteMode || 'Electronic'
+    question3.value = mydata?.payload?.metaData?.additional_docs?.standardDocsConsent || 'Electronic'
+    question4.value = mydata?.payload?.metaData?.additional_docs?.internetTradingOpted || 'Yes'
+    question5.value = mydata?.payload?.metaData?.additional_docs?.pastActionsDetails || 'No'
+    question6.value = mydata?.payload?.metaData?.additional_docs?.otherBrokerDetails || 'No'
+    question7.value = mydata?.payload?.metaData?.additional_docs?.accountSettlementPreference || 'CDSL'
+    question8.value = mydata?.payload?.metaData?.additional_docs?.settlementStatementConsent || 'Once in Quarter'
+  }
+  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+    question1.value = mydata?.payload?.metaData?.additional_docs?.documentConsentMode || 'Electronic'
+    question2.value = mydata?.payload?.metaData?.additional_docs?.contractNoteMode || 'Electronic'
+    question3.value = mydata?.payload?.metaData?.additional_docs?.standardDocsConsent || 'Electronic'
+    question4.value = mydata?.payload?.metaData?.additional_docs?.internetTradingOpted || 'Yes'
+    question5.value = mydata?.payload?.metaData?.additional_docs?.pastActionsDetails || 'No'
+    question6.value = mydata?.payload?.metaData?.additional_docs?.otherBrokerDetails || 'No'
+    question7.value = mydata?.payload?.metaData?.additional_docs?.accountSettlementPreference || 'CDSL'
+    question8.value = mydata?.payload?.metaData?.additional_docs?.settlementStatementConsent || 'Once in Quarter'
+  }
+};
 const startDrawing = (e) => {
   if (isImageUploaded.value) return;
   isDrawing = true;
@@ -205,6 +304,7 @@ const getMousePos = (event) => {
 
 onMounted(async () => {
   await getsegmentdata()
+ 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -264,41 +364,6 @@ const emit = defineEmits(['updateDiv']);
 
 
 
-const createunsignedDocument = async () => {
-  loading.value = false
-  esigngen.value = true
-  const apiurl = `${baseurl.value}nkyc_document`;
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-  });
-
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        'Content-Type': 'application/json',
-      },
-      body: jsonString,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data.payload.status == 'ok') {
-      pagestatus('esign')
-      emit('updateDiv', 'esign');
-    }
-
-  } catch (error) {
-    console.error(error.message);
-  }
-};
 
 
 const startTimer = () => {
@@ -355,7 +420,8 @@ const uploadsign = async () => {
     const data = await uploadResponse.json();
 
     if (data.payload.status === 'ok') {
-      createunsignedDocument();
+       pagestatus('esign')
+      emit('updateDiv', 'esign');
     }
 
   } catch (error) {
@@ -457,9 +523,54 @@ const handleButtonClick = () => {
 }
 
 const additionaldoc=()=>{
-  pagestatus('additionalinformation')
-  emit('updateDiv', 'additionalinformation');
+ visible.value=true
+ getsegmentdatadialog()
 }
+
+const documentsavebtn = async () => {
+
+
+  const apiurl = `${baseurl.value}additional_docs`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "signdraw",
+    documentConsentMode: question1.value,
+    contractNoteMode: question2.value,
+    standardDocsConsent: question3.value,
+    internetTradingOpted: question4.value,
+    pastActionsDetails: question5.value,
+    otherBrokerDetails: question6.value,
+    accountSettlementPreference: question7.value,
+    settlementStatementConsent: question8.value
+
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+  
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+     visible.value=false
+    }
+  } catch (error) {
+  
+    console.error(error.message);
+  }
+};
 </script>
 <style>
 .signature-canvas {

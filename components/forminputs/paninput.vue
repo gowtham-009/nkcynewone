@@ -119,7 +119,7 @@ onMounted(() => {
 .pan-input-wrapper {
   display: flex;
   align-items: center;
-  border: 2px solid #a4a4a4;
+  border: 1px solid #a4a4a4;
   padding: 5px 5px;
   border-radius: 8px;
   background-color: white;

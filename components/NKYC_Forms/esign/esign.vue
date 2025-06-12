@@ -12,31 +12,38 @@
         <p class="text-sm text-gray-500 font-normal leading-5">
           You will receive OTP to Aadhaar Linked Mobile No
         </p>
-
         <div class="w-full mt-2 rounded-lg bg-blue-50 gap-1 p-2 dark:!bg-gray-800">
           <div v-for="(step, index) in steps" :key="index" class="w-full flex ">
             <div class="font-normal text-sm text-gray-500">{{ step.label }}</div>
             <div class="font-normal text-sm text-gray-500">{{ step.text }}</div>
           </div>
         </div>
+
+         <div v-if="loadingen" class="w-full p-1  rounded-lg bg-blue-50 my-2">
+          <div class="flex items-center justify-center mb-2">
+            <i class="pi pi-spinner pi-spin text-2xl text-blue-500 mr-2"></i>
+            <span class="text-blue-500">Esign Generating...</span>
+          </div>
+        
+        </div>
       </div>
 
+      
+      
+
       <div class="w-full flex gap-2">
-        <!-- Buttons -->
-        <button @click="back($event)" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer rounded-lg border-0 text-white w-1/6 py-3 dark:bg-slate-900 relative overflow-hidden">
+        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </button>
-
-        <button @click="handleButtonClick($event)" ref="rippleBtn" :disabled="!isStatusValid"
-          class="primary_color wave-btn text-white w-5/6 py-3 rounded-lg text-xl border-0 relative overflow-hidden">
+        </Button>
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!isStatusValid"
+          class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
           {{ buttonText }}
-        </button>
-
+        </Button>
       </div>
     </div>
 
-    <div v-if="loading" class="flex justify-center items-center p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
+    <div v-if="loadingen" class="flex justify-center items-center p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
       <ProgressSpinner />
     </div>
@@ -59,6 +66,7 @@ const loading = ref(false);
 const isStatusValid = ref(true);
 const isBack = ref(true);
 const route = useRoute();
+const loadingen=ref(false)
 
 const steps = [
   { label: 'A.', text: 'Click Next Step' },
@@ -80,8 +88,44 @@ onMounted(() => {
   window.addEventListener('resize', updateHeight);
 });
 
+
+const createunsignedDocument = async () => {
+    isStatusValid.value=false
+  loadingen.value = true
+  const apiurl = `${baseurl.value}nkyc_document`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+  });
+
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status == 'ok') {
+     createEsign()
+    }
+
+  } catch (error) {
+    console.error(error.message);
+  }
+};
+
 const createEsign = async () => {
-  isStatusValid.value = false
+ 
   const apiurl = `${baseurl.value}esign`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -186,62 +230,84 @@ const esignStatusCheck = async (requestId) => {
   }
 };
 
-const createRipple = (event, buttonRef) => {
-  const button = buttonRef.value;
-  const circle = document.createElement('span');
-  circle.classList.add('ripple');
 
-  const rect = button.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
 
-  circle.style.left = `${x}px`;
-  circle.style.top = `${y}px`;
+const handleButtonClick = () => {
 
-  button.appendChild(circle);
+
+  const button = rippleBtn.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+
+  button.$el.appendChild(circle)
 
   setTimeout(() => {
-    circle.remove();
-  }, 600);
-};
-
-const handleButtonClick = async (event) => {
-  createRipple(event, rippleBtn);
-  setTimeout(() =>
-   createEsign(),
-
-    600);
-};
-
-const back = async (event) => {
-  createRipple(event, rippleBtnback);
-  setTimeout(async () => {
-    const myData = await pagestatus('signdraw');
-      if (myData?.payload?.status === 'ok') {
-        emit('updateDiv', 'signdraw');
-      }
-
-      isBack.value = false;
-  }, 600);
-};
-</script>
-<style scoped>
-.ripple {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
-  animation: ripple 0.6s linear;
-  width: 100px;
-  height: 100px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 1;
+    circle.remove()
+   createunsignedDocument()
+    isStatusValid.value = false;
+  }, 600)
 }
 
-@keyframes ripple {
+const back = () => {
+  const button = rippleBtnback.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+  button.$el.appendChild(circle)
+
+  setTimeout(() => {
+    circle.remove()
+    pagestatus('signdraw')
+    emit('updateDiv', 'signdraw');
+    isBack.value = false;
+  }, 600)
+
+}
+
+</script>
+<style scoped>
+
+.ripple {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ripple-animation 0.6s linear;
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+  from {
+    transform: scale(0);
+    opacity: 1;
+  }
   to {
-    transform: translate(-50%, -50%) scale(3);
+    transform: scale(2);
     opacity: 0;
   }
+}
+
+.pi-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

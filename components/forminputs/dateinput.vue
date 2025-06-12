@@ -1,11 +1,11 @@
 <template>
   <span class="font-semibold text-lg">Date of Birth as per PAN</span>
-  <div class="date-wrapper w-full">
+  <div class="date-wrapper w-full rounded-lg">
     <Calendar
       v-model="internalDate"
       dateFormat="dd/mm/yy"
       placeholder="DD / MM / YYYY"
-      class="custom-calendar w-full dark:!bg-gray-800"
+      class="custom-calendar w-full dark:!bg-gray-800 rounded-lg"
       inputClass="custom-input"
       :manualInput="true"
       :showOnFocus="false"
