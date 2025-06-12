@@ -110,6 +110,7 @@ watch(panvalue, (newVal) => {
 });
 
 onMounted(() => {
+  localStorage.removeItem('userkey')
   const fullHeight = window.innerHeight;
   box1Height.value = fullHeight;
   box2Height.value = 0;
