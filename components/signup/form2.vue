@@ -349,7 +349,16 @@ watch(p_otp, (newval) => {
   }
 })
 
-
+watch(mobileNo,(newval)=>{
+  if(newval.length<10){
+errormsg.value=false
+  }
+  else if(newval.length==10){
+    isStatusValid.value=true
+  }
+  
+  
+})
 
 
 
