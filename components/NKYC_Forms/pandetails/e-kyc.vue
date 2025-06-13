@@ -96,7 +96,8 @@
 
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const route = useRoute()
 const { baseurl } = globalurl();
@@ -135,11 +136,18 @@ const back = () => {
     circle.style.top = `${y}px`
     button.$el.appendChild(circle)
 
-    setTimeout(() => {
+    setTimeout(async() => {
         circle.remove()
-        pagestatus('main')
-        emit('updateDiv', 'main');
-        isBack.value = false
+       const page = await pagestatus('main')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'main');
+      isBack.value = false;
+    }
     }, 600)
 
 }
@@ -320,6 +328,9 @@ const digilocker_getaadhardoc = async (requestid) => {
             emit('updateDiv', 'parmanentaddress');
         }
 
+       
+
+
     } catch (error) {
         console.error('Error:', error.message);
     }
@@ -345,10 +356,20 @@ const handleButtonClick = () => {
 
     button.$el.appendChild(circle)
 
-    setTimeout(() => {
+    setTimeout(async() => {
         circle.remove()
-        digilocker_create()
+        const mydata = await getServerData();
+        if(mydata.payload.status=='ok'){
+            digilocker_create()
         isFormdisabled.value = false
+        }
+       else if((mydata.payload.status=='error' && mydata.payload.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing User Token.')){
+             alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+        }
+      
+       
     }, 600)
 };
 

@@ -73,7 +73,7 @@
 
 import emailOTP from '~/components/forminputs/emailotp.vue'
 import { ref, onMounted } from 'vue';
-
+import { useRoute, useRouter } from 'vue-router'
 import EmailInput from '~/components/forminputs/emailinput.vue';
 
 import { encryptionrequestdata } from '~/utils/globaldata.js'
@@ -83,7 +83,7 @@ import { pagestatus } from '~/utils/pagestatus.js'
 
 const { baseurl } = globalurl();
 
-
+const router = useRouter();
 
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
@@ -182,11 +182,18 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('mobile')
-    emit('updateDiv', 'mobile');
-    isBack.value = false;
+  const page = await pagestatus('mobile')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'mobile');
+      isBack.value = false;
+    }
   }, 600)
 
 }
@@ -365,8 +372,9 @@ const handleButtonClick = () => {
 
   setTimeout(async () => {
     circle.remove();
-
-    if (!emailbox.value) {
+ const mydata = await getServerData();
+     if(mydata.payload.status=='ok'){
+       if (!emailbox.value) {
       // First step: trigger sending OTP
       if (isValidEmail.value) {
         await sendemailotp();
@@ -383,6 +391,19 @@ const handleButtonClick = () => {
         errorotp.value = 'Enter a valid 5-digit OTP';
       }
     }
+     }
+
+      else if (
+        mydata?.payload?.status === 'error' &&
+        (mydata?.payload?.message === 'User Not Found.' ||
+         mydata?.payload?.message === 'Missing User Token.')
+    ) {
+       alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+   
+   
   }, 600);
 };
 

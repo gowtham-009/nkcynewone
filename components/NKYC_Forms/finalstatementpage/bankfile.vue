@@ -86,7 +86,8 @@ const pdferrorbox = ref(false);
 const isBack = ref(true); // Assuming this is a placeholder for actual back navigation logic
 const isStatusValid = ref(true); // Assuming this is a placeholder for actual status validation logic
 let intervalId = null;
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const options = [
   {
     label: 'CAMS',
@@ -100,10 +101,24 @@ const options = [
   }
 ];
 
-const toggleSelection = (value) => {
+const toggleSelection = async(value) => {
   selected.value = value;
   if (value === 'CAMS') {
-    camsbankdata();
+      const mydata = await getServerData();
+      if(mydata.payload.status=='ok'){
+        camsbankdata();
+      }
+
+      else if (
+        mydata?.payload?.status === 'error' &&
+        (mydata?.payload?.message === 'User Not Found.' ||
+         mydata?.payload?.message === 'Missing User Token.')
+    ) {
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
+    }
+    
   } else if (value === 'Upload Last 6 Months Bank Statement PDF') {
     pdferrorbox.value=false
     buttonText.value = 'Upload Bank Statement';
@@ -317,6 +332,12 @@ const bankstatement = async (pdfval) => {
         emit('updateDiv', 'thankyou');
       }
     }
+
+      else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
+    }
   } catch (error) {
     console.error('bankstatement error:', error.message);
   }
@@ -359,11 +380,16 @@ const back = async () => {
 
   setTimeout(async () => {
     circle.remove();
-    const mydata = await pagestatus('esign');
-    if (mydata.payload.status === 'ok') {
-      emit('updateDiv', 'esign');
+   const page = await pagestatus('esign')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
     }
-    isBack.value = false;
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'esign');
+      isBack.value = false;
+    }
   }, 600);
 };
 </script>

@@ -60,6 +60,8 @@
 
 import { ref, onMounted } from 'vue';
 
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
@@ -107,9 +109,16 @@ onMounted(async () => {
 
 const emit = defineEmits(['updateDiv']);
 
-const retake = () => {
-    pagestatus('takephoto')
-    emit('updateDiv', 'takephoto');
+const retake = async() => {
+    const page = await pagestatus('takephoto')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'takephoto');
+    }
 }
 const back = () => {
     const button = rippleBtnback.value
@@ -124,11 +133,19 @@ const back = () => {
     circle.style.top = `${y}px`
     button.$el.appendChild(circle)
 
-    setTimeout(() => {
+    setTimeout(async() => {
         circle.remove()
-        pagestatus('photosign1')
-        emit('updateDiv', 'photosign1');
-        isBack
+        circle.remove()
+      const page = await pagestatus('photosign1')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'photosign1');
+      isBack.value = false;
+    }
     }, 600)
 
 }
@@ -149,11 +166,19 @@ const handleButtonClick = () => {
 
     button.$el.appendChild(circle)
 
-    setTimeout(() => {
+    setTimeout(async() => {
         circle.remove()
-        pagestatus('signdraw')
-        emit('updateDiv', 'signdraw');
-        isStatusValid.value = false;
+         const page = await pagestatus('signdraw')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'signdraw');
+     isStatusValid.value = false;
+    }
+        
     }, 600)
 };
 

@@ -64,7 +64,8 @@ import State from '~/components/NKYC_Forms/pandetails/paninputs/state.vue'
 import City from '~/components/NKYC_Forms/pandetails/paninputs/city.vue'
 import Pincode from '~/components/NKYC_Forms/pandetails/paninputs/pincode.vue'
 import { ref, onMounted } from 'vue';
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const emit = defineEmits(['updateDiv']);
 
 const { baseurl } = globalurl();
@@ -156,9 +157,13 @@ const communicateaddressdata = async () => {
           if (mydata.payload.status == 'ok') {
             emit('updateDiv', 'info');
           }
-
-
         }
+      }
+
+      else if((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')){
+        alert('Session has expired, please login.');
+       localStorage.removeItem('userkey')
+       router.push('/')
       }
     }
 
@@ -208,11 +213,18 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('parmanentaddress')
-    emit('updateDiv', 'parmanentaddress');
-    isBack.value = false;
+   const page=await pagestatus('parmanentaddress')
+       if((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')){
+             alert('Session has expired, please login.');
+  localStorage.removeItem('userkey')
+  router.push('/')
+       }
+       else if(page.payload.status=='ok'){
+         emit('updateDiv', 'parmanentaddress');
+        isBack.value = false;
+       }
   }, 600)
 
 };

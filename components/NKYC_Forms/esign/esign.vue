@@ -56,7 +56,8 @@ import { useRoute } from 'vue-router';
 
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Ready for Esign');
 const rippleBtn = ref(null);
@@ -117,6 +118,12 @@ const createunsignedDocument = async () => {
     const data = await response.json();
     if (data.payload.status == 'ok') {
      createEsign()
+    }
+
+      else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing required parameters.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
     }
 
   } catch (error) {
@@ -268,11 +275,18 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('signdraw')
-    emit('updateDiv', 'signdraw');
-    isBack.value = false;
+   const page = await pagestatus('signdraw')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'signdraw');
+      isBack.value = false;
+    }
   }, 600)
 
 }

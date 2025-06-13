@@ -51,7 +51,8 @@
 import { ref, onMounted } from 'vue';
 import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const emit = defineEmits(['updateDiv']);
 const deviceHeight = ref(0);
 const activebox = ref('marriedbox');
@@ -108,11 +109,18 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('occupation')
-    emit('updateDiv', 'occupation');
-    isBack.value = false;
+   const page = await pagestatus('occupation')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'occupation');
+      isBack.value = false;
+    }
   }, 600)
 
 };
@@ -155,6 +163,11 @@ const personalinfo = async () => {
       const data = await response.json()
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'nominee');
+      }
+        else if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
 
     }

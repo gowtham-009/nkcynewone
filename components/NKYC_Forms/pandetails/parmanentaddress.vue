@@ -62,8 +62,8 @@ import Pincode from '~/components/NKYC_Forms/pandetails/paninputs/pincode.vue';
 import Addresscheck from '~/components/NKYC_Forms/pandetails/paninputs/confirmcheckbox.vue';
 
 import { pagestatus } from '~/utils/pagestatus.js'
-
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 // Form Refs
 const { baseurl } = globalurl();
 const emit = defineEmits(['updateDiv']);
@@ -133,7 +133,7 @@ await setPermanentAddress();
 const permanentaddressdata = async () => {
 
   const apiurl = `${baseurl.value}address`;
-  const pageCode = commAddressRef.value?.confirm ? "address" : "communication";
+  const pageCode = commAddressRef.value?.confirm ? "address" : "communicationaddress";
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     comAddSameAsPermanent: commAddressRef.value?.confirm ? "YES" : "NO",
@@ -167,9 +167,6 @@ const permanentaddressdata = async () => {
       if (data.payload.status == 'ok') {
         const isConfirmed = commAddressRef.value?.confirm;
         if (isConfirmed) {
-
-
-
           const mydata = await pagestatus('info')
           if (mydata.payload.status == 'ok') {
             emit('updateDiv', 'info');
@@ -180,6 +177,12 @@ const permanentaddressdata = async () => {
           emit('updateDiv', 'communicationaddress');
 
         }
+      }
+
+      else if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
 
 
@@ -215,7 +218,7 @@ const handleButtonClick = (event) => {
     circle.remove()
 
     permanentaddressdata()
-    isaddress.value=false
+    isaddress.value = false
 
   }, 600)
 };
@@ -238,9 +241,16 @@ function back() {
   setTimeout(async () => {
     circle.remove()
 
-    pagestatus('main')
-    emit('updateDiv', 'main');
-    isBack.value = false;
+    const page = await pagestatus('main')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'main');
+      isBack.value = false;
+    }
   }, 600)
 
 }

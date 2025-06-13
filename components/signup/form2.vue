@@ -87,7 +87,7 @@ const timeLeft = ref(10);
 const phoneNumber = ref('')
 const mobileotp = ref(false)
 const rippleBtn = ref(null)
-const rippleBtnback = ref(null)
+
 const buttonText = ref("Next");
 const otperror = ref(false)
 const errorotp = ref('')
@@ -215,12 +215,12 @@ const sendmobileotp = async (resend) => {
     buttonText.value='Verify Otp'
      emit('updateDiv', 'email');
   }
-  else if(data.payload.status=='error'){
-    
+  else if(data.payload.status=='error'  && data.payload.message=='Mobile No already exists.' && data.payload.otpStatus==0){
     errormsg.value=true
     errormobile.value=data.payload.message
      
   }
+ 
 
 } catch (error) {
   console.error("OTP Send Error:", error.message);
@@ -312,12 +312,25 @@ const mobile_signup = async (event) => {
 
   setTimeout(async () => {
     circle.remove();
-
-    if (mobileotp.value && p_otp.value.length === 4) {
+     const mydata = await getServerData();
+     if(mydata.payload.status=='ok'){
+       if (mobileotp.value && p_otp.value.length === 4) {
       await otpverfication();
     } else {
       await sendmobileotp();
     }
+     }
+
+       else if (
+        mydata?.payload?.status === 'error' &&
+        (mydata?.payload?.message === 'User Not Found.' ||
+         mydata?.payload?.message === 'Missing User Token.')
+    ) {
+       alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+   
     
   }, 600);
 };

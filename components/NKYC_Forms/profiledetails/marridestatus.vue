@@ -92,6 +92,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { pagestatus } from '~/utils/pagestatus.js'
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 
@@ -189,14 +191,16 @@ const back = () => {
   setTimeout(async () => {
 
     circle.remove()
-
-
-
-    const mydata = await pagestatus('parmanentaddress')
-    if (mydata.payload.status == 'ok') {
-      emit('updateDiv', 'parmanentaddress');
+    const page = await pagestatus('parmanentaddress')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
     }
-    isBack.value = false;
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'parmanentaddress');
+      isBack.value = false;
+    }
   }, 600)
 
 };
@@ -233,7 +237,11 @@ const personalinfo = async () => {
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'clientinfo');
       }
-
+else if((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')){
+ alert('Session has expired, please login.');
+  localStorage.removeItem('userkey')
+  router.push('/')
+}
 
     }
 

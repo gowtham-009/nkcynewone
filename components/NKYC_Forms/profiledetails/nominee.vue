@@ -176,6 +176,9 @@ import Guardian from '~/components/nomineeinputs/guardian.vue';
 
 import Sharevalue from '~/components/nomineeinputs/sharevalue.vue';
 import { pagestatus } from '~/utils/pagestatus.js'
+
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const { baseurl } = globalurl();
 const emit = defineEmits(['updateDiv']);
 const isDisabled = ref(true)
@@ -269,7 +272,16 @@ const resetFormFields = () => {
   drivinginput.value=''
 };
 
-const openNomineeDialog = () => {
+const openNomineeDialog = async() => {
+ const mydata = await getServerData();
+
+if ((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')) {
+  alert('Session has expired, please login.');
+  localStorage.removeItem('userkey')
+  router.push('/')
+  return; // Stop further execution if session expired
+}
+
   resetFormFields();
   visible.value = true;
 };
@@ -579,10 +591,15 @@ const nomineesavedata = async () => {
 
     const data = await response.json();
     if (data.payload.status == 'ok') {
-
       visible.value = false;
       nomineedetails();
     }
+
+     else if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
 
   } catch (error) {
     console.error("Error saving nominee:", error.message);
@@ -623,6 +640,11 @@ const nomineedelete = async (deleteid) => {
     }
 
     const data = await response.json();
+       if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
 
     nomineedetails(); // Refresh the nominee list or details
   } catch (error) {
@@ -679,12 +701,20 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('income')
-    emit('updateDiv', 'income');
+   const page = await pagestatus('income')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'income');
+      isBack.value = false;
+    }
   },
-  isBack.value = false,
+  
   600)
 
 };
@@ -712,6 +742,11 @@ const handleButtonClick = (event) => {
     const mydata = await pagestatus('bank1')
     if (mydata.payload.status == 'ok') {
       emit('updateDiv', 'bank1');
+    }
+    else if((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
     }
 isStatusValid.value=false
 

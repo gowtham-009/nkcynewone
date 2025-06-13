@@ -66,6 +66,8 @@ const rippleBtnback = ref(null)
 const isStatusValid = ref(true);
 const isBack = ref(true);
 
+import { useRouter } from 'vue-router';
+const router = useRouter();
 // qualification Status
 const selected = ref("");
 const options = [
@@ -119,11 +121,18 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('qualification')
-    emit('updateDiv', 'qualification');
-    isBack.value = false;
+   const page = await pagestatus('qualification')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'qualification');
+      isBack.value = false;
+    }
   }, 600)
 
 };
@@ -159,6 +168,13 @@ const personalinfo = async () => {
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'occupation');
       }
+
+       else if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+
     }
 
   } catch (error) {

@@ -103,6 +103,8 @@ import IFSC from '~/components/NKYC_Forms/bankdetails/bankinputs/ifsc.vue'
 import MICR from '~/components/NKYC_Forms/bankdetails/bankinputs/micr.vue'
 import Address from '~/components/NKYC_Forms/bankdetails/bankinputs/address.vue'
 const emit = defineEmits(['updateDiv']);
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
@@ -203,7 +205,7 @@ const getbankaddress = async (ifscval) => {
 const bankvalidation = async () => {
 
   const mydata = await getServerData();
-  const statuscheck = mydata.payload.metaData.bank?.bank1AccNo
+  const statuscheck = mydata?.payload?.metaData?.bank?.bank1AccNo
   if (statuscheck == accno.value) {
     waitingbox.value = false
   }
@@ -251,12 +253,22 @@ const bankvalidation = async () => {
       emit('updateDiv', 'bank4');
 
     }
-    else if (data.payload.status == 'error') {
-       waitingbox.value = false
+    else if (data?.payload?.status == 'error' && data?.payload?.message=='This bank account number and IFSC already exist for another client.') {
+      waitingbox.value = false
       errorbox.value = true
       errormsg.value = data.payload.message
-    
+      isStatusValid.value=false
     }
+    
+      else if( (data?.payload?.status=='error' && data?.payload?.message=='User not found.')||(data?.payload?.status=='error' && data?.payload?.message=='Missing Usertoken parameters.')){
+         alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    
+    
+  
+    
     else {
       emit('updateDiv', 'bank4');
     }
@@ -315,12 +327,16 @@ function back() {
 
   setTimeout(async () => {
     circle.remove()
-
-    const mydata = await pagestatus('nominee')
-    if (mydata.payload.status == 'ok') {
-      emit('updateDiv', 'nominee');
+const page = await pagestatus('nominee')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
     }
-isBack.value = false;
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'nominee');
+      isBack.value = false;
+    }
   }, 600)
 
 }

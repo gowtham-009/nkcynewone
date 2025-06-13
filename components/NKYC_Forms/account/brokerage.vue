@@ -62,7 +62,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const emit = defineEmits(['updateDiv']);
 
 const deviceHeight = ref(0);
@@ -86,11 +87,18 @@ const back = () => {
     circle.style.top = `${y}px`
     button.$el.appendChild(circle)
 
-    setTimeout(() => {
+    setTimeout(async() => {
         circle.remove()
-        pagestatus('segment1')
-        emit('updateDiv', 'segment1');
-        isBack.value = false;
+      const page = await pagestatus('segment1')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'segment1');
+      isBack.value = false;
+    }
     }, 600)
 
 };
@@ -117,29 +125,38 @@ const handleButtonClick = () => {
 
     button.$el.appendChild(circle)
 
-    setTimeout(async () => {
-        circle.remove()
-        const mydata = await getServerData();
-        const statuscheck = mydata.payload.metaData.kraPan.APP_KRA_INFO;
-        const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName
-        if (statuscheck && statuscheck1) {
+   setTimeout(async () => {
+    circle.remove();
+    const mydata = await getServerData();
+  
+    if (mydata?.payload?.status === 'ok') {
+        
+        const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
+        const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
 
-            const mydata = await pagestatus('photosign1')
-            if (mydata.payload.status == 'ok') {
+        if (statuscheck && statuscheck1) {
+            const page = await pagestatus('photosign1');
+            if (page?.payload?.status === 'ok') {
                 emit('updateDiv', 'photosign1');
             }
-
-        }
-        else if (statuscheck && !statuscheck1) {
-            pagestatus('uploadbank'),
-                emit('updateDiv', 'uploadbank');
-        }
-        else if (!statuscheck) {
-            pagestatus('uploadproof'),
-                emit('updateDiv', 'uploadproof');
+        } else if (statuscheck && !statuscheck1) {
+            await pagestatus('uploadbank');
+            emit('updateDiv', 'uploadbank');
+        } else if (!statuscheck) {
+            await pagestatus('uploadproof');
+            emit('updateDiv', 'uploadproof');
         }
 
-isStatusValid.value = false;
-    }, 600)
+    } else if (
+        mydata?.payload?.status === 'error' &&
+        (mydata?.payload?.message === 'User Not Found.' ||
+         mydata?.payload?.message === 'Missing User Token.')
+    ) {
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
+    }
+}, 600);
+
 };
 </script>

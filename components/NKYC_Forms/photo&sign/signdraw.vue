@@ -139,6 +139,8 @@ import Option6 from '~/components/NKYC_Forms/photo&sign/questionoption/radioques
 import Option7 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption7.vue'
 import Option8 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption8.vue'
 
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const question1 = ref('')
 const question2 = ref('')
 const question3 = ref('')
@@ -304,7 +306,6 @@ const getMousePos = (event) => {
 
 onMounted(async () => {
   await getsegmentdata()
- 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -424,6 +425,12 @@ const uploadsign = async () => {
       emit('updateDiv', 'esign');
     }
 
+      else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
+    }
+
   } catch (error) {
     if (timer) clearInterval(timer);
     console.error('Upload failed:', error.message);
@@ -446,11 +453,18 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('photoproceed')
-    emit('updateDiv', 'photoproceed');
-    isBack.value = false;
+  const page = await pagestatus('photoproceed')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'photoproceed');
+      isBack.value = false;
+    }
   }, 600)
 
 }
@@ -566,6 +580,12 @@ const documentsavebtn = async () => {
     if (data.payload.status === 'ok') {
      visible.value=false
     }
+  else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
+    }
+    
   } catch (error) {
   
     console.error(error.message);

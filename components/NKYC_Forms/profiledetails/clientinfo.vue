@@ -55,6 +55,8 @@ import Father from '~/components/NKYC_Forms/profiledetails/profileinputs/father.
 import Mother from '~/components/NKYC_Forms/profiledetails/profileinputs/mother.vue'
 import { ref, onMounted } from 'vue';
 import { pagestatus } from '~/utils/pagestatus.js'
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const { baseurl } = globalurl();
 const emit = defineEmits(['updateDiv']);
 
@@ -129,6 +131,13 @@ const personalinfo = async () => {
         emit('updateDiv', 'qualification');
       }
 
+       else if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+
+
     }
 
   } catch (error) {
@@ -174,11 +183,18 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('info')
-    emit('updateDiv', 'info');
-    isBack.value = false;
+    const page = await pagestatus('info')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'info');
+      isBack.value = false;
+    }
   }, 600)
 
 };

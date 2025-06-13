@@ -7,28 +7,19 @@
     </div>
 
     <!-- Main Content -->
-    <div class="flex justify-between items-center px-2 p-1 flex-col bg-white rounded-t-3xl dark:bg-black"
+    <div class="flex justify-center flex-col items-center  px-2 p-1  bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full p-1"></div>
 
       <!-- GIF -->
       <div class="w-full p-1 flex flex-col justify-center items-center">
         <img :src="gifSrc" alt="Loading animation" class="w-32 h-32" />
+        <p class="text-center text-xl text-gray-500">Thankyou</p>
        
       </div>
 
 
-      <!-- Buttons -->
-      <div class="w-full flex gap-2">
-        <Button ref="rippleBtnback" @click="back" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900 relative overflow-hidden">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" @click="handleButtonClick" ref="rippleBtn"
-          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
-          {{ buttonText }}
-        </Button>
-      </div>
+     
     </div>
 
   
@@ -40,14 +31,11 @@ import { ref, onMounted } from 'vue';
 
 const emit = defineEmits(['updateDiv']);
 const deviceHeight = ref(0);
-const buttonText = ref('Back to Home');
+
 const gifSrc = ref('');
 
-const rippleBtn = ref(null);
-const rippleBtnback = ref(null);
 
 
-const isBack = ref(true);
 
 
 
@@ -65,60 +53,8 @@ onMounted(() => {
 });
 
 
-const createRipple = (event, el) => {
-  const circle = document.createElement('span');
-  circle.classList.add('ripple');
 
-  const rect = el.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
 
-  circle.style.left = `${x}px`;
-  circle.style.top = `${y}px`;
-
-  el.appendChild(circle);
-  setTimeout(() => circle.remove(), 600);
-};
-
-// Button click
-const handleButtonClick = (event) => {
-  createRipple(event, rippleBtn.value.$el);
-  // Logic goes here
-};
-
-// Back button logic
-const back = async (event) => {
-  createRipple(event, rippleBtnback.value.$el);
-
-  setTimeout(async () => {
-    const mydata = await getServerData(); // assume function exists
-    const statuscheck = mydata?.payload?.metaData?.segments;
-
-    if (statuscheck) {
-      const {
-        nseCASH, bseCASH,
-        nseFO, bseFO, nseCOM, bseCOM, MCX,
-        nseCD, nseMF, bseCD, bseMF,
-        MCXcategory, ICEX, mseCD
-      } = statuscheck;
-
-      const onlyCashYes = nseCASH === 'YES' && bseCASH === 'YES' &&
-        ![nseFO, bseFO, nseCOM, bseCOM, MCX, nseCD, bseCD, nseMF, bseMF, MCXcategory, ICEX, mseCD]
-          .includes('YES');
-
-      if (onlyCashYes) {
-        pagestatus('esign'); // assume function exists
-        emit('updateDiv', 'esign');
-      } else {
-        const next = await pagestatus('bankfile');
-        if (next?.payload?.status === 'ok') {
-          emit('updateDiv', 'bankfile');
-        }
-        isBack.value = false;
-      }
-    }
-  }, 600);
-};
 </script>
 
 <style scoped>

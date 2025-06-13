@@ -53,7 +53,8 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 import PAN from '~/components/NKYC_Forms/account/fileuploads/pancard.vue';
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
 const deviceHeight = ref(window.innerHeight);
@@ -162,6 +163,13 @@ const proofupload = async () => {
         emit('updateDiv', 'uploadbank');
       }
     }
+
+     else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')) {
+      
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
   } catch (error) {
     clearInterval(timer);
     console.error('Upload failed:', error.message);
@@ -185,11 +193,18 @@ const back = (event) => {
   circle.style.top = `${y}px`;
   button.$el.appendChild(circle);
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove();
-    pagestatus('brokerage'),
+     const mydata = await pagestatus('brokerage')
+    if (mydata.payload.status == 'ok') {
       emit('updateDiv', 'brokerage');
-      isBack.value = false; 
+    }
+    else if((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+    }
+isBack.value=false
   }, 600);
 };
 

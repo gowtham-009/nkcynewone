@@ -47,7 +47,8 @@ import { ref, onMounted } from 'vue';
 import Bankupload from '~/components/NKYC_Forms/account/fileuploads/bankproof.vue';
 
 const emit = defineEmits(['updateDiv']);
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
@@ -132,11 +133,20 @@ const proofupload = async () => {
 
     const data = await uploadResponse.json();
     if (data.payload.status === 'ok') {
+      
       const mydata = await pagestatus('photosign1');
-      if (mydata.payload.status === 'ok') {
+      if (mydata?.payload?.status === 'ok') {
         emit('updateDiv', 'photosign1');
       }
+
     }
+   
+      else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')) {
+      
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
   } catch (error) {
     console.error(error.message);
   } finally {
@@ -159,7 +169,9 @@ const back = async (event) => {
     circle.remove();
     const mydata = await getServerData();
     const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
-    if (statuscheck) {
+
+    if(mydata.payload.status=='ok'){
+       if (statuscheck) {
       pagestatus('brokerage'),
         emit('updateDiv', 'brokerage');
     } else {
@@ -167,6 +179,13 @@ const back = async (event) => {
         emit('updateDiv', 'uploadproof');
     }
     isBack.value = false;
+    }
+    else if(mydata.payload.status === 'error' &&(mydata.payload.message === 'User Not Found.' || mydata.payload.message === 'Missing User Token.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
+    }
+   
   }, 600);
 };
 

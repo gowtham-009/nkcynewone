@@ -117,7 +117,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { useRoute } from 'vue-router'
+
 import { pagestatus } from '~/utils/pagestatus.js'
 
 
@@ -139,6 +139,7 @@ onMounted(() => {
     });
 });
 
+const router = useRouter();
 
 const handleButtonClick = () => {
     isFormValid.value = false; 
@@ -158,33 +159,40 @@ const handleButtonClick = () => {
     setTimeout(async () => {
         circle.remove()
 
-        const mydata = await getServerData();
-        const statuscheck = mydata?.payload?.metaData?.digi_info
-        if (statuscheck.length == 0) {
+       const mydata = await getServerData();
 
-            const pan = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO
+   
 
-            if(pan){
-                 pagestatus('parmanentaddress')
-                emit('updateDiv', 'parmanentaddress');
-            }
-           else{
-             pagestatus('ekyc')
-            emit('updateDiv', 'ekyc');
-           }
-            
-        }
-        else {
-            pagestatus('parmanentaddress')
-            emit('updateDiv', 'parmanentaddress');
-        }
+if ((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')) {
+  alert('Session has expired, please login.');
+  localStorage.removeItem('userkey')
+  router.push('/')
+  return; // Stop further execution if session expired
+}
+
+const digiInfo = mydata?.payload?.metaData?.digi_info || [];
+const panInfo = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
+
+if (digiInfo.length === 0) {
+  if (panInfo) {
+    pagestatus('parmanentaddress');
+    emit('updateDiv', 'parmanentaddress');
+  } else {
+    pagestatus('ekyc');
+    emit('updateDiv', 'ekyc');
+  }
+} else {
+  pagestatus('parmanentaddress');
+  emit('updateDiv', 'parmanentaddress');
+}
+
 
 
 
     }, 600)
 };
 
-const router = useRouter();
+
 
 function back() {
 
@@ -200,11 +208,19 @@ function back() {
     circle.style.top = `${y}px`
     button.$el.appendChild(circle)
 
-    setTimeout(() => {
+    setTimeout(async() => {
         circle.remove()
-        pagestatus('email')
-        emit('updateDiv', 'email');
+       const page=await pagestatus('email')
+       if((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')){
+             alert('Session has expired, please login.');
+                localStorage.removeItem('userkey')
+                router.push('/')
+       }
+       else if(page.payload.status=='ok'){
+         emit('updateDiv', 'email');
         isBack.value = false;
+       }
+       
     }, 600)
 
 }

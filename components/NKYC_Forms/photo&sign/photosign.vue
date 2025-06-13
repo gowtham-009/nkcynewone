@@ -110,6 +110,8 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Open Camera");
 const isStatusValid = ref(true);
 const isBack = ref(true);
+import { useRouter } from 'vue-router';
+const router = useRouter();
 onMounted(() => {
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
@@ -143,10 +145,11 @@ const back = () => {
         circle.remove()
         const mydata = await getServerData();
 
-        const statuscheck = mydata.payload.metaData.kraPan.APP_KRA_INFO;
-        const statuscheck1 = mydata.payload.metaData.bank.bank1HolderName;
+        const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
+        const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
 
-        if (statuscheck && statuscheck1) {
+        if(mydata.payload.status=='ok'){
+             if (statuscheck && statuscheck1) {
             pagestatus('brokerage')
             emit('updateDiv', 'brokerage');
         }
@@ -163,6 +166,16 @@ const back = () => {
             emit('updateDiv', 'uploadbank');
         }
         isBack.value = false;
+        }
+
+         else if(mydata.payload.status === 'error' &&(mydata.payload.message === 'User Not Found.' || mydata.payload.message === 'Missing User Token.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
+    }
+
+
+       
     }, 600)
 }
 
@@ -184,7 +197,8 @@ const handleButtonClick = () => {
         circle.remove()
         const mydata = await getServerData();
         const statuscheck = mydata?.payload?.metaData?.proofs?.ipvImg || '';
-        if (statuscheck) {
+       if(mydata.payload.status=='ok'){
+         if (statuscheck) {
             pagestatus('photoproceed'),
                 emit('updateDiv', 'photoproceed');
         } else {
@@ -192,6 +206,13 @@ const handleButtonClick = () => {
                 emit('updateDiv', 'takephoto');
         }
 isStatusValid.value = false;
+       }
+
+        else if(mydata.payload.status === 'error' &&(mydata.payload.message === 'User Not Found.' || mydata.payload.message === 'Missing User Token.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
+    }
 
     }, 600)
 };

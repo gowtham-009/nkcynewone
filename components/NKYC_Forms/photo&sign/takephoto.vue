@@ -80,7 +80,8 @@ const longitude = ref(null)
 const timer = ref(30);
 const timerInterval = ref(null);
 const { getLocation, error, isLoaded, coords } = useGeolocation()
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const startCountdown = () => {
   clearInterval(timerInterval.value);
   timer.value = 30;
@@ -196,13 +197,23 @@ const ipvfunction = async () => {
 
     const data = await uploadResponse.json();
 
-    if (data.payload.metaData.is_real === 'true') {
+    if(data.payload.status=='ok'){
+       if (data.payload.metaData.is_real === 'true') {
       pagestatus('photoproceed');
       emit('updateDiv', 'photoproceed');
     } else {
       pagestatus('takephoto');
       emit('updateDiv', 'takephoto');
     }
+    }
+
+    else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
+    }
+
+   
 
   } catch (error) {
     console.error('IPv Upload Failed:', error.message);
@@ -228,11 +239,18 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('photosign1')
-    emit('updateDiv', 'photosign1');
-    isBack.value = false;
+   const page = await pagestatus('photosign1')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'photosign1');
+      isBack.value = false;
+    }
   }, 600)
 
 };

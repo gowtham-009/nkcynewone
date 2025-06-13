@@ -57,7 +57,8 @@
 import { ref, onMounted } from 'vue';
 
 import { pagestatus } from '~/utils/pagestatus.js'
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const { baseurl } = globalurl();
 const deviceHeight = ref(0);
 const buttonText = ref("Next");
@@ -126,11 +127,18 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('clientinfo')
-    emit('updateDiv', 'clientinfo');
-    isBack.value = false;
+    const page = await pagestatus('clientinfo')
+    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+    else if (page.payload.status == 'ok') {
+      emit('updateDiv', 'clientinfo');
+      isBack.value = false;
+    }
   }, 600)
 
 };
@@ -164,6 +172,12 @@ const personalinfo = async () => {
       const data = await response.json()
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'tradingexperience');
+      }
+
+        else if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
+        alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
     }
 

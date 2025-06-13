@@ -77,7 +77,8 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button @click="handleButtonClick" ref="rippleBtn" :disabled="!isStatusValid" class="primary_color text-white w-5/6 py-3 text-xl border-0">
+        <Button @click="handleButtonClick" ref="rippleBtn" :disabled="!isStatusValid"
+          class="primary_color text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
       </div>
@@ -89,7 +90,8 @@
 import { ref, onMounted } from 'vue';
 
 const emit = defineEmits(['updateDiv']);
-
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const bankerror = ref(false)
 const isBack = ref(true);
 const bankname = ref("");
@@ -176,9 +178,6 @@ onMounted(() => {
 
 
 const handleButtonClick = () => {
-
-
-
   const button = rippleBtn.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
@@ -195,13 +194,22 @@ const handleButtonClick = () => {
   setTimeout(async () => {
     circle.remove()
 
-    const mydata = await pagestatus('segment1')
+    const mydata = await pagestatus('bank1')
     if (mydata.payload.status == 'ok') {
       emit('updateDiv', 'segment1');
     }
-isStatusValid.value = false;
+    else if((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+    }
+isStatusValid.value=false
 
-  }, 600)
+    
+
+  },
+
+    600)
 };
 
 
@@ -220,13 +228,20 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove()
-    pagestatus('bank1')
-    emit('updateDiv', 'bank1')
-  },
-  isBack.value = false,
-  600)
+     const mydata = await pagestatus('bank1')
+    if (mydata.payload.status == 'ok') {
+      emit('updateDiv', 'bank1');
+    }
+    else if((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey')
+        router.push('/')
+    }
+isBack.value=false
+},
+    600)
 
 };
 
