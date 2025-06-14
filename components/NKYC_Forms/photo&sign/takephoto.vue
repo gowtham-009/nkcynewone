@@ -168,7 +168,7 @@ const ipvfunction = async () => {
     // Encrypt metadata
     const user = encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
-      pageCode: "ipv",
+      pageCode: "photoproceed",
       location: `${location.latitute},${location.longitude}`,
       country: location.conuntryname
     });

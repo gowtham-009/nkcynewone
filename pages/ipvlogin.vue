@@ -57,6 +57,7 @@ onMounted(() => {
 
 const routeComponents = async (token) => {
   const user = encryptionrequestdata({
+     pageCode:'takephoto',
     userToken: token
   });
 
