@@ -7,7 +7,7 @@
     <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
 
-      <div class="w-full px-2 p-1 mt-1">
+      <div class="w-full px-2 p-1 ">
         <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
           Draw your signature
         </p>
@@ -43,9 +43,24 @@
           <a class="cursor-pointer text-blue-500" @click="additionaldoc" style="text-decoration: underline;">Additional Document</a>
         </div>
 
-        <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
-          <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
-        </div>
+      <div v-if="loading" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
+      {{ syncStatus.icon }} {{ syncStatus.title }}
+    </h2>
+
+    <p class="text-gray-600 dark:text-gray-300 mb-2">
+      {{ syncStatus.message }}
+    </p>
+
+    <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+      <div
+        class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+        :style="{ width: progress + '%' }"
+      >
+        {{ progress.toFixed(2) }}%
+      </div>
+    </div>
+  </div>
 
        
       </div>
@@ -155,7 +170,7 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const canvasRef = ref(null);
 const loading = ref(false)
-const timing = ref(30)
+
 const isStatusValid = ref(true);
 const isBack = ref(true);
 
@@ -166,12 +181,25 @@ const isImageUploaded = ref(false);
 
 const { baseurl } = globalurl();
 
+
+const additionaldocs = async () => {
+
+  const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.additional_docs;
+
+  // Run documentsavebtn only if statuscheck is empty (null, undefined, or empty string/array)
+  if (!statuscheck || (Array.isArray(statuscheck) && statuscheck.length === 0)) {
+    documentsavebtn();
+  }
+};
+
 const getsegmentdata = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
   if (statuscheck) {
     const segments = mydata?.payload?.metaData?.proofs?.signature || '';
     if (segments) {
+      await additionaldocs()
       const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
       const userToken = localStorage.getItem('userkey');
       const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
@@ -199,6 +227,7 @@ const getsegmentdata = async () => {
   }
 
   else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
+    await additionaldocs()
     const segments = mydata?.payload?.metaData?.proofs?.signature || '';
     if (segments) {
       const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
@@ -231,7 +260,7 @@ const getsegmentdata = async () => {
 
 const getsegmentdatadialog = async () => {
   const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.additional_docs || '';
+  const statuscheck = mydata?.payload?.metaData?.additional_docs;
   if (statuscheck) {
     question1.value = mydata?.payload?.metaData?.additional_docs?.documentConsentMode || 'Electronic'
     question2.value = mydata?.payload?.metaData?.additional_docs?.contractNoteMode || 'Electronic'
@@ -252,7 +281,67 @@ const getsegmentdatadialog = async () => {
     question7.value = mydata?.payload?.metaData?.additional_docs?.accountSettlementPreference || 'CDSL'
     question8.value = mydata?.payload?.metaData?.additional_docs?.settlementStatementConsent || 'Once in Quarter'
   }
+
 };
+
+
+const progress = ref(0);
+const progressInterval = ref(null);
+const syncStatus = computed(() => {
+  if (progress.value <= 30) {
+    return {
+     
+      title: 'Syncing',
+      message: 'Saving your bank proof...'
+    };
+  } else if (progress.value <= 80) {
+    return {
+     
+      title: 'Syncing',
+      message: 'Verifying document with SEBI records...'
+    };
+  } else if (progress.value < 100) {
+    return {
+     
+      title: 'Syncing',
+      message: 'Completing your application...'
+    };
+  } else {
+    return {
+     
+      title: 'Syncing',
+      message: 'Documents uploaded successfully!'
+    };
+  }
+});
+
+const startProgressAnimation = () => {
+  progress.value = 0;
+  // Smooth progress animation
+  progressInterval.value = setInterval(() => {
+    if (progress.value < 90) { // Only animate to 90%, rest will complete on API success
+      progress.value += Math.random() * 10;
+      if (progress.value > 90) progress.value = 90;
+    }
+  }, 300);
+};
+
+const completeProgress = () => {
+  clearInterval(progressInterval.value);
+  progress.value = 100;
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
+};
+
+const resetProgress = () => {
+  clearInterval(progressInterval.value);
+  loading.value = false;
+  progress.value = 0;
+};
+
+
+
 const startDrawing = (e) => {
   if (isImageUploaded.value) return;
   isDrawing = true;
@@ -306,6 +395,7 @@ const getMousePos = (event) => {
 
 onMounted(async () => {
   await getsegmentdata()
+ 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -367,23 +457,14 @@ const emit = defineEmits(['updateDiv']);
 
 
 
-const startTimer = () => {
-  timing.value = 30
-  const timer = setInterval(() => {
-    if (timing.value > 0) {
-      timing.value--
-    } else {
-      clearInterval(timer)
-    }
-  }, 1000)
-  return timer
-}
+
 
 const uploadsign = async () => {
   loading.value = true;
+    startProgressAnimation();
   const apiurl = `${baseurl.value}proofFormUpload`;
 
-  let timer; // Declare timer here
+  
 
   try {
     // Fetch the image as a Blob (binary)
@@ -401,7 +482,7 @@ const uploadsign = async () => {
     formData.append('signature', blob, 'signature.jpg'); // Binary file
     formData.append('payload', JSON.stringify({ payload: user }));
 
-    timer = startTimer();
+   
 
     const uploadResponse = await fetch(apiurl, {
       method: 'POST',
@@ -412,7 +493,7 @@ const uploadsign = async () => {
       body: formData,
     });
 
-    clearInterval(timer);
+
 
     if (!uploadResponse.ok) {
       throw new Error(`Network error: ${uploadResponse.status}`);
@@ -421,18 +502,21 @@ const uploadsign = async () => {
     const data = await uploadResponse.json();
 
     if (data.payload.status === 'ok') {
+      completeProgress();
        pagestatus('esign')
       emit('updateDiv', 'esign');
     }
 
       else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')){
-       alert('Session has expired, please login.');
+       resetProgress();
+        alert('Session has expired, please login.');
         localStorage.removeItem('userkey');
         router.push('/');
     }
 
   } catch (error) {
-    if (timer) clearInterval(timer);
+    resetProgress();
+  
     console.error('Upload failed:', error.message);
   } finally {
     loading.value = false;
@@ -531,8 +615,10 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-    uploadsign()
-    isStatusValid.value = false;
+    if (!loading.value && imageSrc.value && isStatusValid.value) {
+      uploadsign();
+      isStatusValid.value = false;
+    }
   }, 600)
 }
 
@@ -548,14 +634,14 @@ const documentsavebtn = async () => {
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "signdraw",
-    documentConsentMode: question1.value,
-    contractNoteMode: question2.value,
-    standardDocsConsent: question3.value,
-    internetTradingOpted: question4.value,
-    pastActionsDetails: question5.value,
-    otherBrokerDetails: question6.value,
-    accountSettlementPreference: question7.value,
-    settlementStatementConsent: question8.value
+    documentConsentMode: question1.value || 'Electronic',
+    contractNoteMode: question2.value || 'Electronic',
+    standardDocsConsent: question3.value || 'Electronic',
+    internetTradingOpted: question4.value || 'Yes',
+    pastActionsDetails: question5.value || 'No',
+    otherBrokerDetails: question6.value || 'No',
+    accountSettlementPreference: question7.value || 'CDSL',
+    settlementStatementConsent: question8.value || 'Once in Quarter'
 
   });
 
@@ -595,7 +681,7 @@ const documentsavebtn = async () => {
 <style>
 .signature-canvas {
   width: 100%;
-  height: 300px;
+  height: 280px;
   border: 1px dashed #ccc;
   touch-action: none;
   background-color: white;

@@ -107,12 +107,25 @@ import { ref, onMounted } from 'vue';
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
-const buttonText = ref("Open Camera");
+const buttonText = ref("");
 const isStatusValid = ref(true);
 const isBack = ref(true);
 import { useRouter } from 'vue-router';
 const router = useRouter();
-onMounted(() => {
+
+const getsegmentdata = async () => {
+     const mydata = await getServerData();
+       const ipv = mydata?.payload?.metaData?.proofs?.ipvImg ;
+       if(ipv){
+        buttonText.value='Next'
+       }
+       else{
+        buttonText.value='Open Camera'
+       }
+
+}
+onMounted(async() => {
+    await getsegmentdata()
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;

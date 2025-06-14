@@ -45,7 +45,7 @@
     </div>
 
     <!-- Instructions -->
-    <div class="instructions text-sm text-center max-w-xs">
+    <!-- <div class="instructions text-sm text-center max-w-xs">
       <p v-if="imageCaptured" class="text-green-500 font-medium">
         ✓ Image captured successfully!
       </p>
@@ -64,7 +64,7 @@
       <p v-else class="text-green-500 font-medium">
         ✓ Perfect! Capturing...
       </p>
-    </div>
+    </div> -->
   </div>
 </template>
 

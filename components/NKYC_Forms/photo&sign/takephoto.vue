@@ -8,40 +8,62 @@
     <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full  px-2 p-1">
-        <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
-          Take a selfie
-        </p>
-        <p class="text-sm text-gray-500 font-normal leading-4">
-          Ensure your face appears clearly within the frame
-        </p>
-
-        <div v-if="loading" class="w-full p-1  rounded-lg bg-blue-50 my-2">
-          <div class="flex items-center justify-center mb-2">
-            <i class="pi pi-spinner pi-spin text-2xl text-blue-500 mr-2"></i>
-            <span class="text-blue-500">Please wait...{{ timer }}</span>
+        <div class="w-full flex">
+          <div class="w-full" >
+            <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
+              Take a selfie
+            </p>
           </div>
-        
-        </div>
-       
-        <div v-if="locationpoint" class=" flex flex-col justify-center  rounded ">
-        <p class="text-gray-500 text-sm">latitude:{{ latitude }} longitude: {{ longitude }}</p>
+          <div class="w-full flex justify-center items-center" >
+             <div v-if="locationpoint" class=" flex flex-col justify-center  rounded ">
+          <p class="text-gray-500 text-sm">{{ latitude.toFixed(4) }} - {{ longitude.toFixed(4) }}</p>
         </div>
 
-        <div  v-if="locationpoint" class="w-full mt-1  flex justify-center flex-col">
+            <div v-if="loading" class="w-full  rounded-lg bg-blue-50 my-2">
+          <div class="flex items-center justify-center mb-1">
+            <i class="pi pi-spinner pi-spin text-xl text-blue-500 mr-2"></i>
+            <span class="text-blue-500 text-sm">Fetching a geolocation...</span>
+          </div>
+        </div>
+
+          </div>
+        </div>
+
+        <p class="text-sm text-gray-500 font-normal leading-4">
+          Ensure your nose is positioned at the center of the
+          cross
+        </p>
+
+    
+
+       
+
+        <div v-if="locationpoint" class="w-full mt-1  flex justify-center flex-col">
           <CMAIDENTIFY @captured="onImageCaptured" />
-          <div class="w-full ">
-          <p class="font-semibold text-gray-500 text-sm leading-4">"Ensure your nose is positioned at the center of the
-            cross (+). Your face should be straight and centered within the frame"</p>
-        </div>
+
 
         </div>
 
-        
 
-       <div v-if="photoprogress" class="w-full p-1 flex justify-center  bg-blue-50 text-blue-500">
-          <p class="text-sm text-blue-500">Please Wait...{{ timer }}</p>
+
+        <div v-if="loadingprogress" class="max-w-md mx-auto p-2 px-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
+            {{ syncStatus.icon }} {{ syncStatus.title }}
+          </h2>
+
+          <p class="text-gray-600 dark:text-gray-300 mb-2">
+            {{ syncStatus.message }}
+          </p>
+
+          <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+            <div
+              class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+              :style="{ width: progress + '%' }">
+              {{ progress.toFixed(2) }}%
+            </div>
+          </div>
         </div>
-       
+
       </div>
 
       <div class="w-full flex gap-2">
@@ -70,30 +92,17 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const imageCaptured = ref(null);
-const loading=ref(true)
+const loading = ref(true)
 const isStatusValid = ref(true);
-const photoprogress = ref(false);
+const loadingprogress = ref(false)
 const isBack = ref(true);
-const locationpoint=ref(false)
+const locationpoint = ref(false)
 const latitude = ref(null)
 const longitude = ref(null)
-const timer = ref(30);
-const timerInterval = ref(null);
+
 const { getLocation, error, isLoaded, coords } = useGeolocation()
 import { useRouter } from 'vue-router';
 const router = useRouter();
-const startCountdown = () => {
-  clearInterval(timerInterval.value);
-  timer.value = 30;
-
-  
-  timerInterval.value = setInterval(() => {
-    timer.value--;
-    if (timer.value <= 0) {
-      clearInterval(timerInterval.value);
-    }
-  }, 1000);
-};
 
 
 
@@ -104,21 +113,21 @@ onMounted(() => {
     deviceHeight.value = window.innerHeight;
   });
   getLocation()
-  startCountdown()
-  
+
+
 
 });
 watch([coords, isLoaded], ([newCoords, loaded]) => {
-  
+
   if (loaded && newCoords.latitude && newCoords.longitude) {
-   
-    loading.value=false
-    locationpoint.value=true
-    latitude.value=newCoords.latitude
-    longitude.value=newCoords.longitude
+
+    loading.value = false
+    locationpoint.value = true
+    latitude.value = newCoords.latitude
+    longitude.value = newCoords.longitude
   }
-  else{
-      getLocation()
+  else {
+    getLocation()
   }
 }, { deep: true });
 
@@ -149,14 +158,67 @@ const getCountry = async () => {
       return geolocation
     }
 
-   
+
   } catch (error) {
     console.error('Error fetching location:', error.message)
   }
 }
 
+
+const progress = ref(0);
+const progressInterval = ref(null);
+const syncStatus = computed(() => {
+  if (progress.value <= 30) {
+    return {
+      title: 'Syncing',
+      message: 'Saving your bank proof...'
+    };
+  } else if (progress.value <= 80) {
+    return {
+      title: 'Syncing',
+      message: 'Verifying document with SEBI records...'
+    };
+  } else if (progress.value < 100) {
+    return {
+      title: 'Syncing',
+      message: 'Completing your application...'
+    };
+  } else {
+    return {
+      title: 'Syncing!',
+      message: 'Documents uploaded successfully!'
+    };
+  }
+});
+
+const startProgressAnimation = () => {
+  progress.value = 0;
+  // Smooth progress animation
+  progressInterval.value = setInterval(() => {
+    if (progress.value < 90) { // Only animate to 90%, rest will complete on API success
+      progress.value += Math.random() * 10;
+      if (progress.value > 90) progress.value = 90;
+    }
+  }, 300);
+};
+
+const completeProgress = () => {
+  clearInterval(progressInterval.value);
+  progress.value = 100;
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
+};
+
+const resetProgress = () => {
+  clearInterval(progressInterval.value);
+  loading.value = false;
+  progress.value = 0;
+};
+
 const ipvfunction = async () => {
-  photoprogress.value = true;
+  loadingprogress.value = true
+  startProgressAnimation();
   const apiurl = `${baseurl.value}ipv`;
   const location = await getCountry();
 
@@ -178,7 +240,7 @@ const ipvfunction = async () => {
     formData.append('ipvImage', blob, 'ipv.jpg'); // Binary image file
     formData.append('payload', JSON.stringify({ payload: user }));
 
-  
+
 
     const uploadResponse = await fetch(apiurl, {
       method: 'POST',
@@ -197,25 +259,28 @@ const ipvfunction = async () => {
 
     const data = await uploadResponse.json();
 
-    if(data.payload.status=='ok'){
-       if (data.payload.metaData.is_real === 'true') {
-      pagestatus('photoproceed');
-      emit('updateDiv', 'photoproceed');
-    } else {
-      pagestatus('takephoto');
-      emit('updateDiv', 'takephoto');
-    }
-    }
-
-    else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')){
-       alert('Session has expired, please login.');
-        localStorage.removeItem('userkey');
-        router.push('/');
+    if (data.payload.status == 'ok') {
+      completeProgress();
+      if (data.payload.metaData.is_real === 'true') {
+        pagestatus('photoproceed');
+        emit('updateDiv', 'photoproceed');
+      } else {
+        pagestatus('takephoto');
+        emit('updateDiv', 'takephoto');
+      }
     }
 
-   
+    else if ((data.payload.status == 'error' && data.payload.message == 'User not found.') || (data.payload.status == 'error' && data.payload.message == 'Missing Usertoken parameters.')) {
+      resetProgress();
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey');
+      router.push('/');
+    }
+
+
 
   } catch (error) {
+    resetProgress();
     console.error('IPv Upload Failed:', error.message);
   }
 };
@@ -238,10 +303,10 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
-   const page = await pagestatus('photosign1')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+    const page = await pagestatus('photosign1')
+    if ((page?.payload?.status == 'error' && page?.payload?.message == 'User Not Found.') || (page?.payload?.status == 'error' && page?.payload?.message == 'Missing Usertoken parameters.')) {
       alert('Session has expired, please login.');
       localStorage.removeItem('userkey')
       router.push('/')
@@ -271,11 +336,12 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
- 
-isStatusValid.value = false;
-     ipvfunction()
-    isStatusValid.value = false;
-  startCountdown()
+
+    if (!loadingprogress.value && imageCaptured.value && isStatusValid.value) {
+      ipvfunction();
+      isStatusValid.value = false;
+    }
+
   }, 600)
 };
 
@@ -286,7 +352,12 @@ isStatusValid.value = false;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

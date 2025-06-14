@@ -18,14 +18,25 @@
             <div class="font-normal text-sm text-gray-500">{{ step.text }}</div>
           </div>
         </div>
+  <div v-if="loadingen" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
+      {{ syncStatus.icon }} {{ syncStatus.title }}
+    </h2>
 
-         <div v-if="loadingen" class="w-full p-1  rounded-lg bg-blue-50 my-2">
-          <div class="flex items-center justify-center mb-2">
-            <i class="pi pi-spinner pi-spin text-2xl text-blue-500 mr-2"></i>
-            <span class="text-blue-500">Esign Generating...</span>
-          </div>
-        
-        </div>
+    <p class="text-gray-600 dark:text-gray-300 mb-2">
+      {{ syncStatus.message }}
+    </p>
+
+    <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+      <div
+        class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+        :style="{ width: progress + '%' }"
+      >
+        {{ progress.toFixed(2) }}%
+      </div>
+    </div>
+  </div>
+
       </div>
 
       
@@ -43,10 +54,26 @@
       </div>
     </div>
 
-    <div v-if="loadingen" class="flex justify-center items-center p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
-      :style="{ height: deviceHeight * 0.92 + 'px' }">
-      <ProgressSpinner />
+   
+       <div v-if="loadingen" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+      {{ syncStatus.icon }} {{ syncStatus.title }}
+    </h2>
+
+    <p class="text-gray-600 dark:text-gray-300 mb-4">
+      {{ syncStatus.message }}
+    </p>
+
+    <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+      <div
+        class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+        :style="{ width: progress + '%' }"
+      >
+        {{ progress.toFixed(2) }}%
+      </div>
     </div>
+  </div>
+
   </div>
 </template>
 
@@ -90,9 +117,66 @@ onMounted(() => {
 });
 
 
+const progress = ref(0);
+const progressInterval = ref(null);
+const syncStatus = computed(() => {
+  if (progress.value <= 30) {
+    return {
+     
+      title: 'Syncing',
+      message: 'Saving your bank proof...'
+    };
+  } else if (progress.value <= 80) {
+    return {
+     
+      title: 'Syncing',
+      message: 'Verifying document with SEBI records...'
+    };
+  } else if (progress.value < 100) {
+    return {
+      
+      title: 'Syncing',
+      message: 'Completing your application...'
+    };
+  } else {
+    return {
+      
+      title: 'Syncing',
+      message: 'Documents uploaded successfully!'
+    };
+  }
+});
+
+const startProgressAnimation = () => {
+  progress.value = 0;
+  // Smooth progress animation
+  progressInterval.value = setInterval(() => {
+    if (progress.value < 90) { // Only animate to 90%, rest will complete on API success
+      progress.value += Math.random() * 10;
+      if (progress.value > 90) progress.value = 90;
+    }
+  }, 300);
+};
+
+const completeProgress = () => {
+  clearInterval(progressInterval.value);
+  progress.value = 100;
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
+};
+
+const resetProgress = () => {
+  clearInterval(progressInterval.value);
+  loading.value = false;
+  progress.value = 0;
+};
+
+
 const createunsignedDocument = async () => {
-    isStatusValid.value=false
+   
   loadingen.value = true
+   startProgressAnimation();
   const apiurl = `${baseurl.value}nkyc_document`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -117,16 +201,19 @@ const createunsignedDocument = async () => {
 
     const data = await response.json();
     if (data.payload.status == 'ok') {
-     createEsign()
+      completeProgress();
+       createEsign()
     }
 
       else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing required parameters.')){
-       alert('Session has expired, please login.');
+     resetProgress();
+        alert('Session has expired, please login.');
         localStorage.removeItem('userkey');
         router.push('/');
     }
 
   } catch (error) {
+    resetProgress();
     console.error(error.message);
   }
 };

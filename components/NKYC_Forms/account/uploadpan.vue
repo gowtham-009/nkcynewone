@@ -28,10 +28,24 @@
             </div>
           </div>
 
-          <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
-            <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
+           <div v-if="loading" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
+      {{ syncStatus.icon }} {{ syncStatus.title }}
+    </h2>
 
-          </div>
+    <p class="text-gray-600 dark:text-gray-300 mb-2">
+      {{ syncStatus.message }}
+    </p>
+
+    <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+      <div
+        class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+        :style="{ width: progress + '%' }"
+      >
+        {{ progress.toFixed(2) }}%
+      </div>
+    </div>
+  </div>
         </div>
       </div>
 
@@ -63,7 +77,7 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const imageSrcpan = ref(null);
 const loading = ref(false)
-const timing = ref(30)
+
 const isStatusValid = ref(true); // Assuming this is set based on some validation logic
 const isBack = ref(true); // Assuming you have some logic to enable/disable back button
 const isImageValid = ref(false)
@@ -94,19 +108,62 @@ const getsegmentdata = async () => {
 
 
 
+const progress = ref(0);
+const progressInterval = ref(null);
+const syncStatus = computed(() => {
+  if (progress.value <= 30) {
+    return {
+     
+      title: 'Syncing',
+      message: 'Saving your bank proof...'
+    };
+  } else if (progress.value <= 80) {
+    return {
+      
+      title: 'Syncing',
+      message: 'Verifying document with SEBI records...'
+    };
+  } else if (progress.value < 100) {
+    return {
+     
+      title: 'Syncing',
+      message: 'Completing your application...'
+    };
+  } else {
+    return {
+     
+      title: 'Syncing',
+      message: 'Documents uploaded successfully!'
+    };
+  }
+});
 
-
-const startTimer = () => {
-  timing.value = 30
-  const timer = setInterval(() => {
-    if (timing.value > 0) {
-      timing.value--
-    } else {
-      clearInterval(timer)
+const startProgressAnimation = () => {
+  progress.value = 0;
+  // Smooth progress animation
+  progressInterval.value = setInterval(() => {
+    if (progress.value < 90) { // Only animate to 90%, rest will complete on API success
+      progress.value += Math.random() * 10;
+      if (progress.value > 90) progress.value = 90;
     }
-  }, 1000)
-  return timer
-}
+  }, 300);
+};
+
+const completeProgress = () => {
+  clearInterval(progressInterval.value);
+  progress.value = 100;
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
+};
+
+const resetProgress = () => {
+  clearInterval(progressInterval.value);
+  loading.value = false;
+  progress.value = 0;
+};
+
+
 const proofupload = async () => {
   if (!imageSrcpan.value) {
     console.error('No image to upload');
@@ -114,6 +171,7 @@ const proofupload = async () => {
   }
 
   loading.value = true;
+   startProgressAnimation();
   const apiurl = `${baseurl.value}proofFormUpload`;
 
   try {
@@ -131,7 +189,7 @@ const proofupload = async () => {
     formData.append('pancard', blob, 'pancard.jpg'); // or 'pancard.pdf' if PDF
     formData.append('payload', JSON.stringify({ payload: encryptedPayload }));
 
-    const timer = startTimer();
+  
 
     const uploadResponse = await fetch(apiurl, {
       method: 'POST',
@@ -142,7 +200,7 @@ const proofupload = async () => {
       body: formData,
     });
 
-    clearInterval(timer);
+
 
     if (!uploadResponse.ok) {
       throw new Error(`Network error: ${uploadResponse.status}`);
@@ -150,6 +208,7 @@ const proofupload = async () => {
 
     const data = await uploadResponse.json();
     if (data.payload.status === 'ok') {
+      completeProgress();
       const mydata = await getServerData();
       const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
 
@@ -165,16 +224,14 @@ const proofupload = async () => {
     }
 
      else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')) {
-      
+       resetProgress();
         alert('Session has expired, please login.');
         localStorage.removeItem('userkey')
         router.push('/')
       }
   } catch (error) {
-    clearInterval(timer);
+      resetProgress();
     console.error('Upload failed:', error.message);
-  } finally {
-    loading.value = false;
   }
 };
 
@@ -223,11 +280,12 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove();
-    proofupload()
-isStatusValid.value = false;
+  if (!loading.value && isImageValid.value && isStatusValid.value) {
+      proofupload();
+      isStatusValid.value = false;
+    }
 
-    // Start the timer when button is clicked
-    startTimer();
+  
   }, 600);
 };
 

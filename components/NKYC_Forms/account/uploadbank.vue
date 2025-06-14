@@ -22,9 +22,25 @@
             </div>
           </div>
 
-          <div v-if="loading" class="w-full p-1 mt-2 bg-blue-50 flex justify-center rounded-lg px-2 py-2">
-            <p class="text-sm text-blue-500">Please Wait...{{ timing }}</p>
-          </div>
+       <div v-if="loading" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
+      {{ syncStatus.icon }} {{ syncStatus.title }}
+    </h2>
+
+    <p class="text-gray-600 dark:text-gray-300 mb-2">
+      {{ syncStatus.message }}
+    </p>
+
+    <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+      <div
+        class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+        :style="{ width: progress + '%' }"
+      >
+        {{ progress.toFixed(2) }}%
+      </div>
+    </div>
+  </div>
+
         </div>
       </div>
 
@@ -55,8 +71,8 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const { baseurl } = globalurl();
 const loading = ref(false)
-const imageSrcbank = ref(null); // format: { src: URL, isPdf: Boolean }
-const timing = ref(30)
+const imageSrcbank = ref(null); 
+
 const isImageValid = ref(false);
 const isStatusValid = ref(true);
 const isBack = ref(true);
@@ -78,81 +94,8 @@ const getsegmentdata = async () => {
 };
 
 
-const startTimer = () => {
-  timing.value = 30
-  const timer = setInterval(() => {
-    if (timing.value > 0) {
-      timing.value--
-    } else {
-      clearInterval(timer)
-    }
-  }, 1000)
-  return timer
-}
 
-const proofupload = async () => {
-  if (!imageSrcbank.value) {
-    console.error('No image to upload');
-    return;
-  }
 
-  loading.value = true;
-  const apiurl = `${baseurl.value}proofFormUpload`;
-
-  try {
-    // Fetch the file as Blob
-    const response = await fetch(imageSrcbank.value.src);
-    const blob = await response.blob();
-
-    // Create FormData
-    const formData = new FormData();
-    formData.append('bank', blob, imageSrcbank.value.isPdf ? 'document.pdf' : 'image.jpg');
-
-    // Add additional JSON metadata (if needed, encrypt and stringify)
-    const metadata = encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
-      pageCode: "photosign1"
-    });
-    formData.append('payload', JSON.stringify({ payload: metadata }));
-
-    const timer = startTimer();
-
-    // Send POST request
-    const uploadResponse = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
-        // DO NOT set Content-Type for multipart/form-data — browser handles it automatically
-      },
-      body: formData
-    });
-
-    clearInterval(timer);
-
-    if (!uploadResponse.ok) throw new Error(`Network error: ${uploadResponse.status}`);
-
-    const data = await uploadResponse.json();
-    if (data.payload.status === 'ok') {
-      
-      const mydata = await pagestatus('photosign1');
-      if (mydata?.payload?.status === 'ok') {
-        emit('updateDiv', 'photosign1');
-      }
-
-    }
-   
-      else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')) {
-      
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
-      }
-  } catch (error) {
-    console.error(error.message);
-  } finally {
-    loading.value = false;
-  }
-};
 
 
 const back = async (event) => {
@@ -189,6 +132,124 @@ const back = async (event) => {
   }, 600);
 };
 
+const progress = ref(0);
+const progressInterval = ref(null);
+const syncStatus = computed(() => {
+  if (progress.value <= 30) {
+    return {
+     
+      title: 'Syncing',
+      message: 'Saving your bank proof...'
+    };
+  } else if (progress.value <= 80) {
+    return {
+   
+      title: 'Syncing',
+      message: 'Verifying document with SEBI records...'
+    };
+  } else if (progress.value < 100) {
+    return {
+    
+      title: 'Syncing',
+      message: 'Completing your application...'
+    };
+  } else {
+    return {
+    
+      title: 'Syncing',
+      message: 'Documents uploaded successfully!'
+    };
+  }
+});
+
+const startProgressAnimation = () => {
+  progress.value = 0;
+  // Smooth progress animation
+  progressInterval.value = setInterval(() => {
+    if (progress.value < 90) { // Only animate to 90%, rest will complete on API success
+      progress.value += Math.random() * 10;
+      if (progress.value > 90) progress.value = 90;
+    }
+  }, 300);
+};
+
+const completeProgress = () => {
+  clearInterval(progressInterval.value);
+  progress.value = 100;
+  setTimeout(() => {
+    loading.value = false;
+  }, 500);
+};
+
+const resetProgress = () => {
+  clearInterval(progressInterval.value);
+  loading.value = false;
+  progress.value = 0;
+};
+
+const proofupload = async () => {
+  if (!imageSrcbank.value) {
+    console.error('No image to upload');
+    return;
+  }
+
+  loading.value = true;
+  startProgressAnimation();
+  const apiurl = `${baseurl.value}proofFormUpload`;
+
+  try {
+    // Fetch the file as Blob
+    const response = await fetch(imageSrcbank.value.src);
+    const blob = await response.blob();
+
+    // Create FormData
+    const formData = new FormData();
+    formData.append('bank', blob, imageSrcbank.value.isPdf ? 'document.pdf' : 'image.jpg');
+
+    // Add metadata
+    const metadata = encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: "photosign1"
+    });
+    formData.append('payload', JSON.stringify({ payload: metadata }));
+
+    // Send POST request
+    const uploadResponse = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+      },
+      body: formData
+    });
+
+    if (!uploadResponse.ok) throw new Error(`Network error: ${uploadResponse.status}`);
+
+    const data = await uploadResponse.json();
+    
+    if (data.payload.status === 'ok') {
+      completeProgress();
+      const mydata = await pagestatus('photosign1');
+      if (mydata?.payload?.status === 'ok') {
+        emit('updateDiv', 'photosign1');
+      }
+    } else if (data.payload.status === 'error' && 
+              (data.payload.message === 'User not found.' || 
+               data.payload.message === 'Missing Usertoken parameters.')) {
+      resetProgress();
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey');
+      router.push('/');
+    } else {
+      resetProgress();
+      alert('Upload failed: ' + (data.payload.message || 'Unknown error'));
+    }
+  } catch (error) {
+    resetProgress();
+    console.error('Upload error:', error);
+    alert('An error occurred during upload. Please try again.');
+  }
+};
+
 const handleButtonClick = (event) => {
   const button = rippleBtn.value;
   const circle = document.createElement('span');
@@ -201,8 +262,10 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove();
-    proofupload();
-    isStatusValid.value = false;
+    if (!loading.value && imageSrcbank.value && isImageValid.value && isStatusValid.value) {
+      proofupload();
+      isStatusValid.value = false;
+    }
   }, 600);
 };
 
