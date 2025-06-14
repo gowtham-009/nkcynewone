@@ -162,13 +162,13 @@ const completeProgress = () => {
   clearInterval(progressInterval.value);
   progress.value = 100;
   setTimeout(() => {
-    loading.value = false;
+    loadingen.value = false;
   }, 500);
 };
 
 const resetProgress = () => {
   clearInterval(progressInterval.value);
-  loading.value = false;
+  loadingen.value = false;
   progress.value = 0;
 };
 
@@ -344,8 +344,10 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-   createunsignedDocument()
-    isStatusValid.value = false;
+  if (!loadingen.value ) {
+      createunsignedDocument();
+      isStatusValid.value = false;
+    }
   }, 600)
 }
 

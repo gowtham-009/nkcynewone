@@ -20,7 +20,7 @@
         </div>
 
             <div v-if="loading" class="w-full  rounded-lg bg-blue-50 ">
-          <div class="flex items-center justify-center">
+          <div class="flex items-center gap-2 justify-center">
             <i class="pi pi-spinner pi-spin text-xl text-blue-500 "></i>
             <span class="text-blue-500 text-sm">Fetching...</span>
           </div>
@@ -206,13 +206,13 @@ const completeProgress = () => {
   clearInterval(progressInterval.value);
   progress.value = 100;
   setTimeout(() => {
-    loading.value = false;
+    loadingprogress.value = false;
   }, 500);
 };
 
 const resetProgress = () => {
   clearInterval(progressInterval.value);
-  loading.value = false;
+  loadingprogress.value = false;
   progress.value = 0;
 };
 

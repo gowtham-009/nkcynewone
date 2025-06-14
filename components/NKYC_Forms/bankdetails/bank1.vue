@@ -63,10 +63,24 @@
             <p class=" text-sm text-red-600 leading-4 text-center">{{ errormsg }}</p>
           </div>
 
-          <div v-if="waitingbox" class="w-full px-2 py-2 mt-1 rounded-lg bg-blue-50">
-            <p class=" text-sm text-blue-600 leading-4 text-center">Please wait. We're depositing ₹1 to your account to
-              verify your bank details</p>
-          </div>
+           <div v-if="waitingbox" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
+      {{ syncStatus.icon }} {{ syncStatus.title }}
+    </h2>
+
+    <p class="text-gray-600 dark:text-gray-300 mb-2">
+      {{ syncStatus.message }}
+    </p>
+
+    <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+      <div
+        class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+        :style="{ width: progress + '%' }"
+      >
+        {{ progress.toFixed(2) }}%
+      </div>
+    </div>
+  </div>
 
         </div>
       </div>
@@ -173,6 +187,61 @@ watch(ifsc, (newIfsc) => {
 });
 
 
+const progress = ref(0);
+const progressInterval = ref(null);
+const syncStatus = computed(() => {
+  if (progress.value <= 30) {
+    return {
+     
+      title: 'Syncing',
+      message: 'Saving your bank proof...'
+    };
+  } else if (progress.value <= 80) {
+    return {
+      
+      title: 'Syncing',
+      message: 'Verifying document with SEBI records...'
+    };
+  } else if (progress.value < 100) {
+    return {
+     
+      title: 'Syncing',
+      message: 'Completing your application...'
+    };
+  } else {
+    return {
+     
+      title: 'Syncing',
+      message: 'Documents uploaded successfully!'
+    };
+  }
+});
+
+const startProgressAnimation = () => {
+  progress.value = 0;
+  // Smooth progress animation
+  progressInterval.value = setInterval(() => {
+    if (progress.value < 90) { // Only animate to 90%, rest will complete on API success
+      progress.value += Math.random() * 10;
+      if (progress.value > 90) progress.value = 90;
+    }
+  }, 300);
+};
+
+const completeProgress = () => {
+  clearInterval(progressInterval.value);
+  progress.value = 100;
+  setTimeout(() => {
+    waitingbox.value = false;
+  }, 500);
+};
+
+const resetProgress = () => {
+  clearInterval(progressInterval.value);
+  waitingbox.value = false;
+  progress.value = 0;
+};
+
 
 
 
@@ -212,6 +281,7 @@ const bankvalidation = async () => {
   else {
 
     waitingbox.value = true
+    startProgressAnimation();
     errorbox.value = false
   }
 
@@ -250,10 +320,12 @@ const bankvalidation = async () => {
 
     if (data?.payload?.metaData?.bankVerifyStatus == 1) {
       errorbox.value = false
+       completeProgress();
       emit('updateDiv', 'bank4');
 
     }
     else if (data?.payload?.status == 'error' && data?.payload?.message=='This bank account number and IFSC already exist for another client.') {
+     resetProgress();
       waitingbox.value = false
       errorbox.value = true
       errormsg.value = data.payload.message
@@ -261,7 +333,8 @@ const bankvalidation = async () => {
     }
     
       else if( (data?.payload?.status=='error' && data?.payload?.message=='User not found.')||(data?.payload?.status=='error' && data?.payload?.message=='Missing Usertoken parameters.')){
-         alert('Session has expired, please login.');
+       resetProgress();
+        alert('Session has expired, please login.');
         localStorage.removeItem('userkey')
         router.push('/')
       }
@@ -270,11 +343,13 @@ const bankvalidation = async () => {
   
     
     else {
+      completeProgress();
       emit('updateDiv', 'bank4');
     }
 
 
   } catch (error) {
+    resetProgress();
     console.error('Error:', error);
     waitingbox.value = false
   }
@@ -305,8 +380,10 @@ const handleButtonClick = () => {
 
 
 
-    bankvalidation()
-    isStatusValid.value = false;
+   if (!waitingbox.value ) {
+      bankvalidation();
+      isStatusValid.value = false;
+    }
   }, 600)
 };
 
