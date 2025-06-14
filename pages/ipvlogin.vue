@@ -32,9 +32,19 @@ onMounted(() => {
 
   if (isBase64(value)) {
     const decoded = atob(value);
-    console.log('✅ This is base64. Decoded value:', decoded);
+
+    // Check if decoded value is a number
+    const decodedNumber = Number(decoded);
+
+    if (!isNaN(decodedNumber)) {
+      console.log('✅ Base64 Value:', value);
+      console.log('🔢 Decoded Number:', decodedNumber);
+    } else {
+      console.log('✅ Base64 Value:', value);
+      console.log('🔤 Decoded String:', decoded);
+    }
   } else {
-    console.log('❌ Not a base64 value:', value);
+    console.log('❌ Not a Base64 value:', value);
   }
 });
 
