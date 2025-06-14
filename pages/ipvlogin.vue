@@ -7,8 +7,9 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, useRouter} from 'vue';
 const { baseurl } = globalurl();
+
 onMounted(() => {
   const queryString = window.location.search; // e.g. "?NDUw"
   console.log('vj', queryString);
@@ -75,10 +76,10 @@ const routeComponents = async (token) => {
     }
 
     const data = await response.json();
-    console.log("lklk:",data)
+  
     if(data.payload.status=='ok' && data.payload.message=='IPV Login Successfull.'){
-        alert('hii')
         localStorage.setItem('userkey',data.payload.metaData.token)
+        window.location.href='https://nkcynewone.vercel.app/'
     }
       
   } catch (error) {
