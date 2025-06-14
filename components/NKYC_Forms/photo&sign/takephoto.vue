@@ -14,13 +14,13 @@
               Take a selfie
             </p>
           </div>
-          <div class="w-full " >
-             <div v-if="locationpoint">
+          <div class="w-full flex justify-center items-center" >
+             <div v-if="locationpoint" class=" flex flex-col justify-center  rounded ">
           <p class="text-gray-500 text-sm">{{ latitude.toFixed(4) }} - {{ longitude.toFixed(4) }}</p>
         </div>
 
             <div v-if="loading" class="w-full  rounded-lg bg-blue-50 my-2">
-          <div class="flex items-center justify-center">
+          <div class="flex items-center justify-center mb-1">
             <i class="pi pi-spinner pi-spin text-xl text-blue-500 mr-2"></i>
             <span class="text-blue-500 text-sm">Fetching a geolocation...</span>
           </div>
