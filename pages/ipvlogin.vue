@@ -1,13 +1,16 @@
 <template>
-  <div>
+  <div class="h-screen w-full flex justify-center items-center">
    
+    <div class="card flex justify-center">
+        <ProgressSpinner />
+    </div>
 
   
   </div>
 </template>
 
 <script setup>
-import { onMounted, useRouter} from 'vue';
+import { onMounted} from 'vue';
 const { baseurl } = globalurl();
 
 onMounted(() => {
