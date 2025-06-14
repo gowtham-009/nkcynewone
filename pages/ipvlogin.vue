@@ -84,7 +84,11 @@ const routeComponents = async (token) => {
     if(data.payload.status=='ok' && data.payload.message=='IPV Login Successfull.'){
         localStorage.setItem('userkey',data.payload.metaData.token)
         if(data.payload.metaData.token){
-              window.location.href='https://nkcynewone.vercel.app/'
+            const page=await pagestatus('takephoto') 
+            if(page.payload.status=='ok'){
+                 window.location.href='https://nkcynewone.vercel.app'
+            }
+             
         }
       
         

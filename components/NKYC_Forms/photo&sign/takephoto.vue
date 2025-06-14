@@ -223,7 +223,6 @@ const ipvfunction = async () => {
 
 const onImageCaptured = (imageData) => {
   imageCaptured.value = imageData
-
 }
 
 const back = () => {
