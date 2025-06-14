@@ -344,7 +344,7 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-  if (!loadingen.value ) {
+  if (!loadingen.value && isStatusValid.value) {
       createunsignedDocument();
       isStatusValid.value = false;
     }

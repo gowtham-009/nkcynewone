@@ -380,7 +380,7 @@ const handleButtonClick = () => {
 
 
 
-   if (!waitingbox.value ) {
+   if (!waitingbox.value && isStatusValid.value ) {
       bankvalidation();
       isStatusValid.value = false;
     }
