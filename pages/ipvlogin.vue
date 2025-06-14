@@ -12,7 +12,7 @@
 <script setup>
 import { onMounted} from 'vue';
 const { baseurl } = globalurl();
-const { getLocation, error, isLoaded, coords } = useGeolocation()
+
 
 onMounted(() => {
   const queryString = window.location.search; // e.g. "?NDUw"
@@ -85,7 +85,7 @@ const routeComponents = async (token) => {
     if(data.payload.status=='ok' && data.payload.message=='IPV Login Successfull.'){
         localStorage.setItem('userkey',data.payload.metaData.token)
         if(data.payload.metaData.token){
-            getLocation()
+           
             const page=await pagestatus('takephoto') 
             if(page.payload.status=='ok'){
                  window.location.href='https://nkcynewone.vercel.app'

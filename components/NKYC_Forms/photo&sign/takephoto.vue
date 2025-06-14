@@ -108,12 +108,13 @@ const router = useRouter();
 
 
 onMounted(() => {
+  getLocation()
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
-  getLocation()
-
+  
 
 
 });
