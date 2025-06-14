@@ -75,6 +75,9 @@ const routeComponents = async (token) => {
     }
 
     const data = await response.json();
+    if(data.payload.status=='ok' && data.payload.messag=='IPV Login Successfull.'){
+        localStorage.setItem('userkey',data.payload.metaData.token)
+    }
       
   } catch (error) {
     console.error("Error saving nominee:", error.message);
