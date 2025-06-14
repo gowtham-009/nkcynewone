@@ -455,9 +455,6 @@ const emit = defineEmits(['updateDiv']);
 
 
 
-
-
-
 const uploadsign = async () => {
   loading.value = true;
     startProgressAnimation();

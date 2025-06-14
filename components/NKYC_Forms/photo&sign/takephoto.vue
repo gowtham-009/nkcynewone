@@ -20,7 +20,7 @@
         </div>
 
             <div v-if="loading" class="w-full  rounded-lg bg-blue-50 ">
-          <div class="flex items-center gap-2 justify-center">
+          <div class="flex items-center gap-2 p-1 justify-center">
             <i class="pi pi-spinner pi-spin text-xl text-blue-500 "></i>
             <span class="text-blue-500 text-sm">Fetching...</span>
           </div>
