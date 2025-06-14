@@ -1,21 +1,18 @@
 <template>
   <div class="h-screen w-full flex justify-center items-center">
-   
     <div class="card flex justify-center">
-        <ProgressSpinner />
+      <ProgressSpinner />
     </div>
-
-  
   </div>
 </template>
 
 <script setup>
-import { onMounted} from 'vue';
+import { onMounted } from 'vue';
 const { baseurl } = globalurl();
+const { getLocation, error, isLoaded, coords } = useGeolocation()
 
-
-onMounted(() => {
-  const queryString = window.location.search; // e.g. "?NDUw"
+onMounted(async () => {
+  const queryString = window.location.search;
   console.log('vj', queryString);
 
   // Remove "?" from the beginning
@@ -37,14 +34,12 @@ onMounted(() => {
 
   if (isBase64(value)) {
     const decoded = atob(value);
-
-    // Check if decoded value is a number
     const decodedNumber = Number(decoded);
 
     if (!isNaN(decodedNumber)) {
       console.log('✅ Base64 Value:', value);
       console.log('🔢 Decoded Number:', decodedNumber);
-      routeComponents(value)
+      await routeComponents(value);
     } else {
       console.log('✅ Base64 Value:', value);
       console.log('🔤 Decoded String:', decoded);
@@ -54,11 +49,38 @@ onMounted(() => {
   }
 });
 
+const checkGeolocation = () => {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve(false);
+      return;
+    }
 
+    navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+      if (result.state === 'granted') {
+        resolve(true);
+      } else if (result.state === 'prompt') {
+        // If permission is prompt, we'll try to get the location
+        navigator.geolocation.getCurrentPosition(
+          () => resolve(true),
+          () => resolve(false)
+        );
+      } else {
+        resolve(false);
+      }
+    }).catch(() => {
+      // Fallback for browsers that don't support permissions API
+      navigator.geolocation.getCurrentPosition(
+        () => resolve(true),
+        () => resolve(false)
+      );
+    });
+  });
+};
 
 const routeComponents = async (token) => {
   const user = encryptionrequestdata({
-     pageCode:'takephoto',
+    pageCode: 'takephoto',
     userToken: token
   });
 
@@ -82,24 +104,24 @@ const routeComponents = async (token) => {
 
     const data = await response.json();
   
-    if(data.payload.status=='ok' && data.payload.message=='IPV Login Successfull.'){
-        localStorage.setItem('userkey',data.payload.metaData.token)
-        if(data.payload.metaData.token){
-           
-            const page=await pagestatus('takephoto') 
-            if(page.payload.status=='ok'){
-                 window.location.href='https://nkcynewone.vercel.app'
-            }
-             
+    if(data.payload.status === 'ok' && data.payload.message === 'IPV Login Successfull.') {
+      localStorage.setItem('userkey', data.payload.metaData.token);
+      if(data.payload.metaData.token) {
+        const page = await pagestatus('takephoto');
+        if(page.payload.status === 'ok') {
+          // Check geolocation permission before redirecting
+          const hasGeolocation = await checkGeolocation();
+          if (hasGeolocation) {
+            window.location.href = 'https://nkcynewone.vercel.app';
+          } else {
+            alert('Please enable location services to continue');
+            // You might want to handle this case differently
+          }
         }
-      
-        
+      }
     }
-      
   } catch (error) {
     console.error("Error saving nominee:", error.message);
- 
   }
 };
-
 </script>
