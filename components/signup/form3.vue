@@ -153,7 +153,6 @@ watch(isValidEmail, (newValue) => {
     
     erroremail.value = false
   } else {
-   
     isStatusValid.value=true
     isSending.value = false
     buttonText.value = "Next"

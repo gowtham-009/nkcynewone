@@ -111,7 +111,7 @@ onMounted(() => {
 watch([coords, isLoaded], ([newCoords, loaded]) => {
   
   if (loaded && newCoords.latitude && newCoords.longitude) {
-    console.log("Location enabled:", newCoords);
+   
     loading.value=false
     locationpoint.value=true
     latitude.value=newCoords.latitude
@@ -149,7 +149,7 @@ const getCountry = async () => {
       return geolocation
     }
 
-    console.log('Reverse Geocoding Data:', data)
+   
   } catch (error) {
     console.error('Error fetching location:', error.message)
   }

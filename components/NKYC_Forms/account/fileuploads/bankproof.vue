@@ -67,7 +67,7 @@ watch(
     if (val && typeof val === 'object') {
       localSrc.value = val.src
       isPdf.value = val.isPdf
-      console.log('Initial load:', isPdf.value)
+    
     } else {
       localSrc.value = ''
       isPdf.value = false
