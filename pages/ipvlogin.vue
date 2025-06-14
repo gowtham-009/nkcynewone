@@ -1,21 +1,21 @@
 <template>
   <div class="h-screen w-full flex justify-center items-center">
-   
     <div class="card flex justify-center">
-        <ProgressSpinner />
+      <ProgressSpinner />
     </div>
-
-  
   </div>
 </template>
 
 <script setup>
-import { onMounted} from 'vue';
+import { onMounted, ref } from 'vue';
 const { baseurl } = globalurl();
 const { getLocation, error, isLoaded, coords } = useGeolocation()
 
-onMounted(() => {
-  const queryString = window.location.search; // e.g. "?NDUw"
+const loading = ref(true);
+const locationObtained = ref(false);
+
+onMounted(async () => {
+  const queryString = window.location.search;
   console.log('vj', queryString);
 
   // Remove "?" from the beginning
@@ -28,7 +28,7 @@ onMounted(() => {
       if (!str || str.length % 4 !== 0) return false;
       const base64Regex = /^[A-Za-z0-9+/]+={0,2}$/;
       if (!base64Regex.test(str)) return false;
-      atob(str); // Try decoding
+      atob(str);
       return true;
     } catch (e) {
       return false;
@@ -37,28 +37,25 @@ onMounted(() => {
 
   if (isBase64(value)) {
     const decoded = atob(value);
-
-    // Check if decoded value is a number
     const decodedNumber = Number(decoded);
 
     if (!isNaN(decodedNumber)) {
       console.log('✅ Base64 Value:', value);
       console.log('🔢 Decoded Number:', decodedNumber);
-      routeComponents(value)
+      await routeComponents(value);
     } else {
       console.log('✅ Base64 Value:', value);
       console.log('🔤 Decoded String:', decoded);
     }
   } else {
     console.log('❌ Not a Base64 value:', value);
+    loading.value = false;
   }
 });
 
-
-
 const routeComponents = async (token) => {
   const user = encryptionrequestdata({
-     pageCode:'takephoto',
+    pageCode: 'takephoto',
     userToken: token
   });
 
@@ -82,24 +79,31 @@ const routeComponents = async (token) => {
 
     const data = await response.json();
   
-    if(data.payload.status=='ok' && data.payload.message=='IPV Login Successfull.'){
-        localStorage.setItem('userkey',data.payload.metaData.token)
-        if(data.payload.metaData.token){
-            getLocation()
-            const page=await pagestatus('takephoto') 
-            if(page.payload.status=='ok'){
-                 window.location.href='https://nkcynewone.vercel.app'
-            }
-             
+    if(data.payload.status === 'ok' && data.payload.message === 'IPV Login Successfull.'){
+      localStorage.setItem('userkey', data.payload.metaData.token);
+      if(data.payload.metaData.token){
+        try {
+          // Get location and wait for it to complete
+          await getLocation();
+          locationObtained.value = true;
+          
+          const page = await pagestatus('takephoto');
+          if(page.payload.status === 'ok'){
+            window.location.href = 'https://nkcynewone.vercel.app';
+          }
+        } catch (err) {
+          console.error("Error getting location:", err);
+          // Handle location error (maybe proceed anyway or show error)
+          const page = await pagestatus('takephoto');
+          if(page.payload.status === 'ok'){
+            window.location.href = 'https://nkcynewone.vercel.app';
+          }
         }
-      
-        
+      }
     }
-      
   } catch (error) {
     console.error("Error saving nominee:", error.message);
- 
+    loading.value = false;
   }
 };
-
 </script>
