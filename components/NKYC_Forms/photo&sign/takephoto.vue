@@ -19,10 +19,10 @@
           <p class="text-gray-500 text-sm">{{ latitude.toFixed(4) }} - {{ longitude.toFixed(4) }}</p>
         </div>
 
-            <div v-if="loading" class="w-full  rounded-lg bg-blue-50 my-2">
-          <div class="flex items-center justify-center mb-1">
-            <i class="pi pi-spinner pi-spin text-xl text-blue-500 mr-2"></i>
-            <span class="text-blue-500 text-sm">Fetching a geolocation...</span>
+            <div v-if="loading" class="w-full  rounded-lg bg-blue-50 ">
+          <div class="flex items-center justify-center">
+            <i class="pi pi-spinner pi-spin text-xl text-blue-500 "></i>
+            <span class="text-blue-500 text-sm">Fetching...</span>
           </div>
         </div>
 
