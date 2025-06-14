@@ -15,5 +15,8 @@ const loc=()=>{
 getLocation();
 }
 
+onMounted(() => {
+  loc()
+})
 
 </script>
