@@ -16,9 +16,8 @@
         </p>
         <div class="w-full mt-1 rounded-lg   bg-blue-50 dark:bg-slate-900">
                   
-
-                    <div class="w-full flex items-center  gap-2 mt-1 ">
-                        <div class="p-2">
+                    <div class="w-full flex items-center  gap-2 ">
+                        <div class="p-1">
                             <p class="text-gray-500 leading-5 font-normal text-sm">
                                 Choose the option to upload an image of your signature for accuracy.
                             </p>
@@ -681,7 +680,7 @@ const documentsavebtn = async () => {
 <style>
 .signature-canvas {
   width: 100%;
-  height: 280px;
+  height: 270px;
   border: 1px dashed #ccc;
   touch-action: none;
   background-color: white;
