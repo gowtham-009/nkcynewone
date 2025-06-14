@@ -3,7 +3,7 @@
   <div class="input-wrapper dark:!bg-gray-800">
     <InputText
       id="email"
-      class="prime-input w-full border-2  dark:!bg-gray-800" 
+      class="prime-input w-full border-2  dark:!bg-gray-800"  
       v-model="email"
      
       variant="filled"

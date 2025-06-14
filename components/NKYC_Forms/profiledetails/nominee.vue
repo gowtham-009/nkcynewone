@@ -468,11 +468,35 @@ const isSaveDisabled = computed(() => {
 const dialogbox = (editdata) => {
   let formattedDOB = '';
 
+  // Handle date formatting more robustly
   if (editdata.dob) {
+    // Check if date is already in ISO format (YYYY-MM-DD)
     const isoDateMatch = editdata.dob.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    
+    // Check if date is in DD/MM/YYYY format
+    const slashDateMatch = editdata.dob.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+    
     if (isoDateMatch) {
       const [, year, month, day] = isoDateMatch;
       formattedDOB = `${day}/${month}/${year}`;
+    } 
+    else if (slashDateMatch) {
+      // If already in DD/MM/YYYY format, use as is
+      formattedDOB = editdata.dob;
+    }
+    else {
+      // Fallback - try to parse as Date object
+      try {
+        const dateObj = new Date(editdata.dob);
+        if (!isNaN(dateObj.getTime())) {
+          const day = String(dateObj.getDate()).padStart(2, '0');
+          const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+          const year = dateObj.getFullYear();
+          formattedDOB = `${day}/${month}/${year}`;
+        }
+      } catch (e) {
+        console.error("Error parsing date:", e);
+      }
     }
   }
 
@@ -480,12 +504,9 @@ const dialogbox = (editdata) => {
   idval.value = editdata.id;
   name.value = editdata.name;
 
-
   selectedStatement.value = statementOptions.value.find(
     option => option.value === editdata.relation || option.name === editdata.relation
-  ) || statementOptions.value[0]; // Fallback to first option if not found
-
-
+  ) || statementOptions.value[0];
 
   dob.value = formattedDOB;
   address.value = editdata.address;
@@ -493,13 +514,11 @@ const dialogbox = (editdata) => {
   email.value = editdata.email;
   selected.value = editdata.idType;
 
-
-   if(selected.value === 'PAN') {
+  if(selected.value === 'PAN') {
     pan.value = true;
     aadhar.value = false;
     drivingLicence.value = false;
-   paninput.value=editdata.idNo
-    // Reset other validations
+    paninput.value = editdata.idNo;
     isAadharValid.value = false;
     isDrivingLicenceValid.value = false;
   }
@@ -507,8 +526,7 @@ const dialogbox = (editdata) => {
     pan.value = false;
     aadhar.value = true;
     drivingLicence.value = false;
-    aadharinput.value =editdata.idNo
-    // Reset other validations
+    aadharinput.value = editdata.idNo;
     isPanValid.value = false;
     isDrivingLicenceValid.value = false;
   }
@@ -516,73 +534,114 @@ const dialogbox = (editdata) => {
     pan.value = false;
     aadhar.value = false;
     drivingLicence.value = true;
-    drivinginput.value=editdata.idNo
-    // Reset other validations
+    drivinginput.value = editdata.idNo;
     isPanValid.value = false;
     isAadharValid.value = false;
   }
 
-
-
   guardian.value = editdata.guardian;
   shareval.value = editdata.share;
-  prooftype.value = editdata.idType ;
+  prooftype.value = editdata.idType;
 };
-
 
 const nomineesavedata = async () => {
   visible.value = true;
 
+  // Validate maximum nominees
   if (!idval.value && nomineeCount.value >= 10) {
     alert("Maximum of 10 nominees allowed.");
     visible.value = false;
     return;
   }
 
-  const date = new Date(dob.value);
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-based
-  const dd = String(date.getDate()).padStart(2, '0');
-
-  const formattedDate = `${yyyy}-${mm}-${dd}`;
-
-
-
-
-
-  const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
-  const relationship = selectedStatement.value.name;
-
-
-
-  const user = encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: "nominee",
-    nomineeName: name.value,
-    nomineeRelation: relationship,
-    nomineeAddress: address.value,
-    nomineeMobile: mobileNo.value,
-    nomineeEmail: email.value,
-    nomineeIdType: selected.value,
-    nomineeIdNo: paninput.value || aadharinput.value || drivinginput.value,
-    nomineeDob: formattedDate,
-    nomineeGuardianName: guardian.value,
-    nomineeShare: shareval.value,
-    nomineeId: nomineeId,
-  });
-
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-  const apiurl = `${baseurl.value}nominee`;
-
   try {
+    // Validate required fields
+    if (!name.value || !selectedStatement.value || !dob.value || !address.value || 
+        !mobileNo.value || !email.value || !selected.value || !shareval.value) {
+      throw new Error("Please fill all required fields");
+    }
+
+    // Parse date
+    let formattedDate = '';
+    const dateMatch = dob.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    
+    if (dateMatch) {
+      // DD/MM/YYYY format
+      const [, day, month, year] = dateMatch;
+      formattedDate = `${year}-${month}-${day}`;
+      
+      // Validate date
+      const dateObj = new Date(`${year}-${month}-${day}`);
+      if (isNaN(dateObj.getTime())) {
+        throw new Error("Invalid date");
+      }
+    } else {
+      // Try parsing as Date object
+      const dateObj = new Date(dob.value);
+      if (isNaN(dateObj.getTime())) {
+        throw new Error("Please enter date in DD/MM/YYYY format");
+      }
+      const yyyy = dateObj.getFullYear();
+      const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const dd = String(dateObj.getDate()).padStart(2, '0');
+      formattedDate = `${yyyy}-${mm}-${dd}`;
+    }
+
+    // Validate share percentage
+    const share = parseFloat(shareval.value);
+    if (isNaN(share)) {
+      throw new Error("Invalid share percentage");
+    }
+
+    // Prepare request data
+    const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
+    const relationship = selectedStatement.value.name || selectedStatement.value.value;
+    
+    // Get ID number based on selected type
+    let idNumber = '';
+    if (selected.value === 'PAN') {
+      if (!paninput.value || !isPanValid.value) {
+        throw new Error("Please enter a valid PAN number");
+      }
+      idNumber = paninput.value;
+    } else if (selected.value === 'Aadhar Last 4 Digits') {
+      if (!aadharinput.value || !isAadharValid.value) {
+        throw new Error("Please enter last 4 digits of Aadhar");
+      }
+      idNumber = aadharinput.value;
+    } else if (selected.value === 'Driving Licence') {
+      if (!drivinginput.value || !isDrivingLicenceValid.value) {
+        throw new Error("Please enter a valid Driving Licence number");
+      }
+      idNumber = drivinginput.value;
+    }
+
+    const user = encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: "nominee",
+      nomineeName: name.value,
+      nomineeRelation: relationship,
+      nomineeAddress: address.value,
+      nomineeMobile: mobileNo.value,
+      nomineeEmail: email.value,
+      nomineeIdType: selected.value,
+      nomineeIdNo: idNumber,
+      nomineeDob: formattedDate,
+      nomineeGuardianName: guardian.value,
+      nomineeShare: share,
+      nomineeId: nomineeId,
+    });
+
+    const payload = { payload: user };
+    const apiurl = `${baseurl.value}nominee`;
+
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
         'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
         'Content-Type': 'application/json',
       },
-      body: jsonString,
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
@@ -590,24 +649,28 @@ const nomineesavedata = async () => {
     }
 
     const data = await response.json();
-    if (data.payload.status == 'ok') {
+    
+    if (data.payload.status === 'ok') {
       visible.value = false;
-      nomineedetails();
-    }
-
-     else if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
+      await nomineedetails();
+      resetFormFields();
+    } else if (data.payload.status === 'error') {
+      if (data.payload.message === 'User Not Found.' || 
+          data.payload.message === 'Missing Usertoken parameters.') {
         alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
+        localStorage.removeItem('userkey');
+        router.push('/');
+      } else {
+        throw new Error(data.payload.message || "Failed to save nominee");
       }
+    }
 
   } catch (error) {
     console.error("Error saving nominee:", error.message);
+    alert(error.message || "An error occurred while saving nominee");
     visible.value = false;
   }
 };
-
-
 
 const nomineedelete = async (deleteid) => {
 
