@@ -76,6 +76,7 @@ const routeComponents = async (token) => {
 
     const data = await response.json();
     if(data.payload.status=='ok' && data.payload.messag=='IPV Login Successfull.'){
+        alert('hii')
         localStorage.setItem('userkey',data.payload.metaData.token)
     }
       
