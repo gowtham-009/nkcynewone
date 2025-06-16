@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted,onUnmounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import CMAIDENTIFY from '~/components/NKYC_Forms/photo&sign/cameraidentification/cmaidentify.vue';
 const emit = defineEmits(['updateDiv']);
@@ -151,6 +151,15 @@ onMounted(() => {
     }
   }, 5000);
 });
+
+
+onUnmounted(() => {
+  if (locationInterval.value) {
+    clearInterval(locationInterval.value);
+    locationInterval.value = null;
+  }
+});
+
 
 // Methods
 function setupResizeListener() {
