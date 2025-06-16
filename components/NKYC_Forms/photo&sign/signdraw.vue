@@ -185,9 +185,11 @@ const additionaldocs = async () => {
 
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.additional_docs;
+  console.log("jvhdiu",statuscheck)
 
-  // Run documentsavebtn only if statuscheck is empty (null, undefined, or empty string/array)
-  if (!statuscheck || (Array.isArray(statuscheck) && statuscheck.length === 0)) {
+
+  if (statuscheck.length === 0) {
+     alert('h9')
     documentsavebtn();
   }
 };

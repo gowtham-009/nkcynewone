@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col justify-center items-center">
     <div class="camera-wrapper" :class="{
-      'border-blue-400': !readyToCapture && !imageCaptured,
+'border-blue-400': !readyToCapture && !imageCaptured,
       'border-green-500': readyToCapture || imageCaptured,
     }">
       <video ref="video" autoplay playsinline v-if="!imageCaptured && cameraActive" class="camera-video" />
