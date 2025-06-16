@@ -47,9 +47,7 @@
                 <button @click="requestLocation" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
                   <i class="pi pi-refresh mr-1"></i> Try Again
                 </button>
-                <button @click="reloadPage" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm">
-                  <i class="pi pi-replay mr-1"></i> Reload Page
-                </button>
+              
               </div>
             </div>
           </div>
@@ -126,57 +124,32 @@ const showLocationAlert = ref(false);
 const latitude = ref(null);
 const longitude = ref(null);
 const locationCheckTimeout = ref(null);
+const locationInterval = ref(null);
 
 // Camera & Image State
 const imageCaptured = ref(null);
 const cameraError = ref(null);
 const isStatusValid = ref(true);
 
-// Upload State
-const uploadInProgress = ref(false);
-const progress = ref(0);
-const progressInterval = ref(null);
+
+
 
 // Configuration
 const { baseurl } = globalurl();
 
-// Computed Properties
-const canContinue = computed(() => {
-  return imageCaptured.value && isStatusValid.value && locationEnabled.value && !uploadInProgress.value;
-});
 
-const syncStatus = computed(() => {
-  if (progress.value <= 30) {
-    return {
-      icon: 'pi pi-cloud-upload',
-      title: 'Uploading',
-      message: 'Saving your selfie for verification...'
-    };
-  } else if (progress.value <= 80) {
-    return {
-      icon: 'pi pi-shield',
-      title: 'Verifying',
-      message: 'Comparing with government records...'
-    };
-  } else if (progress.value < 100) {
-    return {
-      icon: 'pi pi-cog',
-      title: 'Processing',
-      message: 'Finalizing your application...'
-    };
-  } else {
-    return {
-      icon: 'pi pi-check-circle',
-      title: 'Success!',
-      message: 'Verification completed successfully!'
-    };
-  }
-});
 
-// Lifecycle Hooks
+
 onMounted(() => {
   setupResizeListener();
   checkLocationPermission();
+
+  // 🔁 Start location polling every 5 seconds
+  locationInterval.value = setInterval(() => {
+    if (!locationEnabled.value) {
+      getLocationWithTimeout(true);
+    }
+  }, 5000);
 });
 
 // Methods
@@ -223,28 +196,22 @@ function handlePermissionState(state) {
   }
 }
 
-function getLocationWithTimeout() {
-  // Set timeout for location fetch (5 seconds)
-  locationCheckTimeout.value = setTimeout(() => {
-    if (!locationEnabled.value) {
-      locationLoading.value = false;
-      showLocationAlert.value = true;
-    }
-  }, 5000);
-
-  // Request location
+function getLocationWithTimeout(isRepeated = false) {
   navigator.geolocation.getCurrentPosition(
     (position) => {
-      clearTimeout(locationCheckTimeout.value);
       handleLocationSuccess(position);
+      if (isRepeated && locationInterval.value) {
+        clearInterval(locationInterval.value); // ✅ Stop interval after successful location fetch
+        locationInterval.value = null;
+      }
     },
     (err) => {
-      clearTimeout(locationCheckTimeout.value);
       handleLocationError(err);
     },
     { enableHighAccuracy: true, timeout: 10000 }
   );
 }
+
 
 function handleLocationSuccess(position) {
   latitude.value = position.coords.latitude;
@@ -267,9 +234,7 @@ function requestLocation() {
   getLocationWithTimeout();
 }
 
-function reloadPage() {
-  window.location.reload();
-}
+
 
 function onImageCaptured(imageData) {
   imageCaptured.value = imageData;
