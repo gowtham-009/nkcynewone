@@ -44,27 +44,7 @@
       </div>
     </div>
 
-    <!-- Instructions -->
-    <!-- <div class="instructions text-sm text-center max-w-xs">
-      <p v-if="imageCaptured" class="text-green-500 font-medium">
-        ✓ Image captured successfully!
-      </p>
-      <p v-else-if="multipleFacesDetected" class="text-red-500 font-medium">
-        ❌ Multiple faces detected! Only one face allowed.
-      </p>
-      <p v-else-if="!faceDetected" class="text-red-500">
-        ❌ No face detected
-      </p>
-      <p v-else-if="!isFaceCentered" class="text-yellow-500">
-        ⬆️ Center your face in the circle
-      </p>
-      <p v-else-if="faceDistanceScore < 70" class="text-yellow-500">
-        📏 Move slightly closer
-      </p>
-      <p v-else class="text-green-500 font-medium">
-        ✓ Perfect! Capturing...
-      </p>
-    </div> -->
+  
   </div>
 </template>
 

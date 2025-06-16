@@ -1,366 +1,360 @@
 <template>
-  <div class="primary_color">
+  <div class="flex flex-col justify-center items-center">
+    <div class="camera-wrapper" :class="{
+      'border-blue-400': !readyToCapture && !imageCaptured,
+      'border-green-500': readyToCapture || imageCaptured,
+    }">
+      <video ref="video" autoplay playsinline v-if="!imageCaptured && cameraActive" class="camera-video" />
+      <img v-if="imageCaptured" :src="capturedImage" alt="Captured Face" class="camera-image" />
+      <canvas ref="canvas" class="hidden"></canvas>
 
-    <div class="flex justify-between primary_color items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
-      <logo style="width: 40px; height: 40px;" />
-      <profile />
-    </div>
-    <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
-      :style="{ height: deviceHeight * 0.92 + 'px' }">
-      <div class="w-full  px-2 p-1">
-        <div class="w-full flex">
-          <div class="w-full" >
-            <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
-              Take a selfie
-            </p>
-          </div>
-          <div class="w-full flex justify-center items-center" >
-             <div v-if="locationpoint" class=" flex flex-col justify-center  rounded ">
-          <p class="text-gray-500 text-sm">{{ latitude.toFixed(4) }} - {{ longitude.toFixed(4) }}</p>
-        </div>
-
-            <div v-if="loading" class="w-full  rounded-lg bg-blue-50 ">
-          <div class="flex items-center gap-2 p-1 justify-center">
-            <i class="pi pi-spinner pi-spin text-xl text-blue-500 "></i>
-            <span class="text-blue-500 text-sm">Fetching...</span>
-          </div>
-        </div>
-
-          </div>
-        </div>
-
-        <p class="text-sm text-gray-500 font-normal leading-4">
-          Ensure your nose is positioned at the center of the
-          cross
-        </p>
-
-    
-
-       
-
-        <div v-if="locationpoint" class="w-full mt-1  flex justify-center flex-col">
-          <CMAIDENTIFY @captured="onImageCaptured" />
-
-
-        </div>
-
-
-
-        <div v-if="loadingprogress" class="max-w-md mx-auto p-2 px-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
-            {{ syncStatus.icon }} {{ syncStatus.title }}
-          </h2>
-
-          <p class="text-gray-600 dark:text-gray-300 mb-2">
-            {{ syncStatus.message }}
-          </p>
-
-          <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
-            <div
-              class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
-              :style="{ width: progress + '%' }">
-              {{ progress.toFixed(2) }}%
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" :disabled="!imageCaptured || !isStatusValid" ref="rippleBtn" @click="handleButtonClick"
-          class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-          {{ buttonText }}
-        </Button>
+      <div class="center-guide" v-if="!imageCaptured">
+        <div class="crosshair"></div>
+        <div class="distance-ring" :class="{ 'ring-green': readyToCapture }"></div>
+        <div class="axis-line x-axis"></div>
+        <div class="axis-line y-axis"></div>
       </div>
     </div>
 
+    <div class="status-indicators mt-1 text-center">
+      <div>
+        <span class="font-medium">Faces: </span>
+        <span :class="{
+          'text-red-500': faceCount !== 1,
+          'text-green-500': faceCount === 1
+        }">
+          {{ faceCount }}
+          <span v-if="faceCount === 0">❌ (No face)</span>
+          <span v-else-if="faceCount === 1">✅</span>
+          <span v-else>❌ (Only one allowed)</span>
+        </span>
+      </div>
+
+      <div v-if="faceCount === 1">
+        <span class="font-medium">Position: </span>
+        <span :class="{
+          'text-red-500': !isNoseCentered,
+          'text-green-500': isNoseCentered
+        }">
+          {{ nosePositionStatus }}
+        </span>
+      </div>
+
+      <div v-if="faceCount === 1">
+        <span class="font-medium">Distance: </span>
+        <span :class="{
+          'text-red-500': distanceScore < 65,
+          'text-yellow-500': distanceScore >= 65 && distanceScore < 80,
+          'text-green-500': distanceScore >= 80
+        }">
+          {{ distanceScore.toFixed(0) }}%
+          <span v-if="distanceScore >= 65 && distanceScore < 80">👌 (Good distance)</span>
+          <span v-else-if="distanceScore >= 80">👍 (Perfect)</span>
+          <span v-else>👎 (Move to ~1ft distance)</span>
+        </span>
+      </div>
+
+      <div v-if="showMultipleFacesWarning" class="mt-2 p-2 bg-red-100 text-red-800 rounded">
+        ⚠️ Multiple faces detected! Only one face can be captured.
+      </div>
+    </div>
   </div>
 </template>
+
 <script setup>
+import { ref, onMounted, computed, watch } from 'vue'
+import * as faceapi from 'face-api.js'
 
-import { ref, onMounted } from 'vue';
+const emit = defineEmits(['captured'])
 
-import CMAIDENTIFY from '~/components/NKYC_Forms/photo&sign/cameraidentification/cmaidentify.vue'
-const deviceHeight = ref(0);
-const emit = defineEmits(['updateDiv']);
-const { baseurl } = globalurl();
-const rippleBtn = ref(null);
-const rippleBtnback = ref(null)
-const buttonText = ref("Continue");
-const imageCaptured = ref(null);
-const loading = ref(true)
-const isStatusValid = ref(true);
-const loadingprogress = ref(false)
-const isBack = ref(true);
-const locationpoint = ref(false)
-const latitude = ref(null)
-const longitude = ref(null)
+// Refs
+const video = ref(null)
+const canvas = ref(null)
+const capturedImage = ref(null)
+const imageCaptured = ref(false)
+const cameraActive = ref(true)
+const isNoseCentered = ref(false)
+const faceCount = ref(0)
+const distanceScore = ref(0)
+const showMultipleFacesWarning = ref(false)
 
-const { getLocation, error, isLoaded, coords } = useGeolocation()
-import { useRouter } from 'vue-router';
-const router = useRouter();
+// Constants
+const CENTER_TOLERANCE = 15 // pixels
+const IDEAL_FACE_WIDTH_PERCENT = 0.4 // 40% of frame at 1ft
+const MIN_FACE_WIDTH_PERCENT = 0.25  // 25% of frame (too far)
+const MAX_FACE_WIDTH_PERCENT = 0.6   // 60% of frame (too close)
+let mediaStream = null
+let detectionInterval = null
+let warningTimeout = null
 
-
-
-
-onMounted(() => {
-  getLocation()
-
-  deviceHeight.value = window.innerHeight;
-  window.addEventListener('resize', () => {
-    deviceHeight.value = window.innerHeight;
-  });
-  
-
-  
-
-
-});
-watch([coords, isLoaded], ([newCoords, loaded]) => {
-
-  if (loaded && newCoords.latitude && newCoords.longitude) {
-
-    loading.value = false
-    locationpoint.value = true
-    latitude.value = newCoords.latitude
-    longitude.value = newCoords.longitude
-  }
-  else {
-    getLocation()
-  }
-}, { deep: true });
-
-
-const getCountry = async () => {
-  if (!latitude.value || !longitude.value) {
-    console.error('Latitude or longitude is missing')
-    return
-  }
-
-  const apiKey = 'R2ey6sqmfP210eJgVXX-NvmoUgrKlDAW4JwVXgVEaHs'
-  const apiUrl = `https://revgeocode.search.hereapi.com/v1/revgeocode?at=${latitude.value},${longitude.value}&lang=en-US&apiKey=${apiKey}`
-
+// Load face detection models
+const loadModels = async () => {
   try {
-    const response = await fetch(apiUrl)
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`)
-    }
-
-    const data = await response.json()
-    if (data) {
-      const geolocation = {
-        latitute: data.items[0].position.lat,
-        longitude: data.items[0].position.lng,
-        conuntryname: data.items[0].address.countryName,
-        countrycode: data.items[0].address.countryCode,
-      }
-      return geolocation
-    }
-
-
+    await faceapi.nets.tinyFaceDetector.loadFromUri('/models/tiny_face_detector')
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/models/face_landmark_68')
   } catch (error) {
-    console.error('Error fetching location:', error.message)
+    console.error('Failed to load models:', error)
   }
 }
 
-
-const progress = ref(0);
-const progressInterval = ref(null);
-const syncStatus = computed(() => {
-  if (progress.value <= 30) {
-    return {
-      title: 'Syncing',
-      message: 'Saving your bank proof...'
-    };
-  } else if (progress.value <= 80) {
-    return {
-      title: 'Syncing',
-      message: 'Verifying document with SEBI records...'
-    };
-  } else if (progress.value < 100) {
-    return {
-      title: 'Syncing',
-      message: 'Completing your application...'
-    };
-  } else {
-    return {
-      title: 'Syncing!',
-      message: 'Documents uploaded successfully!'
-    };
-  }
-});
-
-const startProgressAnimation = () => {
-  progress.value = 0;
-  // Smooth progress animation
-  progressInterval.value = setInterval(() => {
-    if (progress.value < 90) { // Only animate to 90%, rest will complete on API success
-      progress.value += Math.random() * 10;
-      if (progress.value > 90) progress.value = 90;
-    }
-  }, 300);
-};
-
-const completeProgress = () => {
-  clearInterval(progressInterval.value);
-  progress.value = 100;
-  setTimeout(() => {
-    loadingprogress.value = false;
-  }, 500);
-};
-
-const resetProgress = () => {
-  clearInterval(progressInterval.value);
-  loadingprogress.value = false;
-  progress.value = 0;
-};
-
-const ipvfunction = async () => {
-  loadingprogress.value = true
-  startProgressAnimation();
-  const apiurl = `${baseurl.value}ipv`;
-  const location = await getCountry();
+// Face detection logic
+const detectFaces = async () => {
+  if (!video.value || imageCaptured.value) return
 
   try {
-    // Fetch binary blob of the captured image
-    const response = await fetch(imageCaptured.value); // imageCaptured should be a blob URL (e.g., from canvas)
-    const blob = await response.blob();
+    const detections = await faceapi
+      .detectAllFaces(video.value, new faceapi.TinyFaceDetectorOptions({
+        inputSize: 320,
+        scoreThreshold: 0.6
+      }))
+      .withFaceLandmarks()
 
-    // Encrypt metadata
-    const user = encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
-      pageCode: "photoproceed",
-      location: `${location.latitute},${location.longitude}`,
-      country: location.conuntryname
-    });
+    faceCount.value = detections.length
 
-    // Prepare FormData
-    const formData = new FormData();
-    formData.append('ipvImage', blob, 'ipv.jpg'); // Binary image file
-    formData.append('payload', JSON.stringify({ payload: user }));
-
-
-
-    const uploadResponse = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
-        // DO NOT set Content-Type for FormData
-      },
-      body: formData,
-    });
-
-
-
-    if (!uploadResponse.ok) {
-      throw new Error(`Network error: ${uploadResponse.status}`);
+    // Handle multiple faces
+    if (detections.length > 1) {
+      isNoseCentered.value = false
+      distanceScore.value = 0
+      showMultipleFacesWarning.value = true
+      if (warningTimeout) clearTimeout(warningTimeout)
+      warningTimeout = setTimeout(() => {
+        showMultipleFacesWarning.value = false
+      }, 5000)
+      return
     }
 
-    const data = await uploadResponse.json();
+    showMultipleFacesWarning.value = false
 
-    if (data.payload.status == 'ok') {
-      completeProgress();
-      if (data.payload.metaData.is_real === 'true') {
-        pagestatus('photoproceed');
-        emit('updateDiv', 'photoproceed');
-      } else {
-        pagestatus('takephoto');
-        emit('updateDiv', 'takephoto');
-      }
+    // No face or exactly one face
+    if (detections.length !== 1) {
+      isNoseCentered.value = false
+      distanceScore.value = 0
+      return
     }
 
-    else if ((data.payload.status == 'error' && data.payload.message == 'User not found.') || (data.payload.status == 'error' && data.payload.message == 'Missing Usertoken parameters.')) {
-      resetProgress();
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey');
-      router.push('/');
+    // Calculate face metrics
+    const detection = detections[0]
+    const nose = detection.landmarks.getNose()[3]
+    const jaw = detection.landmarks.getJawOutline()
+    const videoRect = video.value.getBoundingClientRect()
+    const scaleX = video.value.videoWidth / videoRect.width
+    const scaleY = video.value.videoHeight / videoRect.height
+
+    // Nose position
+    const nosePosition = {
+      x: nose.x / scaleX,
+      y: nose.y / scaleY
     }
 
+    // Face width calculation
+    const faceWidth = Math.abs(jaw[0].x - jaw[jaw.length - 1].x) / scaleX
+    const faceWidthPercent = faceWidth / videoRect.width
 
+    // Center calculations
+    const center = { 
+      x: videoRect.width / 2, 
+      y: videoRect.height / 2 
+    }
+    const distToCenter = Math.hypot(nosePosition.x - center.x, nosePosition.y - center.y)
+    isNoseCentered.value = distToCenter <= CENTER_TOLERANCE
 
+    // Distance score calculation (1ft = ~75%)
+    if (faceWidthPercent < IDEAL_FACE_WIDTH_PERCENT) {
+      distanceScore.value = (faceWidthPercent - MIN_FACE_WIDTH_PERCENT) / 
+                          (IDEAL_FACE_WIDTH_PERCENT - MIN_FACE_WIDTH_PERCENT) * 75
+    } else {
+      distanceScore.value = 100 - ((faceWidthPercent - IDEAL_FACE_WIDTH_PERCENT) / 
+                                (MAX_FACE_WIDTH_PERCENT - IDEAL_FACE_WIDTH_PERCENT) * 25)
+    }
+    distanceScore.value = Math.min(100, Math.max(0, distanceScore.value))
+
+    // Auto-capture when conditions are perfect
+    if (readyToCapture.value && !imageCaptured.value) {
+      captureImage()
+    }
   } catch (error) {
-    resetProgress();
-    console.error('IPv Upload Failed:', error.message);
+    console.error('Face detection error:', error)
   }
-};
-
-
-const onImageCaptured = (imageData) => {
-  imageCaptured.value = imageData
 }
 
-const back = () => {
-  const button = rippleBtnback.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
+const captureImage = () => {
+  try {
+    const ctx = canvas.value.getContext('2d')
+    canvas.value.width = video.value.videoWidth
+    canvas.value.height = video.value.videoHeight
+    ctx.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height)
+    capturedImage.value = canvas.value.toDataURL('image/jpeg', 0.9)
+    emit('captured', capturedImage.value)
+    imageCaptured.value = true
+    stopCamera()
+  } catch (error) {
+    console.error('Image capture error:', error)
+  }
+}
 
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+const stopCamera = () => {
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(track => track.stop())
+    cameraActive.value = false
+  }
+  if (detectionInterval) {
+    clearInterval(detectionInterval)
+    detectionInterval = null
+  }
+}
 
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-  button.$el.appendChild(circle)
+// Computed properties
+const readyToCapture = computed(() => {
+  return faceCount.value === 1 && 
+         isNoseCentered.value && 
+         distanceScore.value >= 65 &&
+         distanceScore.value <= 85
+})
 
-  setTimeout(async () => {
-    circle.remove()
-    const page = await pagestatus('photosign1')
-    if ((page?.payload?.status == 'error' && page?.payload?.message == 'User Not Found.') || (page?.payload?.status == 'error' && page?.payload?.message == 'Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
+const nosePositionStatus = computed(() => {
+  if (imageCaptured.value) return 'Captured!'
+  return isNoseCentered.value ? 'Centered' : 'Off center'
+})
+
+// Initialize camera
+onMounted(async () => {
+  await loadModels()
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        width: { ideal: 300 },
+        height: { ideal: 300 },
+        facingMode: 'user'
+      }
+    })
+    video.value.srcObject = mediaStream
+    video.value.onloadedmetadata = () => {
+      video.value.play().catch(e => console.error('Video play error:', e))
+      detectionInterval = setInterval(detectFaces, 300)
     }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'photosign1');
-      isBack.value = false;
-    }
-  }, 600)
+  } catch (err) {
+    console.error('Camera error:', err)
+    alert('Camera access denied. Please enable camera permissions.')
+  }
+})
 
-};
-
-const handleButtonClick = () => {
-
-  const button = rippleBtn.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
-
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
-
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-
-  button.$el.appendChild(circle)
-
-  setTimeout(() => {
-    circle.remove()
-
-    if (!loadingprogress.value && imageCaptured.value && isStatusValid.value) {
-      ipvfunction();
-      isStatusValid.value = false;
-    }
-
-  }, 600)
-};
-
+// Cleanup
+onUnmounted(() => {
+  stopCamera()
+  if (warningTimeout) clearTimeout(warningTimeout)
+})
 </script>
-<style>
-.pi-spinner {
-  animation: spin 1s linear infinite;
+
+<style scoped>
+.camera-wrapper {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
+.camera-wrapper.border-blue-400 {
+  border-color: #60a5fa;
+}
 
-  to {
-    transform: rotate(360deg);
-  }
+.camera-wrapper.border-green-500 {
+  border-color: #10b981;
+}
+
+.camera-video,
+.camera-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.center-guide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  z-index: 2;
+}
+
+.crosshair:before,
+.crosshair:after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.crosshair:before {
+  width: 2px;
+  height: 20px;
+  left: 9px;
+  top: 0;
+}
+
+.crosshair:after {
+  width: 20px;
+  height: 2px;
+  left: 0;
+  top: 9px;
+}
+
+.distance-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border: 2px dashed rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  transition: border-color 0.3s ease;
+  z-index: 1;
+}
+
+.distance-ring.ring-green {
+  border-color: rgba(0, 255, 0, 0.7);
+}
+
+.axis-line {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+}
+
+.x-axis {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.y-axis {
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.status-indicators {
+  min-width: 250px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1%;
+  border-radius: 8px;
 }
 </style>
