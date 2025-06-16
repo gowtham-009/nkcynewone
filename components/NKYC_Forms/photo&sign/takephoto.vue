@@ -1,72 +1,96 @@
 <template>
   <div class="primary_color">
-
+    <!-- Header Section -->
     <div class="flex justify-between primary_color items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
       <logo style="width: 40px; height: 40px;" />
       <profile />
     </div>
-    <div class="flex justify-between  p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
+
+    <!-- Main Content Area -->
+    <div class="flex justify-between p-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
-      <div class="w-full  px-2 p-1">
+      <div class="w-full px-2 p-1">
+        <!-- Title and Location Status -->
         <div class="w-full flex">
-          <div class="w-full" >
+          <div class="w-full">
             <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
               Take a selfie
             </p>
           </div>
-          <div class="w-full flex justify-center items-center" >
-             <div v-if="locationpoint" class=" flex flex-col justify-center  rounded ">
-          <p class="text-gray-500 text-sm">{{ latitude.toFixed(4) }} - {{ longitude.toFixed(4) }}</p>
-        </div>
+          <div class="w-full flex justify-center items-center">
+            <div v-if="locationEnabled" class="flex flex-col justify-center rounded">
+              <p class="text-gray-500 text-sm">{{ latitude.toFixed(4) }} - {{ longitude.toFixed(4) }}</p>
+            </div>
 
-            <div v-if="loading" class="w-full  rounded-lg bg-blue-50 ">
-          <div class="flex items-center gap-2 p-1 justify-center">
-            <i class="pi pi-spinner pi-spin text-xl text-blue-500 "></i>
-            <span class="text-blue-500 text-sm">Fetching...</span>
-          </div>
-        </div>
-
-          </div>
-        </div>
-
-        <p class="text-sm text-gray-500 font-normal leading-4">
-          Ensure your nose is positioned at the center of the
-          cross
-        </p>
-
-    
-
-       
-
-        <div v-if="locationpoint" class="w-full mt-1  flex justify-center flex-col">
-          <CMAIDENTIFY @captured="onImageCaptured" />
-
-
-        </div>
-
-
-
-        <div v-if="loadingprogress" class="max-w-md mx-auto p-2 px-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
-            {{ syncStatus.icon }} {{ syncStatus.title }}
-          </h2>
-
-          <p class="text-gray-600 dark:text-gray-300 mb-2">
-            {{ syncStatus.message }}
-          </p>
-
-          <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
-            <div
-              class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
-              :style="{ width: progress + '%' }">
-              {{ progress.toFixed(2) }}%
+            <div v-if="locationLoading" class="w-full rounded-lg bg-blue-50">
+              <div class="flex items-center gap-2 p-1 justify-center">
+                <i class="pi pi-spinner pi-spin text-xl text-blue-500"></i>
+                <span class="text-blue-500 text-sm">Fetching location...</span>
+              </div>
             </div>
           </div>
         </div>
 
+        <!-- Instructions -->
+        <p class="text-sm text-gray-500 font-normal leading-4 mt-1">
+          Ensure your nose is positioned at the center of the cross
+        </p>
+
+        <!-- Location Permission Alert -->
+        <div v-if="showLocationAlert" class="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-lg">
+          <div class="flex items-start">
+            <i class="pi pi-exclamation-triangle text-xl mr-3 mt-0.5"></i>
+            <div>
+              <p class="font-bold">Location Access Required</p>
+              <p class="mt-1">We need your location to verify your identity. Please enable location services in your browser settings.</p>
+              <div class="flex gap-2 mt-3">
+                <button @click="requestLocation" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+                  <i class="pi pi-refresh mr-1"></i> Try Again
+                </button>
+                <button @click="reloadPage" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm">
+                  <i class="pi pi-replay mr-1"></i> Reload Page
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Camera Component -->
+        <div v-if="locationEnabled" class="w-full mt-3 flex justify-center flex-col">
+          <CMAIDENTIFY @captured="onImageCaptured" @error="onCameraError" />
+        </div>
+
+        <!-- Upload Progress -->
+        <div v-if="uploadInProgress" class="max-w-md mx-auto p-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg mt-4">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2 flex items-center">
+            <i :class="syncStatus.icon" class="mr-2"></i> {{ syncStatus.title }}
+          </h2>
+
+          <p class="text-gray-600 dark:text-gray-300 mb-3">
+            {{ syncStatus.message }}
+          </p>
+
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+            <div class="bg-blue-600 h-2.5 transition-all duration-300 ease-in-out"
+              :style="{ width: progress + '%' }"></div>
+          </div>
+          <p class="text-right text-sm text-gray-500 mt-1">{{ progress.toFixed(2) }}% complete</p>
+        </div>
+
+        <!-- Camera Error Alert -->
+        <div v-if="cameraError" class="mt-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg">
+          <div class="flex items-center">
+            <i class="pi pi-camera mr-2"></i>
+            <div>
+              <p class="font-bold">Camera Error</p>
+              <p>{{ cameraError }}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="w-full flex gap-2">
+      <!-- Action Buttons -->
+        <div class="w-full flex gap-2">
         <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
@@ -77,60 +101,191 @@
         </Button>
       </div>
     </div>
-
   </div>
 </template>
+
 <script setup>
-
-import { ref, onMounted } from 'vue';
-
-import CMAIDENTIFY from '~/components/NKYC_Forms/photo&sign/cameraidentification/cmaidentify.vue'
-const deviceHeight = ref(0);
-const emit = defineEmits(['updateDiv']);
-const { baseurl } = globalurl();
-const rippleBtn = ref(null);
-const rippleBtnback = ref(null)
-const buttonText = ref("Continue");
-const imageCaptured = ref(null);
-const loading = ref(true)
-const isStatusValid = ref(true);
-const loadingprogress = ref(false)
-const isBack = ref(true);
-const locationpoint = ref(false)
-const latitude = ref(null)
-const longitude = ref(null)
-
-const { getLocation, error, isLoaded, coords } = useGeolocation()
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import CMAIDENTIFY from '~/components/NKYC_Forms/photo&sign/cameraidentification/cmaidentify.vue';
+const emit = defineEmits(['updateDiv']);
+// Component References
+const rippleBtn = ref(null);
+const rippleBtnback = ref(null);
 const router = useRouter();
 
+// Device & UI State
+const deviceHeight = ref(window.innerHeight);
+const buttonText = ref("Continue");
+const isBack = ref(true);
 
+// Location State
+const locationEnabled = ref(false);
+const locationLoading = ref(true);
+const showLocationAlert = ref(false);
+const latitude = ref(null);
+const longitude = ref(null);
+const locationCheckTimeout = ref(null);
 
+// Camera & Image State
+const imageCaptured = ref(null);
+const cameraError = ref(null);
+const isStatusValid = ref(true);
 
+// Upload State
+const uploadInProgress = ref(false);
+const progress = ref(0);
+const progressInterval = ref(null);
+
+// Configuration
+const { baseurl } = globalurl();
+
+// Computed Properties
+const canContinue = computed(() => {
+  return imageCaptured.value && isStatusValid.value && locationEnabled.value && !uploadInProgress.value;
+});
+
+const syncStatus = computed(() => {
+  if (progress.value <= 30) {
+    return {
+      icon: 'pi pi-cloud-upload',
+      title: 'Uploading',
+      message: 'Saving your selfie for verification...'
+    };
+  } else if (progress.value <= 80) {
+    return {
+      icon: 'pi pi-shield',
+      title: 'Verifying',
+      message: 'Comparing with government records...'
+    };
+  } else if (progress.value < 100) {
+    return {
+      icon: 'pi pi-cog',
+      title: 'Processing',
+      message: 'Finalizing your application...'
+    };
+  } else {
+    return {
+      icon: 'pi pi-check-circle',
+      title: 'Success!',
+      message: 'Verification completed successfully!'
+    };
+  }
+});
+
+// Lifecycle Hooks
 onMounted(() => {
-  getLocation()
+  setupResizeListener();
+  checkLocationPermission();
+});
 
-  deviceHeight.value = window.innerHeight;
+// Methods
+function setupResizeListener() {
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
-  
+}
 
+async function checkLocationPermission() {
+  try {
+    locationLoading.value = true;
+    showLocationAlert.value = false;
 
-});
-watch([coords, isLoaded], ([newCoords, loaded]) => {
+    if (!navigator.geolocation) {
+      throw new Error('Geolocation not supported');
+    }
 
-  if (loaded && newCoords.latitude && newCoords.longitude) {
-
-    loading.value = false
-    locationpoint.value = true
-    latitude.value = newCoords.latitude
-    longitude.value = newCoords.longitude
+    // Modern permission API check
+    if (navigator.permissions) {
+      const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
+      handlePermissionState(permissionStatus.state);
+      
+      permissionStatus.onchange = () => {
+        handlePermissionState(permissionStatus.state);
+      };
+    } else {
+      // Fallback for older browsers
+      getLocationWithTimeout();
+    }
+  } catch (err) {
+    handleLocationError(err);
   }
-  else {
-    getLocation()
+}
+
+function handlePermissionState(state) {
+  if (state === 'granted') {
+    getLocationWithTimeout();
+  } else if (state === 'prompt') {
+    getLocationWithTimeout();
+  } else {
+    locationLoading.value = false;
+    showLocationAlert.value = true;
   }
-}, { deep: true });
+}
+
+function getLocationWithTimeout() {
+  // Set timeout for location fetch (5 seconds)
+  locationCheckTimeout.value = setTimeout(() => {
+    if (!locationEnabled.value) {
+      locationLoading.value = false;
+      showLocationAlert.value = true;
+    }
+  }, 5000);
+
+  // Request location
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      clearTimeout(locationCheckTimeout.value);
+      handleLocationSuccess(position);
+    },
+    (err) => {
+      clearTimeout(locationCheckTimeout.value);
+      handleLocationError(err);
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function handleLocationSuccess(position) {
+  latitude.value = position.coords.latitude;
+  longitude.value = position.coords.longitude;
+  locationEnabled.value = true;
+  locationLoading.value = false;
+  showLocationAlert.value = false;
+}
+
+function handleLocationError(error) {
+  console.error('Location error:', error);
+  locationLoading.value = false;
+  showLocationAlert.value = true;
+  locationEnabled.value = false;
+}
+
+function requestLocation() {
+  showLocationAlert.value = false;
+  locationLoading.value = true;
+  getLocationWithTimeout();
+}
+
+function reloadPage() {
+  window.location.reload();
+}
+
+function onImageCaptured(imageData) {
+  imageCaptured.value = imageData;
+  cameraError.value = null;
+}
+
+function onCameraError(error) {
+  cameraError.value = error.message || 'Failed to access camera';
+}
+
+
+
+
+
+
+
 
 
 const getCountry = async () => {
@@ -166,60 +321,9 @@ const getCountry = async () => {
 }
 
 
-const progress = ref(0);
-const progressInterval = ref(null);
-const syncStatus = computed(() => {
-  if (progress.value <= 30) {
-    return {
-      title: 'Syncing',
-      message: 'Saving your bank proof...'
-    };
-  } else if (progress.value <= 80) {
-    return {
-      title: 'Syncing',
-      message: 'Verifying document with SEBI records...'
-    };
-  } else if (progress.value < 100) {
-    return {
-      title: 'Syncing',
-      message: 'Completing your application...'
-    };
-  } else {
-    return {
-      title: 'Syncing!',
-      message: 'Documents uploaded successfully!'
-    };
-  }
-});
-
-const startProgressAnimation = () => {
-  progress.value = 0;
-  // Smooth progress animation
-  progressInterval.value = setInterval(() => {
-    if (progress.value < 90) { // Only animate to 90%, rest will complete on API success
-      progress.value += Math.random() * 10;
-      if (progress.value > 90) progress.value = 90;
-    }
-  }, 300);
-};
-
-const completeProgress = () => {
-  clearInterval(progressInterval.value);
-  progress.value = 100;
-  setTimeout(() => {
-    loadingprogress.value = false;
-  }, 500);
-};
-
-const resetProgress = () => {
-  clearInterval(progressInterval.value);
-  loadingprogress.value = false;
-  progress.value = 0;
-};
-
 const ipvfunction = async () => {
-  loadingprogress.value = true
-  startProgressAnimation();
+
+
   const apiurl = `${baseurl.value}ipv`;
   const location = await getCountry();
 
@@ -261,7 +365,7 @@ const ipvfunction = async () => {
     const data = await uploadResponse.json();
 
     if (data.payload.status == 'ok') {
-      completeProgress();
+    
       if (data.payload.metaData.is_real === 'true') {
         pagestatus('photoproceed');
         emit('updateDiv', 'photoproceed');
@@ -272,7 +376,7 @@ const ipvfunction = async () => {
     }
 
     else if ((data.payload.status == 'error' && data.payload.message == 'User not found.') || (data.payload.status == 'error' && data.payload.message == 'Missing Usertoken parameters.')) {
-      resetProgress();
+  
       alert('Session has expired, please login.');
       localStorage.removeItem('userkey');
       router.push('/');
@@ -281,15 +385,12 @@ const ipvfunction = async () => {
 
 
   } catch (error) {
-    resetProgress();
+  
     console.error('IPv Upload Failed:', error.message);
   }
 };
 
 
-const onImageCaptured = (imageData) => {
-  imageCaptured.value = imageData
-}
 
 const back = () => {
   const button = rippleBtnback.value
@@ -320,6 +421,7 @@ const back = () => {
 
 };
 
+
 const handleButtonClick = () => {
 
   const button = rippleBtn.value
@@ -338,15 +440,18 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
 
-    if (!loadingprogress.value && imageCaptured.value && isStatusValid.value) {
-      ipvfunction();
+    // if (!loadingprogress.value && imageCaptured.value && isStatusValid.value) {
+     
+    // }
+     ipvfunction();
       isStatusValid.value = false;
-    }
 
   }, 600)
 };
 
+
 </script>
+
 <style>
 .pi-spinner {
   animation: spin 1s linear infinite;
