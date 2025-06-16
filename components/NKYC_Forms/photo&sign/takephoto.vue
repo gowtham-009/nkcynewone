@@ -42,7 +42,7 @@
             <i class="pi pi-exclamation-triangle text-xl mr-3 mt-0.5"></i>
             <div>
               <p class="font-bold">Location Access Required</p>
-              <p class="mt-1">We need your location to verify your identity. Please enable location services in your browser settings.</p>
+              <p class="mt-1">We need your location to verify your identity. Please enable location services in your {{ device }} settings.</p>
               <div class="flex gap-2 mt-3">
                 <button @click="requestLocation" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
                   <i class="pi pi-refresh mr-1"></i> Try Again
@@ -58,21 +58,23 @@
           <CMAIDENTIFY @captured="onImageCaptured" @error="onCameraError" />
         </div>
 
-        <!-- Upload Progress -->
-        <div v-if="uploadInProgress" class="max-w-md mx-auto p-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg mt-4">
-          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2 flex items-center">
-            <i :class="syncStatus.icon" class="mr-2"></i> {{ syncStatus.title }}
+       
+        <div v-if="loadingprogress" class="max-w-md mx-auto p-2 px-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
+            {{ syncStatus.icon }} {{ syncStatus.title }}
           </h2>
 
-          <p class="text-gray-600 dark:text-gray-300 mb-3">
+          <p class="text-gray-600 dark:text-gray-300 mb-2">
             {{ syncStatus.message }}
           </p>
 
-          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
-            <div class="bg-blue-600 h-2.5 transition-all duration-300 ease-in-out"
-              :style="{ width: progress + '%' }"></div>
+          <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+            <div
+              class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+              :style="{ width: progress + '%' }">
+              {{ progress.toFixed(2) }}%
+            </div>
           </div>
-          <p class="text-right text-sm text-gray-500 mt-1">{{ progress.toFixed(2) }}% complete</p>
         </div>
 
         <!-- Camera Error Alert -->
@@ -114,6 +116,7 @@ const router = useRouter();
 
 // Device & UI State
 const deviceHeight = ref(window.innerHeight);
+
 const buttonText = ref("Continue");
 const isBack = ref(true);
 
@@ -123,21 +126,21 @@ const locationLoading = ref(true);
 const showLocationAlert = ref(false);
 const latitude = ref(null);
 const longitude = ref(null);
-const locationCheckTimeout = ref(null);
+
 const locationInterval = ref(null);
 
 // Camera & Image State
 const imageCaptured = ref(null);
 const cameraError = ref(null);
 const isStatusValid = ref(true);
-
+const loadingprogress = ref(false)
 
 
 
 // Configuration
 const { baseurl } = globalurl();
 
-
+const device=ref('Desktop')
 
 
 onMounted(() => {
@@ -163,9 +166,16 @@ onUnmounted(() => {
 
 // Methods
 function setupResizeListener() {
-  window.addEventListener('resize', () => {
+  const updateDeviceInfo = () => {
     deviceHeight.value = window.innerHeight;
-  });
+    device.value = window.innerWidth <= 992 ? 'Mobile' : 'Desktop';
+  };
+
+  // Set initial values
+  updateDeviceInfo();
+
+  // Add resize listener
+  window.addEventListener('resize', updateDeviceInfo);
 }
 
 async function checkLocationPermission() {
@@ -254,14 +264,6 @@ function onCameraError(error) {
   cameraError.value = error.message || 'Failed to access camera';
 }
 
-
-
-
-
-
-
-
-
 const getCountry = async () => {
   if (!latitude.value || !longitude.value) {
     console.error('Latitude or longitude is missing')
@@ -295,8 +297,61 @@ const getCountry = async () => {
 }
 
 
-const ipvfunction = async () => {
 
+const progress = ref(0);
+const progressInterval = ref(null);
+const syncStatus = computed(() => {
+  if (progress.value <= 30) {
+    return {
+      title: 'Syncing',
+      message: 'Saving...'
+    };
+  } else if (progress.value <= 80) {
+    return {
+      title: 'Syncing',
+      message: 'Verifying...'
+    };
+  } else if (progress.value < 100) {
+    return {
+      title: 'Syncing',
+      message: 'Completing...'
+    };
+  } else {
+    return {
+      title: 'Syncing!',
+      message: 'IPV uploaded successfully!'
+    };
+  }
+});
+
+const startProgressAnimation = () => {
+  progress.value = 0;
+  // Smooth progress animation
+  progressInterval.value = setInterval(() => {
+    if (progress.value < 90) { // Only animate to 90%, rest will complete on API success
+      progress.value += Math.random() * 10;
+      if (progress.value > 90) progress.value = 90;
+    }
+  }, 300);
+};
+
+const completeProgress = () => {
+  clearInterval(progressInterval.value);
+  progress.value = 100;
+  setTimeout(() => {
+    loadingprogress.value = false;
+  }, 500);
+};
+
+const resetProgress = () => {
+  clearInterval(progressInterval.value);
+  loadingprogress.value = false;
+  progress.value = 0;
+};
+
+const ipvfunction = async () => {
+  loadingprogress.value = true
+  startProgressAnimation();
 
   const apiurl = `${baseurl.value}ipv`;
   const location = await getCountry();
@@ -339,7 +394,7 @@ const ipvfunction = async () => {
     const data = await uploadResponse.json();
 
     if (data.payload.status == 'ok') {
-    
+     completeProgress();
       if (data.payload.metaData.is_real === 'true') {
         pagestatus('photoproceed');
         emit('updateDiv', 'photoproceed');
@@ -350,7 +405,7 @@ const ipvfunction = async () => {
     }
 
     else if ((data.payload.status == 'error' && data.payload.message == 'User not found.') || (data.payload.status == 'error' && data.payload.message == 'Missing Usertoken parameters.')) {
-  
+   resetProgress();
       alert('Session has expired, please login.');
       localStorage.removeItem('userkey');
       router.push('/');
@@ -359,7 +414,7 @@ const ipvfunction = async () => {
 
 
   } catch (error) {
-  
+   resetProgress();
     console.error('IPv Upload Failed:', error.message);
   }
 };
@@ -414,11 +469,11 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
 
-    // if (!loadingprogress.value && imageCaptured.value && isStatusValid.value) {
-     
-    // }
-     ipvfunction();
+   
+    if (!loadingprogress.value && imageCaptured.value && isStatusValid.value) {
+      ipvfunction();
       isStatusValid.value = false;
+    }
 
   }, 600)
 };

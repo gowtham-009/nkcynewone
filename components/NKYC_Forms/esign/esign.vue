@@ -124,25 +124,25 @@ const syncStatus = computed(() => {
     return {
      
       title: 'Syncing',
-      message: 'Saving your bank proof...'
+      message: 'Saving...'
     };
   } else if (progress.value <= 80) {
     return {
      
       title: 'Syncing',
-      message: 'Verifying document with SEBI records...'
+      message: 'Verifying...'
     };
   } else if (progress.value < 100) {
     return {
       
       title: 'Syncing',
-      message: 'Completing your application...'
+      message: 'Completing...'
     };
   } else {
     return {
       
       title: 'Syncing',
-      message: 'Documents uploaded successfully!'
+      message: 'Esign Generate successfully!'
     };
   }
 });

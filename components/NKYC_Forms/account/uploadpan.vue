@@ -115,7 +115,7 @@ const syncStatus = computed(() => {
     return {
      
       title: 'Syncing',
-      message: 'Saving your bank proof...'
+      message: 'Saving your pan proof...'
     };
   } else if (progress.value <= 80) {
     return {
