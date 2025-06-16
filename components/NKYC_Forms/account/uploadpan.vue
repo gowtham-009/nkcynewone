@@ -78,7 +78,7 @@ const loading = ref(false)
 const isStatusValid = ref(true); // Assuming this is set based on some validation logic
 const isBack = ref(true); // Assuming you have some logic to enable/disable back button
 const isImageValid = ref(false)
-
+const hideUpload = ref(false);
 
 const getsegmentdata = async () => {
   const mydata = await getServerData();

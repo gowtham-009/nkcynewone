@@ -1,17 +1,47 @@
-
-
 import { encryptionrequestdata } from '~/utils/globaldata.js';
 
 export async function pagestatus(pagecode) {
+  const apiUrl = "https://nnkyc.w3webtechnologies.co.in/api/v1/update_pagestatus";
+  const userkey = localStorage.getItem('userkey');
 
-  const apiUrl = "https://nnkyc.w3webtechnologies.co.in//api/v1/update_pagestatus";
+  // Define profileCode mapping based on pagecode
+  const profileCodeMap = {
+   mobile:3,
+   email:6,
+   main:9,
+   ekyc:12,
+  parmanentaddress:15,
+  communicationaddress:18,
+  info:21,
+  clientinfo:24,
+  qualification:27,
+  occupation:30,
+   tradingexperience:33,
+   income:36,
+  nominee:39,
+   bank1:42,
+ bank4:45,
+   segment1:48,
+  brokerage:51,
+  uploadproof:54,
+  uploadincome:57,
+   uploadbank:60,
+  photosign1:63,
+  takephoto:66,
+   photoproceed:68,
+  signdraw:71,
+   additionalinformation:74,
+  esign:77,
+  bankfile:81,
+   thankyou:100,
+  };
 
-  const userkey = localStorage.getItem('userkey') 
+  const profilecode = profileCodeMap[pagecode] || 0; // fallback to 0 if not matched
 
   const encryptedUser = encryptionrequestdata({
     userToken: userkey,
-    pageCode:pagecode,
-    
+    pageCode: pagecode,
+    profileCode: profilecode
   });
 
   const payload = { payload: encryptedUser };
@@ -32,8 +62,7 @@ export async function pagestatus(pagecode) {
     }
 
     const data = await response.json();
-   
-    return data
+    return data;
   } catch (error) {
     console.error('Fetch error:', error);
     return null;
