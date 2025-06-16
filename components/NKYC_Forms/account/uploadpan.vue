@@ -19,33 +19,29 @@
             <div>
               <div class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white">
                 <div class="px-2 py-2">
-                
-<PAN v-model:src="imageSrcpan" v-model:valid="isImageValid" />
-
-
+                  <PAN v-model:src="imageSrcpan" v-model:valid="isImageValid" />
                 </div>
               </div>
             </div>
           </div>
 
-           <div v-if="loading" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
-      {{ syncStatus.icon }} {{ syncStatus.title }}
-    </h2>
+          <div v-if="loading" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
+              {{ syncStatus.icon }} {{ syncStatus.title }}
+            </h2>
 
-    <p class="text-gray-600 dark:text-gray-300 mb-2">
-      {{ syncStatus.message }}
-    </p>
+            <p class="text-gray-600 dark:text-gray-300 mb-2">
+              {{ syncStatus.message }}
+            </p>
 
-    <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
-      <div
-        class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
-        :style="{ width: progress + '%' }"
-      >
-        {{ progress.toFixed(2) }}%
-      </div>
-    </div>
-  </div>
+            <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+              <div
+                class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+                :style="{ width: progress + '%' }">
+                {{ progress.toFixed(2) }}%
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -55,7 +51,8 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrcpan ||  !isImageValid || !isStatusValid"
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick"
+          :disabled="!imageSrcpan || !isImageValid || !isStatusValid"
           class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
@@ -89,12 +86,10 @@ const getsegmentdata = async () => {
   const userToken = localStorage.getItem('userkey');
   const segments = mydata?.payload?.metaData?.proofs?.pancard || '';
 
-  if (
-    (mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '') ||
-    (mydata?.payload?.metaData?.digi_info?.aadhaarUID &&
-     mydata?.payload?.metaData?.digi_docs?.aadhaarDocument)
-  ) {
+  if ( (mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '') ||
+  (mydata?.payload?.metaData?.digi_info?.aadhaarUID &&mydata?.payload?.metaData?.digi_docs?.aadhaarDocument)) {
     if (segments) {
+
       const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
       console.log('Image URL:', imgSrc);
       imageSrcpan.value = imgSrc;
@@ -103,6 +98,15 @@ const getsegmentdata = async () => {
       isImageValid.value = true;
     }
   }
+  // const digilockpan = mydata?.payload?.metaData?.digi_docs?.panDocument;
+  // const pancard = mydata?.payload?.metaData?.proofs?.pancard;
+
+  // if (digilockpan) {
+  //   const panslice = digilockpan.replace(/\.pdf$/i, ".png");
+  //   if (panslice === pancard) {
+  //     hideUpload.value = true; // ✅ This hides the component
+  //   }
+  // }
 };
 
 
@@ -113,25 +117,25 @@ const progressInterval = ref(null);
 const syncStatus = computed(() => {
   if (progress.value <= 30) {
     return {
-     
+
       title: 'Syncing',
       message: 'Saving your pan proof...'
     };
   } else if (progress.value <= 80) {
     return {
-      
+
       title: 'Syncing',
       message: 'Verifying document with SEBI records...'
     };
   } else if (progress.value < 100) {
     return {
-     
+
       title: 'Syncing',
       message: 'Completing your application...'
     };
   } else {
     return {
-     
+
       title: 'Syncing',
       message: 'Documents uploaded successfully!'
     };
@@ -171,7 +175,7 @@ const proofupload = async () => {
   }
 
   loading.value = true;
-   startProgressAnimation();
+  startProgressAnimation();
   const apiurl = `${baseurl.value}proofFormUpload`;
 
   try {
@@ -189,7 +193,7 @@ const proofupload = async () => {
     formData.append('pancard', blob, 'pancard.jpg'); // or 'pancard.pdf' if PDF
     formData.append('payload', JSON.stringify({ payload: encryptedPayload }));
 
-  
+
 
     const uploadResponse = await fetch(apiurl, {
       method: 'POST',
@@ -223,14 +227,14 @@ const proofupload = async () => {
       }
     }
 
-     else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')) {
-       resetProgress();
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
-      }
-  } catch (error) {
+    else if ((data.payload.status == 'error' && data.payload.message == 'User not found.') || (data.payload.status == 'error' && data.payload.message == 'Missing Usertoken parameters.')) {
       resetProgress();
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
+    }
+  } catch (error) {
+    resetProgress();
     console.error('Upload failed:', error.message);
   }
 };
@@ -250,18 +254,18 @@ const back = (event) => {
   circle.style.top = `${y}px`;
   button.$el.appendChild(circle);
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove();
-     const mydata = await pagestatus('brokerage')
+    const mydata = await pagestatus('brokerage')
     if (mydata.payload.status == 'ok') {
       emit('updateDiv', 'brokerage');
     }
-    else if((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')){
-       alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
+    else if ((mydata?.payload?.status == 'error' && mydata?.payload?.message == 'User Not Found.') || (mydata?.payload?.status == 'error' && mydata?.payload?.message == 'Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey')
+      router.push('/')
     }
-isBack.value=false
+    isBack.value = false
   }, 600);
 };
 
@@ -280,12 +284,12 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove();
-  if (!loading.value && isImageValid.value && isStatusValid.value) {
+    if (!loading.value && isImageValid.value && isStatusValid.value) {
       proofupload();
       isStatusValid.value = false;
     }
 
-  
+
   }, 600);
 };
 
@@ -296,4 +300,3 @@ onMounted(async () => {
   });
 });
 </script>
-

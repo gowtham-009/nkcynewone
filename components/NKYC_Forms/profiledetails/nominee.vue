@@ -133,7 +133,8 @@
         </div>
         <div class="w-full mt-2">
           <Sharevalue v-model="shareval" />
-          <p class="text-right text-gray-500 text-md">Maximum limit: {{ availabilelimit }}</p>
+         
+          <p class="text-right text-gray-500 text-md">Maximum limit:0 - {{ availabilelimit }}</p>
         </div>
         <div class="w-full mt-3">
           <Button :disabled="isSaveDisabled" label="Save" @click="nomineesavedata"
