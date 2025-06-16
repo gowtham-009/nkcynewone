@@ -126,7 +126,7 @@ const isBack = ref(true);
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
-const buttonText = ref("Continue");
+const buttonText = ref("Next");
 const prooftype = ref('')
 const inputval = ref('')
 

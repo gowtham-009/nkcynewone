@@ -191,7 +191,7 @@ const visible = ref(false);
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
-const buttonText = ref("Continue");
+const buttonText = ref("Next");
 const nomineetext = ref("Add Nominee");
 const nomineeCount = ref(0);
 

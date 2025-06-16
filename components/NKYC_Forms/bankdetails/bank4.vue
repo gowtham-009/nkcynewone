@@ -103,7 +103,7 @@ const address = ref("");
 const successtext = ref('')
 const verifiedtext = ref('')
 
-const buttonText = ref('Continue');
+const buttonText = ref('Next');
 
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
