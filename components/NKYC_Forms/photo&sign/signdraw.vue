@@ -636,8 +636,9 @@ const documentsavebtn = async () => {
     internetTradingOpted: question4.value || 'Yes',
     pastActionsDetails: question5.value || 'No',
     otherBrokerDetails: question6.value || 'No',
-    accountSettlementPreference: question7.value || 'CDSL',
-    settlementStatementConsent: question8.value || 'Once in Quarter'
+    otherDPDetails:question7.value || 'CDSL',
+    accountSettlementPreference: question8.value ||'Once in Quarter' ,
+    settlementStatementConsent:  'Yes'
 
   });
 
