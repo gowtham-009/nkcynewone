@@ -144,6 +144,7 @@ const device=ref('Desktop')
 
 
 onMounted(() => {
+  locationLoading.value = true;
   setupResizeListener();
   checkLocationPermission();
 
@@ -210,12 +211,13 @@ function handlePermissionState(state) {
   } else if (state === 'prompt') {
     getLocationWithTimeout();
   } else {
-    locationLoading.value = false;
+    locationLoading.value = true;
     showLocationAlert.value = true;
   }
 }
 
 function getLocationWithTimeout(isRepeated = false) {
+  
   navigator.geolocation.getCurrentPosition(
     (position) => {
       handleLocationSuccess(position);
@@ -242,7 +244,7 @@ function handleLocationSuccess(position) {
 
 function handleLocationError(error) {
   console.error('Location error:', error);
-  locationLoading.value = false;
+  locationLoading.value = true;
   showLocationAlert.value = true;
   locationEnabled.value = false;
 }
