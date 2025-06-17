@@ -29,34 +29,44 @@
               </div>
 
             </div>
-
+ <span class="text-red-500">{{ accnotypeerror }}</span>
           </div>
 
           <div>
             <span class="text-gray-500  text-sm">Account no</span>
             <Accno v-model="accno" />
+             <span class="text-red-500">{{ accnoerror }}</span>
+
           </div>
 
 
           <div>
             <span class="text-gray-500  text-sm">IFSC code</span>
             <IFSC v-model="ifsc" />
+                  <span class="text-red-500">{{ ifscerror }}</span>
+
           </div>
 
 
           <div>
             <span class="text-gray-500  text-sm">MICR code</span>
             <MICR v-model="micr" />
+                  <span class="text-red-500">{{ micrerror }}</span>
+
           </div>
 
           <div>
             <span class="text-gray-500  text-sm">Bank name</span>
             <Bankname v-model="bankname" />
+                  <span class="text-red-500">{{ banknameerror }}</span>
+
           </div>
 
           <div>
             <p class="text-gray-500  text-sm font-normal leading-4">Bank Address</p>
             <Address v-model="address" class="mt-1" />
+                  <span class="text-red-500">{{ addresserror }}</span>
+
           </div>
 
           <div v-if="errorbox" class="w-full px-2 py-2 mt-1 rounded-lg bg-red-50">
@@ -141,6 +151,15 @@ const errorbox = ref(false)
 const waitingbox = ref(false)
 const errormsg = ref('')
 const isStatusValid = ref(true);
+
+
+// error
+const accnotypeerror=ref('')
+const accnoerror=ref('')
+const ifscerror=ref('')
+const micrerror=ref('')
+const banknameerror=ref('')
+const addresserror=ref('')
 
 const profilesetinfo = async () => {
   const mydata = await getServerData();
@@ -259,6 +278,13 @@ const getbankaddress = async (ifscval) => {
     const data = await response.json();
     if (data) {
 
+       accnotypeerror.value=""
+     accnoerror.value =""
+     ifscerror.value=""
+     micrerror.value=""
+     banknameerror.value=""
+     addresserror.value=""
+     
       micr.value = data.MICR;
       bankname.value = data.BANK;
       address.value = data.ADDRESS;
@@ -340,7 +366,35 @@ const headertoken=htoken
         router.push('/')
       }
     
+    else if (data?.payload?.status === 'error') {
+      accnotypeerror.value=""
+     accnoerror.value =""
+     ifscerror.value=""
+     micrerror.value=""
+     banknameerror.value=""
+     addresserror.value=""
+  data.payload.errors.forEach((err) => {
     
+if (err.field === 'bankAccType' && !selected.value) {
+      accnotypeerror.value = err.message || ' ';
+    }
+    if (err.field === 'bankAccNo' && !accno.value) {
+      accnoerror.value = err.message || ' ';
+    }
+    if (err.field === 'bankIFSC' && !ifsc.value) {
+      ifscerror.value = err.message || ' ';
+    }
+    if (err.field === 'bankMICR' && !micr.value) {
+      micrerror.value = err.message || ' ';
+    }
+    if (err.field === 'bankName' && !bankname.value) {
+      banknameerror.value = err.message || ' ';
+    }
+     if (err.field === 'bankAddress' && !addresserror.value) {
+      addresserror.value = err.message || ' ';
+    }
+  });
+}
   
     
     else {

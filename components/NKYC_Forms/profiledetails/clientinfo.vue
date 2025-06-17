@@ -13,9 +13,13 @@
 
         <div class="w-full mt-1 ">
           <Father v-model="father" />
+            <span class="text-red-500">{{ fathererror }}</span>
+
         </div>
         <div class="w-full mt-1">
           <Mother v-model="mother" />
+                      <span class="text-red-500">{{ mothererror }}</span>
+
         </div>
 
 
@@ -68,6 +72,10 @@ const rippleBtnback = ref(null)
 
 const father = ref("");
 const mother = ref("");
+
+const fathererror=ref('')
+const mothererror=ref('')
+
 const isStatusValid = ref(true);
 const isBack = ref(true);
 const profilesetinfo = async () => {
@@ -138,6 +146,24 @@ const personalinfo = async () => {
         router.push('/')
       }
 
+      else if (data?.payload?.status === 'error') {
+      fathererror.value=""
+     mothererror.value =""
+   
+    
+  data.payload.errors.forEach((err) => {
+    
+
+    if (err.field === 'fatherName' && !father.value) {
+      fathererror.value = err.message || ' ';
+    }
+    if (err.field === 'motherName' && !mother.value) {
+      mothererror.value = err.message || ' ';
+    }
+ 
+ 
+  });
+}
 
     }
 

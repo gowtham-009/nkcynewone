@@ -30,8 +30,11 @@
             ]">
               {{ option.label }}
             </button>
+
+
           </div>
         </div>
+               <span class="text-red-500">{{ qulificationerror }}</span>
 
 
       </div>
@@ -69,7 +72,7 @@ const activebox = ref('marriedbox');
 const isStatusValid = ref(true);
 const isBack = ref(true);
 const emit = defineEmits(['updateDiv']);
-
+const qulificationerror=ref('')
 
 // qualification Status
 const selected = ref("");
@@ -180,6 +183,25 @@ const headertoken=htoken
         localStorage.removeItem('userkey')
         router.push('/')
       }
+
+
+        else if (data?.payload?.status === 'error') {
+      qulificationerror.value=""
+
+   
+    
+  data.payload.errors.forEach((err) => {
+    
+
+    if (err.field === 'education' && !selected.value) {
+      qulificationerror.value = err.message || ' ';
+    }
+
+ 
+ 
+  });
+}
+
     }
 
   } catch (error) {

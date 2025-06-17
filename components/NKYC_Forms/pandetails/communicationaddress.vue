@@ -16,18 +16,21 @@
         </p>
 
 
-        <div class="w-full mt-1">
+      <div class="w-full mt-1">
           <Address v-model="address" />
+          <span class="text-red-500">{{ addresserror }}</span>
         </div>
-
         <div class="w-full mt-1">
           <State v-model="state" />
+          <span class="text-red-500">{{ stateerror }}</span>
         </div>
         <div class="w-full mt-1">
           <City v-model="city" />
+          <span class="text-red-500">{{ cityerror }}</span>
         </div>
         <div class="w-full mt-1">
           <Pincode v-model="pincode" />
+          <span class="text-red-500">{{ pincodeerror }}</span>
         </div>
 
 
@@ -81,6 +84,13 @@ const city = ref('');
 const pincode = ref('');
 const isaddress = ref(true);
 const isBack = ref(true);
+
+
+//errorlist
+const addresserror=ref('')
+const stateerror=ref('')
+const cityerror=ref('')
+const pincodeerror=ref('')
 
 const setCommunicationAddress = async () => {
   const mydata = await getServerData();
@@ -166,6 +176,29 @@ const communicateaddressdata = async () => {
        localStorage.removeItem('userkey')
        router.push('/')
       }
+
+       else if (data?.payload?.status === 'error') {
+      addresserror.value=""
+     cityerror.value =""
+     stateerror.value=""
+     pincodeerror.value=""
+  data.payload.errors.forEach((err) => {
+    
+
+    if (err.field === 'permanentAddress' && !address.value) {
+      addresserror.value = err.message || ' ';
+    }
+    if (err.field === 'permanentCity' && !city.value) {
+      cityerror.value = err.message || ' ';
+    }
+    if (err.field === 'permanentState' && !state.value) {
+      stateerror.value = err.message || ' ';
+    }
+    if (err.field === 'permanentPincode' && !pincode.value) {
+      pincodeerror.value = err.message || ' ';
+    }
+  });
+}
     }
 
   } catch (error) {

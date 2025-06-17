@@ -63,6 +63,8 @@
         <input type="text" v-model="idval" class="hidden">
         <div class="w-full">
           <Name v-model="name" />
+           <span class="text-red-500">{{ nameerror }}</span>
+
         </div>
         <div class="w-full mt-4">
           <span class="text-gray-500 ">Relationship*</span>
@@ -71,21 +73,31 @@
               class="w-full prime-input " />
             <span class="bottom-border"></span>
           </div>
+                     <span class="text-red-500">{{ relationshiperror }}</span>
+
         </div>
         <div class="w-full mt-2">
           <DOB v-model="dob" />
+                     <span class="text-red-500">{{ doberror }}</span>
+
         </div>
 
         <div class="w-full mt-2">
           <Address v-model="address" />
+                     <span class="text-red-500">{{ addresserror }}</span>
+
         </div>
 
         <div class="w-full mt-2">
           <Mobile v-model="mobileNo" />
+                     <span class="text-red-500">{{ mobileerror }}</span>
+
         </div>
 
         <div class="w-full mt-2">
           <Email v-model="email" />
+                     <span class="text-red-500">{{ emailerror }}</span>
+
         </div>
         <div class="w-full mt-2">
           <div class="flex gap-2">
@@ -116,12 +128,16 @@
           </div>
           <div v-if="aadhar" class="w-full " >
               <Aadhar v-model="aadharinput" />
+                         
+
           </div>
           <div v-if="drivingLicence" class="w-full " >
               <Driving v-model="drivinginput" />
+                        
+
           </div>
 
-         
+         <span class="text-red-500">{{ iderror }}</span>
         </div>
 
 
@@ -133,7 +149,8 @@
         </div>
         <div class="w-full mt-2">
           <Sharevalue v-model="shareval" />
-         
+                    <span class="text-red-500">{{ sharevalerror }}</span>
+
           <p class="text-right text-gray-500 text-md">Maximum limit:0 - {{ availabilelimit }}</p>
         </div>
         <div class="w-full mt-3">
@@ -220,6 +237,16 @@ const drivinginput = ref('')
 const isPanValid = ref(false);
 const isAadharValid = ref(false);
 const isDrivingLicenceValid = ref(false);
+
+// error
+const nameerror=ref('')
+const relationshiperror=ref('')
+const doberror=ref('')
+const addresserror=ref('')
+const mobileerror=ref('')
+const emailerror=ref('')
+const sharevalerror=ref('')
+const iderror=ref('')
 
 const statementOptions = ref([
   { value: 'Son', name: 'Son' },
@@ -551,7 +578,7 @@ const nomineesavedata = async () => {
 
   // Validate maximum nominees
   if (!idval.value && nomineeCount.value >= 10) {
-    alert("Maximum of 10 nominees allowed.");
+   
     visible.value = false;
     return;
   }
@@ -560,7 +587,7 @@ const nomineesavedata = async () => {
     // Validate required fields
     if (!name.value || !selectedStatement.value || !dob.value || !address.value || 
         !mobileNo.value || !email.value || !selected.value || !shareval.value) {
-      throw new Error("Please fill all required fields");
+      
     }
 
     // Parse date
@@ -575,13 +602,13 @@ const nomineesavedata = async () => {
       // Validate date
       const dateObj = new Date(`${year}-${month}-${day}`);
       if (isNaN(dateObj.getTime())) {
-        throw new Error("Invalid date");
+       
       }
     } else {
       // Try parsing as Date object
       const dateObj = new Date(dob.value);
       if (isNaN(dateObj.getTime())) {
-        throw new Error("Please enter date in DD/MM/YYYY format");
+        
       }
       const yyyy = dateObj.getFullYear();
       const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -592,7 +619,7 @@ const nomineesavedata = async () => {
     // Validate share percentage
     const share = parseFloat(shareval.value);
     if (isNaN(share)) {
-      throw new Error("Invalid share percentage");
+     
     }
 
     // Prepare request data
@@ -603,17 +630,17 @@ const nomineesavedata = async () => {
     let idNumber = '';
     if (selected.value === 'PAN') {
       if (!paninput.value || !isPanValid.value) {
-        throw new Error("Please enter a valid PAN number");
+       
       }
       idNumber = paninput.value;
     } else if (selected.value === 'Aadhar Last 4 Digits') {
       if (!aadharinput.value || !isAadharValid.value) {
-        throw new Error("Please enter last 4 digits of Aadhar");
+        
       }
       idNumber = aadharinput.value;
     } else if (selected.value === 'Driving Licence') {
       if (!drivinginput.value || !isDrivingLicenceValid.value) {
-        throw new Error("Please enter a valid Driving Licence number");
+        
       }
       idNumber = drivinginput.value;
     }
@@ -656,14 +683,51 @@ const nomineesavedata = async () => {
       visible.value = false;
       await nomineedetails();
       resetFormFields();
-    } else if (data.payload.status === 'error') {
+    } 
+    else if (data.payload.status === 'error') {
       if (data.payload.message === 'User Not Found.' || 
           data.payload.message === 'Missing Usertoken parameters.') {
         alert('Session has expired, please login.');
         localStorage.removeItem('userkey');
         router.push('/');
-      } else {
-        throw new Error(data.payload.message || "Failed to save nominee");
+      } 
+      else{
+          nameerror.value = ""
+        relationshiperror.value = ""
+        doberror.value = ""
+        addresserror.value = ""
+        mobileerror.value=""
+        emailerror.value=""
+        iderror.value=""
+        sharevalerror.value=""
+        data.payload.errors.forEach((err) => {
+
+
+          if (err.field === 'nomineeName' && !name.value) {
+            nameerror.value = err.message || ' ';
+          }
+          if (err.field === 'nomineeRelation' && !selectedStatement.value) {
+            relationshiperror.value = err.message || ' ';
+          }
+            if (err.field === 'nomineeDob' && !dob.value) {
+            doberror.value = err.message || ' ';
+          }
+          if (err.field === 'nomineeAddress' && !address.value) {
+            addresserror.value = err.message || ' ';
+          }
+          if (err.field === 'nomineeMobile' && !mobileNo.value) {
+            mobileerror.value = err.message || ' ';
+          }
+            if (err.field === 'nomineeEmail' && !email.value) {
+            emailerror.value = err.message || ' ';
+          }
+            if (err.field === 'nomineeIdNo') {
+            iderror.value = err.message || ' ';
+          }
+           if (err.field === 'nomineeShare' && !shareval.value) {
+            sharevalerror.value = err.message || ' ';
+          }
+        });
       }
     }
 

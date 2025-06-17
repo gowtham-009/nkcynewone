@@ -17,10 +17,22 @@
           <span class="text-gray-500 text-md font-medium">Upload PAN</span>
           <div class="grid grid-cols-1 gap-3">
             <div>
-              <div v-if="pancard" class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white">
+              <div v-if="pancard"
+                class="overflow-hidden flex justify-center items-center rounded-lg mt-2 bg-white shadow-lg dark:border-white">
                 <div class="px-2 py-2">
                   <PAN v-model:src="imageSrcpan" v-model:valid="isImageValid" />
                 </div>
+              </div>
+
+              <div v-if="digipan" class="w-full p-1 flex justify-center bg-gray-100 rounded-lg shadow-sm">
+                <div class="w-32 h-40 rounded-lg" @click="panzoom()">
+                  <img :src="digisrc" alt="">
+                </div>
+
+                <Dialog v-model:visible="visible" modal header="View" :style="{ width: '25rem' }">
+                  <img :src="digisrc" alt="PAN Image" class="shadow-md rounded-xl w-full mb-1"
+                    style="filter: grayscale(100%)" />
+                </Dialog>
               </div>
             </div>
           </div>
@@ -68,7 +80,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
@@ -79,8 +91,9 @@ const pancard = ref(true);
 const isStatusValid = ref(true); // Assuming this is set based on some validation logic
 const isBack = ref(true); // Assuming you have some logic to enable/disable back button
 const isImageValid = ref(false)
-
-
+const digipan = ref(false)
+const digisrc = ref('')
+const visible = ref(false)
 const getsegmentdata = async () => {
   const headertoken = htoken;
   const mydata = await getServerData();
@@ -106,14 +119,21 @@ const getsegmentdata = async () => {
   if (digilockpan) {
     const panslice = digilockpan.replace(/\.pdf$/i, ".png");
     if (panslice === pancardName) {
-      pancard.value = false; // ❌ hide pancard section
+
+      pancard.value = false; 
+      digipan.value = true
+      const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${pancardName}`;
+      digisrc.value = imgSrc
     } else {
       pancard.value = true;  // ✅ show pancard section
+      digipan.value = false
     }
   }
 };
 
-
+function panzoom() {
+  visible.value = true
+}
 
 const progress = ref(0);
 const progressInterval = ref(null);
@@ -180,7 +200,7 @@ const proofupload = async () => {
   loading.value = true;
   startProgressAnimation();
   const apiurl = `${baseurl.value}proofFormUpload`;
- const headertoken=htoken
+  const headertoken = htoken
   try {
     // Convert URL to binary Blob
     const response = await fetch(imageSrcpan.value);
@@ -201,7 +221,7 @@ const proofupload = async () => {
     const uploadResponse = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization':headertoken
+        'Authorization': headertoken
         // Do NOT manually set 'Content-Type'
       },
       body: formData,
@@ -285,12 +305,33 @@ const handleButtonClick = (event) => {
   circle.style.top = `${y}px`;
   button.$el.appendChild(circle);
 
-  setTimeout(() => {
+  setTimeout(async () => {
     circle.remove();
-    if (!loading.value && isImageValid.value && isStatusValid.value) {
-      proofupload();
-      isStatusValid.value = false;
+    const mydata = await getServerData();
+    const digilockpan = mydata?.payload?.metaData?.digi_docs?.panDocument;
+    const pancardName = mydata?.payload?.metaData?.proofs?.pancard;
+    if (digilockpan) {
+      const panslice = digilockpan.replace(/\.pdf$/i, ".png");
+      if (panslice === pancardName) {
+        const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
+      if (statuscheck1) {
+        const nextPage = await pagestatus('photosign1');
+        if (nextPage.payload.status === 'ok') {
+          emit('updateDiv', 'photosign1');
+        }
+      } else {
+        await pagestatus('uploadbank');
+        emit('updateDiv', 'uploadbank');
+      }
+      }
     }
+    else {
+      if (!loading.value && isImageValid.value && isStatusValid.value) {
+        proofupload();
+        isStatusValid.value = false;
+      }
+    }
+
 
 
   }, 600);

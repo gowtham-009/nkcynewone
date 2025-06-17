@@ -32,6 +32,7 @@
             </button>
           </div>
         </div>
+               <span class="text-red-500">{{tradingerror }}</span>
 
 
       </div>
@@ -66,7 +67,7 @@ const emit = defineEmits(['updateDiv']);
 const rippleBtnback = ref(null)
 const isStatusValid = ref(true);
 const isBack = ref(true);
-
+const tradingerror=ref('')
 import { useRouter } from 'vue-router';
 const router = useRouter();
 // qualification Status
@@ -175,6 +176,22 @@ const headertoken=htoken
         localStorage.removeItem('userkey')
         router.push('/')
       }
+
+      
+        else if (data?.payload?.status === 'error') {
+      tradingerror.value=""
+
+   
+    
+  data.payload.errors.forEach((err) => {
+    
+
+    if (err.field === 'tradingExperience' && !selected.value) {
+      tradingerror.value = err.message || ' ';
+    }
+ 
+  });
+}
 
     }
 

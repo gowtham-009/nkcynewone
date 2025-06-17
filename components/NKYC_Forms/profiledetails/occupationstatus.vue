@@ -27,6 +27,8 @@
             {{ option.label }}
           </button>
         </div>
+                       <span class="text-red-500">{{ occupationerror }}</span>
+
       </div>
 
       <div class="w-full flex gap-2">
@@ -63,6 +65,7 @@ const rippleBtnback = ref(null)
 const isStatusValid = ref(true);
 const selected = ref("");
 const isBack = ref(true);
+const occupationerror=ref('')
 const options = [
   { label: "Agriculturist ", value: "Agriculturist " },
   { label: "Business", value: "Business" },
@@ -174,6 +177,23 @@ const personalinfo = async () => {
         localStorage.removeItem('userkey')
         router.push('/')
       }
+
+        else if (data?.payload?.status === 'error') {
+      occupationerror.value=""
+
+   
+    
+  data.payload.errors.forEach((err) => {
+    
+
+    if (err.field === 'occupation' && !selected.value) {
+      occupationerror.value = err.message || ' ';
+    }
+
+ 
+ 
+  });
+}
 
     }
 

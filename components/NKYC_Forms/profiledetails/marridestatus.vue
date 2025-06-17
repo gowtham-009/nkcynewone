@@ -29,6 +29,7 @@
               ]">
               {{ option.label }}
             </button>
+             <span class="text-red-500">{{ gendererror }}</span>
           </div>
         </div>
 
@@ -43,6 +44,8 @@
             ]">
               {{ option.label }}
             </button>
+                         <span class="text-red-500">{{ maritalerror }}</span>
+
           </div>
         </div>
 
@@ -64,6 +67,8 @@
               ]">
                 {{ option.label }}
               </button>
+                                       <span class="text-red-500">{{ peperror }}</span>
+
             </div>
           </div>
         </div>
@@ -106,6 +111,9 @@ const emit = defineEmits(['updateDiv']);
 const isStatusValid = ref(true);
 const isBack = ref(true);
 
+const gendererror=ref('')
+const maritalerror=ref('')
+const peperror=ref('')
 // gender status
 const selectedgender = ref("");
 const selectoptions = [
@@ -244,6 +252,26 @@ else if((data?.payload?.status == 'error' && data?.payload?.message=='User Not F
   router.push('/')
 }
 
+    else if (data?.payload?.status === 'error') {
+      gendererror.value=""
+     maritalerror.value =""
+     peperror.value=""
+    
+  data.payload.errors.forEach((err) => {
+    
+
+    if (err.field === 'gender' && !selectedgender.value) {
+      gendererror.value = err.message || ' ';
+    }
+    if (err.field === 'maritalStatus' && !selected.value) {
+      maritalerror.value = err.message || ' ';
+    }
+    if (err.field === 'pep' && !clientselected.value) {
+      peperror.value = err.message || ' ';
+    }
+ 
+  });
+}
     }
 
   } catch (error) {

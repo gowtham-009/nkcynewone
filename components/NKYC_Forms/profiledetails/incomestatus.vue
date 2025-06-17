@@ -27,6 +27,8 @@
             {{ option.label }}
           </button>
         </div>
+                       <span class="text-red-500">{{ incomeerror }}</span>
+
       </div>
 
 
@@ -62,7 +64,7 @@ const rippleBtn = ref(null);
 const isStatusValid = ref(true);
 const rippleBtnback = ref(null)
 const isBack = ref(true);
-
+const incomeerror=ref('')
 const selected = ref("");
 const options = [
   { label: "Below 1 lakh", value: "Below 1 lakh" },
@@ -170,6 +172,23 @@ const headertoken=htoken
         localStorage.removeItem('userkey')
         router.push('/')
       }
+
+        else if (data?.payload?.status === 'error') {
+      incomeerror.value=""
+
+   
+    
+  data.payload.errors.forEach((err) => {
+    
+
+    if (err.field === 'annualIncome' && !selected.value) {
+      incomeerror.value = err.message || ' ';
+    }
+
+ 
+ 
+  });
+}
 
     }
 

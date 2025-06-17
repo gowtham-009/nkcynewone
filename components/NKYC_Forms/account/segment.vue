@@ -40,6 +40,7 @@
             </p>
           </button>
         </div>
+             <span class="text-red-500">{{ segmenterror }}</span>
 
 
       </div>
@@ -70,6 +71,7 @@ const {htoken}=headerToken()
 const selected = ref(['equity', 'fno', 'commodities']);
 const isStatusValid = ref(true); 
 const isBack = ref(true); 
+const segmenterror=ref('')
 const options = [
   {
     label: 'Equity',
@@ -209,6 +211,13 @@ const segmentdata = async () => {
         localStorage.removeItem('userkey')
         router.push('/')
       }
+
+      else if (data?.payload?.status === 'error') {
+        alert('hiii')
+      segmenterror.value=data.payload.message
+ 
+ 
+}
 
   } catch (error) {
     console.error(error.message);

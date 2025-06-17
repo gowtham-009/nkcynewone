@@ -221,6 +221,11 @@ const sendmobileotp = async (resend) => {
     errormobile.value=data.payload.message
      
   }
+  else if(data.payload.status=='error'  && data.payload.message=='Missing required parameters.' && data.payload.otpStatus==0){
+    errormsg.value=true
+    errormobile.value=data.payload.message
+     
+  }
  
 
 } catch (error) {

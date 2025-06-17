@@ -20,19 +20,28 @@
 
         <div class="w-full mt-1">
           <Address v-model="address" />
+          <span class="text-red-500">{{ addresserror }}</span>
         </div>
         <div class="w-full mt-1">
           <State v-model="state" />
+          <span class="text-red-500">{{ stateerror }}</span>
         </div>
         <div class="w-full mt-1">
           <City v-model="city" />
+          <span class="text-red-500">{{ cityerror }}</span>
         </div>
         <div class="w-full mt-1">
           <Pincode v-model="pincode" />
+          <span class="text-red-500">{{ pincodeerror }}</span>
         </div>
         <div class="w-full mt-1">
           <Addresscheck ref="commAddressRef" />
+
         </div>
+
+
+
+
       </div>
 
       <!-- Buttons -->
@@ -66,7 +75,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 // Form Refs
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const emit = defineEmits(['updateDiv']);
 const address = ref('');
 
@@ -85,6 +94,12 @@ const isaddress = ref(true);
 
 // Device height
 const deviceHeight = ref(window.innerHeight);
+
+//errorlist
+const addresserror = ref('')
+const stateerror = ref('')
+const cityerror = ref('')
+const pincodeerror = ref('')
 
 // Handle window resize
 const updateHeight = () => {
@@ -145,7 +160,7 @@ const permanentaddressdata = async () => {
     permanentPincode: pincode.value,
 
   });
- const headertoken=htoken
+  const headertoken = htoken
 
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
@@ -181,11 +196,36 @@ const permanentaddressdata = async () => {
         }
       }
 
-      else if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
+      else if ((data?.payload?.status == 'error' && data?.payload?.message == 'User Not Found.') || (data?.payload?.status == 'error' && data?.payload?.message == 'Missing Usertoken parameters.')) {
         alert('Session has expired, please login.');
         localStorage.removeItem('userkey')
         router.push('/')
       }
+
+      else if (data?.payload?.status === 'error') {
+        addresserror.value = ""
+        cityerror.value = ""
+        stateerror.value = ""
+        pincodeerror.value = ""
+        data.payload.errors.forEach((err) => {
+
+
+          if (err.field === 'permanentAddress' && !address.value) {
+            addresserror.value = err.message || ' ';
+          }
+          if (err.field === 'permanentCity' && !city.value) {
+            cityerror.value = err.message || ' ';
+          }
+          if (err.field === 'permanentState' && !state.value) {
+            stateerror.value = err.message || ' ';
+          }
+          if (err.field === 'permanentPincode' && !pincode.value) {
+            pincodeerror.value = err.message || ' ';
+          }
+        });
+      }
+
+
 
 
     }
@@ -244,7 +284,7 @@ function back() {
     circle.remove()
 
     const page = await pagestatus('main')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+    if ((page?.payload?.status == 'error' && page?.payload?.message == 'User Not Found.') || (page?.payload?.status == 'error' && page?.payload?.message == 'Missing Usertoken parameters.')) {
       alert('Session has expired, please login.');
       localStorage.removeItem('userkey')
       router.push('/')
