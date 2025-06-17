@@ -68,6 +68,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
+const {htoken}=headerToken()
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
@@ -81,8 +82,9 @@ const isImageValid = ref(false)
 const hideUpload = ref(false);
 
 const getsegmentdata = async () => {
+  const headertoken=htoken
   const mydata = await getServerData();
-  const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+  const imageauth = headertoken;
   const userToken = localStorage.getItem('userkey');
   const segments = mydata?.payload?.metaData?.proofs?.pancard || '';
 
@@ -90,7 +92,7 @@ const getsegmentdata = async () => {
   (mydata?.payload?.metaData?.digi_info?.aadhaarUID &&mydata?.payload?.metaData?.digi_docs?.aadhaarDocument)) {
     if (segments) {
 
-      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+      const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
       console.log('Image URL:', imgSrc);
       imageSrcpan.value = imgSrc;
 
@@ -177,7 +179,7 @@ const proofupload = async () => {
   loading.value = true;
   startProgressAnimation();
   const apiurl = `${baseurl.value}proofFormUpload`;
-
+ const headertoken=htoken
   try {
     // Convert URL to binary Blob
     const response = await fetch(imageSrcpan.value);
@@ -198,7 +200,7 @@ const proofupload = async () => {
     const uploadResponse = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+        'Authorization':headertoken
         // Do NOT manually set 'Content-Type'
       },
       body: formData,

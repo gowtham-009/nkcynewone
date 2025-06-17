@@ -179,7 +179,7 @@ let isDrawing = false;
 const isImageUploaded = ref(false);
 
 const { baseurl } = globalurl();
-
+const {htoken}=headerToken()
 
 const additionaldocs = async () => {
 
@@ -229,11 +229,12 @@ const getsegmentdata = async () => {
 
   else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
     await additionaldocs()
+    const headertoken=htoken
     const segments = mydata?.payload?.metaData?.proofs?.signature || '';
     if (segments) {
-      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+      const imageauth = headertoken;
       const userToken = localStorage.getItem('userkey');
-      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+      const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
       imageSrc.value = imgSrc;
 
 
@@ -461,7 +462,7 @@ const uploadsign = async () => {
   loading.value = true;
     startProgressAnimation();
   const apiurl = `${baseurl.value}proofFormUpload`;
-
+const headertoken=htoken
   
 
   try {
@@ -485,7 +486,7 @@ const uploadsign = async () => {
     const uploadResponse = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Authorization': headertoken,
         // Content-Type must NOT be set manually for FormData
       },
       body: formData,
@@ -643,7 +644,7 @@ const documentsavebtn = async () => {
     settlementStatementConsent:  'Yes'
 
   });
-
+const headertoken=htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
 
@@ -651,7 +652,7 @@ const documentsavebtn = async () => {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Authorization': headertoken,
         'Content-Type': 'application/json',
       },
       body: jsonString,

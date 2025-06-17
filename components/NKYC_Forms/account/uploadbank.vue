@@ -70,6 +70,7 @@ const buttonText = ref('Next');
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const { baseurl } = globalurl();
+const {htoken}=headerToken()
 const loading = ref(false)
 const imageSrcbank = ref(null); 
 
@@ -81,12 +82,12 @@ const getsegmentdata = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
   const segments = mydata?.payload?.metaData?.proofs?.bank || '';
-
+ const headertoken=htoken
   if (segments) {
     const isPdfFile = segments.toLowerCase().endsWith('.pdf');
-    const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+    const imageauth = headertoken;
     const userToken = localStorage.getItem('userkey');
-    const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+    const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
 
     imageSrcbank.value = { src: imgSrc, isPdf: isPdfFile };
     isImageValid.value = true;
@@ -212,12 +213,12 @@ const proofupload = async () => {
       pageCode: "photosign1"
     });
     formData.append('payload', JSON.stringify({ payload: metadata }));
-
+const headertoken=htoken
     // Send POST request
     const uploadResponse = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+        'Authorization': headertoken
       },
       body: formData
     });

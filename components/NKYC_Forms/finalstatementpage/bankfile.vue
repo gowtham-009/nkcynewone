@@ -73,6 +73,7 @@ import { useRoute } from 'vue-router';
 
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
+const {htoken}=headerToken()
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Activate F&O');
 const rippleBtn = ref(null);
@@ -182,6 +183,7 @@ onMounted(() => {
 let checkCount = 0; 
 
 const camsbankdatacheck = async () => {
+   const headertoken=htoken
   const apiurl = `${baseurl.value}cams`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -193,7 +195,7 @@ const camsbankdatacheck = async () => {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        Authorization: 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        Authorization: headertoken,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ payload: user }),
@@ -240,6 +242,7 @@ const camsbankdatacheck = async () => {
 
 
 const camsbankdata = async () => {
+   const headertoken=htoken
   const mydata = await getServerData();
   const ifscvalue = mydata?.payload?.metaData?.bank?.bank1IFSC;
 
@@ -256,7 +259,7 @@ const camsbankdata = async () => {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        Authorization: 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        Authorization: headertoken,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ payload: user }),
@@ -309,7 +312,7 @@ const bankstatement = async (pdfval) => {
       userToken: localStorage.getItem('userkey'),
       pageCode: 'thankyou'
     });
-
+ const headertoken=htoken
     // Prepare FormData with binary PDF + payload
     const formData = new FormData();
     formData.append('bankStatement', blob, 'bankstatement.pdf');
@@ -318,7 +321,7 @@ const bankstatement = async (pdfval) => {
     const uploadResponse = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        Authorization: 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        Authorization: headertoken,
         // Don't manually set Content-Type for FormData
       },
       body: formData,

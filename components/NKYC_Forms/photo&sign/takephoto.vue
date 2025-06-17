@@ -139,7 +139,7 @@ const loadingprogress = ref(false)
 
 // Configuration
 const { baseurl } = globalurl();
-
+const {htoken}=headerToken()
 const device=ref('Desktop')
 
 
@@ -362,7 +362,7 @@ const ipvfunction = async () => {
     // Fetch binary blob of the captured image
     const response = await fetch(imageCaptured.value); // imageCaptured should be a blob URL (e.g., from canvas)
     const blob = await response.blob();
-
+const headertoken=htoken
     // Encrypt metadata
     const user = encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
@@ -381,7 +381,7 @@ const ipvfunction = async () => {
     const uploadResponse = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Authorization': headertoken,
         // DO NOT set Content-Type for FormData
       },
       body: formData,

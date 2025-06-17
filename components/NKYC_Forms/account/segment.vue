@@ -66,7 +66,7 @@ const router = useRouter();
 
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
-
+const {htoken}=headerToken()
 const selected = ref(['equity', 'fno', 'commodities']);
 const isStatusValid = ref(true); 
 const isBack = ref(true); 
@@ -182,7 +182,7 @@ const segmentdata = async () => {
     pageCode: "brokerage",
     ...segmentFlags
   });
-
+ const headertoken=htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
 
@@ -190,7 +190,7 @@ const segmentdata = async () => {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Authorization': headertoken,
         'Content-Type': 'application/json',
       },
       body: jsonString,

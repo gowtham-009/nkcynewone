@@ -122,6 +122,7 @@ const router = useRouter();
 
 import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
+const {htoken}=headerToken()
 const isBack = ref(true);
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
@@ -298,7 +299,7 @@ const bankvalidation = async () => {
 
 
   });
-
+const headertoken=htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
 
@@ -307,7 +308,7 @@ const bankvalidation = async () => {
       method: 'POST',
 
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+        'Authorization': headertoken
       },
       body: jsonString,
     });

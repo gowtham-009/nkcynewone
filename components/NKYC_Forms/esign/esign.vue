@@ -83,6 +83,7 @@ import { useRoute } from 'vue-router';
 
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
+const {htoken}=headerToken()
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const deviceHeight = ref(window.innerHeight);
@@ -174,7 +175,7 @@ const resetProgress = () => {
 
 
 const createunsignedDocument = async () => {
-   
+    const headertoken=htoken
   loadingen.value = true
    startProgressAnimation();
   const apiurl = `${baseurl.value}nkyc_document`;
@@ -189,7 +190,7 @@ const createunsignedDocument = async () => {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Authorization': headertoken,
         'Content-Type': 'application/json',
       },
       body: jsonString,
@@ -219,7 +220,7 @@ const createunsignedDocument = async () => {
 };
 
 const createEsign = async () => {
- 
+ const headertoken=htoken
   const apiurl = `${baseurl.value}esign`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -232,7 +233,7 @@ const createEsign = async () => {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Authorization': headertoken,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ payload: user }),
@@ -261,12 +262,12 @@ const esignStatusCheck = async (requestId) => {
     esignId: requestId,
     esignAction: 'checkEsignStatus',
   });
-
+const headertoken=htoken
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Authorization':headertoken,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ payload: user }),
