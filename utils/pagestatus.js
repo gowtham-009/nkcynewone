@@ -41,7 +41,7 @@ export async function pagestatus(pagecode) {
   const encryptedUser = encryptionrequestdata({
     userToken: userkey,
     pageCode: pagecode,
-    profileCode: profilecode
+    profileStatus: profilecode
   });
 
   const payload = { payload: encryptedUser };
