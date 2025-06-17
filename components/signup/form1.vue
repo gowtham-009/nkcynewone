@@ -70,6 +70,7 @@ import { kradatares } from '~/utils/kradata.js';
 const router=useRouter()
 
 const { baseurl } = globalurl();
+const {htoken}=headerToken()
 const panerror = ref(false);
 const panvalue = ref('');
 const dobbox = ref(false);
@@ -145,14 +146,14 @@ const kraaddresssubmission = async (resend) => {
     userToken: userkey
   });
 
- 
+ const headertoken=htoken
 
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+        'Authorization':headertoken
       },
       body: JSON.stringify({ payload: encryptedPayload })
     });
@@ -193,12 +194,13 @@ const otpverfication = async () => {
     otpCode: loginotpval.value
   });
 
+   const headertoken=htoken
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+        'Authorization': headertoken
       },
       body: JSON.stringify({ payload: encrypted })
     });

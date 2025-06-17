@@ -101,6 +101,7 @@ const router = useRouter();
 
 const route = useRoute()
 const { baseurl } = globalurl();
+const {htoken}=headerToken()
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
@@ -155,7 +156,8 @@ const back = () => {
 
 const digilocker_create = async () => {
     const apiurl = baseurl.value + 'digilocker';
-    const authorization = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+     const headertoken=htoken
+    const authorization = headertoken;
     const user = encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "createUrl",
@@ -200,8 +202,9 @@ const digilocker_create = async () => {
 
 const digilocker_request = async () => {
     const apiurl = baseurl.value + 'digilocker';
-    const authorization = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
-    const user = encryptionrequestdata({
+ const headertoken=htoken
+    const authorization = headertoken;
+        const user = encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "getDetails",
         digilockerReqId: route.query.requestId
@@ -247,8 +250,9 @@ const digilocker_request = async () => {
 
 const digilocker_getfiles = async (requestid) => {
     const apiurl = baseurl.value + 'digilocker';
-    const authorization = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
-    const files = requestid.payload.metaData.fileIds;
+ const headertoken=htoken
+    const authorization = headertoken;
+        const files = requestid.payload.metaData.fileIds;
 
 
 
@@ -295,8 +299,8 @@ const digilocker_getfiles = async (requestid) => {
 const digilocker_getaadhardoc = async (requestid) => {
 
     const apiurl = baseurl.value + 'digilocker';
-    const authorization = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
-
+ const headertoken=htoken
+    const authorization = headertoken;
 
     const user = encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),

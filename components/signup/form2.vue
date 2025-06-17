@@ -81,6 +81,7 @@ import { getServerData } from '~/utils/serverdata.js'
 import { getEncryptionData } from '~/utils/kradata.js'
 import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
+const {htoken}=headerToken()
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
 const timeLeft = ref(10); 
@@ -166,14 +167,14 @@ const sendmobileotp = async (resend) => {
     pageCode:"mobile",
     userToken:localStorage.getItem('userkey')
   });
- 
+  const headertoken=htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
  try {
   const response = await fetch(apiurl, {
     method: 'POST',
     headers: {
-      'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+      'Authorization': headertoken,
       'Content-Type': 'application/json',
     },
     body: jsonString,
@@ -242,14 +243,14 @@ const otpverfication = async () => {
     otpCode:p_otp.value,
     pageCode:"email",
   });
- 
+  const headertoken=htoken
     const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
  try {
   const response = await fetch(apiurl, {
     method: 'POST',
     headers: {
-      'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+      'Authorization': headertoken,
       'Content-Type': 'application/json',
     },
     body: jsonString,

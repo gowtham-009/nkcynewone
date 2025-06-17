@@ -51,6 +51,7 @@
 import { ref, onMounted } from 'vue';
 import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
+const {htoken}=headerToken()
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const emit = defineEmits(['updateDiv']);
@@ -142,14 +143,14 @@ const personalinfo = async () => {
     annualIncome: selected.value,
 
   });
-
+const headertoken=htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Authorization': headertoken,
         'Content-Type': 'application/json',
       },
       body: jsonString,

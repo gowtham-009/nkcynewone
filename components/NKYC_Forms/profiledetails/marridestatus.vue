@@ -95,6 +95,7 @@ import { pagestatus } from '~/utils/pagestatus.js'
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const { baseurl } = globalurl();
+const {htoken}=headerToken()
 const deviceHeight = ref(0);
 
 const buttonText = ref("Next");
@@ -215,14 +216,14 @@ const personalinfo = async () => {
     maritalStatus: selected.value,
     pep: clientselected.value
   });
-
+ const headertoken=htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1',
+        'Authorization': headertoken,
         'Content-Type': 'application/json',
       },
       body: jsonString,
