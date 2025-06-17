@@ -58,6 +58,9 @@
           <CMAIDENTIFY @captured="onImageCaptured" @error="onCameraError" />
         </div>
 
+        <div v-if="ipverror" class="w-100 p-1 bg-red-100 mt-2 px-2 rounded-lg" >
+          <p class="text-sm text-red-500 text-center leading-5">{{ ipvlimiterror }}</p>
+        </div>
        
         <div v-if="loadingprogress" class="max-w-md mx-auto p-2 px-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
           <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
@@ -120,6 +123,8 @@ const deviceHeight = ref(window.innerHeight);
 const buttonText = ref("Continue");
 const isBack = ref(true);
 
+const ipverror=ref(false)
+const ipvlimiterror=ref('')
 // Location State
 const locationEnabled = ref(false);
 const locationLoading = ref(true);
@@ -404,6 +409,13 @@ const headertoken=htoken
         pagestatus('takephoto');
         emit('updateDiv', 'takephoto');
       }
+    }
+
+
+    else if(data.payload.status == 'error'&& data.payload.message == 'IPV limit reached. Please contact the admin for assistance.'){
+      ipvlimiterror.value=data.payload.message
+      ipverror.value=true
+      loadingprogress.value=false
     }
 
     else if ((data.payload.status == 'error' && data.payload.message == 'User not found.') || (data.payload.status == 'error' && data.payload.message == 'Missing Usertoken parameters.')) {

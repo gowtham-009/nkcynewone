@@ -17,7 +17,7 @@
           <span class="text-gray-500 text-md font-medium">Upload PAN</span>
           <div class="grid grid-cols-1 gap-3">
             <div>
-              <div class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white">
+              <div v-if="pancard" class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white">
                 <div class="px-2 py-2">
                   <PAN v-model:src="imageSrcpan" v-model:valid="isImageValid" />
                 </div>
@@ -75,42 +75,43 @@ const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const imageSrcpan = ref(null);
 const loading = ref(false)
-
+const pancard = ref(true);
 const isStatusValid = ref(true); // Assuming this is set based on some validation logic
 const isBack = ref(true); // Assuming you have some logic to enable/disable back button
 const isImageValid = ref(false)
-const hideUpload = ref(false);
+
 
 const getsegmentdata = async () => {
-  const headertoken=htoken
+  const headertoken = htoken;
   const mydata = await getServerData();
   const imageauth = headertoken;
   const userToken = localStorage.getItem('userkey');
   const segments = mydata?.payload?.metaData?.proofs?.pancard || '';
 
-  if ( (mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '') ||
-  (mydata?.payload?.metaData?.digi_info?.aadhaarUID &&mydata?.payload?.metaData?.digi_docs?.aadhaarDocument)) {
+  if (
+    mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO ||
+    (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument)
+  ) {
     if (segments) {
-
       const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
       console.log('Image URL:', imgSrc);
       imageSrcpan.value = imgSrc;
-
-      // ✅ Mark image as valid when prefilled
       isImageValid.value = true;
     }
   }
-  // const digilockpan = mydata?.payload?.metaData?.digi_docs?.panDocument;
-  // const pancard = mydata?.payload?.metaData?.proofs?.pancard;
 
-  // if (digilockpan) {
-  //   const panslice = digilockpan.replace(/\.pdf$/i, ".png");
-  //   if (panslice === pancard) {
-  //     hideUpload.value = true; // ✅ This hides the component
-  //   }
-  // }
+  const digilockpan = mydata?.payload?.metaData?.digi_docs?.panDocument;
+  const pancardName = mydata?.payload?.metaData?.proofs?.pancard;
+
+  if (digilockpan) {
+    const panslice = digilockpan.replace(/\.pdf$/i, ".png");
+    if (panslice === pancardName) {
+      pancard.value = false; // ❌ hide pancard section
+    } else {
+      pancard.value = true;  // ✅ show pancard section
+    }
+  }
 };
-
 
 
 

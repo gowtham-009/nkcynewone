@@ -82,7 +82,7 @@ import { getEncryptionData } from '~/utils/kradata.js'
 import { pagestatus } from '~/utils/pagestatus.js'
 
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+
 const router = useRouter();
 
 const deviceHeight = ref(0);
@@ -224,7 +224,7 @@ const sendemailotp = async (resend) => {
     pageCode:"email",
     userToken:localStorage.getItem('userkey')
   });
-  const headertoken=htoken
+ 
     const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
 
@@ -233,7 +233,7 @@ const sendemailotp = async (resend) => {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers:{
-        'Authorization':headertoken
+        'Authorization':'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
       },
       body: jsonString
 
@@ -303,7 +303,7 @@ const otpverfication = async () => {
     otpCode:e_otp.value,
      pageCode:"main",
   });
-  const headertoken=htoken
+ 
     const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
 
@@ -312,7 +312,7 @@ const otpverfication = async () => {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers:{
-        'Authorization':headertoken
+        'Authorization':'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
       },
       body: jsonString
 
