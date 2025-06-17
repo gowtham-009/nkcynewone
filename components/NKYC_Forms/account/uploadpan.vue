@@ -18,7 +18,7 @@
           <div class="grid grid-cols-1 gap-3">
             <div>
               <div v-if="pancard"
-                class="overflow-hidden flex justify-center items-center rounded-lg mt-2 bg-white shadow-lg dark:border-white">
+                class="overflow-hidden flex w-full justify-center items-center rounded-lg mt-2 bg-white shadow-lg dark:border-white">
                 <div class="px-2 py-2">
                   <PAN v-model:src="imageSrcpan" v-model:valid="isImageValid" />
                 </div>
