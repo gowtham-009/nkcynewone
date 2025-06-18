@@ -15,11 +15,30 @@
         <div class="w-full mt-3">
           <span class="text-gray-500 text-md font-medium">Upload Bank</span>
           <div class="grid grid-cols-1 gap-3 dark:bg-gray-800">
-            <div class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white dark:bg-gray-800">
+            <div v-if="bankbox" class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white dark:bg-gray-800">
               <div class="px-2 py-2">
                 <Bankupload v-model:modelValue="imageSrcbank" v-model:valid="isImageValid" />
               </div>
             </div>
+
+
+             <div v-if="bankoverwite" class="w-full p-1 flex justify-center items-center flex-col" >
+      <div v-if="isPdfFile" class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="openPdfInNewTab()">
+        <div class="w-full h-full bg-gray-200 flex flex-col items-center justify-center rounded-lg">
+          <i class="pi pi-file-pdf text-5xl text-red-500"></i>
+          <span class="text-xs mt-2">PDF Document</span>
+        </div>
+      </div>
+      <div v-else class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="bankoverzoom()">
+        <img :src="bankoverwitesrc" alt="" class="w-32 h-40 rounded-lg" >
+       <Dialog v-model:visible="visible" modal header="View" :style="{ width: '25rem' }">
+                  <img :src="bankoverwitesrc" alt="PAN Image" class="shadow-md rounded-xl w-full mb-1"
+                    style="filter: grayscale(100%)" />
+                </Dialog>
+      </div>
+
+      <Button type="button" @click="viewbankoverwrite()" class="w-full bg-blue-500 text-white border-0">Remove</Button>
+    </div>
           </div>
 
        <div v-if="loading" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
@@ -49,10 +68,11 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrcbank || !isImageValid || !isStatusValid"
-          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
-          {{ buttonText }}
-        </Button>
+      <Button type="button" ref="rippleBtn" @click="handleButtonClick" 
+  :disabled="!((bankoverwitesrc || (imageSrcbank && isImageValid)) && isStatusValid)"
+  class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
+  {{ buttonText }}
+</Button>
       </div>
     </div>
   </div>
@@ -73,32 +93,66 @@ const { baseurl } = globalurl();
 const {htoken}=headerToken()
 const loading = ref(false)
 const imageSrcbank = ref(null); 
-
+const visible=ref(false)
 const isImageValid = ref(false);
 const isStatusValid = ref(true);
 const isBack = ref(true);
+const isPdfFile = ref(false);
+
+const bankbox=ref(true)
+const bankoverwite=ref(false)
+const bankoverwitesrc=ref(null)
 
 const getsegmentdata = async () => {
+  const headertoken=htoken
   const mydata = await getServerData();
+  const imageauth = headertoken;
+  const userToken = localStorage.getItem('userkey');
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
   const segments = mydata?.payload?.metaData?.proofs?.bank || '';
- const headertoken=htoken
-  if (segments) {
-    const isPdfFile = segments.toLowerCase().endsWith('.pdf');
-    const imageauth = headertoken;
-    const userToken = localStorage.getItem('userkey');
-    const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
 
-    imageSrcbank.value = { src: imgSrc, isPdf: isPdfFile };
-    isImageValid.value = true;
+  if (segments) {
+    bankoverwite.value = true;
+    bankbox.value = false;
+    isPdfFile.value = segments.toLowerCase().endsWith('.pdf');
+    const fileUrl = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
+    
+    if (isPdfFile.value) {
+      bankoverwitesrc.value = fileUrl; // Store the URL for PDF
+    } else {
+      bankoverwitesrc.value = fileUrl; // Store the URL for image
+    }
+    
+    isImageValid.value = true;  
+    isStatusValid.value = true;
+  } else {
+    bankbox.value = true;
+    bankoverwite.value = false;
   }
 };
 
+watch([imageSrcbank, isImageValid], ([src, valid]) => {
+  if (src && valid) {
+    isStatusValid.value = true; 
+  }
+});
+const openPdfInNewTab = () => {
+  if (isPdfFile.value && bankoverwitesrc.value) {
+    window.open(bankoverwitesrc.value, '_blank');
+  }
+};
 
+function viewbankoverwrite() {
+ bankbox.value = true;
+  bankoverwite.value = false;
+  bankoverwitesrc.value = null;
+  imageSrcbank.value = null;
+  isImageValid.value = false;
+}
 
-
-
-
+function bankoverzoom(){
+  visible.value=true
+}
 const back = async (event) => {
   const button = rippleBtnback.value;
   const circle = document.createElement('span');
@@ -261,12 +315,24 @@ const handleButtonClick = (event) => {
   circle.style.top = `${event.clientY - rect.top}px`;
   button.$el.appendChild(circle);
 
-  setTimeout(() => {
+  setTimeout(async() => {
     circle.remove();
-    if (!loading.value && imageSrcbank.value && isImageValid.value && isStatusValid.value) {
-      proofupload();
-      isStatusValid.value = false;
-    }
+      const mydata = await getServerData();
+        const bankcardName = mydata?.payload?.metaData?.proofs?.bank;
+        if(bankoverwite.value===true && bankcardName){
+          await pagestatus('photosign1');
+           emit('updateDiv', 'photosign1');
+        }
+        else{
+           proofupload();
+          isStatusValid.value = false;
+        }
+
+
+    // if (!loading.value && imageSrcbank.value && isImageValid.value && isStatusValid.value) {
+    //   proofupload();
+    //   isStatusValid.value = false;
+    // }
   }, 600);
 };
 
