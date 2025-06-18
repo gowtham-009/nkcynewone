@@ -55,7 +55,11 @@
 
         <!-- Camera Component -->
         <div v-if="locationEnabled" class="w-full mt-3 flex justify-center flex-col">
-          <CMAIDENTIFY @captured="onImageCaptured" @error="onCameraError" />
+          <CMAIDENTIFY 
+      ref="cameraComponent"
+      @captured="onImageCaptured" 
+      @error="onCameraError" 
+    />
         </div>
 
         <div v-if="ipverror" class="w-100 p-1 bg-red-100 mt-2 px-2 rounded-lg" >
@@ -83,7 +87,7 @@
         <!-- Camera Error Alert -->
         <div v-if="cameraError" class="mt-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg">
           <div class="flex items-center">
-            <i class="pi pi-camera mr-2"></i>
+          
             <div>
               <p class="font-bold">Camera Error</p>
               <p>{{ cameraError }}</p>
@@ -91,7 +95,19 @@
           </div>
         </div>
       </div>
+ <Dialog v-model:visible="visible" modal header="Failed" :style="{ width: '25rem' }">
+      <p>Hi, Your Image Quality is 0%</p>
+      <p>Hi, We could not verify your face.</p>
+      <p>1. Ensure your face is facing towards light source</p>
+      <p>2. Click 'Take Picture'</p>
+      <p>We will verify and move you to Next Step</p>
 
+      <p>Note: We need your image quality to meet minimum 85% and above for succesfull verfication</p>
+
+      <div class="w-full flex justify-end">
+        <Button type="button" @click="retake()" class="bg-blue-500 border-0 text-md text-white">Retake</Button>
+      </div>
+ </Dialog>
       <!-- Action Buttons -->
         <div class="w-full flex gap-2">
         <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
@@ -116,7 +132,7 @@ const emit = defineEmits(['updateDiv']);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null);
 const router = useRouter();
-
+const cameraComponent = ref(null);
 // Device & UI State
 const deviceHeight = ref(window.innerHeight);
 
@@ -140,7 +156,7 @@ const cameraError = ref(null);
 const isStatusValid = ref(true);
 const loadingprogress = ref(false)
 
-
+const visible=ref(false)
 
 // Configuration
 const { baseurl } = globalurl();
@@ -162,6 +178,16 @@ onMounted(() => {
 });
 
 
+function retake() {
+  visible.value = false;
+  imageCaptured.value = null; // Clear the captured image
+  isStatusValid.value = true; // Reset validation status
+  
+  // Call the retake method on the camera component if it exists
+  if (cameraComponent.value && cameraComponent.value.retakePhoto) {
+    cameraComponent.value.retakePhoto();
+  }
+}
 onUnmounted(() => {
   if (locationInterval.value) {
     clearInterval(locationInterval.value);
@@ -357,6 +383,12 @@ const resetProgress = () => {
 };
 
 const ipvfunction = async () => {
+   ipverror.value=false
+  if(!imageCaptured.value){
+    ipverror.value=true
+    ipvlimiterror.value="Ipv image invalid"
+    return
+  }
   loadingprogress.value = true
   startProgressAnimation();
 
@@ -400,14 +432,13 @@ const headertoken=htoken
 
     const data = await uploadResponse.json();
 
-    if (data.payload.status == 'ok') {
+    if (data.payload.status == 'ok' ) {
      completeProgress();
-      if (data.payload.metaData.is_real === 'true') {
+      if (data.payload.metaData.is_real === 'true' && data.payload.metaData.realValue >= 0.6) {
         pagestatus('photoproceed');
         emit('updateDiv', 'photoproceed');
       } else {
-        pagestatus('takephoto');
-        emit('updateDiv', 'takephoto');
+       visible.value=true
       }
     }
 
@@ -482,12 +513,13 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-
-   
-    if (!loadingprogress.value && imageCaptured.value && isStatusValid.value) {
-      ipvfunction();
+ ipvfunction();
       isStatusValid.value = false;
-    }
+   
+    // if (!loadingprogress.value && imageCaptured.value && isStatusValid.value) {
+    //   ipvfunction();
+    //   isStatusValid.value = false;
+    // }
 
   }, 600)
 };

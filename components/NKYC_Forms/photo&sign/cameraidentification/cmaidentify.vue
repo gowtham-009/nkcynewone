@@ -67,6 +67,40 @@ const multipleFacesDetected = ref(false)
 let mediaStream = null
 let alertShown = false
 
+
+const retakePhoto = () => {
+  // Clear the captured image
+  capturedImage.value = null;
+  imageCaptured.value = false;
+  
+  // Restart the camera
+  stopCamera();
+  startCamera();
+};
+
+defineExpose({
+  retakePhoto
+});
+
+
+const startCamera = async () => {
+  try {
+    cameraActive.value = true;
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        width: FRAME_SIZE,
+        height: FRAME_SIZE,
+        facingMode: 'user'
+      }
+    });
+    video.value.srcObject = mediaStream;
+    startDetectionLoop();
+  } catch (err) {
+    emit('error', { message: 'Could not access camera: ' + err.message });
+  }
+};
+
+
 // Frame settings
 const FRAME_SIZE = 300
 const CENTER_TOLERANCE = 20
