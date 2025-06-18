@@ -42,6 +42,10 @@
           <a class="cursor-pointer text-blue-500" @click="additionaldoc" style="text-decoration: underline;">Additional Document</a>
         </div>
 
+        <div v-if="signerror" class="w-full p-1 bg-red-100">
+          <p class="text-red-500 text-sm text-center">{{ errorsign }}</p>
+        </div>
+
       <div v-if="loading" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
     <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
       {{ syncStatus.icon }} {{ syncStatus.title }}
@@ -130,10 +134,11 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!imageSrc || !isStatusValid"
-          class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-          {{ buttonText }}
-        </Button>
+       <Button type="button" ref="rippleBtn" @click="handleButtonClick" 
+    :disabled="!hasSignature || !isStatusValid"
+    class="primary_color text-white w-5/6 py-3 text-xl border-0">
+    {{ buttonText }}
+  </Button>
       </div>
 
 
@@ -154,6 +159,7 @@ import Option7 from '~/components/NKYC_Forms/photo&sign/questionoption/radioques
 import Option8 from '~/components/NKYC_Forms/photo&sign/questionoption/radioquestionoption8.vue'
 
 import { useRouter } from 'vue-router';
+const hasSignature = ref(false);
 const router = useRouter();
 const question1 = ref('')
 const question2 = ref('')
@@ -172,7 +178,8 @@ const loading = ref(false)
 
 const isStatusValid = ref(true);
 const isBack = ref(true);
-
+const signerror=ref(false)
+const errorsign=ref('')
 const visible=ref(false)
 let ctx = null;
 let isDrawing = false;
@@ -221,6 +228,7 @@ const getsegmentdata = async () => {
 
         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
         isImageUploaded.value = true;
+         hasSignature.value = true;
       };
       img.src = imgSrc;
     }
@@ -252,12 +260,27 @@ const getsegmentdata = async () => {
 
         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
         isImageUploaded.value = true;
+         hasSignature.value = true;
       };
       img.src = imgSrc;
     }
   }
 };
 
+
+const checkCanvasContent = () => {
+  if (!canvasRef.value || !ctx) return false;
+  
+  const canvas = canvasRef.value;
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  
+  for (let i = 0; i < imageData.length; i += 4) {
+    if (imageData[i + 3] !== 0) { // Check alpha channel
+      return true;
+    }
+  }
+  return false;
+};
 
 
 const getsegmentdatadialog = async () => {
@@ -362,10 +385,15 @@ const draw = (e) => {
 const stopDrawing = (e) => {
   if (!isDrawing || isImageUploaded.value) return;
   isDrawing = false;
-  ctx.beginPath(); // reset path
-
-  imageSrc.value = canvasRef.value.toDataURL('image/png');
+  ctx.beginPath();
+  
+    
+  hasSignature.value = checkCanvasContent();
+  if (hasSignature.value) {
+    imageSrc.value = canvasRef.value.toDataURL('image/png');
+  }
 };
+
 
 const drawDot = (x, y) => {
   if (isImageUploaded.value) return;
@@ -409,7 +437,7 @@ onMounted(async () => {
   canvas.height = 300;
 
   ctx = canvas.getContext("2d");
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1;
   ctx.strokeStyle = "black";
   ctx.fillStyle = "black";
 
@@ -459,6 +487,7 @@ const emit = defineEmits(['updateDiv']);
 
 
 const uploadsign = async () => {
+      signerror.value=false
   loading.value = true;
     startProgressAnimation();
   const apiurl = `${baseurl.value}proofFormUpload`;
@@ -557,8 +586,8 @@ const erase = () => {
   ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
   imageSrc.value = '';
   isImageUploaded.value = false;
+  hasSignature.value = false;
 };
-
 
 const fileInput = ref(null);
 
@@ -583,43 +612,62 @@ const uploadImage = (event) => {
 
       ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
       isImageUploaded.value = true;
-      imageSrc.value = canvas.toDataURL('image/png'); // ✅ set imageSrc
-
+      imageSrc.value = canvas.toDataURL('image/png');
+      hasSignature.value = true;
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 };
 
+// Modify erase to update hasSignature
 
 
 
 const handleButtonClick = () => {
+  // Check if canvas is empty
   const canvas = canvasRef.value;
   if (!canvas) return;
-  imageSrc.value = canvas.toDataURL('image/png');
+  
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  let isEmpty = true;
+  
+  for (let i = 0; i < imageData.length; i += 4) {
+    if (imageData[i + 3] !== 0) { // Check alpha channel
+      isEmpty = false;
+      break;
+    }
+  }
+  
+  if (isEmpty && !isImageUploaded.value) {
+    signerror.value=true
+    errorsign.value='Please draw your signature or upload an image before continuing'
+ 
+    return;
+  }
+  
+  // Proceed with the ripple effect and upload
+  const button = rippleBtn.value;
+  const circle = document.createElement('span');
+  circle.classList.add('ripple');
 
-  const button = rippleBtn.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
+  const rect = button.$el.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
 
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+  circle.style.left = `${x}px`;
+  circle.style.top = `${y}px`;
 
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-
-  button.$el.appendChild(circle)
+  button.$el.appendChild(circle);
 
   setTimeout(() => {
-    circle.remove()
-    if (!loading.value && imageSrc.value && isStatusValid.value) {
+    circle.remove();
+    if (!loading.value && (imageSrc.value || !isEmpty) && isStatusValid.value) {
       uploadsign();
       isStatusValid.value = false;
     }
-  }, 600)
-}
+  }, 600);
+};
 
 const additionaldoc=()=>{
  visible.value=true
