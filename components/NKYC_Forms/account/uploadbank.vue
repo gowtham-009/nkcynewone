@@ -41,6 +41,11 @@
     </div>
           </div>
 
+          <div v-if="bankerror" class="w-full p-1 mt-2 bg-red-100 px-1 py-1">
+            <p class="text-center text-red-500 text-md">{{ errorbank }}</p>
+
+          </div>
+
        <div v-if="loading" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
     <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
       {{ syncStatus.icon }} {{ syncStatus.title }}
@@ -102,6 +107,9 @@ const isPdfFile = ref(false);
 const bankbox=ref(true)
 const bankoverwite=ref(false)
 const bankoverwitesrc=ref(null)
+
+const bankerror=ref(false)
+const errorbank=ref('')
 
 const getsegmentdata = async () => {
   const headertoken=htoken
@@ -243,8 +251,11 @@ const resetProgress = () => {
 };
 
 const proofupload = async () => {
+   bankerror.value=false
   if (!imageSrcbank.value) {
-    console.error('No image to upload');
+  
+    bankerror.value=true
+    errorbank.value='No image to upload'
     return;
   }
 
@@ -324,6 +335,7 @@ const handleButtonClick = (event) => {
            emit('updateDiv', 'photosign1');
         }
         else{
+      
            proofupload();
           isStatusValid.value = false;
         }
