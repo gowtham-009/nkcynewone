@@ -25,8 +25,13 @@
               </div>
 
               <div v-if="panoverwite" class="w-full flex flex-col justify-center items-center p-1" >
-                  <div class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="panzoom()" >
+                  <div  class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="panoverzoom()" >
                   <img :src="panoverwitesrc" alt="" class="w-32 h-40">
+
+                   <Dialog v-model:visible="visible1" modal header="View" :style="{ width: '25rem' }">
+                  <img :src="panoverwitesrc" alt="PAN Image" class="shadow-md rounded-xl w-full mb-1"
+                    style="filter: grayscale(100%)" />
+                </Dialog>
                 </div>
 
                 <Button type="button" @click="viewpanoverwrite()" class="w-full bg-blue-500 text-white border-0">Remove</Button>
@@ -34,7 +39,7 @@
 
               <div v-if="digipan" class="w-full p-1 flex justify-center bg-gray-100 rounded-lg shadow-sm">
                 <div class="w-32 h-40 rounded-lg" @click="panzoom()">
-                  <img :src="digisrc" alt="">
+                  <img :src="digisrc" alt="" class="w-32 h-40">
                 </div>
 
                 <Dialog v-model:visible="visible" modal header="View" :style="{ width: '25rem' }">
@@ -105,7 +110,7 @@ const digisrc = ref('')
 const visible = ref(false)
 const panoverwite=ref(false)
 const panoverwitesrc=ref(null)
-
+const visible1=ref(false)
 const getsegmentdata = async () => {
   const headertoken = htoken;
   const mydata = await getServerData();
@@ -161,6 +166,11 @@ watch([imageSrcpan, isImageValid], ([src, valid]) => {
 
 function panzoom() {
   visible.value = true
+}
+
+function panoverzoom() {
+  alert("hi")
+  visible1.value = true
 }
 
 function viewpanoverwrite() {

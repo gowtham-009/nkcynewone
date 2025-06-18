@@ -3,7 +3,7 @@ import { encryptionrequestdata } from '~/utils/globaldata.js';
 export async function pagestatus(pagecode) {
   const apiUrl = "https://nnkyc.w3webtechnologies.co.in/api/v1/update_pagestatus";
   const userkey = localStorage.getItem('userkey');
-  console.log("componentname:", pagecode)
+
   // Define profileCode mapping based on pagecode
   const profileCodeMap = {
    mobile:3,
@@ -38,7 +38,7 @@ export async function pagestatus(pagecode) {
   };
 
   const profilecode = profileCodeMap[pagecode] || 0; // fallback to 0 if not matched
-console.log("profileno:",profilecode)
+
   const encryptedUser = encryptionrequestdata({
     userToken: userkey,
     pageCode: pagecode,
