@@ -28,7 +28,10 @@
 
 
                 </div>
-        <canvas ref="canvasRef" class="signature-canvas rounded-lg mt-1" @touchstart.prevent @touchmove.prevent />
+        
+
+                <div class="w-full" >
+                  <canvas ref="canvasRef" class="signature-canvas rounded-lg mt-1" @touchstart.prevent @touchmove.prevent />
 
         <div class="w-full mt-1 flex gap-2 justify-center">
           <Button @click="erase" icon="pi pi-trash" label="Clear"
@@ -37,7 +40,7 @@
             label="Upload Signature"></Button>
           <input type="file" accept="image/*" ref="fileInput" @change="uploadImage" style="display: none" />
         </div>
-
+                </div>
         <div class="w-full mt-1">
           <a class="cursor-pointer text-blue-500" @click="additionaldoc" style="text-decoration: underline;">Additional Document</a>
         </div>
@@ -64,8 +67,6 @@
       </div>
     </div>
   </div>
-
-       
       </div>
 
 
@@ -160,6 +161,9 @@ import Option8 from '~/components/NKYC_Forms/photo&sign/questionoption/radioques
 
 import { useRouter } from 'vue-router';
 const hasSignature = ref(false);
+const isSignatureUploaded = ref(false);
+const isSignatureModified = ref(false);
+const initialSignatureLoaded = ref(false);
 const router = useRouter();
 const question1 = ref('')
 const question2 = ref('')
@@ -208,6 +212,7 @@ const getsegmentdata = async () => {
     const segments = mydata?.payload?.metaData?.proofs?.signature || '';
     if (segments) {
       await additionaldocs()
+       isSignatureUploaded.value = true;
       const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
       const userToken = localStorage.getItem('userkey');
       const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
@@ -229,6 +234,7 @@ const getsegmentdata = async () => {
         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
         isImageUploaded.value = true;
          hasSignature.value = true;
+          initialSignatureLoaded.value = true;
       };
       img.src = imgSrc;
     }
@@ -261,6 +267,7 @@ const getsegmentdata = async () => {
         ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
         isImageUploaded.value = true;
          hasSignature.value = true;
+           initialSignatureLoaded.value = true;
       };
       img.src = imgSrc;
     }
@@ -366,10 +373,10 @@ const resetProgress = () => {
 };
 
 
-
 const startDrawing = (e) => {
   if (isImageUploaded.value) return;
   isDrawing = true;
+  isSignatureModified.value = true; // Mark as modified when drawing starts
   const pos = getMousePos(e);
   ctx.beginPath();
   ctx.moveTo(pos.x, pos.y);
@@ -387,7 +394,6 @@ const stopDrawing = (e) => {
   isDrawing = false;
   ctx.beginPath();
   
-    
   hasSignature.value = checkCanvasContent();
   if (hasSignature.value) {
     imageSrc.value = canvasRef.value.toDataURL('image/png');
@@ -531,6 +537,7 @@ const headertoken=htoken
 
     if (data.payload.status === 'ok') {
       completeProgress();
+        isSignatureUploaded.value = true;
        pagestatus('esign')
       emit('updateDiv', 'esign');
     }
@@ -580,13 +587,13 @@ const back = () => {
   }, 600)
 
 }
-
 const erase = () => {
   if (!canvasRef.value || !ctx) return;
   ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
   imageSrc.value = '';
   isImageUploaded.value = false;
   hasSignature.value = false;
+  isSignatureModified.value = true; // Mark as modified when erased
 };
 
 const fileInput = ref(null);
@@ -594,7 +601,6 @@ const fileInput = ref(null);
 const triggerUpload = () => {
   fileInput.value?.click();
 };
-
 const uploadImage = (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -614,17 +620,14 @@ const uploadImage = (event) => {
       isImageUploaded.value = true;
       imageSrc.value = canvas.toDataURL('image/png');
       hasSignature.value = true;
+      isSignatureModified.value = true; // Mark as modified when new image uploaded
     };
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 };
-
 // Modify erase to update hasSignature
-
-
-
-const handleButtonClick = () => {
+const handleButtonClick = async () => {
   // Check if canvas is empty
   const canvas = canvasRef.value;
   if (!canvas) return;
@@ -633,38 +636,39 @@ const handleButtonClick = () => {
   let isEmpty = true;
   
   for (let i = 0; i < imageData.length; i += 4) {
-    if (imageData[i + 3] !== 0) { // Check alpha channel
+    if (imageData[i + 3] !== 0) {
       isEmpty = false;
       break;
     }
   }
   
   if (isEmpty && !isImageUploaded.value) {
-    signerror.value=true
-    errorsign.value='Please draw your signature or upload an image before continuing'
- 
+    signerror.value = true;
+    errorsign.value = 'Please draw your signature or upload an image before continuing';
     return;
   }
   
-  // Proceed with the ripple effect and upload
+  // Ripple effect
   const button = rippleBtn.value;
   const circle = document.createElement('span');
   circle.classList.add('ripple');
-
   const rect = button.$el.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
-
   circle.style.left = `${x}px`;
   circle.style.top = `${y}px`;
-
   button.$el.appendChild(circle);
 
-  setTimeout(() => {
+  setTimeout(async () => {
     circle.remove();
-    if (!loading.value && (imageSrc.value || !isEmpty) && isStatusValid.value) {
-      uploadsign();
-      isStatusValid.value = false;
+    
+    if (initialSignatureLoaded.value && !isSignatureModified.value) {
+      const page = await pagestatus('esign');
+      if (page?.payload?.status === 'ok') {
+        emit('updateDiv', 'esign');
+      }
+    } else {
+      await uploadsign();
     }
   }, 600);
 };
