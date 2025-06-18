@@ -141,7 +141,7 @@ const getsegmentdata = async () => {
   if (digilockpan) {
     const panslice = digilockpan.replace(/\.pdf$/i, ".png");
     if (panslice === pancardName) {
-
+        panoverwite.value = false;
       pancard.value = false; 
       digipan.value = true
       const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${pancardName}`;
