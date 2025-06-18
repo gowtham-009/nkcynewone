@@ -18,10 +18,18 @@
           <div class="grid grid-cols-1 gap-3">
             <div>
               <div v-if="pancard"
-                class="overflow-hidden flex w-full justify-center items-center rounded-lg mt-2 bg-white shadow-lg dark:border-white">
-                <div class="px-2 py-2">
+                class="overflow-hidden flex w-full justify-center items-center rounded-lg mt-2 bg-white shadow-lg dark:border-white" >
+                <div class="px-2 py-2 w-full" >
                   <PAN v-model:src="imageSrcpan" v-model:valid="isImageValid" />
                 </div>
+              </div>
+
+              <div v-if="panoverwite" class="w-full flex flex-col justify-center items-center p-1" >
+                  <div class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="panzoom()" >
+                  <img :src="panoverwitesrc" alt="" class="w-32 h-40">
+                </div>
+
+                <Button type="button" @click="viewpanoverwrite()" class="w-full bg-blue-500 text-white border-0">Remove</Button>
               </div>
 
               <div v-if="digipan" class="w-full p-1 flex justify-center bg-gray-100 rounded-lg shadow-sm">
@@ -64,7 +72,8 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" ref="rippleBtn" @click="handleButtonClick"
-          :disabled="!imageSrcpan || !isImageValid || !isStatusValid"
+          :disabled="!(panoverwitesrc || (imageSrcpan && isImageValid && isStatusValid))"
+
           class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
@@ -94,22 +103,35 @@ const isImageValid = ref(false)
 const digipan = ref(false)
 const digisrc = ref('')
 const visible = ref(false)
+const panoverwite=ref(false)
+const panoverwitesrc=ref(null)
+
 const getsegmentdata = async () => {
   const headertoken = htoken;
   const mydata = await getServerData();
   const imageauth = headertoken;
   const userToken = localStorage.getItem('userkey');
-  const segments = mydata?.payload?.metaData?.proofs?.pancard || '';
+  const segments = mydata?.payload?.metaData?.proofs?.pancard ;
 
   if (
     mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO ||
     (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument)
   ) {
-    if (segments) {
-      const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
-      console.log('Image URL:', imgSrc);
-      imageSrcpan.value = imgSrc;
-      isImageValid.value = true;
+
+    
+   if (segments) {
+  pancard.value = false;
+  panoverwite.value = true;
+  const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
+  
+  panoverwitesrc.value = imgSrc;
+  isImageValid.value = true;  
+  isStatusValid.value = true;
+  //imageSrcpan.value = imgSrc; // Also set imageSrcpan to ensure consistency
+}
+    else{
+       pancard.value=true
+    panoverwite.value=false
     }
   }
 
@@ -131,9 +153,26 @@ const getsegmentdata = async () => {
   }
 };
 
+watch([imageSrcpan, isImageValid], ([src, valid]) => {
+  if (src && valid) {
+    isStatusValid.value = true; 
+  }
+});
+
 function panzoom() {
   visible.value = true
 }
+
+function viewpanoverwrite() {
+  pancard.value = true;
+  digipan.value = false;
+  panoverwite.value = false;
+  panoverwitesrc.value = null;      // Clear overwritten image src
+  imageSrcpan.value = null;         // Clear pancard image if needed
+  isImageValid.value = false;       // Mark image as invalid
+  isStatusValid.value = false;      // Disable Next button
+}
+
 
 const progress = ref(0);
 const progressInterval = ref(null);
@@ -326,10 +365,27 @@ const handleButtonClick = (event) => {
       }
     }
     else {
+      if(panoverwite.value===true && pancardName){
+
+        const bankcheck = mydata?.payload?.metaData?.bank?.bank1HolderName;
+        if(bankcheck){
+            await pagestatus('photosign1');
+              emit('updateDiv', 'photosign1');
+              isStatusValid.value = false;
+        }else{
+          await pagestatus('uploadbank');
+          emit('updateDiv', 'uploadbank');
+          isStatusValid.value = false;
+        }
+      }
+      else{
+
       if (!loading.value && isImageValid.value && isStatusValid.value) {
         proofupload();
         isStatusValid.value = false;
       }
+      }
+
     }
 
 
