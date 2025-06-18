@@ -202,7 +202,7 @@ const permanentaddressdata = async () => {
         router.push('/')
       }
 
-      else if (data?.payload?.status === 'error') {
+     else if(data.payload.status=='error' && data.payload.errors.length>0) {
         addresserror.value = ""
         cityerror.value = ""
         stateerror.value = ""

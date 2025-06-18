@@ -146,7 +146,7 @@ const personalinfo = async () => {
         router.push('/')
       }
 
-      else if (data?.payload?.status === 'error') {
+    else if(data.payload.status=='error' && data.payload.errors.length>0){
       fathererror.value=""
      mothererror.value =""
    

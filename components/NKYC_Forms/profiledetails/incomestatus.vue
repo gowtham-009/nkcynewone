@@ -173,7 +173,7 @@ const headertoken=htoken
         router.push('/')
       }
 
-        else if (data?.payload?.status === 'error') {
+       else if(data.payload.status=='error' && data.payload.errors.length>0){
       incomeerror.value=""
 
    

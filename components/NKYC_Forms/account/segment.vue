@@ -213,7 +213,7 @@ const segmentdata = async () => {
       }
 
       else if (data?.payload?.status === 'error') {
-        alert('hiii')
+       
       segmenterror.value=data.payload.message
  
  

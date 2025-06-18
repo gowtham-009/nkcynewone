@@ -252,7 +252,7 @@ else if((data?.payload?.status == 'error' && data?.payload?.message=='User Not F
   router.push('/')
 }
 
-    else if (data?.payload?.status === 'error') {
+   else if(data.payload.status=='error' && data.payload.errors.length>0) {
       gendererror.value=""
      maritalerror.value =""
      peperror.value=""
