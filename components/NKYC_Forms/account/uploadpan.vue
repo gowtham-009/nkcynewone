@@ -26,7 +26,7 @@
 
               <div v-if="panoverwite" class="w-full flex flex-col justify-center items-center p-1" >
                   <div  class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="panoverzoom()" >
-                  <img :src="panoverwitesrc" alt="" class="w-32 h-40">
+                  <img :src="panoverwitesrc" alt="" class="w-32 h-40 rounded-lg">
 
                    <Dialog v-model:visible="visible1" modal header="View" :style="{ width: '25rem' }">
                   <img :src="panoverwitesrc" alt="PAN Image" class="shadow-md rounded-xl w-full mb-1"
@@ -39,7 +39,7 @@
 
               <div v-if="digipan" class="w-full p-1 flex justify-center bg-gray-100 rounded-lg shadow-sm">
                 <div class="w-32 h-40 rounded-lg" @click="panzoom()">
-                  <img :src="digisrc" alt="" class="w-32 h-40">
+                  <img :src="digisrc" alt="" class="w-32 h-40 rounded-lg">
                 </div>
 
                 <Dialog v-model:visible="visible" modal header="View" :style="{ width: '25rem' }">

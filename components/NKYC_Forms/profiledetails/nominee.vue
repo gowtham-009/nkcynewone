@@ -144,6 +144,7 @@
         <div class="w-full mt-2">
           <div :class="{ 'disabled-container': isDisabled }">
             <Guardian v-model="guardian" />
+             <span class="text-red-500">{{ guardianerror }}</span>
           </div>
 
         </div>
@@ -248,6 +249,7 @@ const emailerror=ref('')
 const sharevalerror=ref('')
 const iderror=ref('')
 
+const guardianerror = ref('')
 const statementOptions = ref([
   { value: 'Son', name: 'Son' },
   { value: 'Daughter', name: 'Daughter' },
@@ -480,6 +482,10 @@ const isSaveDisabled = computed(() => {
     isIdValid = isDrivingLicenceValid.value;
   }
 
+  // Check if guardian is required (based on age)
+  const requiresGuardian = !isDisabled.value; // isDisabled is false when under 18
+  const guardianValid = !requiresGuardian || (requiresGuardian && guardian.value.trim() !== '');
+
   return (
     !selectedStatement.value ||
     !dob.value ||
@@ -489,7 +495,8 @@ const isSaveDisabled = computed(() => {
     mobileNo.value.length !== 10 ||
     !isValidEmail.value ||
     share > availabilelimit.value ||
-    !isIdValid // Add ID validation check
+    !isIdValid ||
+    !guardianValid // Add guardian validation
   );
 });
 
@@ -691,7 +698,7 @@ const nomineesavedata = async () => {
         localStorage.removeItem('userkey');
         router.push('/');
       } 
-      else{
+      else if(data.payload.status=='error' && data.payload.errors.length>0) {
           nameerror.value = ""
         relationshiperror.value = ""
         doberror.value = ""
@@ -699,32 +706,36 @@ const nomineesavedata = async () => {
         mobileerror.value=""
         emailerror.value=""
         iderror.value=""
+        guardianerror.value=""
         sharevalerror.value=""
         data.payload.errors.forEach((err) => {
 
 
-          if (err.field === 'nomineeName' && !name.value) {
+          if (err.field === 'nomineeName') {
             nameerror.value = err.message || ' ';
           }
-          if (err.field === 'nomineeRelation' && !selectedStatement.value) {
+          if (err.field === 'nomineeRelation') {
             relationshiperror.value = err.message || ' ';
           }
-            if (err.field === 'nomineeDob' && !dob.value) {
+            if (err.field === 'nomineeDob') {
             doberror.value = err.message || ' ';
           }
-          if (err.field === 'nomineeAddress' && !address.value) {
+          if (err.field === 'nomineeAddress') {
             addresserror.value = err.message || ' ';
           }
-          if (err.field === 'nomineeMobile' && !mobileNo.value) {
+          if (err.field === 'nomineeMobile') {
             mobileerror.value = err.message || ' ';
           }
-            if (err.field === 'nomineeEmail' && !email.value) {
+            if (err.field === 'nomineeEmail') {
             emailerror.value = err.message || ' ';
           }
             if (err.field === 'nomineeIdNo') {
             iderror.value = err.message || ' ';
           }
-           if (err.field === 'nomineeShare' && !shareval.value) {
+           if (err.field === 'nomineeGuardianName') {
+            guardianerror.value = err.message || ' ';
+          }
+           if (err.field === 'nomineeShare') {
             sharevalerror.value = err.message || ' ';
           }
         });
@@ -898,23 +909,22 @@ watch(dob, (newval) => {
   if (newval) {
     const dobval = new Date(newval);
     const today = new Date();
-
     let age = today.getFullYear() - dobval.getFullYear();
     const month = today.getMonth() - dobval.getMonth();
 
-    // Adjust age if birthday hasn't occurred yet this year
     if (month < 0 || (month === 0 && today.getDate() < dobval.getDate())) {
       age--;
     }
 
     if (age < 18) {
-
       isDisabled.value = false;
-
-
+      // When under 18, guardian becomes required
+      if (!guardian.value) {
+        guardianerror.value = '';
+      }
     } else {
       isDisabled.value = true;
-
+      guardianerror.value = '';
     }
   }
 });
