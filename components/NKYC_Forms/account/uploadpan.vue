@@ -50,6 +50,9 @@
             </div>
           </div>
 
+          <div v-if="errorimage" class="w-full px-1 py-1 bg-red-100 rounded-lg mt-1">
+            <p class="text-red-500 text-sm text-center">{{ imageerror }}</p>
+          </div>
           <div v-if="loading" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
             <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
               {{ syncStatus.icon }} {{ syncStatus.title }}
@@ -111,6 +114,10 @@ const visible = ref(false)
 const panoverwite=ref(false)
 const panoverwitesrc=ref(null)
 const visible1=ref(false)
+
+const errorimage=ref(false)
+const imageerror=ref('')
+
 const getsegmentdata = async () => {
   const headertoken = htoken;
   const mydata = await getServerData();
@@ -169,7 +176,7 @@ function panzoom() {
 }
 
 function panoverzoom() {
-  alert("hi")
+
   visible1.value = true
 }
 
@@ -241,8 +248,10 @@ const resetProgress = () => {
 
 
 const proofupload = async () => {
+  errorimage.value=false
   if (!imageSrcpan.value) {
-    console.error('No image to upload');
+      errorimage.value=true
+      imageerror.value="Please Upload Pan Proof"
     return;
   }
 
@@ -375,6 +384,7 @@ const handleButtonClick = (event) => {
       }
     }
     else {
+   
       if(panoverwite.value===true && pancardName){
 
         const bankcheck = mydata?.payload?.metaData?.bank?.bank1HolderName;
@@ -389,11 +399,11 @@ const handleButtonClick = (event) => {
         }
       }
       else{
-
-      if (!loading.value && isImageValid.value && isStatusValid.value) {
-        proofupload();
+  proofupload();
         isStatusValid.value = false;
-      }
+      // if (!loading.value && isImageValid.value && isStatusValid.value) {
+      
+      // }
       }
 
     }
