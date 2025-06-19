@@ -937,15 +937,15 @@ watch(dob, (newval) => {
     }
 
     if (age < 18) {
-       console.log("ageeee",age)
+    
       isDisabled.value = false;
       // When under 18, guardian becomes required
       if (!guardian.value) {
         guardianerror.value = '';
       }
     } else {
-       console.log("ageeee",age)
-       guardian.value=' '
+      
+       guardian.value=''
       isDisabled.value = true;
       guardianerror.value = '';
     }
