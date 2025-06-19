@@ -306,12 +306,14 @@ const resetFormFields = () => {
 const openNomineeDialog = async() => {
  const mydata = await getServerData();
 
-if ((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')) {
-  alert('Session has expired, please login.');
-  localStorage.removeItem('userkey')
-  router.push('/')
-  return; // Stop further execution if session expired
-}
+  if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
 
   resetFormFields();
   visible.value = true;
@@ -718,12 +720,14 @@ const nomineesavedata = async () => {
       await nomineedetails();
       resetFormFields();
     } 
+
+       
+
     else if (data.payload.status === 'error') {
-      if (data.payload.message === 'User Not Found.' || 
-          data.payload.message === 'Missing Usertoken parameters.') {
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey');
-        router.push('/');
+      if (data.payload.code == '1002' || data.payload.code=='1004') {
+       alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
       } 
       else if(data.payload.status=='error' && data.payload.errors.length>0) {
        
@@ -799,10 +803,13 @@ const headertoken=htoken
     }
 
     const data = await response.json();
-       if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
+       if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
       }
 
     nomineedetails(); // Refresh the nominee list or details
@@ -862,16 +869,21 @@ const back = () => {
 
   setTimeout(async() => {
     circle.remove()
-   const page = await pagestatus('income')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'income');
-      isBack.value = false;
-    }
+
+     const data = await pagestatus('income')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'income');
+  isBack.value = false;
+}
+
+   
   },
   
   600)
@@ -902,11 +914,15 @@ const handleButtonClick = (event) => {
     if (mydata.payload.status == 'ok') {
       emit('updateDiv', 'bank1');
     }
-    else if((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')){
-       alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
-    }
+    else if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
+
 isStatusValid.value=false
 
 

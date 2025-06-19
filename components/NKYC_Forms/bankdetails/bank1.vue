@@ -344,31 +344,34 @@ const headertoken=htoken
     }
 
     const data = await response.json();
- accnotypeerror.value=""
+      accnotypeerror.value=""
      accnoerror.value =""
      ifscerror.value=""
      micrerror.value=""
      banknameerror.value=""
      addresserror.value=""
-    if (data?.payload?.metaData?.bankVerifyStatus == 1) {
+    if (data.payload.status=='ok'&&(data.payload.metaData.bankVerifyStatus == 1 || data.payload.metaData.bankVerifyStatus == 0)) {
       errorbox.value = false
        completeProgress();
       emit('updateDiv', 'bank4');
 
     }
-    else if (data?.payload?.status == 'error' && data?.payload?.message=='This bank account number and IFSC already exist for another client.') {
-     resetProgress();
+    else if (data.payload.status == 'error' && data.payload.code=='H1002') {
+  
       waitingbox.value = false
       errorbox.value = true
       errormsg.value = data.payload.message
       isStatusValid.value=false
     }
     
-      else if( (data?.payload?.status=='error' && data?.payload?.message=='User not found.')||(data?.payload?.status=='error' && data?.payload?.message=='Missing Usertoken parameters.')){
-       resetProgress();
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
+      else if (data.payload.status == 'error') {
+        waitingbox.value=false
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
       }
     
     else if(data.payload.status=='error' && data.payload.errors.length>0) {
@@ -397,11 +400,7 @@ if (err.field === 'bankAccType' && !selected.value) {
 }
   
     
-    else {
-      completeProgress();
-      emit('updateDiv', 'bank4');
-    }
-
+ 
 
   } catch (error) {
     resetProgress();
@@ -459,16 +458,20 @@ function back() {
 
   setTimeout(async () => {
     circle.remove()
-const page = await pagestatus('nominee')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'nominee');
-      isBack.value = false;
-    }
+   circle.remove()
+
+ const data = await pagestatus('nominee')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'nominee');
+  isBack.value = false;
+}
   }, 600)
 
 }

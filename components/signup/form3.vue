@@ -186,17 +186,23 @@ const back = () => {
 
   setTimeout(async () => {
     circle.remove()
-    const page = await pagestatus('mobile')
-    if ((page?.payload?.status == 'error' && page?.payload?.message == 'User Not Found.') || (page?.payload?.status == 'error' && page?.payload?.message == 'Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'mobile');
-      isBack.value = false;
-    }
-  }, 600)
+    const data = await pagestatus('mobile')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'mobile');
+  isBack.value = false;
+}
+
+  
+
+  },
+600)
 
 }
 
@@ -284,20 +290,20 @@ const sendemailotp = async (resend) => {
         emailerror.value = data.payload.message
       }
 
-        else if(data.payload.status=='error'  && data.payload.code=='1002'){
-      
-     alert(data.payload.message)
-      localStorage.removeItem('userkey')
+      else if (data.payload.status == 'error' && data.payload.code == '1002') {
+
+        alert(data.payload.message)
+        localStorage.removeItem('userkey')
         router.push('/')
-      
-    }
-  
-      else if(data.payload.status=='error'  && data.payload.code=='1004'){
-    alert(data.payload.message)
-      localStorage.removeItem('userkey')
+
+      }
+
+      else if (data.payload.status == 'error' && data.payload.code == '1004') {
+        alert(data.payload.message)
+        localStorage.removeItem('userkey')
         router.push('/')
-      
-    }
+
+      }
     }
   } catch (error) {
     console.error(error.message)
@@ -340,31 +346,31 @@ const otpverfication = async () => {
         pagestatus('main')
         emit('updateDiv', 'main');
       }
-      else if (data.payload.status === 'error'&& data.payload.code === 'C1006') {
+      else if (data.payload.status === 'error' && data.payload.code === 'C1006') {
         otperror.value = true
         errorotp.value = data.payload.message
         isSending.value = true;
       }
-         else if (data.payload.status === 'error'&& data.payload.code === '1005' && data.payload.otpStatus === 0) {
+      else if (data.payload.status === 'error' && data.payload.code === '1005' && data.payload.otpStatus === 0) {
         otperror.value = true
         errorotp.value = data.payload.message
         isSending.value = true;
       }
 
-      else if(data.payload.status=='error'  && data.payload.code=='1002'){
-    errormsg.value=true
-    errormobile.value=data.payload.message
-    localStorage.removeItem('userkey')
-      router.push('/')
-     
-  }
-    else if(data.payload.status=='error'  && data.payload.code=='1004'){
-    errormsg.value=true
-    errormobile.value=data.payload.message
-    localStorage.removeItem('userkey')
-      router.push('/')
-     
-  }
+      else if (data.payload.status == 'error' && data.payload.code == '1002') {
+        errormsg.value = true
+        errormobile.value = data.payload.message
+        localStorage.removeItem('userkey')
+        router.push('/')
+
+      }
+      else if (data.payload.status == 'error' && data.payload.code == '1004') {
+        errormsg.value = true
+        errormobile.value = data.payload.message
+        localStorage.removeItem('userkey')
+        router.push('/')
+
+      }
 
 
     }
@@ -407,20 +413,20 @@ const handleButtonClick = () => {
   button.$el.appendChild(circle);
   setTimeout(async () => {
     circle.remove();
-   
 
-    if(emailbox.value==true){
-     
-       await otpverfication();
+
+    if (emailbox.value == true) {
+
+      await otpverfication();
 
     }
-    else{
-      
- await sendemailotp();
+    else {
+
+      await sendemailotp();
     }
 
-    
- 
+
+
   }, 600);
 };
 

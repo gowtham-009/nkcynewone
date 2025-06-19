@@ -199,10 +199,13 @@ const permanentaddressdata = async () => {
         }
       }
 
-      else if ((data?.payload?.status == 'error' && data?.payload?.message == 'User Not Found.') || (data?.payload?.status == 'error' && data?.payload?.message == 'Missing Usertoken parameters.')) {
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
+      else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
       }
 
      else if(data.payload.status=='error' && data.payload.errors.length>0) {
@@ -223,6 +226,9 @@ const permanentaddressdata = async () => {
             pincodeerror.value = err.message || ' ';
           }
         });
+      }
+      else{
+        console.log(data.payload.message)
       }
 
 
@@ -283,16 +289,18 @@ function back() {
   setTimeout(async () => {
     circle.remove()
 
-    const page = await pagestatus('main')
-    if ((page?.payload?.status == 'error' && page?.payload?.message == 'User Not Found.') || (page?.payload?.status == 'error' && page?.payload?.message == 'Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'main');
-      isBack.value = false;
-    }
+     const data = await pagestatus('main')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'main');
+  isBack.value = false;
+}
   }, 600)
 
 }

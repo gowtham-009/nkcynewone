@@ -100,8 +100,8 @@
                     class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
                     <i class="pi pi-angle-left text-3xl dark:text-white"></i>
                 </Button>
-                <Button type="button" ref="rippleBtn" :disabled="!isFormValid" label="Continue" @click="handleButtonClick"
-                    class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
+                <Button type="button" ref="rippleBtn" :disabled="!isFormValid" label="Continue"
+                    @click="handleButtonClick" class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
                     {{ buttonText }}
                 </Button>
             </div>
@@ -142,7 +142,7 @@ onMounted(() => {
 const router = useRouter();
 
 const handleButtonClick = () => {
-    isFormValid.value = false; 
+    isFormValid.value = false;
     const button = rippleBtn.value
     const circle = document.createElement('span')
     circle.classList.add('ripple')
@@ -159,35 +159,33 @@ const handleButtonClick = () => {
     setTimeout(async () => {
         circle.remove()
 
-       const mydata = await getServerData();
+        const data = await getServerData();
 
-   
+        if (data.payload.status == 'error') {
+            if (data.payload.code == '1004' || data.payload.code == '1002') {
+                alert(data.payload.message)
+                localStorage.removeItem('userkey')
+                router.push('/')
+                return
+            }
+        }
+        else {
+        const digiInfo = data?.payload?.metaData?.digi_info || [];
+        const panInfo = data?.payload?.metaData?.kraPan?.APP_KRA_INFO;
 
-if ((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')) {
-  alert('Session has expired, please login.');
-  localStorage.removeItem('userkey')
-  router.push('/')
-  return; // Stop further execution if session expired
-}
-
-const digiInfo = mydata?.payload?.metaData?.digi_info || [];
-const panInfo = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
-
-if (digiInfo.length === 0) {
-  if (panInfo) {
-    pagestatus('parmanentaddress');
-    emit('updateDiv', 'parmanentaddress');
-  } else {
-    pagestatus('ekyc');
-    emit('updateDiv', 'ekyc');
-  }
-} else {
-  pagestatus('parmanentaddress');
-  emit('updateDiv', 'parmanentaddress');
-}
-
-
-
+        if (digiInfo.length === 0) {
+          if (panInfo) {
+            pagestatus('parmanentaddress');
+            emit('updateDiv', 'parmanentaddress');
+          } else {
+            pagestatus('ekyc');
+            emit('updateDiv', 'ekyc');
+          }
+        } else {
+          pagestatus('parmanentaddress');
+          emit('updateDiv', 'parmanentaddress');
+        }
+        }
 
     }, 600)
 };
@@ -208,19 +206,23 @@ function back() {
     circle.style.top = `${y}px`
     button.$el.appendChild(circle)
 
-    setTimeout(async() => {
+    setTimeout(async () => {
         circle.remove()
-       const page=await pagestatus('email')
-       if((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')){
-             alert('Session has expired, please login.');
-                localStorage.removeItem('userkey')
-                router.push('/')
-       }
-       else if(page.payload.status=='ok'){
-         emit('updateDiv', 'email');
-        isBack.value = false;
-       }
-       
+
+          const data = await pagestatus('email')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'email');
+  isBack.value = false;
+}
+
+
     }, 600)
 
 }

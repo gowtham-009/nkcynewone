@@ -114,27 +114,27 @@ const back = () => {
   const button = rippleBtnback.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
-
   const rect = button.$el.getBoundingClientRect()
   const x = event.clientX - rect.left
   const y = event.clientY - rect.top
-
   circle.style.left = `${x}px`
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
-
   setTimeout(async() => {
     circle.remove()
-   const page = await pagestatus('qualification')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'qualification');
-      isBack.value = false;
-    }
+ const data = await pagestatus('qualification')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'qualification');
+  isBack.value = false;
+}
+
   }, 600)
 
 };
@@ -171,11 +171,15 @@ const headertoken=htoken
         emit('updateDiv', 'occupation');
       }
 
-       else if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
+       else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
       }
+
 
       
        else if(data.payload.status=='error' && data.payload.errors.length>0){

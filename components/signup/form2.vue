@@ -225,16 +225,14 @@ const sendmobileotp = async (resend) => {
   }
 
    else if(data.payload.status=='error'  && data.payload.code=='1002'){
-    errormsg.value=true
-    errormobile.value=data.payload.message
+   alert(data.payload.message)
     localStorage.removeItem('userkey')
       router.push('/')
      
   }
  
     else if(data.payload.status=='error'  && data.payload.code=='1004'){
-    errormsg.value=true
-    errormobile.value=data.payload.message
+    alert(data.payload.message)
     localStorage.removeItem('userkey')
       router.push('/')
      

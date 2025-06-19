@@ -198,11 +198,14 @@ const handleButtonClick = () => {
     if (mydata.payload.status == 'ok') {
       emit('updateDiv', 'segment1');
     }
-    else if((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')){
-       alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
-    }
+    else if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
 isStatusValid.value=false
 
     
@@ -230,16 +233,21 @@ const back = () => {
 
   setTimeout(async() => {
     circle.remove()
-     const mydata = await pagestatus('bank1')
-    if (mydata.payload.status == 'ok') {
-      emit('updateDiv', 'bank1');
-    }
-    else if((mydata?.payload?.status == 'error' && mydata?.payload?.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing Usertoken parameters.')){
-       alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
-    }
-isBack.value=false
+       circle.remove()
+
+ const data = await pagestatus('bank1')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'bank1');
+  isBack.value = false;
+}
+
 },
     600)
 

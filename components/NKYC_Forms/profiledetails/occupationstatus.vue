@@ -120,16 +120,20 @@ const back = () => {
 
   setTimeout(async() => {
     circle.remove()
-   const page = await pagestatus('tradingexperience')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'tradingexperience');
-      isBack.value = false;
-    }
+
+ const data = await pagestatus('tradingexperience')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'tradingexperience');
+  isBack.value = false;
+}
+
   }, 600)
 
 };
@@ -172,10 +176,13 @@ const personalinfo = async () => {
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'income');
       }
-        else if ((data?.payload?.status == 'error' && data?.payload?.message=='User Not Found.')||(data?.payload?.status == 'error' && data?.payload?.message=='Missing Usertoken parameters.')) {
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
+        else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
       }
 
        else if(data.payload.status=='error' && data.payload.errors.length>0) {
