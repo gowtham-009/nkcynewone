@@ -180,7 +180,10 @@ const permanentaddressdata = async () => {
     }
     else {
       const data = await response.json()
-
+        addresserror.value = ""
+        cityerror.value = ""
+        stateerror.value = ""
+        pincodeerror.value = ""
       if (data.payload.status == 'ok') {
         const isConfirmed = commAddressRef.value?.confirm;
         if (isConfirmed) {
@@ -203,10 +206,7 @@ const permanentaddressdata = async () => {
       }
 
      else if(data.payload.status=='error' && data.payload.errors.length>0) {
-        addresserror.value = ""
-        cityerror.value = ""
-        stateerror.value = ""
-        pincodeerror.value = ""
+     
         data.payload.errors.forEach((err) => {
 
 

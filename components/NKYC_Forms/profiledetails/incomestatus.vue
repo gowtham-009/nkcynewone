@@ -27,7 +27,7 @@
             {{ option.label }}
           </button>
         </div>
-                       <span class="text-red-500">{{ incomeerror }}</span>
+                     <span class="text-red-500">{{ incomeerror }}</span>
 
       </div>
 
@@ -164,6 +164,7 @@ const headertoken=htoken
     }
     else {
       const data = await response.json()
+          incomeerror.value=""
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'nominee');
       }
@@ -174,7 +175,7 @@ const headertoken=htoken
       }
 
        else if(data.payload.status=='error' && data.payload.errors.length>0){
-      incomeerror.value=""
+  
 
    
     

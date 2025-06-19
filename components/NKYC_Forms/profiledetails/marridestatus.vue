@@ -29,9 +29,11 @@
               ]">
               {{ option.label }}
             </button>
-             <span class="text-red-500">{{ gendererror }}</span>
+           
           </div>
         </div>
+     
+             <span class="text-red-500">{{ gendererror }}</span>
 
         <div class="w-full  mt-2">
           <p class="text-gray-600 text-md font-medium ">Marital status</p>
@@ -44,11 +46,10 @@
             ]">
               {{ option.label }}
             </button>
-                         <span class="text-red-500">{{ maritalerror }}</span>
 
           </div>
         </div>
-
+<span class="text-red-500">{{ maritalerror }}</span>
         <div class="w-full mt-2 ">
           <span class="text-gray-600 text-md font-medium">
             Are you PEP/Related to PEP
@@ -67,10 +68,12 @@
               ]">
                 {{ option.label }}
               </button>
-                                       <span class="text-red-500">{{ peperror }}</span>
-
+          
+                                      
             </div>
           </div>
+           <span class="text-red-500">{{ peperror }}</span>
+
         </div>
 
 
@@ -243,6 +246,9 @@ const personalinfo = async () => {
     }
     else {
       const data = await response.json()
+         gendererror.value=""
+     maritalerror.value =""
+     peperror.value=""
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'clientinfo');
       }
@@ -253,9 +259,7 @@ else if((data?.payload?.status == 'error' && data?.payload?.message=='User Not F
 }
 
    else if(data.payload.status=='error' && data.payload.errors.length>0) {
-      gendererror.value=""
-     maritalerror.value =""
-     peperror.value=""
+   
     
   data.payload.errors.forEach((err) => {
     

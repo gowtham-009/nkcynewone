@@ -203,6 +203,7 @@ const segmentdata = async () => {
     }
 
     const data = await response.json();
+    segmenterror.value=''
     if (data.payload.status === 'ok') {
       emit('updateDiv', 'brokerage');
     }

@@ -63,7 +63,7 @@
         <input type="text" v-model="idval" class="hidden">
         <div class="w-full">
           <Name v-model="name" />
-           <span class="text-red-500">{{ nameerror }}</span>
+           <span class="text-red-500 text-sm">{{ nameerror }}</span>
 
         </div>
         <div class="w-full mt-4">
@@ -73,30 +73,30 @@
               class="w-full prime-input " />
             <span class="bottom-border"></span>
           </div>
-                     <span class="text-red-500">{{ relationshiperror }}</span>
+                     <span class="text-red-500 text-sm">{{ relationshiperror }}</span>
 
         </div>
         <div class="w-full mt-2">
           <DOB v-model="dob" />
-                     <span class="text-red-500">{{ doberror }}</span>
+                     <span class="text-red-500 text-sm">{{ doberror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Address v-model="address" />
-                     <span class="text-red-500">{{ addresserror }}</span>
+                     <span class="text-red-500 text-sm">{{ addresserror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Mobile v-model="mobileNo" />
-                     <span class="text-red-500">{{ mobileerror }}</span>
+                     <span class="text-red-500 text-sm">{{ mobileerror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Email v-model="email" />
-                     <span class="text-red-500">{{ emailerror }}</span>
+                     <span class="text-red-500 text-sm">{{ emailerror }}</span>
 
         </div>
         <div class="w-full mt-2">
@@ -137,20 +137,20 @@
 
           </div>
 
-         <span class="text-red-500">{{ iderror }}</span>
+         <span class="text-red-500 text-sm">{{ iderror }}</span>
         </div>
 
 
         <div class="w-full mt-2">
           <div :class="{ 'disabled-container': isDisabled }">
             <Guardian v-model="guardian" />
-             <span class="text-red-500">{{ guardianerror }}</span>
+             <span class="text-red-500 text-sm">{{ guardianerror }}</span>
           </div>
 
         </div>
         <div class="w-full mt-2">
           <Sharevalue v-model="shareval" />
-                    <span class="text-red-500">{{ sharevalerror }}</span>
+                    <span class="text-red-500 text-sm">{{ sharevalerror }}</span>
 
           <p class="text-right text-gray-500 text-md">Maximum limit:0 - {{ availabilelimit }}</p>
         </div>
@@ -685,7 +685,15 @@ const nomineesavedata = async () => {
     }
 
     const data = await response.json();
-    
+       nameerror.value = ""
+        relationshiperror.value = ""
+        doberror.value = ""
+        addresserror.value = ""
+        mobileerror.value=""
+        emailerror.value=""
+        iderror.value=""
+        guardianerror.value=""
+        sharevalerror.value=""
     if (data.payload.status === 'ok') {
       visible.value = false;
       await nomineedetails();
@@ -699,15 +707,7 @@ const nomineesavedata = async () => {
         router.push('/');
       } 
       else if(data.payload.status=='error' && data.payload.errors.length>0) {
-          nameerror.value = ""
-        relationshiperror.value = ""
-        doberror.value = ""
-        addresserror.value = ""
-        mobileerror.value=""
-        emailerror.value=""
-        iderror.value=""
-        guardianerror.value=""
-        sharevalerror.value=""
+       
         data.payload.errors.forEach((err) => {
 
 

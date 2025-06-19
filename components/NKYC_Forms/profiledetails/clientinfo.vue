@@ -136,6 +136,8 @@ const personalinfo = async () => {
     }
     else {
       const data = await response.json()
+          fathererror.value=""
+     mothererror.value =""
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'qualification');
       }
@@ -147,8 +149,7 @@ const personalinfo = async () => {
       }
 
     else if(data.payload.status=='error' && data.payload.errors.length>0){
-      fathererror.value=""
-     mothererror.value =""
+  
    
     
   data.payload.errors.forEach((err) => {

@@ -341,10 +341,7 @@ const handleButtonClick = (event) => {
         }
 
 
-    // if (!loading.value && imageSrcbank.value && isImageValid.value && isStatusValid.value) {
-    //   proofupload();
-    //   isStatusValid.value = false;
-    // }
+  
   }, 600);
 };
 

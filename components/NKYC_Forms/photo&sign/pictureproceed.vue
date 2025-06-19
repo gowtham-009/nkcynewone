@@ -240,9 +240,9 @@ const handleButtonClick = () => {
     else if (page.payload.status == 'ok') {
       const mydata = await getServerData();
       const statuscheck = mydata?.payload?.metaData?.additional_docs;
-      console.log("len:",statuscheck.length)
+     
       if (statuscheck.length === 0) {
-        alert('hi')
+       
         documentsavebtn();
       }
       emit('updateDiv', 'signdraw');

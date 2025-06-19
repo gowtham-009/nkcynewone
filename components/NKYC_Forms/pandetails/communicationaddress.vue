@@ -161,6 +161,10 @@ const communicateaddressdata = async () => {
     }
     else {
       const data = await response.json()
+    addresserror.value=""
+     cityerror.value =""
+     stateerror.value=""
+     pincodeerror.value=""
       if (data.payload.status == 'ok') {
         const mydata = await pagestatus('info')
         if (mydata.payload.status == 'ok') {
@@ -179,10 +183,7 @@ const communicateaddressdata = async () => {
 
       else if(data.payload.status=='error' && data.payload.errors.length>0) {
       
-      addresserror.value=""
-     cityerror.value =""
-     stateerror.value=""
-     pincodeerror.value=""
+   
      data.payload.errors.forEach((err) => {
     
 

@@ -344,7 +344,12 @@ const headertoken=htoken
     }
 
     const data = await response.json();
-
+ accnotypeerror.value=""
+     accnoerror.value =""
+     ifscerror.value=""
+     micrerror.value=""
+     banknameerror.value=""
+     addresserror.value=""
     if (data?.payload?.metaData?.bankVerifyStatus == 1) {
       errorbox.value = false
        completeProgress();
@@ -367,12 +372,7 @@ const headertoken=htoken
       }
     
     else if(data.payload.status=='error' && data.payload.errors.length>0) {
-      accnotypeerror.value=""
-     accnoerror.value =""
-     ifscerror.value=""
-     micrerror.value=""
-     banknameerror.value=""
-     addresserror.value=""
+     
   data.payload.errors.forEach((err) => {
     
 if (err.field === 'bankAccType' && !selected.value) {
