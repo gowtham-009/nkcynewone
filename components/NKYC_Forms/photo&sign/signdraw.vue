@@ -213,7 +213,8 @@ const getsegmentdata = async () => {
     if (segments) {
       await additionaldocs()
        isSignatureUploaded.value = true;
-      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+       const headertoken=htoken
+      const imageauth = headertoken;
       const userToken = localStorage.getItem('userkey');
       const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
       imageSrc.value = imgSrc;

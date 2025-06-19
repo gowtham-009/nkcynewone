@@ -178,23 +178,24 @@ const communicateaddressdata = async () => {
       }
 
       else if(data.payload.status=='error' && data.payload.errors.length>0) {
+      
       addresserror.value=""
      cityerror.value =""
      stateerror.value=""
      pincodeerror.value=""
-  data.payload.errors.forEach((err) => {
+     data.payload.errors.forEach((err) => {
     
 
-    if (err.field === 'permanentAddress' && !address.value) {
+    if (err.field === 'communicationAddress' && !address.value) {
       addresserror.value = err.message || ' ';
     }
-    if (err.field === 'permanentCity' && !city.value) {
+    if (err.field === 'communicationCity' && !city.value) {
       cityerror.value = err.message || ' ';
     }
-    if (err.field === 'permanentState' && !state.value) {
+    if (err.field === 'communicationState' && !state.value) {
       stateerror.value = err.message || ' ';
     }
-    if (err.field === 'permanentPincode' && !pincode.value) {
+    if (err.field === 'communicationPincode' && !pincode.value) {
       pincodeerror.value = err.message || ' ';
     }
   });
