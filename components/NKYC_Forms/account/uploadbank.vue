@@ -255,7 +255,7 @@ const proofupload = async () => {
   if (!imageSrcbank.value) {
   
     bankerror.value=true
-    errorbank.value='No image to upload'
+    errorbank.value='Please upload file in valid format'
     return;
   }
 

@@ -457,22 +457,22 @@ watch(paninput, (newVal) => {
   }
 });
 
-// Add Aadhar validation watcher
+
 watch(aadharinput, (newVal) => {
   isAadharValid.value = newVal.length === 4 && /^\d+$/.test(newVal);
 });
 
-// Add Driving Licence validation watcher
+
 watch(drivinginput, (newVal) => {
-  // Basic validation - adjust according to your driving licence format requirements
+  
   isDrivingLicenceValid.value = newVal.length >= 16; // Example minimum length
 });
 
-// Modify the isSaveDisabled computed property to include ID validation
+
 const isSaveDisabled = computed(() => {
   const share = parseFloat(shareval.value) || 0;
   
-  // Check ID validation based on selected type
+ 
   let isIdValid = false;
   if (selected.value === 'PAN') {
     isIdValid = isPanValid.value;
@@ -503,9 +503,8 @@ const dialogbox = (editdata) => {
   let formattedDOB = '';
   let dobDate = null;
 
-  // Handle date formatting and age calculation
   if (editdata.dob) {
-    // Try ISO format (YYYY-MM-DD)
+    
     const isoDateMatch = editdata.dob.match(/^(\d{4})-(\d{2})-(\d{2})/);
     
     // Try DD/MM/YYYY format
@@ -547,15 +546,13 @@ const dialogbox = (editdata) => {
     isDisabled.value = age >= 18;
     
     // Set guardian error only if under 18 and guardian is empty
-    if (age < 18 && !editdata.guardian) {
-      guardianerror.value = 'Guardian is required for nominees under 18';
-    } else {
+     if (age >= 18) {
+      guardian.value = '';
       guardianerror.value = '';
+    } else if (!editdata.guardian) {
+      guardianerror.value = 'Guardian is required for nominees under 18';
     }
-  } else {
-    // Default to enabled if date is invalid
-    isDisabled.value = false;
-  }
+  } 
 
   // Set form values
   visible.value = true;
@@ -928,6 +925,7 @@ onMounted(async () => {
 
 
 watch(dob, (newval) => {
+ 
   if (newval) {
     const dobval = new Date(newval);
     const today = new Date();
@@ -939,12 +937,15 @@ watch(dob, (newval) => {
     }
 
     if (age < 18) {
+       console.log("ageeee",age)
       isDisabled.value = false;
       // When under 18, guardian becomes required
       if (!guardian.value) {
         guardianerror.value = '';
       }
     } else {
+       console.log("ageeee",age)
+       guardian.value=' '
       isDisabled.value = true;
       guardianerror.value = '';
     }

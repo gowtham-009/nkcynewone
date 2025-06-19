@@ -251,7 +251,7 @@ const proofupload = async () => {
   errorimage.value=false
   if (!imageSrcpan.value) {
       errorimage.value=true
-      imageerror.value="Please Upload Pan Proof"
+      imageerror.value="Please upload file in valid format"
     return;
   }
 
