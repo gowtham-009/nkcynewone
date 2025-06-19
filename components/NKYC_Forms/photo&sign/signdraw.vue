@@ -192,18 +192,7 @@ const isImageUploaded = ref(false);
 const { baseurl } = globalurl();
 const {htoken}=headerToken()
 
-const additionaldocs = async () => {
 
-  const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.additional_docs;
-  console.log("jvhdiu",statuscheck)
-
-
-  if (statuscheck.length === 0) {
-     
-    documentsavebtn();
-  }
-};
 
 const getsegmentdata = async () => {
   const mydata = await getServerData();
@@ -211,7 +200,7 @@ const getsegmentdata = async () => {
   if (statuscheck) {
     const segments = mydata?.payload?.metaData?.proofs?.signature ;
     if (segments) {
-      await additionaldocs()
+   
        isSignatureUploaded.value = true;
        const headertoken=htoken
       const imageauth = headertoken;
@@ -243,7 +232,7 @@ const getsegmentdata = async () => {
   }
 
   else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
-    await additionaldocs()
+ 
     const headertoken=htoken
     const segments = mydata?.payload?.metaData?.proofs?.signature || '';
     if (segments) {

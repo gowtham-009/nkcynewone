@@ -70,6 +70,8 @@ const deviceHeight = ref(0);
 const srcUrl = ref(null)
 const isBack = ref(true); // Assuming you have a way to determine if the back button should be enabled
 const isStatusValid = ref(true); // Assuming you have a way to determine if the status is valid
+const { baseurl } = globalurl();
+const {htoken}=headerToken()
 
 const clientname=ref('')
 const getsegmentdata = async () => {
@@ -151,6 +153,57 @@ const back = () => {
 }
 
 
+const documentsavebtn = async () => {
+
+
+  const apiurl = `${baseurl.value}additional_docs`;
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "signdraw",
+    documentConsentMode: question1.value || 'Electronic',
+    contractNoteMode: question2.value || 'Electronic',
+    standardDocsConsent: question3.value || 'Electronic',
+    internetTradingOpted: question4.value || 'Yes',
+    pastActionsDetails: question5.value || 'No',
+    otherBrokerDetails: question6.value || 'No',
+    otherDPDetails:question7.value || 'CDSL',
+    accountSettlementPreference: question8.value ||'Once in Quarter' ,
+    settlementStatementConsent:  'Yes'
+
+  });
+const headertoken=htoken
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': headertoken,
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    });
+  
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status === 'ok') {
+     visible.value=false
+    }
+  else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')){
+       alert('Session has expired, please login.');
+        localStorage.removeItem('userkey');
+        router.push('/');
+    }
+    
+  } catch (error) {
+  
+    console.error(error.message);
+  }
+};
 
 const handleButtonClick = () => {
     const button = rippleBtn.value
@@ -168,7 +221,15 @@ const handleButtonClick = () => {
 
     setTimeout(async() => {
         circle.remove()
-         const page = await pagestatus('signdraw')
+         const mydata = await getServerData();
+  const statuscheck = mydata?.payload?.metaData?.additional_docs;
+
+  if (statuscheck.length === 0) {  
+    alert('hi')
+    documentsavebtn();
+  }
+  else{
+    const page = await pagestatus('signdraw')
     if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
       alert('Session has expired, please login.');
       localStorage.removeItem('userkey')
@@ -178,6 +239,9 @@ const handleButtonClick = () => {
       emit('updateDiv', 'signdraw');
      isStatusValid.value = false;
     }
+  }
+
+  
         
     }, 600)
 };
