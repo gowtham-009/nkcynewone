@@ -191,7 +191,8 @@ const headertoken=htoken
 
     const data = await response.json();
     if (data.payload.status === 'ok') {
-     visible.value=false
+       emit('updateDiv', 'signdraw');
+     isStatusValid.value = false;
     }
   else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')){
        alert('Session has expired, please login.');
