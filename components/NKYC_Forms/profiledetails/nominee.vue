@@ -63,7 +63,7 @@
         <input type="text" v-model="idval" class="hidden">
         <div class="w-full">
           <Name v-model="name" />
-           <span class="text-red-500 text-sm">{{ nameerror }}</span>
+           <span class="text-red-500">{{ nameerror }}</span>
 
         </div>
         <div class="w-full mt-4">
@@ -73,30 +73,30 @@
               class="w-full prime-input " />
             <span class="bottom-border"></span>
           </div>
-                     <span class="text-red-500 text-sm">{{ relationshiperror }}</span>
+                     <span class="text-red-500">{{ relationshiperror }}</span>
 
         </div>
         <div class="w-full mt-2">
           <DOB v-model="dob" />
-                     <span class="text-red-500 text-sm">{{ doberror }}</span>
+                     <span class="text-red-500">{{ doberror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Address v-model="address" />
-                     <span class="text-red-500 text-sm">{{ addresserror }}</span>
+                     <span class="text-red-500">{{ addresserror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Mobile v-model="mobileNo" />
-                     <span class="text-red-500 text-sm">{{ mobileerror }}</span>
+                     <span class="text-red-500">{{ mobileerror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Email v-model="email" />
-                     <span class="text-red-500 text-sm">{{ emailerror }}</span>
+                     <span class="text-red-500">{{ emailerror }}</span>
 
         </div>
         <div class="w-full mt-2">
@@ -137,20 +137,20 @@
 
           </div>
 
-         <span class="text-red-500 text-sm">{{ iderror }}</span>
+         <span class="text-red-500">{{ iderror }}</span>
         </div>
 
 
         <div class="w-full mt-2">
           <div :class="{ 'disabled-container': isDisabled }">
             <Guardian v-model="guardian" />
-             <span class="text-red-500 text-sm">{{ guardianerror }}</span>
+             <span class="text-red-500">{{ guardianerror }}</span>
           </div>
 
         </div>
         <div class="w-full mt-2">
           <Sharevalue v-model="shareval" />
-                    <span class="text-red-500 text-sm">{{ sharevalerror }}</span>
+                    <span class="text-red-500">{{ sharevalerror }}</span>
 
           <p class="text-right text-gray-500 text-md">Maximum limit:0 - {{ availabilelimit }}</p>
         </div>
@@ -499,43 +499,65 @@ const isSaveDisabled = computed(() => {
     !guardianValid // Add guardian validation
   );
 });
-
-
 const dialogbox = (editdata) => {
   let formattedDOB = '';
+  let dobDate = null;
 
-  // Handle date formatting more robustly
+  // Handle date formatting and age calculation
   if (editdata.dob) {
-    // Check if date is already in ISO format (YYYY-MM-DD)
+    // Try ISO format (YYYY-MM-DD)
     const isoDateMatch = editdata.dob.match(/^(\d{4})-(\d{2})-(\d{2})/);
     
-    // Check if date is in DD/MM/YYYY format
+    // Try DD/MM/YYYY format
     const slashDateMatch = editdata.dob.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
     
     if (isoDateMatch) {
       const [, year, month, day] = isoDateMatch;
       formattedDOB = `${day}/${month}/${year}`;
+      dobDate = new Date(year, month - 1, day);
     } 
     else if (slashDateMatch) {
-      // If already in DD/MM/YYYY format, use as is
+      const [, day, month, year] = slashDateMatch;
       formattedDOB = editdata.dob;
+      dobDate = new Date(year, month - 1, day);
     }
     else {
       // Fallback - try to parse as Date object
-      try {
-        const dateObj = new Date(editdata.dob);
-        if (!isNaN(dateObj.getTime())) {
-          const day = String(dateObj.getDate()).padStart(2, '0');
-          const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-          const year = dateObj.getFullYear();
-          formattedDOB = `${day}/${month}/${year}`;
-        }
-      } catch (e) {
-        console.error("Error parsing date:", e);
+      dobDate = new Date(editdata.dob);
+      if (!isNaN(dobDate.getTime())) {
+        const day = String(dobDate.getDate()).padStart(2, '0');
+        const month = String(dobDate.getMonth() + 1).padStart(2, '0');
+        const year = dobDate.getFullYear();
+        formattedDOB = `${day}/${month}/${year}`;
       }
     }
   }
 
+  // Calculate age if we have a valid date
+  if (dobDate && !isNaN(dobDate.getTime())) {
+    const today = new Date();
+    let age = today.getFullYear() - dobDate.getFullYear();
+    const monthDiff = today.getMonth() - dobDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+      age--;
+    }
+
+    // Enable guardian field only if under 18
+    isDisabled.value = age >= 18;
+    
+    // Set guardian error only if under 18 and guardian is empty
+    if (age < 18 && !editdata.guardian) {
+      guardianerror.value = 'Guardian is required for nominees under 18';
+    } else {
+      guardianerror.value = '';
+    }
+  } else {
+    // Default to enabled if date is invalid
+    isDisabled.value = false;
+  }
+
+  // Set form values
   visible.value = true;
   idval.value = editdata.id;
   name.value = editdata.name;
@@ -579,7 +601,6 @@ const dialogbox = (editdata) => {
   shareval.value = editdata.share;
   prooftype.value = editdata.idType;
 };
-
 const nomineesavedata = async () => {
   visible.value = true;
 
@@ -694,6 +715,7 @@ const nomineesavedata = async () => {
         iderror.value=""
         guardianerror.value=""
         sharevalerror.value=""
+        
     if (data.payload.status === 'ok') {
       visible.value = false;
       await nomineedetails();

@@ -27,8 +27,7 @@
             {{ option.label }}
           </button>
         </div>
-                     <span class="text-red-500">{{ incomeerror }}</span>
-
+            <span class="text-red-500">{{ incomeerror }}</span>
       </div>
 
 

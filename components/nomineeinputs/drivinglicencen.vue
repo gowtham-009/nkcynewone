@@ -4,18 +4,17 @@
     <div class="lic-input-wrapper input-wrapper w-full dark:!bg-gray-800">
      
       <InputText
-        v-model="displaylic"
-        @input="handleInput"
-        @keydown="handleKeyDown"
-        @paste="handlePaste"
-     
-        maxlength="16"
-        class="lic-input prime-input dark:!text-gray-100"
-        autocapitalize="characters"
-        autocomplete="off"
-        spellcheck="false"
-        ref="licInput"
-      />
+  v-model="displaylic"
+  @input="handleInput"
+  @keydown="handleKeyDown"
+  @paste="handlePaste"
+  maxlength="16"
+  class="lic-input prime-input dark:!text-gray-100"
+  autocapitalize="characters"
+  autocomplete="off"
+  spellcheck="false"
+  ref="licInput"
+/>
         <span class="bottom-border"></span>
     </div>
   </div>
@@ -36,23 +35,21 @@ const licInput = ref(null)
 function formatPan(value) {
   return value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16)
 }
-
 function handleInput(e) {
   const input = e.target.value
-  // Format and limit to 10 characters
   const formatted = formatPan(input)
   rawLic.value = formatted
   displaylic.value = formatted
   
-  // Prevent exceeding 10 characters (mobile keyboards sometimes ignore maxlength)
-  if (input.length > 10) {
+  if (input.length > 16) {
     displaylic.value = displaylic.value.slice(0, 16)
-    // Move cursor to end
+    // Move cursor to end using the event target (which is the input element)
     setTimeout(() => {
-      licInput.value.setSelectionRange(16, 16)
+      e.target.setSelectionRange(16, 16)
     }, 0)
   }
 }
+
 
 function handleKeyDown(e) {
   // Allow backspace, delete, tab, arrow keys, etc.
@@ -77,11 +74,9 @@ function handlePaste(e) {
   const pasteData = e.clipboardData.getData('text/plain')
   const formatted = formatPan(pasteData).slice(0, 16)
   
-  // Get current selection
   const start = e.target.selectionStart
   const end = e.target.selectionEnd
   
-  // Insert pasted text at cursor position
   const before = displaylic.value.substring(0, start)
   const after = displaylic.value.substring(end, displaylic.value.length)
   const newValue = (before + formatted + after).slice(0, 16)
@@ -89,13 +84,12 @@ function handlePaste(e) {
   rawLic.value = formatPan(newValue)
   displaylic.value = rawLic.value
   
-  // Set cursor position after pasted text
+  // Use the event target instead of licInput.value
   setTimeout(() => {
     const newCursorPos = Math.min(start + formatted.length, 16)
-    licInput.value.setSelectionRange(newCursorPos, newCursorPos)
+    e.target.setSelectionRange(newCursorPos, newCursorPos)
   }, 0)
 }
-
 // Emit value to parent
 watch(rawLic, (val) => {
   emit('update:modelValue', val)
