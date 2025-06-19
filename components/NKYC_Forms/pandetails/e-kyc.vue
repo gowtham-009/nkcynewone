@@ -139,16 +139,19 @@ const back = () => {
 
     setTimeout(async() => {
         circle.remove()
-       const page = await pagestatus('main')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'main');
-      isBack.value = false;
-    }
+       
+ const data = await pagestatus('main')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'main');
+  isBack.value = false;
+}
     }, 600)
 
 }
@@ -367,11 +370,14 @@ const handleButtonClick = () => {
             digilocker_create()
         isFormdisabled.value = false
         }
-       else if((mydata.payload.status=='error' && mydata.payload.message=='User Not Found.')||(mydata?.payload?.status == 'error' && mydata?.payload?.message=='Missing User Token.')){
-             alert('Session has expired, please login.');
-        localStorage.removeItem('userkey')
-        router.push('/')
+      else if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
         }
+       
+      }
       
        
     }, 600)

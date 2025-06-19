@@ -89,16 +89,19 @@ const back = () => {
 
     setTimeout(async() => {
         circle.remove()
-      const page = await pagestatus('segment1')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'segment1');
-      isBack.value = false;
-    }
+     
+ const data = await pagestatus('segment1')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'segment1');
+  isBack.value = false;
+}
     }, 600)
 
 };
@@ -147,15 +150,15 @@ const handleButtonClick = () => {
             emit('updateDiv', 'uploadproof');
         }
 
-    } else if (
-        mydata?.payload?.status === 'error' &&
-        (mydata?.payload?.message === 'User Not Found.' ||
-         mydata?.payload?.message === 'Missing User Token.')
-    ) {
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey');
-        router.push('/');
-    }
+    }  else if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
+
 }, 600);
 
 };

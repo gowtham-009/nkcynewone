@@ -186,11 +186,15 @@ const back = async (event) => {
     }
     isBack.value = false;
     }
-    else if(mydata.payload.status === 'error' &&(mydata.payload.message === 'User Not Found.' || mydata.payload.message === 'Missing User Token.')){
-       alert('Session has expired, please login.');
-        localStorage.removeItem('userkey');
-        router.push('/');
-    }
+    else if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
+
    
   }, 600);
 };
@@ -298,14 +302,14 @@ const headertoken=htoken
       if (mydata?.payload?.status === 'ok') {
         emit('updateDiv', 'photosign1');
       }
-    } else if (data.payload.status === 'error' && 
-              (data.payload.message === 'User not found.' || 
-               data.payload.message === 'Missing Usertoken parameters.')) {
-      resetProgress();
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey');
-      router.push('/');
-    } else {
+    }    else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      } else {
       resetProgress();
       alert('Upload failed: ' + (data.payload.message || 'Unknown error'));
     }
@@ -334,6 +338,14 @@ const handleButtonClick = (event) => {
           await pagestatus('photosign1');
            emit('updateDiv', 'photosign1');
         }
+        else if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
         else{
       
            proofupload();

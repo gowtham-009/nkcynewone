@@ -308,12 +308,14 @@ const proofupload = async () => {
       }
     }
 
-    else if ((data.payload.status == 'error' && data.payload.message == 'User not found.') || (data.payload.status == 'error' && data.payload.message == 'Missing Usertoken parameters.')) {
-      resetProgress();
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
+    else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
   } catch (error) {
     resetProgress();
     console.error('Upload failed:', error.message);
@@ -337,16 +339,20 @@ const back = (event) => {
 
   setTimeout(async () => {
     circle.remove();
-    const mydata = await pagestatus('brokerage')
-    if (mydata.payload.status == 'ok') {
-      emit('updateDiv', 'brokerage');
-    }
-    else if ((mydata?.payload?.status == 'error' && mydata?.payload?.message == 'User Not Found.') || (mydata?.payload?.status == 'error' && mydata?.payload?.message == 'Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    isBack.value = false
+   
+    
+ const data = await pagestatus('brokerage')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'brokerage');
+  isBack.value = false;
+}
   }, 600);
 };
 
@@ -383,9 +389,20 @@ const handleButtonClick = (event) => {
       }
       }
     }
-    else {
+
+    else if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
+
+
+    else if(panoverwite.value===true && pancardName){
    
-      if(panoverwite.value===true && pancardName){
+      if(pancardName){
 
         const bankcheck = mydata?.payload?.metaData?.bank?.bank1HolderName;
         if(bankcheck){
@@ -401,9 +418,7 @@ const handleButtonClick = (event) => {
       else{
   proofupload();
         isStatusValid.value = false;
-      // if (!loading.value && isImageValid.value && isStatusValid.value) {
-      
-      // }
+     
       }
 
     }
