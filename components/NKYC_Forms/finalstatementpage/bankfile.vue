@@ -37,6 +37,21 @@
           </template>
         </div>
 
+        <div v-if="uploadedPDF" class="w-full bg-gray-100 p-3 rounded-xl mt-3 dark:bg-gray-800">
+  <div class="flex items-center justify-between">
+    <a
+      :href="uploadedPDF" target="_blank"
+      class="text-blue-600 font-semibold underline hover:text-blue-800 dark:text-blue-400">
+      View Uploaded Bank Statement
+    </a>
+    <button
+      @click="editPDF"
+      class="ml-4 text-sm px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition">
+      Edit
+    </button>
+  </div>
+</div>
+
         <div v-if="pdferrorbox" class="w-full p-1 mt-2 rounded-lg bg-red-50">
           <p class="text-sm text-red-500 text-center">Sorry we couldnt fetch you data, please upload pdf.</p>
         </div>
@@ -66,7 +81,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
@@ -83,12 +97,29 @@ const loading = ref(false);
 const fileInput = ref(null);
 const selected = ref('');
 const route = useRoute();
+const uploadedPDF=ref('')
 const pdferrorbox = ref(false);
-const isBack = ref(true); // Assuming this is a placeholder for actual back navigation logic
-const isStatusValid = ref(true); // Assuming this is a placeholder for actual status validation logic
+const uploadTriggeredByEdit = ref(false);
+const isNewUpload = ref(false); // Add this flag to track new uploads
+
+const isBack = ref(true);
+const isStatusValid = ref(true);
 let intervalId = null;
 import { useRouter } from 'vue-router';
 const router = useRouter();
+
+const getdatapdf = async() => {
+  const mydata = await getServerData();
+  const bankpdf = mydata?.payload?.metaData?.proofs?.bankStatement;
+  if(bankpdf) {
+    const headertoken = htoken;
+    const imageauth = headertoken;
+    const userToken = localStorage.getItem('userkey');
+    const bankstatementpdffile = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${bankpdf}`;
+    uploadedPDF.value = bankstatementpdffile;
+  }
+}
+
 const options = [
   {
     label: 'CAMS',
@@ -105,21 +136,20 @@ const options = [
 const toggleSelection = async(value) => {
   selected.value = value;
   if (value === 'CAMS') {
+    uploadedPDF.value=false
       const mydata = await getServerData();
       if(mydata.payload.status=='ok'){
         camsbankdata();
       }
-
       else if (
         mydata?.payload?.status === 'error' &&
         (mydata?.payload?.message === 'User Not Found.' ||
          mydata?.payload?.message === 'Missing User Token.')
-    ) {
+      ) {
         alert('Session has expired, please login.');
         localStorage.removeItem('userkey');
         router.push('/');
-    }
-    
+      }
   } else if (value === 'Upload Last 6 Months Bank Statement PDF') {
     pdferrorbox.value=false
     buttonText.value = 'Upload Bank Statement';
@@ -167,6 +197,7 @@ const initPage = async () => {
 
     if (time2 >= time1) {
       selected.value = 'CAMS';
+      uploadedPDF.value=false
     } else {
       selected.value = 'Upload Last 6 Months Bank Statement PDF';
       buttonText.value = 'Upload Bank Statement';
@@ -174,16 +205,23 @@ const initPage = async () => {
   }
 };
 
-onMounted(() => {
+const editPDF = () => {
+  uploadTriggeredByEdit.value = true;
+  isNewUpload.value = true; // Set flag when editing
+  triggerUpload();
+};
+onMounted(async() => {
+  await getdatapdf()
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
   initPage();
 });
+
 let checkCount = 0; 
 
 const camsbankdatacheck = async () => {
-   const headertoken=htoken
+  const headertoken=htoken
   const apiurl = `${baseurl.value}cams`;
   const user = encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -217,12 +255,12 @@ const camsbankdatacheck = async () => {
         bankStatementFile
       ) {
         clearInterval(intervalId);
-         const mydata = await pagestatus('thankyou');
-  if (mydata.payload.status === 'ok') {
-    emit('updateDiv', 'thankyou');
-  }
+        const mydata = await pagestatus('thankyou');
+        if (mydata.payload.status === 'ok') {
+          emit('updateDiv', 'thankyou');
+        }
       } else {
-        checkCount++; // Increment attempt counter
+        checkCount++;
 
         const isCamsDataEmpty =
           Array.isArray(camsData) && camsData.length === 0;
@@ -240,9 +278,8 @@ const camsbankdatacheck = async () => {
   }
 };
 
-
 const camsbankdata = async () => {
-   const headertoken=htoken
+  const headertoken=htoken
   const mydata = await getServerData();
   const ifscvalue = mydata?.payload?.metaData?.bank?.bank1IFSC;
 
@@ -274,46 +311,49 @@ const camsbankdata = async () => {
   }
 };
 
-
-
-
 const triggerUpload = () => {
   fileInput.value?.click();
 };
 
-const uploadPDF = (event) => {
+const uploadPDF = async (event) => {
   const file = event.target.files[0];
   if (!file || file.type !== 'application/pdf') {
-    alert('Only PDF files are allowed.');
+    
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const pdfDataUrl = e.target.result;
-    if (pdfDataUrl) {
-      bankstatement(pdfDataUrl);
-    }
-  };
-  reader.readAsDataURL(file);
-  event.target.value = '';
+  // Create preview URL
+  uploadedPDF.value = URL.createObjectURL(file);
+
+
+  if (isNewUpload.value || selected.value === 'Upload Last 6 Months Bank Statement PDF') {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const pdfDataUrl = e.target.result;
+      await bankstatement(pdfDataUrl);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Reset the flag after upload
+  isNewUpload.value = false;
+  event.target.value = ''; // Clear for re-selection
 };
+
 
 const bankstatement = async (pdfval) => {
   const apiurl = `${baseurl.value}proofFormUpload`;
 
   try {
-    // Convert URL or file input to Blob (binary)
     const response = await fetch(pdfval);
     const blob = await response.blob();
 
-    // Encrypt metadata
     const user = encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: 'thankyou'
     });
- const headertoken=htoken
-    // Prepare FormData with binary PDF + payload
+    
+    const headertoken=htoken
     const formData = new FormData();
     formData.append('bankStatement', blob, 'bankstatement.pdf');
     formData.append('payload', JSON.stringify({ payload: user }));
@@ -322,7 +362,6 @@ const bankstatement = async (pdfval) => {
       method: 'POST',
       headers: {
         Authorization: headertoken,
-        // Don't manually set Content-Type for FormData
       },
       body: formData,
     });
@@ -335,18 +374,16 @@ const bankstatement = async (pdfval) => {
         emit('updateDiv', 'thankyou');
       }
     }
-
-      else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')){
-       alert('Session has expired, please login.');
-        localStorage.removeItem('userkey');
-        router.push('/');
+    else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')) {
+      alert('Session has expired, please login.');
+      localStorage.removeItem('userkey');
+      router.push('/');
     }
   } catch (error) {
     console.error('bankstatement error:', error.message);
   }
 };
-
-const handleButtonClick = (event) => {
+const handleButtonClick = async (event) => {
   const button = rippleBtn.value;
   const circle = document.createElement('span');
   circle.classList.add('ripple');
@@ -360,12 +397,23 @@ const handleButtonClick = (event) => {
 
   button.$el.appendChild(circle);
 
-  setTimeout(() => {
+  setTimeout(async () => {
     circle.remove();
-    triggerUpload();
-    isStatusValid.value = false; 
+    
+    // If PDF already exists, directly move to thank you page
+    if (uploadedPDF.value) {
+      const pageroute = await pagestatus('thankyou');
+      if (pageroute.payload.status === 'ok') {
+        emit('updateDiv', 'thankyou');
+      }
+    } 
+    // Else trigger upload
+    else {
+      triggerUpload();
+    }
   }, 600);
 };
+
 
 const back = async () => {
   const button = rippleBtnback.value;
@@ -383,7 +431,7 @@ const back = async () => {
 
   setTimeout(async () => {
     circle.remove();
-   const page = await pagestatus('esign')
+    const page = await pagestatus('esign')
     if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
       alert('Session has expired, please login.');
       localStorage.removeItem('userkey')

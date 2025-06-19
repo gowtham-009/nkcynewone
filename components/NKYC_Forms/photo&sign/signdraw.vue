@@ -209,14 +209,14 @@ const getsegmentdata = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
   if (statuscheck) {
-    const segments = mydata?.payload?.metaData?.proofs?.signature || '';
+    const segments = mydata?.payload?.metaData?.proofs?.signature ;
     if (segments) {
       await additionaldocs()
        isSignatureUploaded.value = true;
        const headertoken=htoken
       const imageauth = headertoken;
       const userToken = localStorage.getItem('userkey');
-      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+      const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
       imageSrc.value = imgSrc;
 
 
