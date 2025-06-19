@@ -214,7 +214,7 @@ const syncStatus = computed(() => {
     return {
      
       title: 'Syncing',
-      message: 'Saving your bank proof...'
+      message: 'Verifying bank details'
     };
   } else if (progress.value <= 80) {
     return {
@@ -232,7 +232,7 @@ const syncStatus = computed(() => {
     return {
      
       title: 'Syncing',
-      message: 'Documents uploaded successfully!'
+      message: 'Bank details uploaded successfully!'
     };
   }
 });
