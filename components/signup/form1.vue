@@ -29,7 +29,6 @@
 
         <div class="w-full mt-2" v-if="dobbox">
           <DOB v-model="visibleDate" />
-        
         </div>
 
         <div v-if="loginotpbox" class="w-full  mt-1">
@@ -163,6 +162,16 @@ const kraaddresssubmission = async (resend) => {
     }
 
     const data = await response.json();
+    if(data.payload.status=='error' && data.payload.code=='A1001'){
+      panerror.value=true
+      error.value=data.payload.message
+
+    }
+      else{
+        console.log(data.payload.message)
+      }
+
+
     if (resend == 'resend') {
       resend_sh.value = true
       timeLeft.value = 60;
@@ -209,7 +218,19 @@ const otpverfication = async () => {
       throw new Error("Network error");
     }
 
-    return await response.json();
+    const data=await response.json();
+    if(data.payload.status=='error' && data.payload.code=='AA1001'){
+      loginerror.value=true
+      errorval.value=data.payload.message
+    }
+    else if(data.payload.status=='error' && data.payload.code=='AA1002'){
+       loginerror.value=true
+      errorval.value=data.payload.message
+    }
+    else{
+      console.log(data.payload.message)
+    }
+    return data
   } catch (error) {
     console.error('OTP verification failed:', error.message);
     return null;
@@ -229,7 +250,7 @@ const handleButtonClick = async () => {
   let data = null;
 
   // Determine if OTP verification or KRA address submission should occur
-  if (loginotpval.value.length === 4) {
+  if (loginotpbox.value==true) {
     data = await otpverfication();
   } else {
     data = await kraaddresssubmission();
@@ -268,11 +289,7 @@ const handleButtonClick = async () => {
             router.push('/main'); // Default route
           }
         }
-      } else {
-        // Handle OTP verification error
-        loginerror.value = true;
-        errorval.value = data.payload.message;
-      }
+      } 
 
     } else {
       // If handling KRA address submission

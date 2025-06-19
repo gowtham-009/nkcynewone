@@ -109,7 +109,6 @@ const setMobileData = async () => {
     const profileMobile = mydata?.payload?.metaData?.profile?.mobileNo;
      const kraMobile = mydata?.payload?.metaData?.kraPan?.APP_MOB_NO;
     let rawMobile = profileMobile || appKraMobile || kraMobile || '';
-    console.log("profile:",profileMobile, "kra:",appKraMobile, "jkh:", kraMobile)
       
 
     if (rawMobile.startsWith('91') && rawMobile.length === 12) {
@@ -199,9 +198,7 @@ const sendmobileotp = async (resend) => {
       }
     }, 1000);
   if(resend=='resend'){
-  
      resend_sh.value=true
-       
   }
 
   if (data.payload.status === 'ok' && data.payload.otpStatus=='0') {
@@ -216,17 +213,32 @@ const sendmobileotp = async (resend) => {
     buttonText.value='Verify Otp'
      emit('updateDiv', 'email');
   }
-  else if(data.payload.status=='error'  && data.payload.message=='Mobile No already exists.' && data.payload.otpStatus==0){
+  else if(data.payload.status=='error'  && data.payload.code=='B1002' && data.payload.otpStatus==0){
     errormsg.value=true
     errormobile.value=data.payload.message
      
   }
-  else if(data.payload.status=='error'  && data.payload.message=='Missing required parameters.' && data.payload.otpStatus==0){
+  else if(data.payload.status=='error'  && data.payload.code=='1005' && data.payload.otpStatus==0){
     errormsg.value=true
     errormobile.value=data.payload.message
+     
+  }
+
+   else if(data.payload.status=='error'  && data.payload.code=='1002'){
+    errormsg.value=true
+    errormobile.value=data.payload.message
+    localStorage.removeItem('userkey')
+      router.push('/')
      
   }
  
+    else if(data.payload.status=='error'  && data.payload.code=='1004'){
+    errormsg.value=true
+    errormobile.value=data.payload.message
+    localStorage.removeItem('userkey')
+      router.push('/')
+     
+  }
 
 } catch (error) {
   console.error("OTP Send Error:", error.message);
@@ -264,7 +276,7 @@ const otpverfication = async () => {
   const data = await response.json(); // Read body regardless of status
 
   if (!response.ok) {
-    // Show API message even on errors like 409
+   
     console.error("Error:", data.message);
     errormsg.value = data.message; // Show in UI
     return;
@@ -274,17 +286,35 @@ const otpverfication = async () => {
      
     emit('updateDiv', 'email');
   }
-  else if(data.payload.status==='error'){
+  else if(data.payload.status==='error' && data.payload.code=='1005' && data.payload.otpStatus=='0'){
     otperror.value = true
-     errorotp.value = 'Invalid OTP'
+     errorotp.value = data.payload.message
       isSending.value=true
+  }
+
+   else if(data.payload.status==='error' && data.payload.code=='B1006' ){
+    otperror.value = true
+     errorotp.value = data.payload.message
+      isSending.value=true
+  }
+
+  else if(data.payload.status=='error'  && data.payload.code=='1002'){
+   alert(data.payload.message)
+    localStorage.removeItem('userkey')
+      router.push('/')
+     
+  }
+ 
+    else if(data.payload.status=='error'  && data.payload.code=='1004'){
+   alert(data.payload.message)
+    localStorage.removeItem('userkey')
+      router.push('/')
+     
   }
 
 
 } catch (error) {
-  console.error("OTP Send Error:", error.message);
-   errormsg.value = true;
-    errormobile.value = 'Invalid mobile number';
+  console.error("OTP Send Error:", error.message);  
 }
 };
 
@@ -318,24 +348,15 @@ const mobile_signup = async (event) => {
 
   setTimeout(async () => {
     circle.remove();
-     const mydata = await getServerData();
-     if(mydata.payload.status=='ok'){
-       if (mobileotp.value && p_otp.value.length === 4) {
-      await otpverfication();
-    } else {
-      await sendmobileotp();
-    }
-     }
 
-       else if (
-        mydata?.payload?.status === 'error' &&
-        (mydata?.payload?.message === 'User Not Found.' ||
-         mydata?.payload?.message === 'Missing User Token.')
-    ) {
-       alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
+    if(mobileotp.value==true){
+      await otpverfication();
     }
+    else{
+await sendmobileotp();
+    }
+
+      
    
     
   }, 600);

@@ -2,7 +2,7 @@
   <div class="primary_color">
     <div class="flex justify-between items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
       <logo style="width: 40px; height: 40px;" />
-       <profile />
+      <profile />
     </div>
     <div class="flex justify-between  p-2 px-2 flex-col bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
@@ -57,7 +57,7 @@
         </Button>
         <Button type="button" ref="rippleBtn" label="Verify OTP"
           class="primary_color text-white w-5/6 py-3 text-xl border-0" @click="handleButtonClick()"
-          :disabled="isButtonDisabled ||  !isStatusValid">
+          :disabled="isButtonDisabled || !isStatusValid">
           {{ buttonText }}
         </Button>
       </div>
@@ -87,7 +87,7 @@ const router = useRouter();
 
 const deviceHeight = ref(0);
 const emit = defineEmits(['updateDiv']);
-const timeLeft = ref(60); 
+const timeLeft = ref(60);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const buttonText = ref("Next");
@@ -105,7 +105,7 @@ const e_otp = ref('')
 
 
 
-const emailid=ref('')
+const emailid = ref('')
 const setEmailData = async () => {
   try {
     const kraResData = getEncryptionData();
@@ -115,13 +115,13 @@ const setEmailData = async () => {
     const profileEmail = myData?.payload?.metaData?.profile?.emailId;
     const kraEmail = myData?.payload?.metaData?.kraPan?.APP_EMAIL;
 
-    const rawEmail =  profileEmail || appKraEmail|| kraEmail || '';
-  
+    const rawEmail = profileEmail || appKraEmail || kraEmail || '';
+
     emailid.value = rawEmail;
 
-     if (myData?.payload?.metaData?.otpVerification?.email?.otpVerifiedStatus=='0') {
-     emailbox.value=true
-      
+    if (myData?.payload?.metaData?.otpVerification?.email?.otpVerifiedStatus == '0') {
+      emailbox.value = true
+
     }
 
   } catch (error) {
@@ -150,10 +150,10 @@ const isButtonDisabled = computed(() => {
 
 watch(isValidEmail, (newValue) => {
   if (newValue === false) {
-    
+
     erroremail.value = false
   } else {
-    isStatusValid.value=true
+    isStatusValid.value = true
     isSending.value = false
     buttonText.value = "Next"
   }
@@ -165,7 +165,7 @@ onMounted(() => {
   });
 
 
- 
+
 
 
 });
@@ -184,10 +184,10 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
-  const page = await pagestatus('mobile')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
+    const page = await pagestatus('mobile')
+    if ((page?.payload?.status == 'error' && page?.payload?.message == 'User Not Found.') || (page?.payload?.status == 'error' && page?.payload?.message == 'Missing Usertoken parameters.')) {
       alert('Session has expired, please login.');
       localStorage.removeItem('userkey')
       router.push('/')
@@ -201,7 +201,7 @@ const back = () => {
 }
 
 const sendemailotp = async (resend) => {
-  isStatusValid.value = false; 
+  isStatusValid.value = false;
   isSending.value = true; // Disable button
   const apiurl = baseurl.value + 'validateEmail'
 
@@ -217,23 +217,23 @@ const sendemailotp = async (resend) => {
 
   emailidtext.value = maskEmail(email);
 
-    const user = encryptionrequestdata({
-    otpType:'email',
+  const user = encryptionrequestdata({
+    otpType: 'email',
     email: emailid.value,
-    resend:'false',
-    pageCode:"email",
-    userToken:localStorage.getItem('userkey')
+    resend: 'false',
+    pageCode: "email",
+    userToken: localStorage.getItem('userkey')
   });
- 
-    const payload = { payload: user };
+
+  const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
 
 
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
-      headers:{
-        'Authorization':'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
       },
       body: jsonString
 
@@ -242,48 +242,62 @@ const sendemailotp = async (resend) => {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    
+
     else {
       const data = await response.json()
 
-       clearInterval(timer);
-    timeLeft.value = 10; // reset countdown
-    timer = setInterval(() => {
-      if (timeLeft.value > 0) {
-        timeLeft.value -= 1;
-      } else {
-        clearInterval(timer);
-      }
-    }, 1000);
-           if(resend=='resend'){
+      clearInterval(timer);
+      timeLeft.value = 10; // reset countdown
+      timer = setInterval(() => {
+        if (timeLeft.value > 0) {
+          timeLeft.value -= 1;
+        } else {
+          clearInterval(timer);
+        }
+      }, 1000);
+      if (resend == 'resend') {
 
-          
 
-            e_otp.value=''
+
+        e_otp.value = ''
         resend_sh.value = true
-     
-     }
-    
-      if (data.payload.status == 'ok' && data.payload.otpStatus=='0') {
-     
- 
 
-         isSending.value = true;
+      }
+
+      if (data.payload.status == 'ok' && data.payload.otpStatus == '0') {
+        isSending.value = true;
         emailbox.value = true
         buttonText.value = "Verify OTP"
-      
       }
 
-      else if(data.payload.status == 'ok' && data.payload.otpStatus==1){
-       
-        emailbox.value=false
-         pagestatus('main')
-    emit('updateDiv', 'main');
+      else if (data.payload.status == 'ok' && data.payload.otpStatus == 1) {
+        emailbox.value = false
+        pagestatus('main')
+        emit('updateDiv', 'main');
       }
-      else if(data.payload.status == 'error'){
-          erroremail.value=true
-          emailerror.value=data.payload.message
+      else if (data.payload.status == 'error' && data.payload.code == 'C1002') {
+        erroremail.value = true
+        emailerror.value = data.payload.message
       }
+      else if (data.payload.status == 'error' && data.payload.code == '1005') {
+        erroremail.value = true
+        emailerror.value = data.payload.message
+      }
+
+        else if(data.payload.status=='error'  && data.payload.code=='1002'){
+      
+     alert(data.payload.message)
+      localStorage.removeItem('userkey')
+        router.push('/')
+      
+    }
+  
+      else if(data.payload.status=='error'  && data.payload.code=='1004'){
+    alert(data.payload.message)
+      localStorage.removeItem('userkey')
+        router.push('/')
+      
+    }
     }
   } catch (error) {
     console.error(error.message)
@@ -294,25 +308,25 @@ const sendemailotp = async (resend) => {
 
 const otpverfication = async () => {
   isSending.value = true; // Disable button
-  isStatusValid.value = false; 
+  isStatusValid.value = false;
   const apiurl = baseurl.value + 'validateEmail'
-    const user = encryptionrequestdata({
-    userToken:localStorage.getItem('userkey'),
-    email:emailid.value,
-    verifyotp:"false",
-    otpCode:e_otp.value,
-     pageCode:"main",
+  const user = encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    email: emailid.value,
+    verifyotp: "false",
+    otpCode: e_otp.value,
+    pageCode: "main",
   });
- 
-    const payload = { payload: user };
+
+  const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
 
 
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
-      headers:{
-        'Authorization':'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+      headers: {
+        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
       },
       body: jsonString
 
@@ -322,17 +336,37 @@ const otpverfication = async () => {
     }
     else {
       const data = await response.json()
-      if(data.payload.status=='ok'){
+      if (data.payload.status == 'ok') {
         pagestatus('main')
-    emit('updateDiv', 'main');
+        emit('updateDiv', 'main');
       }
-       else if(data.payload.status==='error'){
-    otperror.value = true
-     errorotp.value = data.payload.message
-       isSending.value = true;
-  }
+      else if (data.payload.status === 'error'&& data.payload.code === 'C1006') {
+        otperror.value = true
+        errorotp.value = data.payload.message
+        isSending.value = true;
+      }
+         else if (data.payload.status === 'error'&& data.payload.code === '1005' && data.payload.otpStatus === 0) {
+        otperror.value = true
+        errorotp.value = data.payload.message
+        isSending.value = true;
+      }
+
+      else if(data.payload.status=='error'  && data.payload.code=='1002'){
+    errormsg.value=true
+    errormobile.value=data.payload.message
+    localStorage.removeItem('userkey')
+      router.push('/')
      
-    
+  }
+    else if(data.payload.status=='error'  && data.payload.code=='1004'){
+    errormsg.value=true
+    errormobile.value=data.payload.message
+    localStorage.removeItem('userkey')
+      router.push('/')
+     
+  }
+
+
     }
   } catch (error) {
     console.error(error.message)
@@ -340,22 +374,22 @@ const otpverfication = async () => {
 }
 
 function otpclear() {
-  buttonText.value='Next'
+  buttonText.value = 'Next'
   emailbox.value = false
-      isSending.value = false;;
-  e_otp.value=''
+  isSending.value = false;;
+  e_otp.value = ''
 }
 
 
 watch(e_otp, (newval) => {
   if (newval.length === 5) {
-   isStatusValid.value = true; 
+    isStatusValid.value = true;
     isSending.value = false;
     otperror.value = false
   }
   else {
     isSending.value = true;
-     otperror.value = false
+    otperror.value = false
   }
 })
 
@@ -371,41 +405,22 @@ const handleButtonClick = () => {
   circle.style.left = `${x}px`;
   circle.style.top = `${y}px`;
   button.$el.appendChild(circle);
-
   setTimeout(async () => {
     circle.remove();
- const mydata = await getServerData();
-     if(mydata.payload.status=='ok'){
-       if (!emailbox.value) {
-      // First step: trigger sending OTP
-      if (isValidEmail.value) {
-        await sendemailotp();
-      } else {
-        erroremail.value = true;
-        emailerror.value = 'Please enter a valid email address';
-      }
-    } else {
-      // Second step: verify the OTP
-      if (e_otp.value.length === 5) {
-        await otpverfication();
-      } else {
-        otperror.value = true;
-        errorotp.value = 'Enter a valid 5-digit OTP';
-      }
-    }
-     }
+   
 
-      else if (
-        mydata?.payload?.status === 'error' &&
-        (mydata?.payload?.message === 'User Not Found.' ||
-         mydata?.payload?.message === 'Missing User Token.')
-    ) {
-       alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
+    if(emailbox.value==true){
+     
+       await otpverfication();
+
     }
-   
-   
+    else{
+      
+ await sendemailotp();
+    }
+
+    
+ 
   }, 600);
 };
 
