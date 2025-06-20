@@ -141,14 +141,13 @@ const toggleSelection = async(value) => {
       if(mydata.payload.status=='ok'){
         camsbankdata();
       }
-      else if (
-        mydata?.payload?.status === 'error' &&
-        (mydata?.payload?.message === 'User Not Found.' ||
-         mydata?.payload?.message === 'Missing User Token.')
-      ) {
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey');
-        router.push('/');
+     else if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
       }
   } else if (value === 'Upload Last 6 Months Bank Statement PDF') {
     pdferrorbox.value=false
