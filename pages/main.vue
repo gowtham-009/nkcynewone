@@ -118,7 +118,7 @@ import PHOTOSIGN1 from '~/components/NKYC_Forms/photo&sign/photosign.vue'
 import TAKEPHOTO from '~/components/NKYC_Forms/photo&sign/takephoto.vue'
 import PHOTOPROCEED from '~/components/NKYC_Forms/photo&sign/pictureproceed.vue'
 import SIGNDRAWING from '~/components/NKYC_Forms/photo&sign/signdraw.vue'
-import ADDITIONALINFO from '~/components/NKYC_Forms/photo&sign/documentconfirmation.vue'
+
 import ESIGN from '~/components/NKYC_Forms/esign/esign.vue'
 import BANKFILE from '~/components/NKYC_Forms/finalstatementpage/bankfile.vue'
 
