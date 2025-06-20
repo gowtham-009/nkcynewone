@@ -176,6 +176,7 @@ function extractTimestamp(filename) {
 }
 
 const initPage = async () => {
+    
   const queryval = route.query.ecres;
   const mydata = await getServerData();
 
@@ -189,6 +190,7 @@ const initPage = async () => {
     content.value = false;
     loading.value = true;
     intervalId = setInterval(() => {
+   
       camsbankdatacheck();
     }, 5000);
   } else if (statuscheck2 || statuscheck) {
@@ -199,6 +201,8 @@ const initPage = async () => {
       selected.value = 'CAMS';
       uploadedPDF.value=false
     } else {
+
+      await getdatapdf()
       selected.value = 'Upload Last 6 Months Bank Statement PDF';
       buttonText.value = 'Upload Bank Statement';
     }
@@ -211,7 +215,7 @@ const editPDF = () => {
   triggerUpload();
 };
 onMounted(async() => {
-  await getdatapdf()
+
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
@@ -221,6 +225,7 @@ onMounted(async() => {
 let checkCount = 0; 
 
 const camsbankdatacheck = async () => {
+ 
   const headertoken=htoken
   const apiurl = `${baseurl.value}cams`;
   const user = encryptionrequestdata({
@@ -243,7 +248,7 @@ const camsbankdatacheck = async () => {
     const meta = data.payload?.metaData;
 
     if (data.payload.status === 'ok') {
-    alert('hii')
+    
       const clienttrnxid1 = meta?.cams_create?.clienttrnxid;
       const clienttrnxid2 = meta?.cams_data?.clienttxnid;
       const consentStatus = meta?.cams_create?.consentStatus;
@@ -256,7 +261,6 @@ const camsbankdatacheck = async () => {
         bankStatementFile
       ) {
 
-        alert('hilloe')
         clearInterval(intervalId);
         const mydata = await pagestatus('thankyou');
         if (mydata.payload.status === 'ok') {
@@ -292,6 +296,7 @@ const camsbankdatacheck = async () => {
 };
 
 const camsbankdata = async () => {
+
   const headertoken=htoken
   const mydata = await getServerData();
   const ifscvalue = mydata?.payload?.metaData?.bank?.bank1IFSC;
@@ -303,7 +308,11 @@ const camsbankdata = async () => {
     camsAction: 'createCams',
     bankIfsc: ifscvalue,
     redirecUrl: 'https://nkcynewone.vercel.app/main',
+
+   
   });
+
+
 
   try {
     const response = await fetch(apiurl, {
