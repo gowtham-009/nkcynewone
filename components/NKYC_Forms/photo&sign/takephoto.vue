@@ -443,18 +443,22 @@ const headertoken=htoken
     }
 
 
-    else if(data.payload.status == 'error'&& data.payload.message == 'IPV limit reached. Please contact the admin for assistance.'){
+    else if(data.payload.status == 'error'&& data.payload.code == 'L1002'){
+      loadingprogress.value=false
       ipvlimiterror.value=data.payload.message
       ipverror.value=true
-      loadingprogress.value=false
+     
     }
 
-    else if ((data.payload.status == 'error' && data.payload.message == 'User not found.') || (data.payload.status == 'error' && data.payload.message == 'Missing Usertoken parameters.')) {
-   resetProgress();
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey');
-      router.push('/');
-    }
+   else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             loadingprogress.value=false
+          alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
 
 
 
@@ -481,16 +485,18 @@ const back = () => {
 
   setTimeout(async () => {
     circle.remove()
-    const page = await pagestatus('photosign1')
-    if ((page?.payload?.status == 'error' && page?.payload?.message == 'User Not Found.') || (page?.payload?.status == 'error' && page?.payload?.message == 'Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'photosign1');
-      isBack.value = false;
-    }
+     const data = await pagestatus('photosign1')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'photosign1');
+  isBack.value = false;
+}
   }, 600)
 
 };

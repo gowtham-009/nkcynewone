@@ -273,6 +273,16 @@ const camsbankdatacheck = async () => {
         }
       }
     }
+
+    else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
+
   } catch (error) {
     console.error('camsbankdatacheck error:', error.message);
   }
@@ -306,6 +316,15 @@ const camsbankdata = async () => {
     if (data.payload.status === 'ok') {
       window.location.href = data.payload.metaData.redirectionurl;
     }
+    else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
+
   } catch (error) {
     console.error('camsbankdata error:', error.message);
   }
@@ -374,11 +393,15 @@ const bankstatement = async (pdfval) => {
         emit('updateDiv', 'thankyou');
       }
     }
-    else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey');
-      router.push('/');
-    }
+  else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
+
   } catch (error) {
     console.error('bankstatement error:', error.message);
   }
@@ -406,6 +429,15 @@ const handleButtonClick = async (event) => {
       if (pageroute.payload.status === 'ok') {
         emit('updateDiv', 'thankyou');
       }
+
+      else if (pageroute.payload.status == 'error') {
+      if (pageroute.payload.code == '1002' || pageroute.payload.code=='1004'){
+    alert(pageroute.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+
     } 
     // Else trigger upload
     else {
@@ -431,16 +463,18 @@ const back = async () => {
 
   setTimeout(async () => {
     circle.remove();
-    const page = await pagestatus('esign')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'esign');
-      isBack.value = false;
-    }
+   const data = await pagestatus('esign')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'esign');
+  isBack.value = false;
+}
   }, 600);
 };
 </script>

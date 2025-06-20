@@ -83,14 +83,15 @@ const question8 = ref('')
 const clientname = ref('')
 const getsegmentdata = async () => {
   const mydata = await getServerData();
+    const headertoken=htoken
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
   if (statuscheck) {
     clientname.value = mydata?.payload?.metaData?.profile?.clientName
     const segments = mydata?.payload?.metaData?.proofs?.ipvImg || '';
     if (segments) {
-      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+      const imageauth = headertoken;
       const userToken = localStorage.getItem('userkey');
-      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+      const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
 
       srcUrl.value = imgSrc; // ✅ Set image to component
     }
@@ -99,9 +100,9 @@ const getsegmentdata = async () => {
     const segments = mydata?.payload?.metaData?.proofs?.ipvImg || '';
     if (segments) {
       clientname.value = mydata?.payload?.metaData?.profile?.clientName
-      const imageauth = 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1';
+      const imageauth = headertoken;
       const userToken = localStorage.getItem('userkey');
-      const imgSrc = `https://nnkyc.w3webtechnologies.co.in/api/v1/view/uploads/${imageauth}/${userToken}/${segments}`;
+      const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
 
       srcUrl.value = imgSrc; // ✅ Set image to component
     }
@@ -145,16 +146,18 @@ const back = () => {
   setTimeout(async () => {
     circle.remove()
     circle.remove()
-    const page = await pagestatus('photosign1')
-    if ((page?.payload?.status == 'error' && page?.payload?.message == 'User Not Found.') || (page?.payload?.status == 'error' && page?.payload?.message == 'Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'photosign1');
-      isBack.value = false;
-    }
+  const data = await pagestatus('photosign1')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'photosign1');
+  isBack.value = false;
+}
   }, 600)
 
 }
@@ -201,12 +204,14 @@ const documentsavebtn = async () => {
       emit('updateDiv', 'signdraw');
       isStatusValid.value = false;
     }
-    else if ((data.payload.status == 'error' && data.payload.message == 'User not found.') || (data.payload.status == 'error' && data.payload.message == 'Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey');
-      router.push('/');
-    }
-
+    else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
   } catch (error) {
 
     console.error(error.message);
@@ -232,15 +237,17 @@ const handleButtonClick = () => {
 
 
     const page = await pagestatus('signdraw')
-    if ((page?.payload?.status == 'error' && page?.payload?.message == 'User Not Found.') || (page?.payload?.status == 'error' && page?.payload?.message == 'Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
+   if (page.payload.status == 'error') {
+        if (page.payload.code == '1002' || page.payload.code=='1004'){
+             alert(page.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
     else if (page.payload.status == 'ok') {
       const mydata = await getServerData();
       const statuscheck = mydata?.payload?.metaData?.additional_docs;
-     
       if (statuscheck.length === 0) {
        
         documentsavebtn();

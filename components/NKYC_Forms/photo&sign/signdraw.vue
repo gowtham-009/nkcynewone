@@ -532,12 +532,15 @@ const headertoken=htoken
       emit('updateDiv', 'esign');
     }
 
-      else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing Usertoken parameters.')){
-       resetProgress();
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey');
-        router.push('/');
-    }
+    
+       else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
 
   } catch (error) {
     resetProgress();
@@ -564,16 +567,18 @@ const back = () => {
 
   setTimeout(async() => {
     circle.remove()
-  const page = await pagestatus('photoproceed')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'photoproceed');
-      isBack.value = false;
-    }
+ const data = await pagestatus('photoproceed')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'photoproceed');
+  isBack.value = false;
+}
   }, 600)
 
 }

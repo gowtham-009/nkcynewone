@@ -181,12 +181,14 @@ const back = () => {
         isBack.value = false;
         }
 
-         else if(mydata.payload.status === 'error' &&(mydata.payload.message === 'User Not Found.' || mydata.payload.message === 'Missing User Token.')){
-       alert('Session has expired, please login.');
-        localStorage.removeItem('userkey');
-        router.push('/');
-    }
-
+         else if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+}
 
        
     }, 600)
@@ -221,11 +223,15 @@ const handleButtonClick = () => {
 isStatusValid.value = false;
        }
 
-        else if(mydata.payload.status === 'error' &&(mydata.payload.message === 'User Not Found.' || mydata.payload.message === 'Missing User Token.')){
-       alert('Session has expired, please login.');
-        localStorage.removeItem('userkey');
-        router.push('/');
-    }
+        else if (mydata.payload.status == 'error') {
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+}
+
 
     }, 600)
 };

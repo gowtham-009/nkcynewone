@@ -206,12 +206,14 @@ const createunsignedDocument = async () => {
        createEsign()
     }
 
-      else if ((data.payload.status == 'error' && data.payload.message=='User not found.')||(data.payload.status == 'error' && data.payload.message=='Missing required parameters.')){
-     resetProgress();
-        alert('Session has expired, please login.');
-        localStorage.removeItem('userkey');
-        router.push('/');
-    }
+      else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+}
 
   } catch (error) {
     resetProgress();
@@ -246,6 +248,14 @@ const createEsign = async () => {
       const decoded = atob(data.payload.metaData.dataEsign);
       window.location.href = decoded;
     }
+      else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+}
   } catch (error) {
     console.error('Create Esign failed:', error.message);
   } finally {
@@ -320,6 +330,15 @@ const headertoken=htoken
 
 
     }
+
+      else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+}
   } catch (error) {
     console.error('Status check failed:', error.message);
   }
@@ -345,6 +364,8 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+    
+
   if (!loadingen.value && isStatusValid.value) {
       createunsignedDocument();
       isStatusValid.value = false;
@@ -367,16 +388,21 @@ const back = () => {
 
   setTimeout(async() => {
     circle.remove()
-   const page = await pagestatus('signdraw')
-    if ((page?.payload?.status == 'error' && page?.payload?.message=='User Not Found.')||(page?.payload?.status == 'error' && page?.payload?.message=='Missing Usertoken parameters.')) {
-      alert('Session has expired, please login.');
-      localStorage.removeItem('userkey')
-      router.push('/')
-    }
-    else if (page.payload.status == 'ok') {
-      emit('updateDiv', 'signdraw');
-      isBack.value = false;
-    }
+  
+    
+ const data = await pagestatus('signdraw')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'signdraw');
+  isBack.value = false;
+}
+
   }, 600)
 
 }

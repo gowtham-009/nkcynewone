@@ -189,7 +189,14 @@ const digilocker_create = async () => {
             const url = data.payload.metaData.url
             window.location.href = url;
         }
-
+        else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
     } catch (error) {
         console.error('Error:', error.message);
 
@@ -234,6 +241,14 @@ const digilocker_request = async () => {
             digilocker_getfiles(data)
 
         }
+        else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
 
         else {
             content.value = true
@@ -288,6 +303,14 @@ const digilocker_getfiles = async (requestid) => {
 
             digilocker_getaadhardoc(requestid.payload.metaData.requestId)
         }
+        else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
 
     } catch (error) {
         console.error('Error:', error.message);
@@ -334,6 +357,14 @@ const digilocker_getaadhardoc = async (requestid) => {
             pagestatus('parmanentaddress')
             emit('updateDiv', 'parmanentaddress');
         }
+        else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
+      }
 
        
 
