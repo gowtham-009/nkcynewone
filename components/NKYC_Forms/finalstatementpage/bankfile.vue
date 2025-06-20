@@ -255,6 +255,8 @@ const camsbankdatacheck = async () => {
         consentStatus === 'ACTIVE' &&
         bankStatementFile
       ) {
+
+        alert('hilloe')
         clearInterval(intervalId);
         const mydata = await pagestatus('thankyou');
         if (mydata.payload.status === 'ok') {
