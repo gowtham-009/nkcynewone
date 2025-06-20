@@ -89,13 +89,13 @@ const routeComponents = async (token) => {
 
     const data = await response.json();
   
-    if(data.payload.status=='ok' && data.payload.message=='IPV Login Successfull.'){
+    if(data.payload.status=='ok' && data.payload.metaData.token){
         localStorage.setItem('userkey',data.payload.metaData.token)
         if(data.payload.metaData.token){
           
             const page=await pagestatus('takephoto') 
             if(page.payload.status=='ok'){
-                 window.location.href='https://nkcynewone.vercel.app'
+               window.location.href='https://nkcynewone.vercel.app'
             }
              
         }
