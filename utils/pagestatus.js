@@ -31,9 +31,9 @@ export async function pagestatus(pagecode) {
   takephoto:75,
    photoproceed:80,
   signdraw:85,
-   additionalinformation:90,
-  esign:95,
-  bankfile:98,
+  
+  esign:90,
+  bankfile:95,
    thankyou:100,
   };
 

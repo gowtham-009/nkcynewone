@@ -73,9 +73,7 @@
       <div v-else-if="currentForm === 'signdraw'">
         <SIGNDRAWING :data="data" @updateDiv="handleUpdateDiv" />
       </div>
-      <div v-else-if="currentForm === 'additionalinformation'">
-        <ADDITIONALINFO :data="data" @updateDiv="handleUpdateDiv" />
-      </div>
+     
       <div v-else-if="currentForm === 'esign'">
         <ESIGN @updateDiv="handleUpdateDiv" />
       </div>
@@ -155,7 +153,7 @@ const formMap = {
   '$@takephoto1': 'takephoto',
   '$@photoproceed1': 'photoproceed',
   '$@signdraw1': 'signdraw',
-  '$@additional1': 'additionalinformation',
+ 
   '$@esign1': 'esign',
   '$@bankfile1': 'bankfile',
   '$@thankyou1': 'thankyou',
