@@ -243,6 +243,7 @@ const camsbankdatacheck = async () => {
     const meta = data.payload?.metaData;
 
     if (data.payload.status === 'ok') {
+    alert('hii')
       const clienttrnxid1 = meta?.cams_create?.clienttrnxid;
       const clienttrnxid2 = meta?.cams_data?.clienttxnid;
       const consentStatus = meta?.cams_create?.consentStatus;
