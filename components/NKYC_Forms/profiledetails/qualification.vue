@@ -190,11 +190,8 @@ const headertoken=htoken
               localStorage.removeItem('userkey')
               router.push('/')
         }
-       
-      }
 
-
-
+        
        else if(data.payload.status=='error' && data.payload.errors.length>0) {
       qulificationerror.value=""
 
@@ -211,6 +208,11 @@ const headertoken=htoken
  
   });
 }
+       
+      }
+
+
+
 
     }
 

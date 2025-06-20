@@ -182,10 +182,8 @@ const personalinfo = async () => {
               localStorage.removeItem('userkey')
               router.push('/')
         }
-       
-      }
 
-       else if(data.payload.status=='error' && data.payload.errors.length>0) {
+          else if(data.payload.status=='error' && data.payload.errors.length>0) {
       occupationerror.value=""
 
    
@@ -202,6 +200,10 @@ const personalinfo = async () => {
   });
 }
 
+       
+      }
+
+     
     }
 
   } catch (error) {

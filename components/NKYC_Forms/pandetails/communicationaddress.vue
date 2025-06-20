@@ -181,9 +181,8 @@ const communicateaddressdata = async () => {
               localStorage.removeItem('userkey')
               router.push('/')
         }
-       
-      }
-      else if(data.payload.status=='error' && data.payload.errors.length>0) {
+
+          else if(data.payload.status=='error' && data.payload.errors.length>0) {
       
    
      data.payload.errors.forEach((err) => {
@@ -203,6 +202,9 @@ const communicateaddressdata = async () => {
     }
   });
 }
+       
+      }
+    
     }
 
   } catch (error) {

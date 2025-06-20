@@ -366,15 +366,13 @@ const headertoken=htoken
     
       else if (data.payload.status == 'error') {
         waitingbox.value=false
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
+        if (data.payload.code == '1002' || data.payload.code=='1004')
+        {
              alert(data.payload.message);
               localStorage.removeItem('userkey')
               router.push('/')
         }
-       
-      }
-    
-    else if(data.payload.status=='error' && data.payload.errors.length>0) {
+          else if(data.payload.status=='error' && data.payload.errors.length>0) {
      
   data.payload.errors.forEach((err) => {
     
@@ -398,6 +396,10 @@ if (err.field === 'bankAccType' && !selected.value) {
     }
   });
 }
+       
+      }
+    
+  
   
     
  
