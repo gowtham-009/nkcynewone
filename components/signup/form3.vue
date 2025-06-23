@@ -288,7 +288,7 @@ const sendemailotp = async (resend) => {
         }
       }, 1000);
       if (resend == 'resend') {
-
+otperror.value=false
 
 
         e_otp.value = ''
