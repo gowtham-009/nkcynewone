@@ -1,360 +1,433 @@
 <template>
-  <div class="flex flex-col justify-center items-center">
-    <div class="camera-wrapper" :class="{
-'border-blue-400': !readyToCapture && !imageCaptured,
-      'border-green-500': readyToCapture || imageCaptured,
-    }">
-      <video ref="video" autoplay playsinline v-if="!imageCaptured && cameraActive" class="camera-video" />
-      <img v-if="imageCaptured" :src="capturedImage" alt="Captured Face" class="camera-image" />
-      <canvas ref="canvas" class="hidden"></canvas>
+  <div class="primary_color overflow-hidden h-screen">
 
-      <div class="center-guide" v-if="!imageCaptured">
-        <div class="crosshair"></div>
-        <div class="distance-ring" :class="{ 'ring-green': readyToCapture }"></div>
-        <div class="axis-line x-axis"></div>
-        <div class="axis-line y-axis"></div>
+    <!-- Box 1 -->
+    <div class="w-full p-2 primary_color transition-all duration-300" :style="{ height: box1Height + 'px' }">
+      <div class="w-full px-2 py-2 flex justify-end items-center">
+        <ThemeSwitch />
+      </div>
+
+      <div class="w-full flex justify-center items-center">
+        <logo />
       </div>
     </div>
 
-    <div class="status-indicators mt-1 text-center">
-      <div>
-        <span class="font-medium">Faces: </span>
-        <span :class="{
-          'text-red-500': faceCount !== 1,
-          'text-green-500': faceCount === 1
-        }">
-          {{ faceCount }}
-          <span v-if="faceCount === 0">❌ (No face)</span>
-          <span v-else-if="faceCount === 1">✅</span>
-          <span v-else>❌ (Only one allowed)</span>
-        </span>
-      </div>
+    <!-- Box 2 -->
+    <div v-show="showBox2"
+      class="w-full p-1 flex flex-col justify-between bg-white rounded-t-3xl dark:bg-black transition-all duration-300"
+      :style="{ height: box2Height + 'px' }">
+      <div class="w-full mt-2 px-2 flex flex-col justify-between">
+        <span class="font-medium text-gray-500 text-md">Identity Verification</span>
+        <p class="text-lg font-semibold dark:text-gray-400">Fill Your PAN Details</p>
+        <p class="font-medium text-gray-500 text-md leading-5">This is required as mandated by regulator for
+          verification
+          purposes. </p>
 
-      <div v-if="faceCount === 1">
-        <span class="font-medium">Position: </span>
-        <span :class="{
-          'text-red-500': !isNoseCentered,
-          'text-green-500': isNoseCentered
-        }">
-          {{ nosePositionStatus }}
-        </span>
-      </div>
+        <div class="w-full mt-2">
+          <PAN v-model="panvalue" />
+          <span class="text-red-500" v-if="panerror">{{ error }}</span>
+        </div>
 
-      <div v-if="faceCount === 1">
-        <span class="font-medium">Distance: </span>
-        <span :class="{
-          'text-red-500': distanceScore < 65,
-          'text-yellow-500': distanceScore >= 65 && distanceScore < 80,
-          'text-green-500': distanceScore >= 80
-        }">
-          {{ distanceScore.toFixed(0) }}%
-          <span v-if="distanceScore >= 65 && distanceScore < 80">👌 (Good distance)</span>
-          <span v-else-if="distanceScore >= 80">👍 (Perfect)</span>
-          <span v-else>👎 (Move to ~1ft distance)</span>
-        </span>
-      </div>
+        <div class="w-full mt-2" v-if="dobbox">
+          <DOB v-model="visibleDate" />
+        </div>
 
-      <div v-if="showMultipleFacesWarning" class="mt-2 p-2 bg-red-100 text-red-800 rounded">
-        ⚠️ Multiple faces detected! Only one face can be captured.
+        <div v-if="loginotpbox" class="w-full  mt-1">
+          <p class="font-medium text-gray-500 text-md dark:text-gray-400">
+            OTP Sent mobile number +91 {{ phoneNumber }}
+          </p>
+          <LOGINOTP v-model="loginotpval" />
+          <span class="text-red-500" v-if="loginerror">{{ errorval }}</span>
+          <div class="w-full flex justify-between items-center">
+            <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
+            <p class="text-md font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resent </p>
+            <button :disabled="timeLeft" type="button" @click="kraaddresssubmission('resend')"
+              class="text-lg font-medium text-blue-500 cursor-pointer ">Resend</button>
+          </div>
+        </div>
+      </div>
+      <div class="w-full">
+        <Button ref="buttonRef" :disabled="!panvalue || !visibleDate || isSending" @click="handleButtonClick"
+          class="primary_color w-full text-white py-3 text-xl border-0 wave-btn">
+          <span ref="waveRef" class="wave"></span>
+          {{ buttonText }}
+        </Button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
-import * as faceapi from 'face-api.js'
+import { ref, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router'
+import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
+import PAN from '~/components/forminputs/paninput.vue';
+import DOB from '~/components/forminputs/dateinput.vue';
+import LOGINOTP from '~/components/forminputs/loginotp.vue';
+import { encryptionrequestdata } from '~/utils/globaldata.js';
+import { kradatares } from '~/utils/kradata.js';
 
-const emit = defineEmits(['captured'])
+const router = useRouter()
 
-// Refs
-const video = ref(null)
-const canvas = ref(null)
-const capturedImage = ref(null)
-const imageCaptured = ref(false)
-const cameraActive = ref(true)
-const isNoseCentered = ref(false)
-const faceCount = ref(0)
-const distanceScore = ref(0)
-const showMultipleFacesWarning = ref(false)
+const { baseurl } = globalurl();
+const { htoken } = headerToken()
+const panerror = ref(false);
+const panvalue = ref('');
+const dobbox = ref(false);
+const loginotpbox = ref(false);
+const box1Height = ref(0);
+const box2Height = ref(0);
+const showBox2 = ref(false);
+const error = ref('');
+const loginerror = ref(false);
+const errorval = ref('');
+const buttonRef = ref(null);
+const waveRef = ref(null);
+const phoneNumber = ref('');
+const emailid = ref('');
+const loginotpval = ref('');
+const visibleDate = ref('');
+const isSending = ref(false);
+const buttonText = ref("Continue");
+const tokenval = ref('');
 
-// Constants
-const CENTER_TOLERANCE = 15 // pixels
-const IDEAL_FACE_WIDTH_PERCENT = 0.4 // 40% of frame at 1ft
-const MIN_FACE_WIDTH_PERCENT = 0.25  // 25% of frame (too far)
-const MAX_FACE_WIDTH_PERCENT = 0.6   // 60% of frame (too close)
-let mediaStream = null
-let detectionInterval = null
-let warningTimeout = null
 
-// Load face detection models
-const loadModels = async () => {
-  try {
-    await faceapi.nets.tinyFaceDetector.loadFromUri('/models/tiny_face_detector')
-    await faceapi.nets.faceLandmark68Net.loadFromUri('/models/face_landmark_68')
-  } catch (error) {
-    console.error('Failed to load models:', error)
+const resend_sh = ref(false)
+const timeLeft = ref(10);
+let timer = null;
+const emit = defineEmits(['updateDiv']);
+
+watch(panvalue, (newVal) => {
+  if (newVal.length === 10) {
+    const pattern = /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/;
+    const isValid = pattern.test(newVal);
+    panerror.value = !isValid;
+    error.value = isValid ? '' : 'Please enter a valid PAN no';
+    dobbox.value = isValid;
+  } else {
+    panerror.value = false;
+    dobbox.value = false;
   }
-}
+});
 
-// Face detection logic
-const detectFaces = async () => {
-  if (!video.value || imageCaptured.value) return
+onMounted(() => {
+  localStorage.removeItem('userkey')
+  const fullHeight = window.innerHeight;
+  box1Height.value = fullHeight;
+  box2Height.value = 0;
+  showBox2.value = false;
 
-  try {
-    const detections = await faceapi
-      .detectAllFaces(video.value, new faceapi.TinyFaceDetectorOptions({
-        inputSize: 320,
-        scoreThreshold: 0.6
-      }))
-      .withFaceLandmarks()
+  setTimeout(() => {
+    showBox2.value = true;
+    box1Height.value = fullHeight * 0.3;
+    box2Height.value = fullHeight * 0.7;
+  }, 500);
 
-    faceCount.value = detections.length
+  window.addEventListener('resize', () => {
+    const updatedHeight = window.innerHeight;
+    box1Height.value = showBox2.value ? updatedHeight * 0.3 : updatedHeight;
+    box2Height.value = showBox2.value ? updatedHeight * 0.7 : 0;
+  });
+});
 
-    // Handle multiple faces
-    if (detections.length > 1) {
-      isNoseCentered.value = false
-      distanceScore.value = 0
-      showMultipleFacesWarning.value = true
-      if (warningTimeout) clearTimeout(warningTimeout)
-      warningTimeout = setTimeout(() => {
-        showMultipleFacesWarning.value = false
-      }, 5000)
-      return
-    }
-
-    showMultipleFacesWarning.value = false
-
-    // No face or exactly one face
-    if (detections.length !== 1) {
-      isNoseCentered.value = false
-      distanceScore.value = 0
-      return
-    }
-
-    // Calculate face metrics
-    const detection = detections[0]
-    const nose = detection.landmarks.getNose()[3]
-    const jaw = detection.landmarks.getJawOutline()
-    const videoRect = video.value.getBoundingClientRect()
-    const scaleX = video.value.videoWidth / videoRect.width
-    const scaleY = video.value.videoHeight / videoRect.height
-
-    // Nose position
-    const nosePosition = {
-      x: nose.x / scaleX,
-      y: nose.y / scaleY
-    }
-
-    // Face width calculation
-    const faceWidth = Math.abs(jaw[0].x - jaw[jaw.length - 1].x) / scaleX
-    const faceWidthPercent = faceWidth / videoRect.width
-
-    // Center calculations
-    const center = { 
-      x: videoRect.width / 2, 
-      y: videoRect.height / 2 
-    }
-    const distToCenter = Math.hypot(nosePosition.x - center.x, nosePosition.y - center.y)
-    isNoseCentered.value = distToCenter <= CENTER_TOLERANCE
-
-    // Distance score calculation (1ft = ~75%)
-    if (faceWidthPercent < IDEAL_FACE_WIDTH_PERCENT) {
-      distanceScore.value = (faceWidthPercent - MIN_FACE_WIDTH_PERCENT) / 
-                          (IDEAL_FACE_WIDTH_PERCENT - MIN_FACE_WIDTH_PERCENT) * 75
-    } else {
-      distanceScore.value = 100 - ((faceWidthPercent - IDEAL_FACE_WIDTH_PERCENT) / 
-                                (MAX_FACE_WIDTH_PERCENT - IDEAL_FACE_WIDTH_PERCENT) * 25)
-    }
-    distanceScore.value = Math.min(100, Math.max(0, distanceScore.value))
-
-    // Auto-capture when conditions are perfect
-    if (readyToCapture.value && !imageCaptured.value) {
-      captureImage()
-    }
-  } catch (error) {
-    console.error('Face detection error:', error)
-  }
-}
-
-const captureImage = () => {
-  try {
-    const ctx = canvas.value.getContext('2d')
-    canvas.value.width = video.value.videoWidth
-    canvas.value.height = video.value.videoHeight
-    ctx.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height)
-    capturedImage.value = canvas.value.toDataURL('image/jpeg', 0.9)
-    emit('captured', capturedImage.value)
-    imageCaptured.value = true
-    stopCamera()
-  } catch (error) {
-    console.error('Image capture error:', error)
-  }
-}
-
-const stopCamera = () => {
-  if (mediaStream) {
-    mediaStream.getTracks().forEach(track => track.stop())
-    cameraActive.value = false
-  }
-  if (detectionInterval) {
-    clearInterval(detectionInterval)
-    detectionInterval = null
-  }
-}
-
-// Computed properties
-const readyToCapture = computed(() => {
-  return faceCount.value === 1 && 
-         isNoseCentered.value && 
-         distanceScore.value >= 65 &&
-         distanceScore.value <= 85
-})
-
-const nosePositionStatus = computed(() => {
-  if (imageCaptured.value) return 'Captured!'
-  return isNoseCentered.value ? 'Centered' : 'Off center'
-})
-
-// Initialize camera
-onMounted(async () => {
-  await loadModels()
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        width: { ideal: 300 },
-        height: { ideal: 300 },
-        facingMode: 'user'
-      }
-    })
-    video.value.srcObject = mediaStream
-    video.value.onloadedmetadata = () => {
-      video.value.play().catch(e => console.error('Video play error:', e))
-      detectionInterval = setInterval(detectFaces, 300)
-    }
-  } catch (err) {
-    console.error('Camera error:', err)
-    alert('Camera access denied. Please enable camera permissions.')
-  }
-})
-
-// Cleanup
 onUnmounted(() => {
-  stopCamera()
-  if (warningTimeout) clearTimeout(warningTimeout)
-})
+  clearInterval(timer);
+});
+
+const kraaddresssubmission = async (resend) => {
+
+  const apiurl = `${baseurl.value}kra_pan`;
+  const userkey = localStorage.getItem('userkey') || '';
+
+  const encryptedPayload = await encryptionrequestdata({
+    panNo: panvalue.value,
+    dob: visibleDate.value,
+    pageCode: "mobile",
+    userToken: userkey
+  });
+
+  const headertoken = htoken
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': headertoken
+      },
+      body: JSON.stringify({ payload: encryptedPayload })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.payload.status == 'error' && data.payload.code == 'A1001') {
+      panerror.value = true
+      error.value = data.payload.message
+
+    }
+    else {
+      console.log(data.payload.message)
+    }
+
+
+    if (resend == 'resend') {
+      resend_sh.value = true
+      timeLeft.value = 60;
+
+      if (timer) {
+        clearInterval(timer);
+      }
+
+      timer = setInterval(() => {
+        if (timeLeft.value > 0) {
+          timeLeft.value -= 1;
+        } else {
+          clearInterval(timer);
+        }
+      }, 1000);
+    }
+    return data;
+  } catch (error) {
+    console.error('Error during KRA address submission:', error.message);
+    return null;
+  }
+};
+
+
+
+
+const panvalidation = async () => {
+    const apiurl = `${baseurl.value}pan_verification`;
+    const user = encryptionrequestdata({
+    userToken:tokenval,
+    pageCode: 'mobile',
+    panNo: panvalue.value,
+    panName: '',
+
+  });
+  const headertoken = htoken
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': headertoken,
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    })
+
+    if (!response.ok) {
+      throw new Error("Network is error", response.status);
+
+    }
+    else {
+      const data = await response.json()
+      if (data.payload.status == 'ok') {
+          localStorage.setItem('userkey', tokenval);
+          router.push('/main'); 
+      }
+
+      else if(data.payload.status=='error' && data.payload.code=='M1001'){
+        panerror.value=true
+        error.value=data.payload.message
+      }
+     
+    }
+
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
+
+const otpverfication = async () => {
+  const apiurl = `${baseurl.value}login_verification`;
+  const encrypted = encryptionrequestdata({
+    userToken: tokenval.value,
+    pageCode: "pan",
+    otpCode: loginotpval.value
+  });
+
+  const headertoken = htoken
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': headertoken
+      },
+      body: JSON.stringify({ payload: encrypted })
+    });
+
+    if (!response.ok) {
+      throw new Error("Network error");
+    }
+
+    const data = await response.json();
+    if (data.payload.status == 'error' && data.payload.code == 'AA1001') {
+      loginerror.value = true
+      errorval.value = data.payload.message
+    }
+    else if (data.payload.status == 'error' && data.payload.code == 'AA1002') {
+      loginerror.value = true
+      errorval.value = data.payload.message
+    }
+    else {
+      console.log(data.payload.message)
+    }
+    return data
+  } catch (error) {
+    console.error('OTP verification failed:', error.message);
+    return null;
+  }
+};
+
+const handleButtonClick = async () => {
+  if (isSending.value) return; // Prevent multiple rapid clicks
+
+  // Start wave animation
+  if (waveRef.value) {
+    waveRef.value.className = 'wave start-half';
+  }
+
+  await new Promise(r => setTimeout(r, 400)); // Allow animation to play
+
+  let data = null;
+
+  // Determine if OTP verification or KRA address submission should occur
+  if (loginotpbox.value == true) {
+    data = await otpverfication();
+  } else {
+    data = await kraaddresssubmission();
+  }
+
+  if (!data) return; // Exit if no data returned
+
+  // Trigger finish animation
+  if (waveRef.value) {
+    void waveRef.value.offsetWidth; // Force reflow to reset animation
+    waveRef.value.className = 'wave finish-half';
+  }
+
+  setTimeout(async () => {
+    const status = data?.payload?.status;
+    const metaData = data?.payload?.metaData;
+
+    // If handling OTP verification
+    if (loginotpval.value.length === 4) {
+      if (status === 'ok') {
+        localStorage.setItem('userkey', tokenval.value);
+        const mydata = await getServerData();
+        const statuscheck = mydata?.payload?.metaData?.profile?.pageStatus;
+
+        const pagetext = ['pan'];
+
+        if (statuscheck) {
+          const matchedPage = pagetext.find(page =>
+            statuscheck.toLowerCase().includes(page)
+          );
+
+          if (matchedPage) {
+            emit('updateDiv', matchedPage); // Go to known page
+          } else {
+            pagestatus(statuscheck); // Custom handler for other statuses
+            router.push('/main'); // Default route
+          }
+        }
+      }
+
+    } else {
+      // If handling KRA address submission
+      if (status === 'ok') {
+          
+          const kycData = metaData?.KYC_DATA;
+
+        if (kycData?.APP_KRA_INFO || kycData?.APP_ERROR_DESC) {
+          panvalidation(data.payload.userKey) 
+        
+        }
+
+
+        else if (metaData?.loginStatus === 0) {
+          // Start OTP timer
+          timer = setInterval(() => {
+            if (timeLeft.value > 0) {
+              timeLeft.value -= 1;
+            } else {
+              clearInterval(timer);
+            }
+          }, 1000);
+
+          // Show OTP input box and set user details
+          loginotpbox.value = true;
+          phoneNumber.value = metaData.mobile || '';
+          emailid.value = metaData.email || '';
+          tokenval.value = metaData.userKey;
+        }
+      }
+    }
+  }, 400);
+};
+
+watch(loginotpval, (val) => {
+  loginerror.value = false;
+  errorval.value = '';
+  isSending.value = !(val.length === 4);
+});
 </script>
 
 <style scoped>
-.camera-wrapper {
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 4px solid;
+.wave-btn {
   position: relative;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  transition: border-color 0.3s ease;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.3s ease-in-out;
 }
 
-.camera-wrapper.border-blue-400 {
-  border-color: #60a5fa;
-}
-
-.camera-wrapper.border-green-500 {
-  border-color: #10b981;
-}
-
-.camera-video,
-.camera-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.center-guide {
+.wave {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
   height: 100%;
+  background: rgba(76, 75, 75, 0.3);
   pointer-events: none;
 }
 
-.crosshair {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 20px;
-  height: 20px;
-  z-index: 2;
+.wave.start-half {
+  animation: waveHalf 0.4s ease-out forwards;
 }
 
-.crosshair:before,
-.crosshair:after {
-  content: '';
-  position: absolute;
-  background: rgba(255, 255, 255, 0.8);
+.wave.finish-half {
+  animation: waveFinish 0.4s ease-out forwards;
 }
 
-.crosshair:before {
-  width: 2px;
-  height: 20px;
-  left: 9px;
-  top: 0;
+@keyframes waveHalf {
+  0% {
+    width: 0%;
+    opacity: 2;
+  }
+
+  100% {
+    width: 70%;
+    opacity: 2;
+  }
 }
 
-.crosshair:after {
-  width: 20px;
-  height: 2px;
-  left: 0;
-  top: 9px;
-}
+@keyframes waveFinish {
+  0% {
+    width: 70%;
+    opacity: 2;
+  }
 
-.distance-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80px;
-  height: 80px;
-  border: 2px dashed rgba(255, 255, 255, 0.6);
-  border-radius: 50%;
-  transition: border-color 0.3s ease;
-  z-index: 1;
-}
-
-.distance-ring.ring-green {
-  border-color: rgba(0, 255, 0, 0.7);
-}
-
-.axis-line {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.3);
-  pointer-events: none;
-}
-
-.x-axis {
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  transform: translateY(-50%);
-}
-
-.y-axis {
-  left: 50%;
-  top: 0;
-  height: 100%;
-  width: 1px;
-  transform: translateX(-50%);
-}
-
-.status-indicators {
-  min-width: 250px;
-  background: rgba(0, 0, 0, 0.05);
-  padding: 1%;
-  border-radius: 8px;
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
 }
 </style>

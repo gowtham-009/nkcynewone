@@ -19,7 +19,8 @@
       <div class="w-full mt-2 px-2 flex flex-col justify-between">
         <span class="font-medium text-gray-500 text-md">Identity Verification</span>
         <p class="text-lg font-semibold dark:text-gray-400">Fill Your PAN Details</p>
-        <p class="font-medium text-gray-500 text-md leading-5">This is required as mandated by regulator for verification
+        <p class="font-medium text-gray-500 text-md leading-5">This is required as mandated by regulator for
+          verification
           purposes. </p>
 
         <div class="w-full mt-2">
@@ -58,7 +59,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import PAN from '~/components/forminputs/paninput.vue';
 import DOB from '~/components/forminputs/dateinput.vue';
@@ -66,10 +67,10 @@ import LOGINOTP from '~/components/forminputs/loginotp.vue';
 import { encryptionrequestdata } from '~/utils/globaldata.js';
 import { kradatares } from '~/utils/kradata.js';
 
-const router=useRouter()
+const router = useRouter()
 
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const panerror = ref(false);
 const panvalue = ref('');
 const dobbox = ref(false);
@@ -133,6 +134,44 @@ onUnmounted(() => {
   clearInterval(timer);
 });
 
+
+const panvalidation = async () => {
+    const apiurl = `${baseurl.value}pan_verification`;
+    const user = encryptionrequestdata({
+      pageCode:'pan',
+    panNo: panvalue.value,
+      panName:''
+  });
+  const headertoken = htoken
+  const payload = { payload: user };
+  const jsonString = JSON.stringify(payload);
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': headertoken,
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    })
+
+    if (!response.ok) {
+      throw new Error("Network is error", response.status);
+
+    }
+    else {
+      const data = await response.json()
+
+      return data
+     
+     
+    }
+
+  } catch (error) {
+    console.log(error.message)
+  }
+}
+
 const kraaddresssubmission = async (resend) => {
 
   const apiurl = `${baseurl.value}kra_pan`;
@@ -142,17 +181,18 @@ const kraaddresssubmission = async (resend) => {
     panNo: panvalue.value,
     dob: visibleDate.value,
     pageCode: "mobile",
-    userToken: userkey
+    userToken: userkey,
+  
   });
 
- const headertoken=htoken
+  const headertoken = htoken
 
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization':headertoken
+        'Authorization': headertoken
       },
       body: JSON.stringify({ payload: encryptedPayload })
     });
@@ -162,19 +202,19 @@ const kraaddresssubmission = async (resend) => {
     }
 
     const data = await response.json();
-    if(data.payload.status=='error' && data.payload.code=='A1001'){
-      panerror.value=true
-      error.value=data.payload.message
+    if (data.payload.status == 'error' && data.payload.code == 'A1001') {
+      panerror.value = true
+      error.value = data.payload.message
 
     }
-      else{
-        console.log(data.payload.message)
-      }
+    else {
+      console.log(data.payload.message)
+    }
 
 
     if (resend == 'resend') {
       resend_sh.value = true
-      timeLeft.value = 60;
+      timeLeft.value = 10;
 
       if (timer) {
         clearInterval(timer);
@@ -188,12 +228,17 @@ const kraaddresssubmission = async (resend) => {
         }
       }, 1000);
     }
+
+
     return data;
   } catch (error) {
     console.error('Error during KRA address submission:', error.message);
     return null;
   }
 };
+
+
+
 
 const otpverfication = async () => {
   const apiurl = `${baseurl.value}login_verification`;
@@ -203,7 +248,7 @@ const otpverfication = async () => {
     otpCode: loginotpval.value
   });
 
-   const headertoken=htoken
+  const headertoken = htoken
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
@@ -218,16 +263,16 @@ const otpverfication = async () => {
       throw new Error("Network error");
     }
 
-    const data=await response.json();
-    if(data.payload.status=='error' && data.payload.code=='AA1001'){
-      loginerror.value=true
-      errorval.value=data.payload.message
+    const data = await response.json();
+    if (data.payload.status == 'error' && data.payload.code == 'AA1001') {
+      loginerror.value = true
+      errorval.value = data.payload.message
     }
-    else if(data.payload.status=='error' && data.payload.code=='AA1002'){
-       loginerror.value=true
-      errorval.value=data.payload.message
+    else if (data.payload.status == 'error' && data.payload.code == 'AA1002') {
+      loginerror.value = true
+      errorval.value = data.payload.message
     }
-    else{
+    else {
       console.log(data.payload.message)
     }
     return data
@@ -238,29 +283,41 @@ const otpverfication = async () => {
 };
 
 const handleButtonClick = async () => {
-  if (isSending.value) return; // Prevent multiple rapid clicks
+  if (isSending.value) return; // Prevent rapid multiple clicks
 
   // Start wave animation
   if (waveRef.value) {
     waveRef.value.className = 'wave start-half';
   }
 
-  await new Promise(r => setTimeout(r, 400)); // Allow animation to play
+  await new Promise(resolve => setTimeout(resolve, 400)); // Allow animation to play
 
-  let data = null;
+ let data = null;
 
-  // Determine if OTP verification or KRA address submission should occur
-  if (loginotpbox.value==true) {
-    data = await otpverfication();
-  } else {
+if (loginotpbox.value === true && loginotpval.value.length === 4) {
+  // OTP submission flow
+  data = await otpverfication();
+} else {
+  // PAN validation + DOB submission flow
+  const pandata = await panvalidation();
+
+  if (pandata?.payload?.status === 'ok') {
     data = await kraaddresssubmission();
+  } else if (pandata?.payload?.code === 'M1001') {
+    panerror.value = true;
+    error.value = pandata.payload.message;
+    dobbox.value=false
+    visibleDate.value = '';
+    waveRef.value.className =''
+    return;
   }
+}
 
-  if (!data) return; // Exit if no data returned
+  if (!data) return;
 
-  // Trigger finish animation
+  // Finish wave animation
   if (waveRef.value) {
-    void waveRef.value.offsetWidth; // Force reflow to reset animation
+    void waveRef.value.offsetWidth; // Force reflow to restart animation
     waveRef.value.className = 'wave finish-half';
   }
 
@@ -268,43 +325,41 @@ const handleButtonClick = async () => {
     const status = data?.payload?.status;
     const metaData = data?.payload?.metaData;
 
-    // If handling OTP verification
+    // OTP Verification Flow
     if (loginotpval.value.length === 4) {
-      if (status === 'ok') {
-        localStorage.setItem('userkey', tokenval.value);
-        const mydata = await getServerData();
-        const statuscheck = mydata?.payload?.metaData?.profile?.pageStatus;
+  if (status === 'ok') {
+    localStorage.setItem('userkey', tokenval.value);
 
-        const pagetext = ['pan'];
+    const mydata = await getServerData();
+    const statuscheck = mydata?.payload?.metaData?.profile?.pageStatus;
 
-        if (statuscheck) {
-          const matchedPage = pagetext.find(page =>
-            statuscheck.toLowerCase().includes(page)
-          );
+    const pagetext = ['pan']; // Add more pages if needed
 
-          if (matchedPage) {
-            emit('updateDiv', matchedPage); // Go to known page
-          } else {
-            pagestatus(statuscheck); // Custom handler for other statuses
-            router.push('/main'); // Default route
-          }
-        }
-      } 
+    if (statuscheck) {
+      const matchedPage = pagetext.find(page =>
+        statuscheck.toLowerCase().includes(page)
+      );
 
-    } else {
-      // If handling KRA address submission
+      if (matchedPage) {
+        emit('updateDiv', matchedPage);
+      } else {
+        pagestatus(statuscheck);
+        router.push('/main');
+      }
+    }
+  }
+} 
+ else {
+      // KRA Info or Send OTP Flow
       if (status === 'ok') {
         const kycData = metaData?.KYC_DATA;
 
-        if (kycData?.APP_KRA_INFO || kycData?.APP_ERROR_DESC ) {
-          localStorage.setItem('userkey', data.payload.userKey);
-          
-          router.push('/main'); // Redirect to main page
-        } 
-      
-        
-        else if (metaData?.loginStatus === 0) {
-          // Start OTP timer
+        if (kycData?.APP_KRA_INFO || kycData?.APP_ERROR_DESC) {
+           localStorage.setItem('userkey', data.payload.userKey);
+          router.push('/main');
+
+        } else if (metaData?.loginStatus === 0) {
+          // Start 60s OTP timer
           timer = setInterval(() => {
             if (timeLeft.value > 0) {
               timeLeft.value -= 1;
@@ -313,7 +368,6 @@ const handleButtonClick = async () => {
             }
           }, 1000);
 
-          // Show OTP input box and set user details
           loginotpbox.value = true;
           phoneNumber.value = metaData.mobile || '';
           emailid.value = metaData.email || '';
@@ -323,6 +377,8 @@ const handleButtonClick = async () => {
     }
   }, 400);
 };
+
+
 
 watch(loginotpval, (val) => {
   loginerror.value = false;
