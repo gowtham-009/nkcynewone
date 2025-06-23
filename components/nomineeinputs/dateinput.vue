@@ -1,5 +1,5 @@
 <template>
-  <span class="font-semibold text-lg">Date of Birth as per PAN</span>
+  <span class="font-semibold text-lg">DOB*</span>
   <div class="date-wrapper w-full rounded-lg">
     <Calendar
       v-model="internalDate"
