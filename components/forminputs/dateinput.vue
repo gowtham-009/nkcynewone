@@ -46,50 +46,49 @@ watch(internalDate, (val) => {
   emit('update:modelValue', formatDate(val));
 });
 
-// Flags
-let isDeleting = false;
 let isFormatting = false;
 
 const handleKeyDown = (e) => {
-  isDeleting = e.key === 'Backspace' || e.key === 'Delete';
+  // do nothing specific here for now
 };
 
-// 💡 INPUT FORMATTER: dd/mm/yyyy with auto-slash & mobile-compatible
 const handleInput = (e) => {
   if (isFormatting) return;
   isFormatting = true;
 
   const input = e.target;
-  let rawDigits = input.value.replace(/\D/g, '').slice(0, 8); // Only 8 digits
+  let raw = input.value;
+
+  // Allow user to enter slashes manually and ignore extra characters
+  raw = raw.replace(/[^0-9/]/g, '');
+
+  // Remove all slashes for reformatting
+  const digits = raw.replace(/\D/g, '').slice(0, 8);
   let formatted = '';
 
-  const dd = rawDigits.slice(0, 2);
-  const mm = rawDigits.slice(2, 4);
-  const yyyy = rawDigits.slice(4, 8);
-
-  // Validation
-  const validDay = +dd >= 1 && +dd <= 31;
-  const validMonth = +mm >= 1 && +mm <= 12;
-  const validYear = yyyy.length < 4 || /^(19|20)/.test(yyyy); // partial OK
-
-  if (rawDigits.length <= 2) {
-    formatted = dd;
-  } else if (rawDigits.length <= 4) {
-    formatted = `${dd}/${mm}`;
+  if (digits.length <= 2) {
+    formatted = digits;
+  } else if (digits.length <= 4) {
+    formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
   } else {
-    formatted = `${dd}/${mm}/${yyyy}`;
+    formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+  }
+
+  // If user manually added slashes in right place, preserve them
+  if (raw.length >= formatted.length) {
+    formatted = raw;
   }
 
   input.value = formatted;
 
-  // Restore cursor after slash insertions
-  let newCursor = formatted.length;
   nextTick(() => {
-    input.setSelectionRange(newCursor, newCursor);
+    const pos = input.value.length;
+    input.setSelectionRange(pos, pos);
     isFormatting = false;
   });
 
-  if (formatted.length === 10 && validDay && validMonth && validYear) {
+  // Final validation
+  if (formatted.length === 10) {
     internalDate.value = parseDate(formatted);
   }
 };
@@ -99,8 +98,9 @@ onMounted(() => {
     const input = document.querySelector('.custom-input');
     if (input) {
       input.setAttribute('maxlength', '10');
-      input.setAttribute('inputmode', 'numeric'); // forces number pad on mobile
-      input.setAttribute('pattern', '\\d{2}/\\d{2}/\\d{4}');
+      input.setAttribute('inputmode', 'text'); // ✅ allows slash
+      input.setAttribute('pattern', '[0-9/]*'); // ✅ digits and slash
+      input.setAttribute('autocomplete', 'off');
     }
   });
 });
