@@ -1,433 +1,190 @@
 <template>
-  <div class="primary_color overflow-hidden h-screen">
+  <div class="date-input-container">
+    <span class="text-md text-gray-500">DOB*</span>
+    <div class="date-wrapper w-full">
+     <Calendar
+  v-model="internalDate"
+  :maxDate="maxDate"
+  dateFormat="dd/mm/yy"
+  placeholder="DD / MM / YYYY"
+  class="custom-calendar w-full dark:!bg-gray-800"
+  inputClass="custom-input"
+  :manualInput="true"
+  :showOnFocus="false"
+  showIcon
+  @date-select="handleDateSelect"
+  @input="handleInput"
+  @keydown="handleKeyDown"
+/>
 
-    <!-- Box 1 -->
-    <div class="w-full p-2 primary_color transition-all duration-300" :style="{ height: box1Height + 'px' }">
-      <div class="w-full px-2 py-2 flex justify-end items-center">
-        <ThemeSwitch />
-      </div>
-
-      <div class="w-full flex justify-center items-center">
-        <logo />
-      </div>
-    </div>
-
-    <!-- Box 2 -->
-    <div v-show="showBox2"
-      class="w-full p-1 flex flex-col justify-between bg-white rounded-t-3xl dark:bg-black transition-all duration-300"
-      :style="{ height: box2Height + 'px' }">
-      <div class="w-full mt-2 px-2 flex flex-col justify-between">
-        <span class="font-medium text-gray-500 text-md">Identity Verification</span>
-        <p class="text-lg font-semibold dark:text-gray-400">Fill Your PAN Details</p>
-        <p class="font-medium text-gray-500 text-md leading-5">This is required as mandated by regulator for
-          verification
-          purposes. </p>
-
-        <div class="w-full mt-2">
-          <PAN v-model="panvalue" />
-          <span class="text-red-500" v-if="panerror">{{ error }}</span>
-        </div>
-
-        <div class="w-full mt-2" v-if="dobbox">
-          <DOB v-model="visibleDate" />
-        </div>
-
-        <div v-if="loginotpbox" class="w-full  mt-1">
-          <p class="font-medium text-gray-500 text-md dark:text-gray-400">
-            OTP Sent mobile number +91 {{ phoneNumber }}
-          </p>
-          <LOGINOTP v-model="loginotpval" />
-          <span class="text-red-500" v-if="loginerror">{{ errorval }}</span>
-          <div class="w-full flex justify-between items-center">
-            <h2 class="font-medium text-md dark:text-gray-500">00:{{ timeLeft.toString().padStart(2, '0') }}s</h2>
-            <p class="text-md font-medium text-center leading-5 text-gray-500" v-if="resend_sh">OTP Resent </p>
-            <button :disabled="timeLeft" type="button" @click="kraaddresssubmission('resend')"
-              class="text-lg font-medium text-blue-500 cursor-pointer ">Resend</button>
-          </div>
-        </div>
-      </div>
-      <div class="w-full">
-        <Button ref="buttonRef" :disabled="!panvalue || !visibleDate || isSending" @click="handleButtonClick"
-          class="primary_color w-full text-white py-3 text-xl border-0 wave-btn">
-          <span ref="waveRef" class="wave"></span>
-          {{ buttonText }}
-        </Button>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { useRouter } from 'vue-router'
-import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
-import PAN from '~/components/forminputs/paninput.vue';
-import DOB from '~/components/forminputs/dateinput.vue';
-import LOGINOTP from '~/components/forminputs/loginotp.vue';
-import { encryptionrequestdata } from '~/utils/globaldata.js';
-import { kradatares } from '~/utils/kradata.js';
+import { ref, watch, nextTick, onMounted } from 'vue';
+const maxDate = new Date(); // <-- add this line at the top
 
-const router = useRouter()
+const props = defineProps({
+  modelValue: String, // Expected format: dd/mm/yyyy
+});
+const emit = defineEmits(['update:modelValue']);
 
-const { baseurl } = globalurl();
-const { htoken } = headerToken()
-const panerror = ref(false);
-const panvalue = ref('');
-const dobbox = ref(false);
-const loginotpbox = ref(false);
-const box1Height = ref(0);
-const box2Height = ref(0);
-const showBox2 = ref(false);
-const error = ref('');
-const loginerror = ref(false);
-const errorval = ref('');
-const buttonRef = ref(null);
-const waveRef = ref(null);
-const phoneNumber = ref('');
-const emailid = ref('');
-const loginotpval = ref('');
-const visibleDate = ref('');
-const isSending = ref(false);
-const buttonText = ref("Continue");
-const tokenval = ref('');
+// Parse and format utilities
+const parseDate = (str) => {
+  if (!str || !/^\d{2}\/\d{2}\/\d{4}$/.test(str)) return null;
+  const [dd, mm, yyyy] = str.split('/');
+  const date = new Date(`${yyyy}-${mm}-${dd}`);
+  return isNaN(date.getTime()) ? null : date;
+};
 
+const formatDate = (dateObj) => {
+  if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) return '';
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const year = dateObj.getFullYear();
+  return `${day}/${month}/${year}`;
+};
 
-const resend_sh = ref(false)
-const timeLeft = ref(10);
-let timer = null;
-const emit = defineEmits(['updateDiv']);
+// Internal state
+const internalDate = ref(parseDate(props.modelValue));
+const isDeleting = ref(false);
+const isFormatting = ref(false);
 
-watch(panvalue, (newVal) => {
-  if (newVal.length === 10) {
-    const pattern = /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/;
-    const isValid = pattern.test(newVal);
-    panerror.value = !isValid;
-    error.value = isValid ? '' : 'Please enter a valid PAN no';
-    dobbox.value = isValid;
-  } else {
-    panerror.value = false;
-    dobbox.value = false;
+// Sync with parent
+watch(() => props.modelValue, (newVal) => {
+  const parsed = parseDate(newVal);
+  if (parsed?.getTime() !== internalDate.value?.getTime()) {
+    internalDate.value = parsed;
   }
 });
 
+watch(internalDate, (newVal) => {
+  const formatted = formatDate(newVal);
+  if (formatted !== props.modelValue) {
+    emit('update:modelValue', formatted);
+  }
+});
+
+// Handle date selection from calendar picker
+const handleDateSelect = (date) => {
+  internalDate.value = date;
+};
+
+// Handle keyboard input
+const handleKeyDown = (e) => {
+  isDeleting.value = e.key === 'Backspace' || e.key === 'Delete';
+};
+
+// Format input as user types
+const handleInput = (e) => {
+  if (isFormatting.value) return;
+  isFormatting.value = true;
+
+  const input = e.target;
+  let value = input.value.replace(/\D/g, ''); // Remove non-digits
+  let formatted = '';
+
+  // Auto-format with slashes
+  if (value.length > 0) {
+    formatted = value.slice(0, 2);
+    if (value.length > 2) {
+      formatted += '/' + value.slice(2, 4);
+      if (value.length > 4) {
+        formatted += '/' + value.slice(4, 8);
+      }
+    }
+  }
+
+  // Validate day and month
+  const [dd = '', mm = ''] = formatted.split('/');
+  if (dd.length === 2 && (parseInt(dd) < 1 || parseInt(dd) > 31)) {
+    formatted = formatted.slice(0, 1); // Keep only first digit if invalid
+  }
+  if (mm.length === 2 && (parseInt(mm) < 1 || parseInt(mm) > 12)) {
+    formatted = formatted.slice(0, 3); // Keep only first month digit if invalid
+  }
+
+  // Update input value
+  input.value = formatted;
+
+  // Set cursor position
+  const cursorPos = formatted.length;
+  nextTick(() => {
+    input.setSelectionRange(cursorPos, cursorPos);
+    isFormatting.value = false;
+  });
+
+  // Update model if complete date
+  if (formatted.length === 10) {
+    const parsed = parseDate(formatted);
+    if (parsed) {
+      internalDate.value = parsed;
+    }
+  }
+};
+
+// Set up input attributes on mount
 onMounted(() => {
-  localStorage.removeItem('userkey')
-  const fullHeight = window.innerHeight;
-  box1Height.value = fullHeight;
-  box2Height.value = 0;
-  showBox2.value = false;
-
-  setTimeout(() => {
-    showBox2.value = true;
-    box1Height.value = fullHeight * 0.3;
-    box2Height.value = fullHeight * 0.7;
-  }, 500);
-
-  window.addEventListener('resize', () => {
-    const updatedHeight = window.innerHeight;
-    box1Height.value = showBox2.value ? updatedHeight * 0.3 : updatedHeight;
-    box2Height.value = showBox2.value ? updatedHeight * 0.7 : 0;
+  nextTick(() => {
+    const input = document.querySelector('.custom-input');
+    if (input) {
+      input.setAttribute('maxlength', '10');
+      input.setAttribute('inputmode', 'numeric');
+      input.setAttribute('pattern', '\\d{2}/\\d{2}/\\d{4}');
+      input.setAttribute('autocomplete', 'off');
+    }
   });
-});
-
-onUnmounted(() => {
-  clearInterval(timer);
-});
-
-const kraaddresssubmission = async (resend) => {
-
-  const apiurl = `${baseurl.value}kra_pan`;
-  const userkey = localStorage.getItem('userkey') || '';
-
-  const encryptedPayload = await encryptionrequestdata({
-    panNo: panvalue.value,
-    dob: visibleDate.value,
-    pageCode: "mobile",
-    userToken: userkey
-  });
-
-  const headertoken = htoken
-
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': headertoken
-      },
-      body: JSON.stringify({ payload: encryptedPayload })
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (data.payload.status == 'error' && data.payload.code == 'A1001') {
-      panerror.value = true
-      error.value = data.payload.message
-
-    }
-    else {
-      console.log(data.payload.message)
-    }
-
-
-    if (resend == 'resend') {
-      resend_sh.value = true
-      timeLeft.value = 60;
-
-      if (timer) {
-        clearInterval(timer);
-      }
-
-      timer = setInterval(() => {
-        if (timeLeft.value > 0) {
-          timeLeft.value -= 1;
-        } else {
-          clearInterval(timer);
-        }
-      }, 1000);
-    }
-    return data;
-  } catch (error) {
-    console.error('Error during KRA address submission:', error.message);
-    return null;
-  }
-};
-
-
-
-
-const panvalidation = async () => {
-    const apiurl = `${baseurl.value}pan_verification`;
-    const user = encryptionrequestdata({
-    userToken:tokenval,
-    pageCode: 'mobile',
-    panNo: panvalue.value,
-    panName: '',
-
-  });
-  const headertoken = htoken
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': headertoken,
-        'Content-Type': 'application/json',
-      },
-      body: jsonString,
-    })
-
-    if (!response.ok) {
-      throw new Error("Network is error", response.status);
-
-    }
-    else {
-      const data = await response.json()
-      if (data.payload.status == 'ok') {
-          localStorage.setItem('userkey', tokenval);
-          router.push('/main'); 
-      }
-
-      else if(data.payload.status=='error' && data.payload.code=='M1001'){
-        panerror.value=true
-        error.value=data.payload.message
-      }
-     
-    }
-
-  } catch (error) {
-    console.log(error.message)
-  }
-}
-
-
-const otpverfication = async () => {
-  const apiurl = `${baseurl.value}login_verification`;
-  const encrypted = encryptionrequestdata({
-    userToken: tokenval.value,
-    pageCode: "pan",
-    otpCode: loginotpval.value
-  });
-
-  const headertoken = htoken
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': headertoken
-      },
-      body: JSON.stringify({ payload: encrypted })
-    });
-
-    if (!response.ok) {
-      throw new Error("Network error");
-    }
-
-    const data = await response.json();
-    if (data.payload.status == 'error' && data.payload.code == 'AA1001') {
-      loginerror.value = true
-      errorval.value = data.payload.message
-    }
-    else if (data.payload.status == 'error' && data.payload.code == 'AA1002') {
-      loginerror.value = true
-      errorval.value = data.payload.message
-    }
-    else {
-      console.log(data.payload.message)
-    }
-    return data
-  } catch (error) {
-    console.error('OTP verification failed:', error.message);
-    return null;
-  }
-};
-
-const handleButtonClick = async () => {
-  if (isSending.value) return; // Prevent multiple rapid clicks
-
-  // Start wave animation
-  if (waveRef.value) {
-    waveRef.value.className = 'wave start-half';
-  }
-
-  await new Promise(r => setTimeout(r, 400)); // Allow animation to play
-
-  let data = null;
-
-  // Determine if OTP verification or KRA address submission should occur
-  if (loginotpbox.value == true) {
-    data = await otpverfication();
-  } else {
-    data = await kraaddresssubmission();
-  }
-
-  if (!data) return; // Exit if no data returned
-
-  // Trigger finish animation
-  if (waveRef.value) {
-    void waveRef.value.offsetWidth; // Force reflow to reset animation
-    waveRef.value.className = 'wave finish-half';
-  }
-
-  setTimeout(async () => {
-    const status = data?.payload?.status;
-    const metaData = data?.payload?.metaData;
-
-    // If handling OTP verification
-    if (loginotpval.value.length === 4) {
-      if (status === 'ok') {
-        localStorage.setItem('userkey', tokenval.value);
-        const mydata = await getServerData();
-        const statuscheck = mydata?.payload?.metaData?.profile?.pageStatus;
-
-        const pagetext = ['pan'];
-
-        if (statuscheck) {
-          const matchedPage = pagetext.find(page =>
-            statuscheck.toLowerCase().includes(page)
-          );
-
-          if (matchedPage) {
-            emit('updateDiv', matchedPage); // Go to known page
-          } else {
-            pagestatus(statuscheck); // Custom handler for other statuses
-            router.push('/main'); // Default route
-          }
-        }
-      }
-
-    } else {
-      // If handling KRA address submission
-      if (status === 'ok') {
-          
-          const kycData = metaData?.KYC_DATA;
-
-        if (kycData?.APP_KRA_INFO || kycData?.APP_ERROR_DESC) {
-          panvalidation(data.payload.userKey) 
-        
-        }
-
-
-        else if (metaData?.loginStatus === 0) {
-          // Start OTP timer
-          timer = setInterval(() => {
-            if (timeLeft.value > 0) {
-              timeLeft.value -= 1;
-            } else {
-              clearInterval(timer);
-            }
-          }, 1000);
-
-          // Show OTP input box and set user details
-          loginotpbox.value = true;
-          phoneNumber.value = metaData.mobile || '';
-          emailid.value = metaData.email || '';
-          tokenval.value = metaData.userKey;
-        }
-      }
-    }
-  }, 400);
-};
-
-watch(loginotpval, (val) => {
-  loginerror.value = false;
-  errorval.value = '';
-  isSending.value = !(val.length === 4);
 });
 </script>
 
 <style scoped>
-.wave-btn {
+.date-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.date-wrapper {
   position: relative;
-  overflow: hidden;
-  cursor: pointer;
+}
+
+.custom-calendar {
+  width: 100%;
+}
+
+.custom-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  background-color: white;
+  transition: border-color 0.2s;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+.custom-input:focus {
   outline: none;
-  transition: background 0.3s ease-in-out;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
 }
 
-.wave {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: rgba(76, 75, 75, 0.3);
-  pointer-events: none;
+.custom-input::placeholder {
+  color: #a0aec0;
+  opacity: 1;
 }
 
-.wave.start-half {
-  animation: waveHalf 0.4s ease-out forwards;
+/* Dark mode styles */
+.dark .custom-input {
+  background-color: #1a202c;
+  border-color: #2d3748;
+  color: #e2e8f0;
 }
 
-.wave.finish-half {
-  animation: waveFinish 0.4s ease-out forwards;
-}
-
-@keyframes waveHalf {
-  0% {
-    width: 0%;
-    opacity: 2;
-  }
-
-  100% {
-    width: 70%;
-    opacity: 2;
-  }
-}
-
-@keyframes waveFinish {
-  0% {
-    width: 70%;
-    opacity: 2;
-  }
-
-  100% {
-    width: 100%;
-    opacity: 0;
-  }
+.dark .custom-input:focus {
+  border-color: #4299e1;
+  box-shadow: 0 0 0 1px #4299e1;
 }
 </style>
