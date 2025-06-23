@@ -40,10 +40,10 @@ const gustfun=async()=>{
 const mydata = await getServerData();
 const statuscheck=mydata.payload.metaData.kraPan.APP_KRA_INFO
 if(statuscheck){
-    gust.value=mydata.payload.metaData.profile.clientName
+    gust.value=mydata.payload.metaData.profile.clientName ||'Gust'
 }
 else{
-     gust.value='Gust'
+     gust.value=mydata.payload.metaData.profile.clientName ||'Gust'
 }
 }
 function toggleDropdown() {
