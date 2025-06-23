@@ -1,7 +1,7 @@
 <template>
   <div class="primary_color">
     <div class="flex justify-between items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
-      <logo style="width: 40px; height: 40px;" />
+      <logo  />
       <profile />
     </div>
     <div class="flex justify-between  p-2 px-2 flex-col bg-white rounded-t-3xl dark:bg-black"
@@ -134,17 +134,35 @@ await setEmailData()
 
 
 const isSending = ref(false);
-
+const validateEmail = (email) => {
+  const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return re.test(String(email).toLowerCase());
+};
 
 // Function to validate email format
 const isValidEmail = computed(() => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailid.value);
+  return validateEmail(emailid.value);
 });
 
 const isButtonDisabled = computed(() => {
-  if (!emailbox.value && !isValidEmail.value) return true;
-  if (emailbox.value && e_otp.value.length !== 5) return true;
-  return isSending.value;
+  if (emailbox.value) {
+    // In OTP mode, disable if OTP isn't complete
+    return e_otp.value.length !== 5;
+  } else {
+    // In email mode, disable if email isn't valid
+    return !isValidEmail.value;
+  }
+});
+
+
+watch(emailid, (newValue) => {
+  if (newValue && !validateEmail(newValue)) {
+    erroremail.value = true;
+    emailerror.value = '';
+  } else {
+    erroremail.value = false;
+    emailerror.value = '';
+  }
 });
 
 
@@ -207,6 +225,14 @@ const back = () => {
 }
 
 const sendemailotp = async (resend) => {
+
+    if (!validateEmail(emailid.value)) {
+    erroremail.value = true;
+    emailerror.value = 'Please enter a valid email address';
+    return;
+  }
+
+
   isStatusValid.value = false;
   isSending.value = true; // Disable button
   const apiurl = baseurl.value + 'validateEmail'
