@@ -163,25 +163,25 @@ const addresserror=ref('')
 
 const profilesetinfo = async () => {
   const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+  const statuscheck = mydata?.payload?.metaData?.bank ;
 
   if (statuscheck) {
 
-    selected.value = mydata?.payload?.metaData?.bank?.bank1AccType || ''
-    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo || ''
-    ifsc.value = mydata?.payload?.metaData?.bank?.bank1IFSC || ''
-    micr.value = mydata?.payload?.metaData?.bank?.bank1MICR || ''
-    address.value = mydata?.payload?.metaData?.bank?.bank1Address || ''
-    bankname.value = mydata?.payload?.metaData?.bank?.bank1Name || ''
+    selected.value = mydata?.payload?.metaData?.bank?.bank1AccType 
+    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo 
+    ifsc.value = mydata?.payload?.metaData?.bank?.bank1IFSC 
+    micr.value = mydata?.payload?.metaData?.bank?.bank1MICR 
+    address.value = mydata?.payload?.metaData?.bank?.bank1Address 
+    bankname.value = mydata?.payload?.metaData?.bank?.bank1Name 
 
   }
-  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
-    selected.value = mydata?.payload?.metaData?.bank?.bank1AccType || ''
-    accno.value = mydata?.payload?.metaData?.bank?.bank1AccNo || ''
-    ifsc.value = mydata?.payload?.metaData?.bank?.bank1IFSC || ''
-    micr.value = mydata?.payload?.metaData?.bank?.bank1MICR || ''
-    address.value = mydata?.payload?.metaData?.bank?.bank1Address || ''
-    bankname.value = mydata?.payload?.metaData?.bank?.bank1Name || ''
+  else {
+    selected.value = ''
+    accno.value = ''
+    ifsc.value = ''
+    micr.value =''
+    address.value = ''
+    bankname.value = ''
   }
 };
 await profilesetinfo()
