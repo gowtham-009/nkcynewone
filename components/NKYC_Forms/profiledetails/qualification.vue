@@ -23,7 +23,7 @@
 
           <div class="w-full grid grid-cols-2 gap-2">
             <button v-for="option in options" :key="option.value" @click="selectMaritalStatus(option.value)" :class="[
-              'px-6 py-2 rounded-lg border-2 text-md font-normal w-full transition-all',
+              'px-6 py-2 rounded-lg border-2 text-md font-normal leading-5 w-full transition-all',
               selected === option.value
                 ? 'bg-blue-600 border-blue-600 text-white'
                 : 'bg-gray-200 border-gray-300 text-black'
