@@ -154,7 +154,8 @@ const clientstatus = (value) => {
 const profilesetinfo = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO ;
-
+  const personal=mydata.payload.metaData.personal
+  if(personal.length===0){
   if (statuscheck) {
     const gender = mydata?.payload?.metaData?.kraPan?.APP_GEN ;
     selectedgender.value = gender === 'M' ? 'Male' : gender === 'F' ? 'Female' : 'Other';
@@ -173,9 +174,17 @@ const profilesetinfo = async () => {
 
     clientselected.value = mydata?.payload?.metaData?.personal?.pep || 'No, I am Not'
   }
-  else {
-
   }
+  else if(mydata.payload.metaData.personal.maritalStatus){
+    const genderp = mydata.payload.metaData.personal.gender ;
+    selectedgender.value = genderp ;
+    const marriedstatus = mydata.payload.metaData.personal.maritalStatus;
+    selected.value = marriedstatus === '01' ? 'married' : marriedstatus === '02' ? 'unmarried' : 'other';
+    clientselected.value = mydata?.payload?.metaData?.personal?.pep || 'No, I am Not'
+  }
+
+
+ 
 };
 
 
