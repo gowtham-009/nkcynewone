@@ -311,7 +311,6 @@ const getCountry = async () => {
     if (!response.ok) {
       throw new Error(`Network error: ${response.status}`)
     }
-
     const data = await response.json()
     if (data) {
       const geolocation = {
