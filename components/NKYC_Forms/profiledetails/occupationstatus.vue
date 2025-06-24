@@ -17,7 +17,7 @@
           These details are required by SEBI to open your Demat account.
         </p>
 
-        <div class="grid grid-cols-2 gap-1 mt-2">
+        <div class="grid grid-cols-2 gap-2 mt-2">
           <button v-for="option in options" :key="option.value" @click="selectMaritalStatus(option.value)" :class="[
             'px-6 py-2 rounded-lg border-2 text-md font-normal leading-5 w-full transition-all',
             selected === option.value
