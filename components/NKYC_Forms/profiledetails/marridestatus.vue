@@ -255,8 +255,8 @@ const back = () => {
     }
 
      else if (mydata.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
+        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+             alert(mydata.payload.message);
               localStorage.removeItem('userkey')
               router.push('/')
         }
