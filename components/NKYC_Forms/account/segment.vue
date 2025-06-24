@@ -118,11 +118,11 @@ const getsegmentdata = async () => {
 
   const internalSelectionSet = new Set();
 
-  
+  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
   const hasAadhaar = mydata?.payload?.metaData?.digi_info?.aadhaarUID &&
     mydata?.payload?.metaData?.digi_docs?.aadhaarDocument;
 
-  if (hasAadhaar) {
+  if (statuscheck || hasAadhaar) {
     Object.entries(segments).forEach(([key, value]) => {
       if (value === "YES" && segmentToInternalMap[key]) {
         internalSelectionSet.add(segmentToInternalMap[key]);
