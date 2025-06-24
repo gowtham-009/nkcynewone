@@ -95,7 +95,10 @@ const pincodeerror=ref('')
 const setCommunicationAddress = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO
-  if (statuscheck) {
+
+  const addresscom=mydata.payload.metaData.address
+  if(addresscom.length==0){
+     if (statuscheck) {
     const add1 = mydata?.payload?.metaData?.kraPan?.APP_COR_ADD1 || ''
     const add2 = mydata?.payload?.metaData?.kraPan?.APP_COR_ADD2 || ''
     const add3 = mydata?.payload?.metaData?.kraPan?.APP_COR_ADD3 || ''
@@ -112,7 +115,16 @@ const setCommunicationAddress = async () => {
     city.value = mydata?.payload?.metaData?.address.comCity || ''
     pincode.value = mydata?.payload?.metaData?.address.comPincode || ''
   }
-  else {
+  }
+ 
+  else if(mydata.payload.metaData.address.comPincode){
+     const add1 = mydata.payload.metaData.address.comAddress
+    const add2 = mydata.payload.metaData.address.comAddressLine2
+    const add3 = mydata.payload.metaData.address.comAddressLine3
+    address.value = add1 + " " + add2 + " " + add3
+    state.value = mydata.payload.metaData.address.comState
+    city.value = mydata.payload.metaData.address.comCity
+    pincode.value = mydata.payload.metaData.address.comPincode
 
   }
 };

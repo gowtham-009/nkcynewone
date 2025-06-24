@@ -179,7 +179,7 @@ const profilesetinfo = async () => {
     const genderp = mydata.payload.metaData.personal.gender ;
     selectedgender.value = genderp ;
     const marriedstatus = mydata.payload.metaData.personal.maritalStatus;
-    selected.value = marriedstatus === '01' ? 'married' : marriedstatus === '02' ? 'unmarried' : 'other';
+    selected.value = marriedstatus ;
     clientselected.value = mydata?.payload?.metaData?.personal?.pep || 'No, I am Not'
   }
 

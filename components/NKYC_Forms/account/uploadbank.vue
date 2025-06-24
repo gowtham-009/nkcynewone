@@ -41,7 +41,7 @@
     </div>
           </div>
 
-          <div v-if="bankerror" class="w-full p-1 mt-2 bg-red-100 px-1 py-1">
+          <div v-if="bankerror" class="w-full p-1 mt-2 rounded-lg bg-red-100 px-1 py-1">
             <p class="text-center text-red-500 text-md">{{ errorbank }}</p>
 
           </div>

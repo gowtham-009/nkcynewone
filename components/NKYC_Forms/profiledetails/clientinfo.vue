@@ -81,9 +81,9 @@ const isBack = ref(true);
 const profilesetinfo = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
-
-  if (statuscheck) {
-
+const personal=mydata.payload.metaData.personal
+if(personal.length===0){
+   if (statuscheck) {
     father.value = mydata?.payload?.metaData?.kraPan?.APP_F_NAME || ''
     mother.value = mydata?.payload?.metaData?.kraPan?.APP_M_NAME || mydata?.payload?.metaData?.personal?.motherName || ''
 
@@ -92,9 +92,14 @@ const profilesetinfo = async () => {
     father.value = mydata?.payload?.metaData?.personal?.fatherName || ''
     mother.value = mydata?.payload?.metaData?.personal?.motherName || ''
   }
-  else {
+}
 
-  }
+else if(mydata.payload.metaData.personal.fatherName && mydata.payload.metaData.personal.motherName){
+    father.value = mydata.payload.metaData.personal.fatherName || ''
+    mother.value = mydata.payload.metaData.personal.motherName || ''
+}
+ 
+  
 };
 
 
