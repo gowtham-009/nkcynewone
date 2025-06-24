@@ -90,9 +90,7 @@ const profilesetinfo = async () => {
   const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
 
   if (statuscheck) {
-
     selected.value = mydata?.payload?.metaData?.personal?.tradingExperience || ''
-
   }
   else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
     selected.value = mydata?.payload?.metaData?.personal?.tradingExperience || ''
