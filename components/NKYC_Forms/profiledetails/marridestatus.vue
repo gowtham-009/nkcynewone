@@ -221,46 +221,54 @@ const back = () => {
   button.$el.appendChild(circle)
 
   setTimeout(async () => {
-    circle.remove()
-    const mydata = await getServerData();
-    if (mydata.payload.metaData.address.sameAsPermanent == 'NO') {
-      const data = await pagestatus('communicationaddress')
-      if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code == '1004') {
+   
+circle.remove();
+ const mydata = await getServerData();
+ if(mydata.payload.status=='ok'){
+  if(mydata.payload.metaData.address.sameAsPermanent === 'NO'){
+ 
+
+     const data = await pagestatus('communicationaddress');
+     if (data.payload.status === 'error') {
+        if (data.payload.code === '1002' || data.payload.code === '1004') {
           alert(data.payload.message);
-          localStorage.removeItem('userkey')
-          router.push('/')
+          localStorage.removeItem('userkey');
+          router.push('/');
         }
       }
-      else if (data.payload.status == 'ok') {
+      else if(data.payload.status === 'ok'){
         emit('updateDiv', 'communicationaddress');
         isBack.value = false;
       }
-
-    }
-
-    else if(mydata.payload.metaData.address.sameAsPermanent == 'Yes'){
-        const data = await pagestatus('parmanentaddress')
-      if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code == '1004') {
+  }
+  else if(mydata.payload.metaData.address.sameAsPermanent === 'YES'){
+  
+    const data = await pagestatus('parmanentaddress');
+     if (data.payload.status === 'error') {
+        if (data.payload.code === '1002' || data.payload.code === '1004') {
           alert(data.payload.message);
-          localStorage.removeItem('userkey')
-          router.push('/')
+          localStorage.removeItem('userkey');
+          router.push('/');
         }
       }
-      else if (data.payload.status == 'ok') {
+      else if(data.payload.status === 'ok'){
         emit('updateDiv', 'parmanentaddress');
         isBack.value = false;
       }
-    }
+      
+    
+    
+  }
+ }
 
-     else if (mydata.payload.status == 'error') {
-        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
-             alert(mydata.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
+  else if (mydata.payload.status == 'error') {
+      if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
+            alert(mydata.payload.message);
+            localStorage.removeItem('userkey')
+            router.push('/')
       }
+}
+
 
 }, 600)
 
