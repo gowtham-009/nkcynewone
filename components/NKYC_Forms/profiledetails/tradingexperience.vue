@@ -73,10 +73,10 @@ const router = useRouter();
 // qualification Status
 const selected = ref("");
 const options = [
-  { label: "New to trading", value: "New to trading" },
-  { label: "1-2 years of experience", value: "1-2 years of experience" },
-  { label: "2-5 years of experience", value: "2-5 years of experience" },
-  { label: "5-10 years of experience", value: "5-10 years of experience" },
+  { label: "New to Trading", value: "New to Trading" },
+  { label: "1-2 Years of Experience", value: "1-2 Years of Experience" },
+  { label: "2-5 Years of Experience", value: "2-5 Years of Experience" },
+  { label: "5-10 Years of Experience", value: "5-10 Years of Experience" },
 
 ];
 

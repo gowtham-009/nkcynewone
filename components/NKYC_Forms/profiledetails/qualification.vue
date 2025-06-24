@@ -78,11 +78,11 @@ const qulificationerror=ref('')
 const selected = ref("");
 const options = [
   { label: "Illiterate", value: "Illiterate" },
-  { label: "Under high school", value: "Under high school" },
+  { label: "Under High School", value: "Under High School" },
   { label: "High school", value: "High school" },
   { label: "Graduate", value: "Graduate" },
-  { label: "Post graduate", value: "Post graduate" },
-  { label: "Professional degree", value: "Professional degree" },
+  { label: "Post Graduate", value: "Post Graduate" },
+  { label: "Professional Degree", value: "Professional Degree" },
 ];
 
 const selectMaritalStatus = (value) => {
