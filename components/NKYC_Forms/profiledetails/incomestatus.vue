@@ -66,11 +66,11 @@ const isBack = ref(true);
 const incomeerror=ref('')
 const selected = ref("");
 const options = [
-  { label: "Below 1 lakh", value: "Below 1 lakh" },
-  { label: "1 lakh to 5 lakhs", value: "1 lakh to 5 lakhs" },
-  { label: "5 lakhs to 10 lakhs", value: "5 lakhs to 10 lakhs" },
-  { label: "10 lakhs to 25 lakhs", value: "10 lakhs to 25 lakhs" },
-  { label: "Above 25 lakhs", value: "Above 25 lakhs" },
+  { label: "Below 1 lakh", value: "BELOW 1 LAC" },
+  { label: "1 lakh to 5 lakhs", value: "1-5 LAC" },
+  { label: "5 lakhs to 10 lakhs", value: "5-10 LAC" },
+  { label: "10 lakhs to 25 lakhs", value: "10-25 LAC" },
+  { label: "Above 25 lakhs", value: "> 25 LAC" },
 
 ];
 
