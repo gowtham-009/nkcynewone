@@ -81,19 +81,19 @@ const selectMaritalStatus = (value) => {
 
 
 const profilesetinfo = async () => {
-  const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO || '';
+  try {
+    const mydata = await getServerData();
+    const incomeData = mydata?.payload?.metaData?.kraPan?.APP_INCOME
+    const personalIncome = mydata?.payload?.metaData?.personal?.annualIncome || '';
+    const kraIncome = mydata?.payload?.metaData?.kraIdentityData?.income?.[incomeData] || '';
+    selected.value = personalIncome || kraIncome;
+    if (!selected.value) {
+      selected.value = '';
+    }
 
-  if (statuscheck) {
-
-    selected.value = mydata?.payload?.metaData?.personal?.annualIncome || ''
-
-  }
-  else if (mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument) {
-    selected.value = mydata?.payload?.metaData?.personal?.annualIncome || ''
-  }
-  else {
-
+  } catch (error) {
+    console.error('Error in profilesetinfo:', error);
+    
   }
 };
 
