@@ -170,7 +170,6 @@ const profilesetinfo = async () => {
         // Use KRA data
         const gender = kraPanData?.APP_GEN;
         selectedgender.value = gender === 'M' ? 'Male' : gender === 'F' ? 'Female' : 'Other';
-
         const marriedstatus = kraPanData?.APP_MAR_STATUS;
         selected.value = marriedstatus === '01' ? 'married' : marriedstatus === '02' ? 'unmarried' : 'other';
       }
@@ -180,7 +179,7 @@ const profilesetinfo = async () => {
         selectedgender.value = gender === 'MALE' ? 'Male' : gender === 'FEMALE' ? 'Female' : 'Other';
 
         const marriedstatus = personalData?.maritalStatus;
-        selected.value = marriedstatus || 'other'; // Provide default if undefined
+        selected.value = marriedstatus 
       }
     }
     else if (personalData.maritalStatus || personalData.gender) {
