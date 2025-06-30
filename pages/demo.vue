@@ -51,7 +51,7 @@
 import { ref, computed, watch, nextTick } from 'vue';
 
 const props = defineProps({
-  modelValue: String,
+  modelValue: String, // format: dd/mm/yyyy
   validate: {
     type: Boolean,
     default: true
@@ -67,6 +67,7 @@ const rawInput = ref('');
 const activeSegment = ref(0);
 const hasInteracted = ref(false);
 
+// Parse the modelValue into day, month, year
 const day = computed(() => props.modelValue?.split('/')[0]?.replace(/\D/g, '') || '');
 const month = computed(() => props.modelValue?.split('/')[1]?.replace(/\D/g, '') || '');
 const year = computed(() => props.modelValue?.split('/')[2]?.replace(/\D/g, '') || '');
@@ -76,6 +77,7 @@ watch(() => props.modelValue, (val) => {
     rawInput.value = '';
     activeSegment.value = 0;
   } else {
+    // Update rawInput when modelValue changes externally
     const [d, m, y] = val.split('/');
     rawInput.value = `${d || ''}${m || ''}${y || ''}`.replace(/\D/g, '').slice(0, 8);
   }
@@ -89,6 +91,7 @@ const setActiveSegment = (segment) => {
   activeSegment.value = segment;
   focusInput();
   
+  // Move cursor to appropriate position
   nextTick(() => {
     if (segment === 0) {
       dateInput.value.setSelectionRange(0, Math.min(2, rawInput.value.length));
@@ -103,9 +106,14 @@ const setActiveSegment = (segment) => {
 const handleInput = (e) => {
   hasInteracted.value = true;
   let value = e.target.value.replace(/\D/g, '');
+  
+  // Limit to 8 digits (DDMMYYYY)
   value = value.slice(0, 8);
+  
+  // Update raw value
   rawInput.value = value;
   
+  // Auto-advance segments based on input length
   if (value.length <= 2) {
     activeSegment.value = 0;
   } else if (value.length <= 4) {
@@ -114,8 +122,10 @@ const handleInput = (e) => {
     activeSegment.value = 2;
   }
   
+  // Format and emit the value
   formatAndEmit(value);
   
+  // Position cursor correctly
   nextTick(() => {
     dateInput.value.setSelectionRange(value.length, value.length);
   });
@@ -137,6 +147,7 @@ const formatAndEmit = (digits) => {
   
   emit('update:modelValue', formattedDate.replace(/_/g, ''));
   
+  // Auto-validate when complete
   if (digits.length === 8) {
     validateDate();
   }
@@ -145,34 +156,40 @@ const formatAndEmit = (digits) => {
 const validateDate = () => {
   if (!props.validate || !hasInteracted.value) return;
   
+  // Check if all segments are filled
   if (rawInput.value.length < 8) return;
   
   const dayVal = parseInt(day.value, 10);
   const monthVal = parseInt(month.value, 10);
   const yearVal = parseInt(year.value, 10);
   
+  // Validate day
   if (dayVal < 1 || dayVal > 31) {
     emit('invalid', 'invalid-day');
     return;
   }
   
+  // Validate month
   if (monthVal < 1 || monthVal > 12) {
     emit('invalid', 'invalid-month');
     return;
   }
   
+  // Validate specific month days
   const daysInMonth = new Date(yearVal, monthVal, 0).getDate();
   if (dayVal > daysInMonth) {
     emit('invalid', 'invalid-day-for-month');
     return;
   }
   
+  // Validate year range
   const currentYear = new Date().getFullYear();
   if (yearVal < 1900 || yearVal > currentYear) {
     emit('invalid', 'invalid-year');
     return;
   }
   
+  // Validate min/max dates if provided
   const enteredDate = new Date(yearVal, monthVal - 1, dayVal);
   if (props.minDate && enteredDate < props.minDate) {
     emit('invalid', 'before-min-date');
@@ -184,10 +201,12 @@ const validateDate = () => {
     return;
   }
   
+  // If all validations pass
   emit('valid', `${day.value.padStart(2, '0')}/${month.value.padStart(2, '0')}/${year.value}`);
 };
 
 const handleKeyDown = (e) => {
+  // Handle arrow keys to move between segments
   if (e.key === 'ArrowLeft') {
     e.preventDefault();
     if (activeSegment.value > 0) {
@@ -201,10 +220,12 @@ const handleKeyDown = (e) => {
       setActiveSegment(activeSegment.value);
     }
   } else if (e.key === 'Backspace') {
+    // Handle backspace to delete characters
     const selectionStart = dateInput.value.selectionStart;
     const selectionEnd = dateInput.value.selectionEnd;
     
     if (selectionStart === selectionEnd) {
+      // No text selected - delete previous character
       if (selectionStart > 0) {
         const newValue = 
           rawInput.value.slice(0, selectionStart - 1) + 
@@ -212,27 +233,32 @@ const handleKeyDown = (e) => {
         rawInput.value = newValue;
         formatAndEmit(newValue);
         
+        // Position cursor correctly
         nextTick(() => {
           dateInput.value.setSelectionRange(selectionStart - 1, selectionStart - 1);
         });
       }
     } else {
+      // Text selected - delete selection
       const newValue = 
         rawInput.value.slice(0, selectionStart) + 
         rawInput.value.slice(selectionEnd);
       rawInput.value = newValue;
       formatAndEmit(newValue);
       
+      // Position cursor correctly
       nextTick(() => {
         dateInput.value.setSelectionRange(selectionStart, selectionStart);
       });
     }
     e.preventDefault();
   } else if (e.key === 'Delete') {
+    // Handle delete key
     const selectionStart = dateInput.value.selectionStart;
     const selectionEnd = dateInput.value.selectionEnd;
     
     if (selectionStart === selectionEnd) {
+      // No text selected - delete next character
       if (selectionStart < rawInput.value.length) {
         const newValue = 
           rawInput.value.slice(0, selectionStart) + 
@@ -240,23 +266,27 @@ const handleKeyDown = (e) => {
         rawInput.value = newValue;
         formatAndEmit(newValue);
         
+        // Position cursor correctly
         nextTick(() => {
           dateInput.value.setSelectionRange(selectionStart, selectionStart);
         });
       }
     } else {
+      // Text selected - delete selection
       const newValue = 
         rawInput.value.slice(0, selectionStart) + 
         rawInput.value.slice(selectionEnd);
       rawInput.value = newValue;
       formatAndEmit(newValue);
       
+      // Position cursor correctly
       nextTick(() => {
         dateInput.value.setSelectionRange(selectionStart, selectionStart);
       });
     }
     e.preventDefault();
   } else if (e.key === 'Tab') {
+    // Handle tab to move to next segment
     if (activeSegment.value < 2) {
       e.preventDefault();
       activeSegment.value += 1;
@@ -271,6 +301,7 @@ const handlePaste = (e) => {
   const digits = pasteData.replace(/\D/g, '').slice(0, 8);
   
   if (digits.length > 0) {
+    // Determine where to insert the pasted digits
     const selectionStart = dateInput.value.selectionStart;
     const selectionEnd = dateInput.value.selectionEnd;
     
@@ -282,6 +313,7 @@ const handlePaste = (e) => {
     rawInput.value = newValue.slice(0, 8);
     formatAndEmit(rawInput.value);
     
+    // Move cursor to end of pasted content
     const newCursorPos = Math.min(selectionStart + digits.length, 8);
     nextTick(() => {
       dateInput.value.setSelectionRange(newCursorPos, newCursorPos);
@@ -318,6 +350,7 @@ const handlePaste = (e) => {
   padding: 0 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .date-segments {
@@ -339,10 +372,15 @@ const handlePaste = (e) => {
   transition: all 0.2s ease;
   position: relative;
   min-width: 0;
+  cursor: pointer;
 }
 
 .date-segment.empty {
   color: #9ca3af;
+}
+
+.date-segment:hover {
+  background-color: #f5f5f5;
 }
 
 .date-segment span {
@@ -365,6 +403,7 @@ const handlePaste = (e) => {
   height: 0;
 }
 
+/* Responsive adjustments */
 @media (max-width: 480px) {
   .date-segment {
     font-size: 16px;
