@@ -180,7 +180,7 @@ const segmentdata = async () => {
     segmentFlags.MCX = "YES";
   }
 
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "brokerage",
     ...segmentFlags
@@ -203,7 +203,8 @@ const segmentdata = async () => {
       throw new Error(`Network error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const decryptedData = await response.json();
+   const data = await decryptionresponse(decryptedData);
     segmenterror.value=''
     if (data.payload.status === 'ok') {
       emit('updateDiv', 'brokerage');

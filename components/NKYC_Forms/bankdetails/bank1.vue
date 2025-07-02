@@ -313,7 +313,7 @@ const bankvalidation = async () => {
   }
 
   const apiurl = `${baseurl.value}bank`;
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "bank4",
     bankAccType: selected.value,
@@ -343,7 +343,8 @@ const headertoken=htoken
       throw new Error('Network response was not ok ' + response.status);
     }
 
-    const data = await response.json();
+    const decryptedData = await response.json();
+       const data = await decryptionresponse(decryptedData);
       accnotypeerror.value=""
      accnoerror.value =""
      ifscerror.value=""

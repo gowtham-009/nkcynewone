@@ -227,7 +227,7 @@ const camsbankdatacheck = async () => {
  
   const headertoken=htoken
   const apiurl = `${baseurl.value}cams`;
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: 'thankyou',
     camsAction: 'checkCamsStatus',
@@ -243,7 +243,8 @@ const camsbankdatacheck = async () => {
       body: JSON.stringify({ payload: user }),
     });
 
-    const data = await response.json();
+    const decryptedData = await response.json();
+    const data = await decryptionresponse(decryptedData);
     const meta = data.payload?.metaData;
 
     if (data.payload.status === 'ok') {
@@ -301,7 +302,7 @@ const camsbankdata = async () => {
   const ifscvalue = mydata?.payload?.metaData?.bank?.bank1IFSC;
 
   const apiurl = `${baseurl.value}cams`;
-  const user = encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: 'csmspdf',
     camsAction: 'createCams',
@@ -323,7 +324,8 @@ const camsbankdata = async () => {
       body: JSON.stringify({ payload: user }),
     });
 
-    const data = await response.json();
+    const decryptedData = await response.json();
+    const data = await decryptionresponse(decryptedData);
     if (data.payload.status === 'ok') {
       window.location.href = data.payload.metaData.redirectionurl;
     }
@@ -378,7 +380,7 @@ const bankstatement = async (pdfval) => {
     const response = await fetch(pdfval);
     const blob = await response.blob();
 
-    const user = encryptionrequestdata({
+    const user =await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: 'thankyou'
     });
@@ -396,7 +398,8 @@ const bankstatement = async (pdfval) => {
       body: formData,
     });
 
-    const data = await uploadResponse.json();
+    const decryptedData = await uploadResponse.json();
+    const data = await decryptionresponse(decryptedData);
     if (data.payload.status === 'ok') {
       const pageroute = await pagestatus('thankyou');
       if (pageroute.payload.status === 'ok') {

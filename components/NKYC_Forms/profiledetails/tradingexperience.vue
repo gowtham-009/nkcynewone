@@ -138,7 +138,7 @@ const back = () => {
 
 const personalinfo = async () => {
   const apiurl = `${baseurl.value}personal_info`;
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "occupation",
     tradingExperience: selected.value,
@@ -162,7 +162,8 @@ const headertoken=htoken
 
     }
     else {
-      const data = await response.json()
+      const decryptedData = await response.json()
+      const data = await decryptionresponse(decryptedData);
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'occupation');
       }

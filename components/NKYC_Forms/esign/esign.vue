@@ -179,7 +179,7 @@ const createunsignedDocument = async () => {
   loadingen.value = true
    startProgressAnimation();
   const apiurl = `${baseurl.value}nkyc_document`;
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
   });
 
@@ -200,7 +200,8 @@ const createunsignedDocument = async () => {
       throw new Error(`Network error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const decryptedData = await response.json();
+    const data = await decryptionresponse(decryptedData);
     if (data.payload.status == 'ok') {
       completeProgress();
        createEsign()
@@ -224,7 +225,7 @@ const createunsignedDocument = async () => {
 const createEsign = async () => {
  const headertoken=htoken
   const apiurl = `${baseurl.value}esign`;
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: 'esign',
     redirectUrl: 'https://nkcynewone.vercel.app/main',
@@ -242,8 +243,8 @@ const createEsign = async () => {
     });
 
     if (!response.ok) throw new Error(`Network error: ${response.status}`);
-    const data = await response.json();
-
+    const decryptedData = await response.json();
+    const data = await decryptionresponse(decryptedData);
     if (data.payload.status === 'ok') {
       const decoded = atob(data.payload.metaData.dataEsign);
       window.location.href = decoded;
@@ -266,7 +267,7 @@ const createEsign = async () => {
 
 const esignStatusCheck = async (requestId) => {
   const apiurl = `${baseurl.value}esign`;
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
 
     esignId: requestId,
@@ -284,8 +285,8 @@ const headertoken=htoken
     });
 
     if (!response.ok) throw new Error(`Network error: ${response.status}`);
-    const data = await response.json();
-
+    const decryptedData = await response.json();
+const data = await decryptionresponse(decryptedData);
     if (data.payload.status === 'ok') {
       content.value = false;
       loading.value = true;

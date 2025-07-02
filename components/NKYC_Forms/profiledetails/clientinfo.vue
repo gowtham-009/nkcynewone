@@ -135,7 +135,7 @@ onMounted(() => {
 
 const personalinfo = async () => {
   const apiurl = `${baseurl.value}personal_info`;
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "qualification",
     fatherName: father.value,
@@ -160,7 +160,8 @@ const personalinfo = async () => {
 
     }
     else {
-      const data = await response.json()
+      const decryptedData = await response.json()
+      const data = await decryptionresponse(decryptedData);
           fathererror.value=""
      mothererror.value =""
       if (data.payload.status == 'ok') {

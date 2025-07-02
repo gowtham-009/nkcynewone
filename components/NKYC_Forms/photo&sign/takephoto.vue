@@ -312,6 +312,7 @@ const getCountry = async () => {
       throw new Error(`Network error: ${response.status}`)
     }
     const data = await response.json()
+    // const data = await decryptionresponse(decryptedData);
     if (data) {
       const geolocation = {
         latitute: data.items[0].position.lat,
@@ -400,7 +401,7 @@ const ipvfunction = async () => {
     const blob = await response.blob();
 const headertoken=htoken
     // Encrypt metadata
-    const user = encryptionrequestdata({
+    const user =await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: "photoproceed",
       location: `${location.latitute},${location.longitude}`,
@@ -429,8 +430,9 @@ const headertoken=htoken
       throw new Error(`Network error: ${uploadResponse.status}`);
     }
 
-    const data = await uploadResponse.json();
-
+    const decryptedData = await uploadResponse.json();
+    console.log('Decrypted Data:', decryptedData);
+    const data = await decryptionresponse(decryptedData);
     if (data.payload.status == 'ok' ) {
      completeProgress();
       if (data.payload.metaData.is_real === 'true' && data.payload.metaData.realValue >= 0.6) {

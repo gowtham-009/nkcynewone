@@ -284,7 +284,7 @@ circle.remove();
 
 const personalinfo = async () => {
   const apiurl = `${baseurl.value}personal_info`;
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "clientinfo",
     gender: selectedgender.value,
@@ -309,8 +309,8 @@ const personalinfo = async () => {
       throw new Error(`Network error: ${response.status}`);
     }
 
-    const data = await response.json();
-
+    const decryptedData = await response.json();
+  const data = await decryptionresponse(decryptedData);
     // Reset errors
     gendererror.value = "";
     maritalerror.value = "";

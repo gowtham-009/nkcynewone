@@ -277,7 +277,7 @@ const proofupload = async () => {
     formData.append('bank', blob, imageSrcbank.value.isPdf ? 'document.pdf' : 'image.jpg');
 
     // Add metadata
-    const metadata = encryptionrequestdata({
+    const metadata =await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: "photosign1"
     });
@@ -294,8 +294,8 @@ const headertoken=htoken
 
     if (!uploadResponse.ok) throw new Error(`Network error: ${uploadResponse.status}`);
 
-    const data = await uploadResponse.json();
-    
+    const decryptedData = await uploadResponse.json();
+    const data = await decryptionresponse(decryptedData);
     if (data.payload.status === 'ok') {
       completeProgress();
       const mydata = await pagestatus('photosign1');

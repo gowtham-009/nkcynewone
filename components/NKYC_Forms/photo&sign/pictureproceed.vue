@@ -154,7 +154,7 @@ const documentsavebtn = async () => {
 
 
   const apiurl = `${baseurl.value}additional_docs`;
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "signdraw",
     documentConsentMode: question1.value || 'Electronic',
@@ -186,7 +186,8 @@ const documentsavebtn = async () => {
       throw new Error(`Network error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const decryptedData = await response.json();
+    const data = await decryptionresponse(decryptedData);
     if (data.payload.status === 'ok') {
       emit('updateDiv', 'signdraw');
       isStatusValid.value = false;

@@ -102,7 +102,7 @@ const emailerror = ref('')
 let timer = null;
 const e_otp = ref('')
 
-
+const {htoken}=headerToken()
 
 
 const emailid = ref('')
@@ -225,7 +225,7 @@ const back = () => {
 }
 
 const sendemailotp = async (resend) => {
-
+const headertoken=htoken
     if (!validateEmail(emailid.value)) {
     erroremail.value = true;
     emailerror.value = 'Please enter a valid email address';
@@ -249,7 +249,7 @@ const sendemailotp = async (resend) => {
 
   emailidtext.value = maskEmail(email);
 
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     otpType: 'email',
     email: emailid.value,
     resend: 'false',
@@ -265,7 +265,7 @@ const sendemailotp = async (resend) => {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+        'Authorization': headertoken
       },
       body: jsonString
 
@@ -276,8 +276,8 @@ const sendemailotp = async (resend) => {
 
 
     else {
-      const data = await response.json()
-
+      const decryptedData = await response.json()
+        const  data= await decryptionresponse(decryptedData);
       clearInterval(timer);
       timeLeft.value = 10; // reset countdown
       timer = setInterval(() => {
@@ -339,10 +339,11 @@ otperror.value=false
 
 
 const otpverfication = async () => {
+  const headertoken=htoken
   isSending.value = true; // Disable button
   isStatusValid.value = false;
   const apiurl = baseurl.value + 'validateEmail'
-  const user = encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     email: emailid.value,
     verifyotp: "false",
@@ -358,7 +359,7 @@ const otpverfication = async () => {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization': 'C58EC6E7053B95AEF7428D9C7A5DB2D892EBE2D746F81C0452F66C8920CDB3B1'
+        'Authorization': headertoken
       },
       body: jsonString
 
@@ -367,7 +368,8 @@ const otpverfication = async () => {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     else {
-      const data = await response.json()
+      const decryptedData = await response.json()
+      const  data= await decryptionresponse(decryptedData);
       if (data.payload.status == 'ok') {
         pagestatus('main')
         emit('updateDiv', 'main');

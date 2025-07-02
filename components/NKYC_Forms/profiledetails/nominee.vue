@@ -630,7 +630,7 @@ const nomineesavedata = async () => {
       idNumber = drivinginput.value;
     }
 
-    const user = encryptionrequestdata({
+    const user =await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: "nominee",
       nomineeName: name.value,
@@ -662,7 +662,8 @@ const nomineesavedata = async () => {
       throw new Error(`Network request failed with status ${response.status}`);
     }
 
-    const data = await response.json();
+    const decryptedData = await response.json();
+     const data = await decryptionresponse(decryptedData);
        nameerror.value = ""
         relationshiperror.value = ""
         doberror.value = ""
@@ -735,7 +736,7 @@ const nomineedelete = async (deleteid) => {
 
 
 
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "nominee",
     removeNominee: deleteid.id
@@ -760,7 +761,8 @@ const headertoken=htoken
       throw new Error(`Network request failed with status ${response.status}`);
     }
 
-    const data = await response.json();
+    const decryptedData = await response.json();
+      const data = await decryptionresponse(decryptedData);
        if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code=='1004'){
              alert(data.payload.message);

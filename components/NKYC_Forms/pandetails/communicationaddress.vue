@@ -167,7 +167,7 @@ const communicateaddressdata = async () => {
 
   const apiurl = `${baseurl.value}address`;
 
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
 
     pageCode: "info",
@@ -196,7 +196,8 @@ const communicateaddressdata = async () => {
 
     }
     else {
-      const data = await response.json()
+      const decryptedData = await response.json()
+      const data = await decryptionresponse(decryptedData);
     addresserror.value=""
      cityerror.value =""
      stateerror.value=""
