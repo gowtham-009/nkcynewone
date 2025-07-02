@@ -64,7 +64,7 @@ onMounted(() => {
 
 
 const routeComponents = async (token) => {
-  const user = encryptionrequestdata({
+  const user =await encryptionrequestdata({
      pageCode:'takephoto',
     userToken: token
   });
@@ -87,8 +87,8 @@ const routeComponents = async (token) => {
       throw new Error(`Network request failed with status ${response.status}`);
     }
 
-    const data = await response.json();
-  
+    const decryptedData = await response.json();
+  const data = await decryptionresponse(decryptedData);
     if(data.payload.status=='ok' && data.payload.metaData.token){
         localStorage.setItem('userkey',data.payload.metaData.token)
         if(data.payload.metaData.token){
