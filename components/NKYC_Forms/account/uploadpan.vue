@@ -265,7 +265,7 @@ const proofupload = async () => {
     const blob = await response.blob();
 
     // Create encrypted JSON payload
-    const encryptedPayload = encryptionrequestdata({
+    const encryptedPayload =await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: 'uploadbank',
     });
@@ -291,7 +291,8 @@ const proofupload = async () => {
       throw new Error(`Network error: ${uploadResponse.status}`);
     }
 
-    const data = await uploadResponse.json();
+    const decryptedData = await uploadResponse.json();
+    const data = await decryptionresponse(decryptedData);
     if (data.payload.status === 'ok') {
       completeProgress();
       const mydata = await getServerData();
