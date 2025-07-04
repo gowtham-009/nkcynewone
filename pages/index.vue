@@ -13,13 +13,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import form1 from '~/components/signup/form1.vue';
 import { getServerData } from '~/utils/serverdata.js';
 
 
 const router = useRouter();
-
+const route = useRoute();
 const currentForm = ref('pan');
 const logauth = ref(false);
 const data = ref({});
@@ -31,7 +31,12 @@ const handleUpdateDiv = (value, newData = {}) => {
 
 onMounted(async () => { 
   
-
+if(route.query.refferalCode){
+   localStorage.setItem('refferalCode', route.query.refferalCode);
+  }
+  else{
+   localStorage.removeItem('refferalCode');
+  }
 
   const userkey = localStorage.getItem('userkey');
   const allowedPages = ['pan'];

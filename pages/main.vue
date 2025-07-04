@@ -16,11 +16,11 @@
       <div v-else-if="currentForm === 'parmanentaddress'">
         <PARMANENTADDRESS :data="data" @updateDiv="handleUpdateDiv" />
       </div>
-     
+
       <div v-else-if="currentForm === 'communicationaddress'">
         <COMMUNICATIONADDRESS :data="data" @updateDiv="handleUpdateDiv" />
       </div>
-      
+
       <div v-else-if="currentForm === 'info'">
         <MARRIEDSTATUS @updateDiv="handleUpdateDiv" />
       </div>
@@ -69,11 +69,11 @@
       <div v-else-if="currentForm === 'photoproceed'">
         <PHOTOPROCEED :data="data" @updateDiv="handleUpdateDiv" />
       </div>
-     
+
       <div v-else-if="currentForm === 'signdraw'">
         <SIGNDRAWING :data="data" @updateDiv="handleUpdateDiv" />
       </div>
-     
+
       <div v-else-if="currentForm === 'esign'">
         <ESIGN @updateDiv="handleUpdateDiv" />
       </div>
@@ -123,9 +123,10 @@ import ESIGN from '~/components/NKYC_Forms/esign/esign.vue'
 import BANKFILE from '~/components/NKYC_Forms/finalstatementpage/bankfile.vue'
 
 import THANKYOU from '~/components/NKYC_Forms/thankyou.vue'
-const authenticated = ref(true) 
+const authenticated = ref(true)
 const route = useRoute()
 const router = useRouter()
+
 const currentForm = ref('nkyclist')
 const data = ref({})
 const formMap = {
@@ -153,10 +154,11 @@ const formMap = {
   '$@takephoto1': 'takephoto',
   '$@photoproceed1': 'photoproceed',
   '$@signdraw1': 'signdraw',
- 
+
   '$@esign1': 'esign',
   '$@bankfile1': 'bankfile',
   '$@thankyou1': 'thankyou',
+
 }
 
 
@@ -175,43 +177,54 @@ watch(() => route.query.form, (newForm) => {
 
 onMounted(async () => {
   const token = localStorage.getItem('userkey');
-  
-  // 🔴 No token? Redirect to "/"
+
   if (!token) {
     authenticated.value = false;
     router.push('/');
     return;
   }
 
-  authenticated.value = true; // 🟢 Mark user as authenticated
+  authenticated.value = true;
 
   const queryForm = route.query.form;
 
+
   try {
-    // First get the server data
     const mydata = await getServerData();
-    
-    // Check if the server returned an error
+
     if (mydata.payload && mydata.payload.status === 'error') {
       localStorage.removeItem('userkey');
       router.push('/');
       return;
     }
 
-    // 🟢 If query param exists and is valid, show that form
     if (queryForm && formMap[queryForm]) {
       currentForm.value = formMap[queryForm];
       data.value = {};
+
+      // ✅ Preserve refferalCode in URL
+      router.replace({
+        path: '/main',
+        query: {
+          form: queryForm
+        }
+      });
+
+
       return;
     }
 
-    // 🔵 Otherwise, load server data to get default page
+    // 🔵 Default page load
     const activePage = mydata?.payload?.metaData?.profile?.pageStatus || 'main';
     currentForm.value = activePage;
-  
 
-    // Optional: clean URL
-    router.replace({ path: '/main' });
+    // ✅ Replace with referral code still in URL
+    router.replace({
+      path: '/main',
+      query: {
+        refferalCode: referralCode
+      }
+    });
 
   } catch (error) {
     console.error('Error fetching server data:', error);
@@ -219,6 +232,7 @@ onMounted(async () => {
     router.push('/');
   }
 });
+
 
 
 </script>

@@ -62,8 +62,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-import { useRouter } from 'vue-router';
+import { useRouter,useRoute  } from 'vue-router';
 const router = useRouter();
+const route=useRoute()
 const emit = defineEmits(['updateDiv']);
 
 const deviceHeight = ref(0);
@@ -131,6 +132,7 @@ const handleButtonClick = () => {
    setTimeout(async () => {
     circle.remove();
     const mydata = await getServerData();
+   
   
     if (mydata?.payload?.status === 'ok') {
         
