@@ -431,7 +431,7 @@ const headertoken=htoken
     }
 
     const decryptedData = await uploadResponse.json();
-    console.log('Decrypted Data:', decryptedData);
+   
     const data = await decryptionresponse(decryptedData);
     if (data.payload.status == 'ok' ) {
      completeProgress();

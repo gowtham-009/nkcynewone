@@ -12,7 +12,7 @@ export async function getServerData() {
   const encryptedUser =await encryptionrequestdata({
     userToken: userkey,
   });
-console.log("Encrypted User:", encryptedUser);
+
   const payload = { payload: encryptedUser };
   const jsonString = JSON.stringify(payload);
 
