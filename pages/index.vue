@@ -2,12 +2,12 @@
   <div>
    
 
-    <!-- Show form only after location granted and auth passed -->
     <div v-if="logauth">
       <div v-if="currentForm === 'pan'">
         <form1 @updateDiv="handleUpdateDiv" />
       </div>
     </div>
+    
   </div>
 </template>
 
@@ -31,11 +31,13 @@ const handleUpdateDiv = (value, newData = {}) => {
 
 onMounted(async () => { 
   
-if(route.query.refferalCode){
-   localStorage.setItem('refferalCode', route.query.refferalCode);
+if(route.query.RefCode){
+   localStorage.setItem('RefCode', route.query.RefCode);
+   const { RefCode, ...rest } = route.query;
+  router.replace({ query: rest });
   }
   else{
-   localStorage.removeItem('refferalCode');
+   localStorage.removeItem('RefCode');
   }
 
   const userkey = localStorage.getItem('userkey');
