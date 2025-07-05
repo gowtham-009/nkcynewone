@@ -202,6 +202,8 @@ const createunsignedDocument = async () => {
 
     const decryptedData = await response.json();
     const data = await decryptionresponse(decryptedData);
+
+    console.log("Decrypted Data:", data);
     if (data.payload.status == 'ok') {
       completeProgress();
        createEsign()
