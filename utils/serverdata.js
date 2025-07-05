@@ -32,8 +32,7 @@ console.log("Encrypted User:", encryptedUser);
 
     const data = await response.json();
     const decryptedData = await decryptionresponse(data);
-    console.log("Decrypted Datalkihoiho:", decryptedData);
-
+    
     
   
     return decryptedData

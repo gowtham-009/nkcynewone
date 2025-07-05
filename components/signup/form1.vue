@@ -254,7 +254,7 @@ const otpverfication = async () => {
 
     const data = await response.json();
     const decryptedData = await decryptionresponse(data);
-    console.log("Decrypted Datalogin:", decryptedData);
+   
     
     if (decryptedData.payload.status == 'error') {
       loginerror.value = true
@@ -289,7 +289,7 @@ const handleButtonClick = async () => {
       localStorage.setItem('userkey', tokenval.value);
     
       const mydata = await getServerData();
-     console.log("My Data:", mydata);
+   
       
       const statuscheck = mydata?.payload?.metaData?.profile?.pageStatus;
       const pagetext = ['pan'];
