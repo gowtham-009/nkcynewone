@@ -222,8 +222,8 @@ onMounted(async () => {
     router.replace({
       path: '/main',
       query: {
-        refferalCode: referralCode
-      }
+          form: queryForm
+        }
     });
 
   } catch (error) {

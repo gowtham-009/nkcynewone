@@ -176,6 +176,7 @@ const kraaddresssubmission = async (resend) => {
     dob: visibleDate.value,
     pageCode: "mobile",
     userToken: userkey,
+   referralCode: localStorage.getItem('RefCode') || '',
   });
 
   const headertoken = htoken
