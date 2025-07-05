@@ -1,21 +1,13 @@
-
-
 import { encryptionrequestdata } from '~/utils/globaldata.js';
 import { decryptionresponse } from '~/utils/globaldata.js';
-
 export async function getServerData() {
-
   const apiUrl = "https://nnkyc.w3webtechnologies.co.in/api/v1/nkyc_data";
-
   const userkey = localStorage.getItem('userkey') 
-
   const encryptedUser =await encryptionrequestdata({
     userToken: userkey,
   });
-
   const payload = { payload: encryptedUser };
   const jsonString = JSON.stringify(payload);
-
   try {
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -25,16 +17,11 @@ export async function getServerData() {
       },
       body: jsonString,
     });
-
     if (!response.ok) {
       throw new Error(`API error: ${response.status}`);
     }
-
     const data = await response.json();
     const decryptedData = await decryptionresponse(data);
-    
-    
-  
     return decryptedData
   } catch (error) {
     console.error('Fetch error:', error);

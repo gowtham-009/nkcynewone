@@ -842,7 +842,6 @@ const back = () => {
   emit('updateDiv', 'income');
   isBack.value = false;
 }
-
    
   },
   
@@ -881,7 +880,7 @@ const handleButtonClick = async (event) => {
           totalShare += share;
         }
 
-        console.log("Total nominee share:", totalShare);
+      
 
         if (totalShare === 100) {
           const myData = await pagestatus('bank1');
