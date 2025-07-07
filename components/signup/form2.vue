@@ -150,9 +150,24 @@ onMounted(() => {
       otp: { transport: ['sms'] },
       signal: ac.signal
     }).then(otpCred => {
-      // ✅ The 4-digit OTP will be here
-      console.log("Received OTP:", otpCred.code);
-      p_otp.value = otpCred.code;
+      const otpCode = otpCred.code; // ✅ This is the 4-digit code like '8631'
+      p_otp.value = otpCode;
+
+      // ✅ Print to console
+      console.log("Auto-read OTP:", otpCode);
+
+      // ✅ Optionally show on screen (for testing/debugging only)
+      const otpBox = document.createElement('div');
+      otpBox.textContent = `Detected OTP: ${otpCode}`;
+      otpBox.style.position = 'fixed';
+      otpBox.style.bottom = '20px';
+      otpBox.style.left = '20px';
+      otpBox.style.padding = '10px';
+      otpBox.style.background = 'yellow';
+      otpBox.style.border = '2px solid #000';
+      otpBox.style.fontSize = '18px';
+      otpBox.style.zIndex = 9999;
+      document.body.appendChild(otpBox);
     }).catch(err => {
       console.warn('Web OTP failed:', err);
     });
