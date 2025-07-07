@@ -1,16 +1,18 @@
 <template>
   <div class="p-4 space-y-4">
     <input
-      type="text"
+      type="tel"
       v-model="mobile"
       placeholder="Enter mobile number"
       class="w-full p-2 border rounded"
     />
+
     <input
+      ref="otpInput"
       v-model="p_otp"
       type="text"
       inputmode="numeric"
-      pattern="\d*"
+      pattern="\d{4}"
       maxlength="4"
       autocomplete="one-time-code"
       placeholder="Enter OTP"
@@ -18,7 +20,7 @@
     />
 
     <button
-      @click="sendmobileotp(false)"
+      @click="sendmobileotp"
       class="bg-blue-500 text-white px-4 py-2 rounded"
     >
       Submit
@@ -31,67 +33,75 @@
 </template>
 
 <script setup>
+import { ref, onMounted, nextTick } from 'vue'
+import { encryptionrequestdata, decryptionresponse } from '~/utils/globaldata.js'
+const { baseurl } = globalurl()
+const { htoken } = headerToken()
 
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router'
-// Composables or globals (ensure these exist)
-import { encryptionrequestdata } from '~/utils/globaldata.js'
-import { decryptionresponse } from '~/utils/globaldata.js'
-const { baseurl } = globalurl();
-const {htoken}=headerToken()
 const mobile = ref('')
 const p_otp = ref('')
+const otpInput = ref(null)
 const errormsg = ref('')
-const phoneNumber = ref('') // Masked mobile number
+
+// Enable Web OTP API if available
+const readOtpFromSms = async () => {
+  if ('OTPCredential' in window && 'credentials' in navigator) {
+    try {
+      const content = await navigator.credentials.get({
+        otp: { transport: ['sms'] },
+        signal: AbortSignal.timeout(60000), // 60s timeout
+      })
+      if (content && content.code) {
+        p_otp.value = content.code
+        console.log('OTP auto-filled:', content.code)
+      }
+    } catch (err) {
+      console.warn('Web OTP API error:', err)
+    }
+  } else {
+    console.warn('Web OTP API not supported')
+  }
+}
 
 const sendmobileotp = async () => {
   const apiurl = `${baseurl.value}validateMobile`
 
-  phoneNumber.value = mobile.value.replace(/^(\d{0,6})(\d{4})$/, '******$2');
-    const user =await encryptionrequestdata({
-    otpType:'mobile',
+  const encrypted = await encryptionrequestdata({
+    otpType: 'mobile',
     mobile: mobile.value,
-    resend:'false',
-    pageCode:"mobile",
-    userToken:localStorage.getItem('userkey')
-  });
-  const headertoken=htoken
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
+    resend: 'false',
+    pageCode: 'mobile',
+    userToken: localStorage.getItem('userkey'),
+  })
 
   try {
-    const response = await fetch(apiurl, {
-    method: 'POST',
-    headers: {
-      'Authorization': headertoken,
-      'Content-Type': 'application/json',
-    },
-    body: jsonString,
-  });
+    const res = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        Authorization: htoken,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ payload: encrypted }),
+    })
 
+    const decrypted = await res.json()
+    const data = await decryptionresponse(decrypted)
 
-    const decryptedData = await response.json(); // Read body regardless of status
-const data = await decryptionresponse(decryptedData);
-
-    console.log('Decrypted response:', data)
-
-    if (!response.ok ) {
+    if (!res.ok) {
       errormsg.value = data.payload?.message || 'Request failed'
       return
     }
 
-   if (data.payload.status === 'ok' && data.payload.otpStatus=='0') {
-    alert('OTP sent successfully')
-   
+    if (data.payload.status === 'ok' && data.payload.otpStatus === '0') {
+      alert('OTP sent successfully')
 
-  }
-  } catch (error) {
-    console.error('OTP send error:', error)
+      // Wait for DOM to update then trigger OTP reader
+      await nextTick()
+      readOtpFromSms()
+    }
+  } catch (err) {
+    console.error('OTP send error:', err)
     errormsg.value = 'Something went wrong. Please try again.'
   }
 }
 </script>
-
-<style scoped>
-/* Optional: Add styling if needed */
-</style>
