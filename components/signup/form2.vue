@@ -56,7 +56,10 @@
           </div>
         </div>
       </div>
-<div>skmvapoemrpo{{ otpDisplay }}</div>
+<p v-if="otpValue" class="text-xl font-semibold text-green-600 mt-2">
+  OTP Detected: {{ otpValue }}
+</p>
+
       <div class="w-full flex gap-2">
       
   <Button
@@ -105,7 +108,7 @@ const isStatusValid = ref(true); // Assuming this is set based on some validatio
 const isSending = ref(false);
 const mobileNo = ref('');
 const router = useRouter();
-const otpDisplay = ref('');
+const otpValue = ref('');
 const setMobileData = async () => {
   try {
     const mydata = await getServerData();
@@ -145,20 +148,17 @@ onMounted(() => {
  if ('OTPCredential' in window) {
     const ac = new AbortController();
 
-    navigator.credentials
-      .get({
-        otp: { transport: ['sms'] },
-        signal: ac.signal,
-      })
-      .then((otp) => {
-        if (otp && otp.code) {
-          p_otp.value = otp.code; // ✅ Autofill input
-          otpDisplay.value = `#${otp.code}`; // ✅ Show on screen
-        }
-      })
-      .catch((err) => {
-        console.warn('Web OTP failed:', err);
-      });
+    navigator.credentials.get({
+      otp: { transport: ['sms'] },
+      signal: ac.signal
+    }).then(otp => {
+      if (otp && otp.code) {
+        p_otp.value = otp.code;        // Autofill input
+        otpValue.value = `#${otp.code}`; // Show visually on screen
+      }
+    }).catch(err => {
+      console.warn('Web OTP failed:', err);
+    });
   }
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
@@ -171,26 +171,6 @@ onUnmounted(() => {
   clearInterval(timer);
 });
 
-
-
-function showOtpBanner(code) {
-  const otpDiv = document.createElement('div');
-  otpDiv.textContent = `Auto-read OTP: ${code}`;
-  otpDiv.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    padding: 12px 20px;
-    background: #fffae6;
-    border: 2px solid #333;
-    border-radius: 6px;
-    color: #333;
-    font-size: 16px;
-    z-index: 9999;
-  `;
-  document.body.appendChild(otpDiv);
-  setTimeout(() => otpDiv.remove(), 6000);
-}
 
 
 
