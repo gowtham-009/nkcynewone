@@ -111,7 +111,6 @@ const handleSendOtp = async () => {
 
     alert('✅ OTP sent successfully')
 
-    // Wait for input to render and try auto-read
     await nextTick()
     autoReadOtp()
   } catch (error) {
