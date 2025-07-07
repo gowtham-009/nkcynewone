@@ -35,14 +35,14 @@
             We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }} <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Mobile Number" />
           </p>
           <div class="w-full mt-3">
-              <input
-  v-model="p_otp"
-  type="text"
-  autocomplete="one-time-code"
-  class="border p-2 rounded w-full"
-  placeholder="Enter OTP"
-/>
-
+               <input
+      v-model="p_otp"
+      id="p_otp"
+      type="text"
+      autocomplete="one-time-code"
+      class="border p-2 rounded w-full"
+      placeholder="Enter OTP"
+    />
             <!-- <phoneOTP  v-model="p_otp" /> -->
             <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
 
@@ -269,16 +269,17 @@ console.log("Response Data:", data);
     errormobile.value=data.payload.message
      
   }
-   else if(data.payload.status=='error'  && data.payload.code=="B1003"){
-    errormsg.value=true
-    errormobile.value=data.payload.message
-     
-  }
 
    else if(data.payload.status=='error'  && data.payload.code=='1002'){
    alert(data.payload.message)
     localStorage.removeItem('userkey')
       router.push('/')
+     
+  }
+
+   else if(data.payload.status=='error'  && data.payload.code=="B1003"){
+    errormsg.value=true
+    errormobile.value=data.payload.message
      
   }
  
