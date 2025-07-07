@@ -281,9 +281,10 @@ const startOTPListener = () => {
       signal: ac.value.signal
     }).then(otp => {
       if (otp && otp.code) {
+        alert('OTP Detected: ' + otp.code);
         otpValue.value = otp.code;
         p_otp.value = otp.code;
-        // Automatically trigger validation
+       
         otpverfication();
       }
     }).catch(err => {
