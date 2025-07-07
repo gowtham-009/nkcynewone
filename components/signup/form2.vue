@@ -141,20 +141,40 @@ const setMobileData = async () => {
 await setMobileData();
 
 onMounted(() => {
-if ('OTPCredential' in window) {
-  const ac = new AbortController();
+if (process.client) { // Ensure this only runs on client-side
+  if ('OTPCredential' in window) {
+    const ac = new AbortController();
 
-  navigator.credentials.get({
-    otp: { transport: ['sms'] },
-    signal: ac.signal,
-  }).then((otp) => {
-    if (otp && otp.code) {
-      alert(`Your OTP is: ${otp.code}`);
-      p_otp.value = otp.code;
-    }
-  }).catch((err) => {
-    console.warn('Web OTP failed:', err);
-  });
+    // Optional: Add a timeout (e.g., 1 minute)
+    const timeout = setTimeout(() => {
+      ac.abort();
+      console.log('OTP request timed out');
+    }, 60000);
+
+    navigator.credentials.get({
+      otp: { transport: ['sms'] },
+      signal: ac.signal,
+    }).then((otp) => {
+      clearTimeout(timeout); // Clear the timeout if OTP is received
+      if (otp?.code) {
+        // For Nuxt, you might want to use a ref or store the value
+        const otpInput = document.querySelector('input[name="otp"]');
+        if (otpInput) {
+          otpInput.value = otp.code;
+          // Optional: auto-submit the form if it exists
+          otpInput.form?.submit();
+        }
+        console.log('OTP received:', otp.code);
+      }
+    }).catch((err) => {
+      clearTimeout(timeout);
+      if (err.name !== 'AbortError') {
+        console.warn('Web OTP failed:', err);
+      }
+    });
+  } else {
+    console.log('Web OTP API not supported in this browser');
+  }
 }
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
