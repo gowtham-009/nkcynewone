@@ -150,10 +150,10 @@ onMounted(() => {
     navigator.credentials.get({
       otp: { transport: ['sms'] },
       signal: ac.signal
-    }).then(otp => {
-      otpCode.value = otp.code  // auto-fill to v-model
+    }).then(otpCred => {
+      otp.value = otpCred.code
     }).catch(err => {
-      console.warn('OTP Auto-fill failed:', err)
+      console.warn('Web OTP failed:', err)
     })
   }
   deviceHeight.value = window.innerHeight;
