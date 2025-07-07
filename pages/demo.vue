@@ -1,14 +1,13 @@
 <template>
   <div class="p-4 space-y-4">
     <input
-      type="text"
+      type="tel"
       v-model="mobile"
       placeholder="Enter mobile number"
       class="w-full p-2 border rounded"
       @input="validateMobile"
     />
 
-    <!-- Modified OTP input with proper attributes for autofill -->
     <input
       ref="otpInput"
       v-model="p_otp"
@@ -35,8 +34,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { encryptionrequestdata } from '~/utils/globaldata.js'
 import { decryptionresponse } from '~/utils/globaldata.js'
 
@@ -47,6 +45,7 @@ const p_otp = ref('')
 const errormsg = ref('')
 const phoneNumber = ref('')
 const otpInput = ref(null)
+const abortController = ref(null)
 
 // Validate mobile number format
 const validateMobile = () => {
@@ -55,23 +54,35 @@ const validateMobile = () => {
 
 // Request OTP autofill
 const requestOTP = async () => {
-  if (!window.OTPCredential) {
+  // Check if browser supports Web OTP API
+  if (!('OTPCredential' in window)) {
     console.log('Web OTP API not supported')
     return
   }
 
+  // Abort any previous OTP requests
+  if (abortController.value) {
+    abortController.value.abort()
+  }
+
+  abortController.value = new AbortController()
+
   try {
-    const otp = await navigator.credentials.get({
-      otp: { transport: ['sms'] }
+    const content = await navigator.credentials.get({
+      otp: { transport: ['sms'] },
+      signal: abortController.value.signal
     })
     
-    if (otp && otp.code) {
-      p_otp.value = otp.code
+    if (content && content.code) {
+      p_otp.value = content.code
       // Optionally submit the form automatically
       // sendmobileotp(false)
     }
   } catch (err) {
-    console.log('Error with OTP autofill:', err)
+    // Ignore 'AbortError' as it's expected when we abort the request
+    if (err.name !== 'AbortError') {
+      console.error('Error with OTP autofill:', err)
+    }
   }
 }
 
@@ -128,15 +139,29 @@ const sendmobileotp = async () => {
 
 // Initialize OTP autofill when component mounts
 onMounted(() => {
-  requestOTP()
+  // Add a small delay to ensure DOM is fully ready
+  setTimeout(() => {
+    if (otpInput.value) {
+      otpInput.value.focus()
+      requestOTP()
+    }
+  }, 500)
+})
+
+// Clean up the abort controller when component unmounts
+onBeforeUnmount(() => {
+  if (abortController.value) {
+    abortController.value.abort()
+  }
 })
 </script>
 
 <style scoped>
-/* Optional: Add styling if needed */
+/* Improved OTP input styling */
 input[autocomplete="one-time-code"] {
   letter-spacing: 0.5em;
   font-size: 1.2rem;
   text-align: center;
+  padding: 0.5rem;
 }
 </style>
