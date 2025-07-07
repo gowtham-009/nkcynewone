@@ -144,18 +144,18 @@ await setMobileData();
 
 onMounted(() => {
 
-if ('OTPCredential' in window) {
+ if ('OTPCredential' in window) {
     const ac = new AbortController()
+
     navigator.credentials.get({
-      p_otp: { transport: ['sms'] },
+      otp: { transport: ['sms'] },
       signal: ac.signal
-    }).then(otpCredential => {
-      otpCode.value = otp.code
+    }).then(otp => {
+      otpCode.value = otp.code  // auto-fill to v-model
     }).catch(err => {
-      console.log('OTP autofill failed:', err)
+      console.warn('OTP Auto-fill failed:', err)
     })
   }
-
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
