@@ -151,7 +151,7 @@ onMounted(() => {
       otp: { transport: ['sms'] },
       signal: ac.signal
     }).then(otpCred => {
-      otp.value = otpCred.code
+      p_otp.value = otpCred.code
     }).catch(err => {
       console.warn('Web OTP failed:', err)
     })
