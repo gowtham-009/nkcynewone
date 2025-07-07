@@ -145,23 +145,7 @@ const setMobileData = async () => {
 await setMobileData();
 
 onMounted(() => {
- if ('OTPCredential' in window) {
-  alert('windo')
-    const ac = new AbortController();
-
-    navigator.credentials.get({
-      otp: { transport: ['sms'] },
-      signal: ac.signal
-    }).then(otp => {
-      if (otp && otp.code) {
-        alert('OTP Detected: ' + otp.code);
-        p_otp.value = otp.code;        // Autofill input
-        otpValue.value = `#${otp.code}`; // Show visually on screen
-      }
-    }).catch(err => {
-      console.warn('Web OTP failed:', err);
-    });
-  }
+ 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -171,6 +155,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(timer);
+   stopOTPListener();
 });
 
 
@@ -233,6 +218,7 @@ console.log("Response Data:", data);
 
     mobileotp.value=true
     buttonText.value='Verify Otp'
+      startOTPListener();
 
   }
   else if(data.payload.status === 'ok' && data.payload.otpStatus=='1'){
@@ -276,6 +262,41 @@ console.log("Response Data:", data);
   console.error("OTP Send Error:", error.message);
   errormsg.value = 'Something went wrong. Please try again.';
 }
+};
+
+
+const ac = ref(null);
+
+const startOTPListener = () => {
+  if ('OTPCredential' in window) {
+    // Abort any previous listener
+    if (ac.value) {
+      ac.value.abort();
+    }
+    
+    ac.value = new AbortController();
+
+    navigator.credentials.get({
+      otp: { transport: ['sms'] },
+      signal: ac.value.signal
+    }).then(otp => {
+      if (otp && otp.code) {
+        otpValue.value = otp.code;
+        p_otp.value = otp.code;
+        // Automatically trigger validation
+        otpverfication();
+      }
+    }).catch(err => {
+      console.warn('Web OTP failed:', err);
+    });
+  }
+};
+
+const stopOTPListener = () => {
+  if (ac.value) {
+    ac.value.abort();
+    ac.value = null;
+  }
 };
 
 
