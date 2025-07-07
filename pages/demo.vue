@@ -1,5 +1,6 @@
 <template>
   <div class="p-4 space-y-4">
+    <!-- Mobile number input -->
     <input
       type="tel"
       v-model="mobile"
@@ -7,6 +8,7 @@
       class="w-full p-2 border rounded"
     />
 
+    <!-- OTP input (autofill enabled) -->
     <input
       ref="otpInput"
       v-model="p_otp"
@@ -19,6 +21,7 @@
       class="w-full p-2 border rounded"
     />
 
+    <!-- Button to send OTP -->
     <button
       @click="handleSendOtp"
       class="bg-blue-500 text-white px-4 py-2 rounded"
@@ -26,6 +29,7 @@
       Send OTP
     </button>
 
+    <!-- Show error -->
     <div v-if="errormsg" class="text-red-500">
       {{ errormsg }}
     </div>
@@ -43,32 +47,40 @@ const p_otp = ref('')
 const otpInput = ref(null)
 const errormsg = ref('')
 
-// 🧠 Try to auto-read OTP using WebOTP API
+// 🔐 Web OTP Autofill Function
 const autoReadOtp = async () => {
-  try {
-    if ('OTPCredential' in window && 'credentials' in navigator) {
-      const ac = new AbortController()
-      const signal = ac.signal
+  if ('OTPCredential' in window && 'credentials' in navigator) {
+    try {
+      const controller = new AbortController()
+      const signal = controller.signal
 
-      const content = await navigator.credentials.get({
+      // Web OTP API permissionless call
+      const otp = await navigator.credentials.get({
         otp: { transport: ['sms'] },
         signal,
       })
 
-      if (content?.code) {
-        p_otp.value = content.code
-        console.log('OTP auto-read:', content.code)
+      if (otp?.code) {
+        p_otp.value = otp.code
+        console.log('✅ OTP auto-filled:', otp.code)
       }
-    } else {
-      console.warn('WebOTP API not supported on this browser')
+    } catch (err) {
+      console.warn('❌ Web OTP auto-read failed:', err)
     }
-  } catch (err) {
-    console.warn('WebOTP read failed or denied:', err)
+  } else {
+    console.warn('⚠️ Web OTP not supported on this browser')
   }
 }
 
-// 🚀 Send OTP to mobile and trigger OTP reader
+// 📤 Send OTP to backend and trigger Web OTP
 const handleSendOtp = async () => {
+  errormsg.value = ''
+
+  if (!/^\d{10}$/.test(mobile.value)) {
+    errormsg.value = 'Please enter a valid 10-digit mobile number'
+    return
+  }
+
   const apiurl = `${baseurl.value}validateMobile`
 
   try {
@@ -97,14 +109,13 @@ const handleSendOtp = async () => {
       return
     }
 
-    alert('OTP sent successfully')
+    alert('✅ OTP sent successfully')
 
-    // 👁️ Allow DOM update, then read OTP
+    // Wait for input to render and try auto-read
     await nextTick()
     autoReadOtp()
-
   } catch (error) {
-    console.error('Send OTP error:', error)
+    console.error('🚨 Send OTP error:', error)
     errormsg.value = 'Something went wrong. Try again.'
   }
 }
