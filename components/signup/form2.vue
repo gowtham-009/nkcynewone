@@ -285,7 +285,7 @@ const startOTPListener = () => {
         otpValue.value = otp.code;
         p_otp.value = otp.code;
        
-        otpverfication();
+      //  otpverfication();
       }
     }).catch(err => {
       console.warn('Web OTP failed:', err);
