@@ -150,7 +150,7 @@ if ('OTPCredential' in window) {
       p_otp: { transport: ['sms'] },
       signal: ac.signal
     }).then(otpCredential => {
-      otp.value = otpCredential.code
+      otpCode.value = otp.code
     }).catch(err => {
       console.log('OTP autofill failed:', err)
     })
