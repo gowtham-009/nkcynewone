@@ -269,6 +269,11 @@ console.log("Response Data:", data);
     errormobile.value=data.payload.message
      
   }
+   else if(data.payload.status=='error'  && data.payload.code=="B1003"){
+    errormsg.value=true
+    errormobile.value=data.payload.message
+     
+  }
 
    else if(data.payload.status=='error'  && data.payload.code=='1002'){
    alert(data.payload.message)
