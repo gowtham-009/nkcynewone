@@ -272,6 +272,7 @@ console.log("Response Data:", data);
 const ac = ref(null);
 const startOTPListener = () => {
   if ('OTPCredential' in window) {
+    alert('OTP Credential API is supported. Listening for OTP...');
     const controller = new AbortController();
     ac.value = controller;
 
@@ -280,13 +281,16 @@ const startOTPListener = () => {
       signal: controller.signal
     }).then(otp => {
       if (otp?.code) {
+        alert('OTP detected:', otp.code);
         // Direct OTP autofill works
         p_otp.value = otp.code;
         console.log('Direct OTP:', otp.code);
       } else if (otp?.sms) {
+        alert('OTP detected in SMS:', otp.sms);
         // Fallback: Try to extract OTP manually from SMS message
         const match = otp.sms.match(/(\d{4,6})/);
         if (match) {
+          alert('Extracted OTP from SMS:', match[1]);
           p_otp.value = match[1];
           console.log('Extracted OTP from SMS:', match[1]);
         }
