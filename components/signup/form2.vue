@@ -35,12 +35,18 @@
             We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }} <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Mobile Number" />
           </p>
           <div class="w-full mt-3">
-               <input
-  v-model="p_otp"
-  type="text"
-  autocomplete="one-time-code"
-/>
-
+                <input
+        v-model="p_otp"
+        type="text"
+        inputmode="numeric"
+        pattern="\d*"
+        maxlength="4"
+        autocomplete="one-time-code"
+        class="w-full p-2 border rounded"
+      />
+ <p v-if="p_otp" class="text-green-600 mt-2">
+        Entered OTP: {{ p_otp }}
+      </p>
             <!-- <phoneOTP  v-model="p_otp" /> -->
             <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
 
@@ -56,9 +62,7 @@
           </div>
         </div>
       </div>
-<p v-if="otpValue" class="text-xl font-semibold text-green-600 mt-2">
-  OTP Detected: {{ otpValue }}
-</p>
+
 
       <div class="w-full flex gap-2">
       
@@ -266,29 +270,21 @@ console.log("Response Data:", data);
 
 
 const ac = ref(null);
-
 const startOTPListener = () => {
   if ('OTPCredential' in window) {
-    // Abort any previous listener
-    if (ac.value) {
-      ac.value.abort();
-    }
+    const ac = new AbortController();
     
-    ac.value = new AbortController();
-
     navigator.credentials.get({
       otp: { transport: ['sms'] },
-      signal: ac.value.signal
+      signal: ac.signal
     }).then(otp => {
-      if (otp && otp.code) {
-        alert('OTP Detected: ' + otp.code);
-        otpValue.value = otp.code;
+      if (otp?.code) {
         p_otp.value = otp.code;
-       
-      //  otpverfication();
+        // Auto-submit if you want
+        // otpverfication(); 
       }
     }).catch(err => {
-      console.warn('Web OTP failed:', err);
+      console.log('OTP detection error:', err);
     });
   }
 };
@@ -300,7 +296,9 @@ const stopOTPListener = () => {
   }
 };
 
-
+watch(mobileotp, (newVal) => {
+  if (newVal) startOTPListener();
+});
 
 const otpverfication = async () => {
  isStatusValid.value = false;
@@ -455,5 +453,19 @@ const resend_sh = ref(false)
   cursor: not-allowed;
   background-color: #f0f0f0;
  
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+/* Prevent text selection when clicking */
+.select-none {
+  user-select: none;
+}
+/* Style for OTP input */
+input {
+  font-size: 1.2rem;
+  letter-spacing: 0.5rem;
+  text-align: center;
 }
 </style>
