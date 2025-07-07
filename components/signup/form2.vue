@@ -141,29 +141,20 @@ const setMobileData = async () => {
 await setMobileData();
 
 onMounted(() => {
- if ('OTPCredential' in window) {
-  const abortController = new AbortController();
+if ('OTPCredential' in window) {
+  const ac = new AbortController();
 
-  navigator.credentials
-    .get({
-      otp: { transport: ['sms'] },
-      signal: abortController.signal,
-    })
-    .then((otp) => {
-      if (otp && otp.code) {
-        // ✅ Autofill the input
-        p_otp.value = otp.code;
-
-        // ✅ Optional: show visual confirmation
-        showOtpBanner(otp.code);
-        console.log('Auto-read OTP:', otp.code);
-      }
-    })
-    .catch((err) => {
-      console.warn('Web OTP failed:', err.message);
-    });
-
-  
+  navigator.credentials.get({
+    otp: { transport: ['sms'] },
+    signal: ac.signal,
+  }).then((otp) => {
+    if (otp && otp.code) {
+      alert(`Your OTP is: ${otp.code}`);
+      p_otp.value = otp.code;
+    }
+  }).catch((err) => {
+    console.warn('Web OTP failed:', err);
+  });
 }
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
