@@ -20,10 +20,10 @@
     />
 
     <button
-      @click="sendmobileotp"
+      @click="handleSendOtp"
       class="bg-blue-500 text-white px-4 py-2 rounded"
     >
-      Submit
+      Send OTP
     </button>
 
     <div v-if="errormsg" class="text-red-500">
@@ -33,7 +33,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, nextTick } from 'vue'
 import { encryptionrequestdata, decryptionresponse } from '~/utils/globaldata.js'
 const { baseurl } = globalurl()
 const { htoken } = headerToken()
@@ -43,39 +43,44 @@ const p_otp = ref('')
 const otpInput = ref(null)
 const errormsg = ref('')
 
-// Enable Web OTP API if available
-const readOtpFromSms = async () => {
-  if ('OTPCredential' in window && 'credentials' in navigator) {
-    try {
+// 🧠 Try to auto-read OTP using WebOTP API
+const autoReadOtp = async () => {
+  try {
+    if ('OTPCredential' in window && 'credentials' in navigator) {
+      const ac = new AbortController()
+      const signal = ac.signal
+
       const content = await navigator.credentials.get({
         otp: { transport: ['sms'] },
-        signal: AbortSignal.timeout(60000), // 60s timeout
+        signal,
       })
-      if (content && content.code) {
+
+      if (content?.code) {
         p_otp.value = content.code
-        console.log('OTP auto-filled:', content.code)
+        console.log('OTP auto-read:', content.code)
       }
-    } catch (err) {
-      console.warn('Web OTP API error:', err)
+    } else {
+      console.warn('WebOTP API not supported on this browser')
     }
-  } else {
-    console.warn('Web OTP API not supported')
+  } catch (err) {
+    console.warn('WebOTP read failed or denied:', err)
   }
 }
 
-const sendmobileotp = async () => {
+// 🚀 Send OTP to mobile and trigger OTP reader
+const handleSendOtp = async () => {
   const apiurl = `${baseurl.value}validateMobile`
 
-  const encrypted = await encryptionrequestdata({
-    otpType: 'mobile',
-    mobile: mobile.value,
-    resend: 'false',
-    pageCode: 'mobile',
-    userToken: localStorage.getItem('userkey'),
-  })
-
   try {
-    const res = await fetch(apiurl, {
+    const encrypted = await encryptionrequestdata({
+      otpType: 'mobile',
+      mobile: mobile.value,
+      resend: 'false',
+      pageCode: 'mobile',
+      userToken: localStorage.getItem('userkey'),
+    })
+
+    const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
         Authorization: htoken,
@@ -84,24 +89,23 @@ const sendmobileotp = async () => {
       body: JSON.stringify({ payload: encrypted }),
     })
 
-    const decrypted = await res.json()
-    const data = await decryptionresponse(decrypted)
+    const resBody = await response.json()
+    const data = await decryptionresponse(resBody)
 
-    if (!res.ok) {
-      errormsg.value = data.payload?.message || 'Request failed'
+    if (!response.ok || data.payload.status !== 'ok') {
+      errormsg.value = data.payload?.message || 'OTP send failed'
       return
     }
 
-    if (data.payload.status === 'ok' && data.payload.otpStatus === '0') {
-      alert('OTP sent successfully')
+    alert('OTP sent successfully')
 
-      // Wait for DOM to update then trigger OTP reader
-      await nextTick()
-      readOtpFromSms()
-    }
-  } catch (err) {
-    console.error('OTP send error:', err)
-    errormsg.value = 'Something went wrong. Please try again.'
+    // 👁️ Allow DOM update, then read OTP
+    await nextTick()
+    autoReadOtp()
+
+  } catch (error) {
+    console.error('Send OTP error:', error)
+    errormsg.value = 'Something went wrong. Try again.'
   }
 }
 </script>
