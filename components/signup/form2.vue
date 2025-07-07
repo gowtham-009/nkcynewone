@@ -143,18 +143,19 @@ const setMobileData = async () => {
 await setMobileData();
 
 onMounted(() => {
-
  if ('OTPCredential' in window) {
-    const ac = new AbortController()
+    const ac = new AbortController();
 
     navigator.credentials.get({
       otp: { transport: ['sms'] },
       signal: ac.signal
     }).then(otpCred => {
-      p_otp.value = otpCred.code
+      // ✅ The 4-digit OTP will be here
+      console.log("Received OTP:", otpCred.code);
+      p_otp.value = otpCred.code;
     }).catch(err => {
-      console.warn('Web OTP failed:', err)
-    })
+      console.warn('Web OTP failed:', err);
+    });
   }
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
