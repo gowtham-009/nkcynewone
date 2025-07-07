@@ -35,7 +35,15 @@
             We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }} <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Mobile Number" />
           </p>
           <div class="w-full mt-3">
-            <phoneOTP v-model="p_otp" />
+               <input
+      v-model="p_otp"
+      id="p_otp"
+      type="text"
+      autocomplete="one-time-code"
+      class="border p-2 rounded w-full"
+      placeholder="Enter OTP"
+    />
+            <!-- <phoneOTP  v-model="p_otp" /> -->
             <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
 
             <div class="w-full h-12 flex justify-center gap-2">
@@ -53,7 +61,7 @@
 
       <div class="w-full flex gap-2">
       
-        <Button
+  <Button
   ref="rippleBtn"
   type="button"
   label="Verify OTP"
@@ -88,7 +96,6 @@ const timeLeft = ref(10);
 const phoneNumber = ref('')
 const mobileotp = ref(false)
 const rippleBtn = ref(null)
-
 const buttonText = ref("Next");
 const otperror = ref(false)
 const errorotp = ref('')
@@ -98,8 +105,7 @@ const errormobile = ref('')
 const p_otp = ref('')
 const isStatusValid = ref(true); // Assuming this is set based on some validation logic
 const isSending = ref(false);
-const mobileNo = ref(''); 
-
+const mobileNo = ref('');
 const router = useRouter();
 const setMobileData = async () => {
   try {
@@ -138,6 +144,17 @@ await setMobileData();
 
 onMounted(() => {
 
+if ('OTPCredential' in window) {
+    const ac = new AbortController()
+    navigator.credentials.get({
+      p_otp: { transport: ['sms'] },
+      signal: ac.signal
+    }).then(otpCredential => {
+      otp.value = otpCredential.code
+    }).catch(err => {
+      console.log('OTP autofill failed:', err)
+    })
+  }
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
@@ -183,6 +200,7 @@ const sendmobileotp = async (resend) => {
 
   const decryptedData = await response.json(); // Read body regardless of status
 const data = await decryptionresponse(decryptedData);
+
 console.log("Response Data:", data);
   if (!response.ok) {
     console.error("Error:", data.message);
@@ -207,7 +225,10 @@ console.log("Response Data:", data);
   }
 
   if (data.payload.status === 'ok' && data.payload.otpStatus=='0') {
-    
+   if (data.payload.otpRefCode) {
+        p_otp.value = data.payload.otpRefCode.toString(); // Ensure it's a string
+        console.log('OTP set to:', p_otp.value);
+      }
     mobileotp.value=true
     buttonText.value='Verify Otp'
 

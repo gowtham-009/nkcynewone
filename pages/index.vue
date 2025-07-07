@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="desktop">
    
 
-    <div v-if="logauth">
+    <div v-if="logauth" class="dk">
       <div v-if="currentForm === 'pan'">
         <form1 @updateDiv="handleUpdateDiv" />
       </div>
@@ -59,3 +59,26 @@ if(route.query.RefCode){
   }
 });
 </script>
+<style>
+.desktop {
+ width: 100%;
+ border: 1px solid red;
+ display: flex;
+ justify-content: center;
+} 
+.dk{
+  width: 30%;
+}
+
+@media (max-width: 800px) {
+  .desktop {
+    width: 100%;
+    border: none;
+    display: flex;
+    justify-content: center;
+  }
+  .dk {
+    width: 100%;
+  }
+}
+</style>

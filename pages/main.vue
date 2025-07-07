@@ -1,5 +1,6 @@
 <template>
-  <div v-if="authenticated">
+  <div class="desktop">
+    <div v-if="authenticated" class="dk">
     <transition name="fade-slide" mode="out-in">
       <div v-if="currentForm === 'mobile'">
         <form2 :data="data" @updateDiv="handleUpdateDiv" />
@@ -84,6 +85,7 @@
         <THANKYOU @updateDiv="handleUpdateDiv" />
       </div>
     </transition>
+  </div>
   </div>
 </template>
 
@@ -250,5 +252,27 @@ onMounted(async () => {
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateY(-20px);
+}
+
+.desktop {
+ width: 100%;
+ border: 1px solid red;
+ display: flex;
+ justify-content: center;
+} 
+.dk{
+  width: 30%;
+}
+
+@media (max-width: 800px) {
+  .desktop {
+    width: 100%;
+    border: none;
+    display: flex;
+    justify-content: center;
+  }
+  .dk {
+    width: 100%;
+  }
 }
 </style>

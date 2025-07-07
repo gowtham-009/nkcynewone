@@ -45,7 +45,7 @@
         ref="dateInput"
         v-model="rawInput"
         type="text"
-        class="hidden-input"
+        class="hidden-input !w-100"
         maxlength="8"
         inputmode="numeric"
         pattern="[0-9]*"

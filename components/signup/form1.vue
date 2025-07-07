@@ -197,6 +197,7 @@ const kraaddresssubmission = async (resend) => {
 
     const data = await response.json();
     const decryptedData = await decryptionresponse(data);
+    console.log('KRA Address Submission Response:', decryptedData);
     
     if (decryptedData.payload.status == 'error' && decryptedData.payload.code == 'A1001') {
       panerror.value = true
