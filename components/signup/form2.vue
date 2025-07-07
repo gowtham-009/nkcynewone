@@ -142,23 +142,19 @@ const setMobileData = async () => {
 
 await setMobileData();
 
-onMounted(async() => {
+onMounted(() => {
 
  if ('OTPCredential' in window) {
-    try {
-      const controller = new AbortController()
-      const content = await navigator.credentials.get({
-        otp: { transport: ['sms'] },
-        signal: controller.signal,
-      })
+    const ac = new AbortController()
 
-      if (content?.code) {
-        p_otp.value = content.code
-        console.log('Autofilled OTP:', content.code)
-      }
-    } catch (err) {
-      console.warn('Web OTP API error:', err)
-    }
+    navigator.credentials.get({
+      otp: { transport: ['sms'] },
+      signal: ac.signal
+    }).then(otpCred => {
+      otp.value = otpCred.code
+    }).catch(err => {
+      console.warn('Web OTP failed:', err)
+    })
   }
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
