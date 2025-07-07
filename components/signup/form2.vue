@@ -272,22 +272,33 @@ console.log("Response Data:", data);
 const ac = ref(null);
 const startOTPListener = () => {
   if ('OTPCredential' in window) {
-    const ac = new AbortController();
-    
+    const controller = new AbortController();
+    ac.value = controller;
+
     navigator.credentials.get({
       otp: { transport: ['sms'] },
-      signal: ac.signal
+      signal: controller.signal
     }).then(otp => {
       if (otp?.code) {
+        // Direct OTP autofill works
         p_otp.value = otp.code;
-        // Auto-submit if you want
-        // otpverfication(); 
+        console.log('Direct OTP:', otp.code);
+      } else if (otp?.sms) {
+        // Fallback: Try to extract OTP manually from SMS message
+        const match = otp.sms.match(/(\d{4,6})/);
+        if (match) {
+          p_otp.value = match[1];
+          console.log('Extracted OTP from SMS:', match[1]);
+        }
+      } else {
+        console.log('OTP not found in SMS or code');
       }
     }).catch(err => {
       console.log('OTP detection error:', err);
     });
   }
 };
+
 
 const stopOTPListener = () => {
   if (ac.value) {
