@@ -316,6 +316,11 @@ otperror.value=false
         emailerror.value = data.payload.message
       }
 
+       else if(data.payload.status=='error'  && data.payload.code=="B1003"){
+    erroremail.value = true
+        emailerror.value = data.payload.message
+     
+  }
       else if (data.payload.status == 'error' && data.payload.code == '1002') {
 
         alert(data.payload.message)
@@ -384,6 +389,7 @@ const otpverfication = async () => {
         errorotp.value = data.payload.message
         isSending.value = true;
       }
+        
 
       else if (data.payload.status == 'error' && data.payload.code == '1002') {
         errormsg.value = true
