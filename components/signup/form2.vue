@@ -146,6 +146,7 @@ await setMobileData();
 
 onMounted(() => {
  if ('OTPCredential' in window) {
+  alert('windo')
     const ac = new AbortController();
 
     navigator.credentials.get({
@@ -153,6 +154,7 @@ onMounted(() => {
       signal: ac.signal
     }).then(otp => {
       if (otp && otp.code) {
+        alert('OTP Detected: ' + otp.code);
         p_otp.value = otp.code;        // Autofill input
         otpValue.value = `#${otp.code}`; // Show visually on screen
       }
