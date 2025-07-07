@@ -225,10 +225,10 @@ console.log("Response Data:", data);
   }
 
   if (data.payload.status === 'ok' && data.payload.otpStatus=='0') {
-   if (data.payload.otpRefCode) {
-        p_otp.value = data.payload.otpRefCode.toString(); // Ensure it's a string
-        console.log('OTP set to:', p_otp.value);
-      }
+  //  if (data.payload.otpRefCode) {
+  //       p_otp.value = data.payload.otpRefCode.toString(); // Ensure it's a string
+  //       console.log('OTP set to:', p_otp.value);
+  //     }
     mobileotp.value=true
     buttonText.value='Verify Otp'
 
