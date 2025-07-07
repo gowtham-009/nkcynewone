@@ -35,19 +35,8 @@
             We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }} <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Mobile Number" />
           </p>
           <div class="w-full mt-3">
-                <input
-        v-model="p_otp"
-        type="text"
-        inputmode="numeric"
-        pattern="\d*"
-        maxlength="4"
-        autocomplete="one-time-code"
-        class="w-full p-2 border rounded"
-      />
- <p v-if="p_otp" class="text-green-600 mt-2">
-        Entered OTP: {{ p_otp }}
-      </p>
-            <!-- <phoneOTP  v-model="p_otp" /> -->
+            
+            <phoneOTP  v-model="p_otp" />
             <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
 
             <div class="w-full h-12 flex justify-center gap-2">
@@ -62,7 +51,6 @@
           </div>
         </div>
       </div>
-
 
       <div class="w-full flex gap-2">
       
@@ -84,7 +72,7 @@
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
+
 import phoneOTP from '~/components/forminputs/otpinput.vue'
 import MobileInput from '~/components/forminputs/mobileinput.vue';
 import Checkbox from '~/components/forminputs/remembercheckbox.vue';
@@ -112,7 +100,6 @@ const isStatusValid = ref(true); // Assuming this is set based on some validatio
 const isSending = ref(false);
 const mobileNo = ref('');
 const router = useRouter();
-const otpValue = ref('');
 const setMobileData = async () => {
   try {
     const mydata = await getServerData();
@@ -159,8 +146,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(timer);
-   stopOTPListener();
 });
+
 
 
 
@@ -222,7 +209,6 @@ console.log("Response Data:", data);
 
     mobileotp.value=true
     buttonText.value='Verify Otp'
-      startOTPListener();
 
   }
   else if(data.payload.status === 'ok' && data.payload.otpStatus=='1'){
@@ -242,16 +228,15 @@ console.log("Response Data:", data);
      
   }
 
+    else if(data.payload.status=='error'  && data.payload.code=="B1003"){
+    errormsg.value=true
+    errormobile.value=data.payload.message
+     
+  }
    else if(data.payload.status=='error'  && data.payload.code=='1002'){
    alert(data.payload.message)
     localStorage.removeItem('userkey')
       router.push('/')
-     
-  }
-
-   else if(data.payload.status=='error'  && data.payload.code=="B1003"){
-    errormsg.value=true
-    errormobile.value=data.payload.message
      
   }
  
@@ -269,51 +254,6 @@ console.log("Response Data:", data);
 };
 
 
-const ac = ref(null);
-const startOTPListener = () => {
-  if ('OTPCredential' in window) {
-    alert('OTP Credential API is supported. Listening for OTP...');
-    const controller = new AbortController();
-    ac.value = controller;
-
-    navigator.credentials.get({
-      otp: { transport: ['sms'] },
-      signal: controller.signal
-    }).then(otp => {
-      if (otp?.code) {
-        alert('OTP detected:', otp.code);
-        // Direct OTP autofill works
-        p_otp.value = otp.code;
-        console.log('Direct OTP:', otp.code);
-      } else if (otp?.sms) {
-        alert('OTP detected in SMS:', otp.sms);
-        // Fallback: Try to extract OTP manually from SMS message
-        const match = otp.sms.match(/(\d{4,6})/);
-        if (match) {
-          alert('Extracted OTP from SMS:', match[1]);
-          p_otp.value = match[1];
-          console.log('Extracted OTP from SMS:', match[1]);
-        }
-      } else {
-        console.log('OTP not found in SMS or code');
-      }
-    }).catch(err => {
-      console.log('OTP detection error:', err);
-    });
-  }
-};
-
-
-const stopOTPListener = () => {
-  if (ac.value) {
-    ac.value.abort();
-    ac.value = null;
-  }
-};
-
-watch(mobileotp, (newVal) => {
-  if (newVal) startOTPListener();
-});
 
 const otpverfication = async () => {
  isStatusValid.value = false;
@@ -468,19 +408,5 @@ const resend_sh = ref(false)
   cursor: not-allowed;
   background-color: #f0f0f0;
  
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-/* Prevent text selection when clicking */
-.select-none {
-  user-select: none;
-}
-/* Style for OTP input */
-input {
-  font-size: 1.2rem;
-  letter-spacing: 0.5rem;
-  text-align: center;
 }
 </style>
