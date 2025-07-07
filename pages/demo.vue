@@ -21,19 +21,29 @@
     />
 
     <button
-      @click="sendmobileotp(false)"
+      @click="sendmobileotp"
       class="bg-blue-500 text-white px-4 py-2 rounded"
     >
       Submit
     </button>
+
+    <div v-if="errormsg" class="text-red-500">
+      {{ errormsg }}
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue'
+import { encryptionrequestdata, decryptionresponse, globalurl, headerToken } from '~/utils/globaldata.js'
 
-const mobile = ref('8489941837') // Prefilled with your number
+const { baseurl } = globalurl()
+const { htoken } = headerToken()
+
+const mobile = ref('')
 const p_otp = ref('')
+const errormsg = ref('')
+const phoneNumber = ref('')
 const otpInput = ref(null)
 const abortController = ref(null)
 
@@ -42,16 +52,14 @@ const validateMobile = () => {
   mobile.value = mobile.value.replace(/[^0-9]/g, '')
 }
 
+// Auto-request OTP from SMS using Web OTP API
 const requestOTP = async () => {
   if (!('OTPCredential' in window)) {
     console.log('Web OTP API not supported')
     return
   }
 
-  if (abortController.value) {
-    abortController.value.abort()
-  }
-
+  if (abortController.value) abortController.value.abort()
   abortController.value = new AbortController()
 
   try {
@@ -59,24 +67,75 @@ const requestOTP = async () => {
       otp: { transport: ['sms'] },
       signal: abortController.value.signal
     })
-    
-    if (content?.code) {
+
+    if (content && content.code) {
       p_otp.value = content.code
-      console.log('OTP autofilled:', content.code)
+      // Optional auto-submit:
+      // await sendmobileotp()
     }
   } catch (err) {
     if (err.name !== 'AbortError') {
-      console.error('OTP autofill error:', err)
+      console.error('Web OTP error:', err)
     }
   }
 }
 
-onMounted(() => {
-  // Focus on OTP input and request autofill
-  if (otpInput.value) {
-    otpInput.value.focus()
-    requestOTP()
+// Send OTP to mobile
+const sendmobileotp = async () => {
+  const apiurl = `${baseurl.value}validateMobile`
+  phoneNumber.value = mobile.value.replace(/^(\d{0,6})(\d{4})$/, '******$2')
+
+  const user = await encryptionrequestdata({
+    otpType: 'mobile',
+    mobile: mobile.value,
+    resend: 'false',
+    pageCode: "mobile",
+    userToken: localStorage.getItem('userkey')
+  })
+
+  const payload = { payload: user }
+  const jsonString = JSON.stringify(payload)
+
+  try {
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': htoken,
+        'Content-Type': 'application/json',
+      },
+      body: jsonString,
+    })
+
+    const decryptedData = await response.json()
+    const data = await decryptionresponse(decryptedData)
+
+    if (!response.ok) {
+      errormsg.value = data.payload?.message || 'Request failed'
+      return
+    }
+
+    if (data.payload.status === 'ok' && data.payload.otpStatus === '0') {
+      alert('OTP sent successfully')
+      await nextTick()
+      if (otpInput.value) {
+        otpInput.value.focus()
+        requestOTP()
+      }
+    }
+  } catch (error) {
+    console.error('OTP send error:', error)
+    errormsg.value = 'Something went wrong. Please try again.'
   }
+}
+
+// Initialize OTP autofill
+onMounted(() => {
+  setTimeout(() => {
+    if (otpInput.value) {
+      otpInput.value.focus()
+      requestOTP()
+    }
+  }, 500)
 })
 
 onBeforeUnmount(() => {
