@@ -35,14 +35,14 @@
             We have sent an OTP to your mobile number <br> +91 {{ phoneNumber }} <Chip @click="otpclear()" class="bg-blue-50 py-1 text-blue-500" label="Change Mobile Number" />
           </p>
           <div class="w-full mt-3">
-               <input
-      v-model="p_otp"
-      id="p_otp"
-      type="text"
-      autocomplete="one-time-code"
-      class="border p-2 rounded w-full"
-      placeholder="Enter OTP"
-    />
+              <input
+  v-model="p_otp"
+  type="text"
+  autocomplete="one-time-code"
+  class="border p-2 rounded w-full"
+  placeholder="Enter OTP"
+/>
+
             <!-- <phoneOTP  v-model="p_otp" /> -->
             <span v-if="otperror" class="text-red-500">{{ errorotp }}</span>
 
@@ -144,33 +144,37 @@ await setMobileData();
 
 onMounted(() => {
  if ('OTPCredential' in window) {
-    const ac = new AbortController();
+    const ac = new AbortController()
 
     navigator.credentials.get({
       otp: { transport: ['sms'] },
       signal: ac.signal
-    }).then(otpCred => {
-      const otpCode = otpCred.code; // ✅ This is the 4-digit code like '8631'
-      p_otp.value = otpCode;
+    }).then(otp => {
+      if (otp && otp.code) {
+        p_otp.value = otp.code  // ✅ Auto-fills your input
+        console.log('Auto-read OTP:', otp.code)
 
-      // ✅ Print to console
-      console.log("Auto-read OTP:", otpCode);
+        // ✅ Show on screen for test
+        const otpDiv = document.createElement('div')
+        otpDiv.textContent = `Auto-read OTP: ${otp.code}`
+        otpDiv.style.position = 'fixed'
+        otpDiv.style.bottom = '20px'
+        otpDiv.style.left = '20px'
+        otpDiv.style.padding = '12px'
+        otpDiv.style.backgroundColor = '#fffae6'
+        otpDiv.style.border = '2px solid #222'
+        otpDiv.style.color = '#222'
+        otpDiv.style.fontSize = '18px'
+        otpDiv.style.zIndex = 9999
+        document.body.appendChild(otpDiv)
 
-      // ✅ Optionally show on screen (for testing/debugging only)
-      const otpBox = document.createElement('div');
-      otpBox.textContent = `Detected OTP: ${otpCode}`;
-      otpBox.style.position = 'fixed';
-      otpBox.style.bottom = '20px';
-      otpBox.style.left = '20px';
-      otpBox.style.padding = '10px';
-      otpBox.style.background = 'yellow';
-      otpBox.style.border = '2px solid #000';
-      otpBox.style.fontSize = '18px';
-      otpBox.style.zIndex = 9999;
-      document.body.appendChild(otpBox);
+        setTimeout(() => {
+          otpDiv.remove()
+        }, 6000)
+      }
     }).catch(err => {
-      console.warn('Web OTP failed:', err);
-    });
+      console.warn('Web OTP failed:', err)
+    })
   }
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
