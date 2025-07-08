@@ -1,8 +1,8 @@
 <template>
-  <div class="p-6 space-y-4 max-w-md mx-auto">
+  <div class="p-6 max-w-md mx-auto space-y-4">
     <h2 class="text-xl font-bold text-center">Mobile OTP Verification</h2>
 
-    <!-- Mobile Number Input -->
+    <!-- 📱 Mobile Input -->
     <input
       v-model="mobileNo"
       type="tel"
@@ -11,19 +11,18 @@
       class="w-full p-2 border rounded"
     />
 
-    <!-- OTP Input -->
+    <!-- 🔢 OTP Input -->
     <input
       v-model="p_otp"
       type="text"
       inputmode="numeric"
-      pattern="\d{4,6}"
       maxlength="6"
       autocomplete="one-time-code"
       placeholder="Waiting for OTP..."
       class="w-full p-2 border rounded"
     />
 
-    <!-- Send OTP Button -->
+    <!-- 🚀 Send/Resend OTP Buttons -->
     <button
       @click="sendmobileotp('')"
       class="w-full bg-blue-600 text-white py-2 rounded"
@@ -31,20 +30,19 @@
       Send OTP
     </button>
 
-    <!-- Resend OTP Button -->
     <button
       v-if="timeLeft === 0 && mobileotp"
       @click="sendmobileotp('resend')"
-      class="w-full bg-gray-500 text-white py-2 rounded"
+      class="w-full bg-gray-600 text-white py-2 rounded"
     >
       Resend OTP
     </button>
 
-    <!-- Status Display -->
-    <div class="text-center mt-2">
-      <p v-if="timeLeft > 0" class="text-sm text-gray-500">⏳ Resend in {{ timeLeft }}s</p>
-      <p v-if="errormsg" class="text-red-600 text-sm mt-2">❌ {{ errormobile }}</p>
-      <p v-if="p_otp" class="text-green-600 text-sm mt-2">✅ OTP: {{ p_otp }}</p>
+    <!-- ⏳ Countdown and Errors -->
+    <div class="text-center text-sm mt-2">
+      <p v-if="timeLeft > 0" class="text-gray-500">⏳ Resend in {{ timeLeft }}s</p>
+      <p v-if="errormsg" class="text-red-600">❌ {{ errormobile }}</p>
+      <p v-if="p_otp" class="text-green-600">✅ OTP: {{ p_otp }}</p>
     </div>
   </div>
 </template>
@@ -57,25 +55,21 @@ import { encryptionrequestdata, decryptionresponse } from '~/utils/globaldata.js
 const { baseurl } = globalurl()
 const { htoken } = headerToken()
 const router = useRouter()
-
-// Props/Emit
 const emit = defineEmits(['updateDiv'])
 
-// State Variables
+// 🧠 State
 const mobileNo = ref('')
 const p_otp = ref('')
 const phoneNumber = ref('')
 const errormsg = ref(false)
 const errormobile = ref('')
-const buttonText = ref('Send OTP')
 const resend_sh = ref(false)
 const otperror = ref(false)
 const mobileotp = ref(false)
-
 const timeLeft = ref(0)
 let timer = null
 
-// ✅ Auto Read OTP with Web OTP API
+// ✅ Auto Read OTP
 const autoReadOtp = async () => {
   if ('OTPCredential' in window && 'credentials' in navigator) {
     try {
@@ -92,18 +86,24 @@ const autoReadOtp = async () => {
         console.log('✅ OTP auto-filled:', result.code)
       }
     } catch (err) {
-      console.warn('❌ Web OTP auto-read failed:', err)
+      console.warn('❌ Web OTP failed:', err)
     }
   } else {
-    console.warn('⚠️ Web OTP not supported on this browser.')
+    console.warn('⚠️ Web OTP not supported on this browser')
   }
 }
 
-// ✅ Send/Resend OTP Function
+// ✅ Send or Resend OTP
 const sendmobileotp = async (resend) => {
   errormsg.value = false
   errormobile.value = ''
   resend_sh.value = false
+
+  if (!/^\d{10}$/.test(mobileNo.value)) {
+    errormsg.value = true
+    errormobile.value = 'Enter a valid 10-digit mobile number'
+    return
+  }
 
   const apiurl = `${baseurl.value}validateMobile`
   phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2')
@@ -129,17 +129,18 @@ const sendmobileotp = async (resend) => {
     const decryptedData = await response.json()
     const data = await decryptionresponse(decryptedData)
 
-    console.log('📦 API Response:', data)
+    console.log('📦 OTP API Response:', data)
 
+    // ❌ Handle invalid API response
     if (!response.ok || !data?.payload) {
       errormsg.value = true
-      errormobile.value = data?.payload?.message || 'Failed to send OTP.'
+      errormobile.value = data?.payload?.message || 'Failed to send OTP'
       return
     }
 
-    // Start countdown
+    // 🕐 Countdown reset
     clearInterval(timer)
-    timeLeft.value = 10
+    timeLeft.value = 30
     timer = setInterval(() => {
       if (timeLeft.value > 0) {
         timeLeft.value -= 1
@@ -148,26 +149,23 @@ const sendmobileotp = async (resend) => {
       }
     }, 1000)
 
-    // Handle resend state
     if (resend === 'resend') {
       otperror.value = false
       p_otp.value = ''
       resend_sh.value = true
     }
 
-    // ✅ OTP sent successfully
+    // ✅ Success handling
     if (data.payload.status === 'ok') {
       if (data.payload.otpStatus === '0') {
         mobileotp.value = true
-        buttonText.value = 'Verify OTP'
         await nextTick()
         autoReadOtp()
       } else if (data.payload.otpStatus === '1') {
         mobileotp.value = false
-        buttonText.value = 'Verify OTP'
-        emit('updateDiv', 'email') // Move to next step
+        emit('updateDiv', 'email')
       }
-    } else if (data.payload.status === 'error') {
+    } else {
       const code = data.payload.code
       const message = data.payload.message || 'Something went wrong'
 
