@@ -58,10 +58,6 @@ const otpController = ref(null)
 onMounted(() => {
 localStorage.setItem('token', '05072025100108SZDAU8WPNJJWI0K1NDBUWXGSBVNEQVMTXMMO26UIUY1QK5GSOT');
 
-
-
-
-
 });
 
 // ✅ Autofill function
@@ -72,7 +68,7 @@ const autoReadOtp = async () => {
   }
 
   try {
-    otpController.value?.abort() // cancel any previous listen
+    otpController.value?.abort() 
     otpController.value = new AbortController()
 
     const otp = await navigator.credentials.get({
@@ -80,9 +76,7 @@ const autoReadOtp = async () => {
       signal: otpController.value.signal
     })
 
-  
     if (otp?.code) {
- 
       p_otp.value = otp.code
       console.log('✅ OTP auto-filled:', otp.code)
     }
@@ -94,14 +88,12 @@ const autoReadOtp = async () => {
   }
 }
 
-// ⚡ Autofill triggers when input is focused
 const handleOtpInputFocus = () => {
   if (p_otp.value === '') {
     autoReadOtp()
   }
 }
 
-// 🚀 Send OTP to backend
 const handleSendOtp = async () => {
   errormsg.value = ''
   isSendingOtp.value = true
