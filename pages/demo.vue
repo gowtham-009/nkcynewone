@@ -111,7 +111,7 @@ const handleSendOtp = async () => {
       mobile: mobile.value,
       resend: 'false',
       pageCode: 'mobile',
-      userToken: localStorage.getItem('userkey'),
+      userToken:'05072025100108SZDAU8WPNJJWI0K1NDBUWXGSBVNEQVMTXMMO26UIUY1QK5GSOT',
     })
 
     const response = await fetch(apiurl, {
