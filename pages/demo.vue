@@ -65,18 +65,21 @@ const autoReadOtp = async () => {
   try {
     otpController.value?.abort() // cancel any previous listen
     otpController.value = new AbortController()
-
+alert('🔍 Listening for OTP in SMS...')
     const otp = await navigator.credentials.get({
       otp: { transport: ['sms'] },
       signal: otpController.value.signal
     })
 
+    alert('🔍 Reading OTP from SMS...')
     if (otp?.code) {
+      alert('✅ OTP received: ' + otp.code)
       p_otp.value = otp.code
       console.log('✅ OTP auto-filled:', otp.code)
     }
   } catch (err) {
     if (err.name !== 'AbortError') {
+      alert(err.message)
       console.warn('❌ Web OTP read failed:', err.message)
     }
   }
