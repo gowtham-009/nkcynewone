@@ -76,10 +76,8 @@ const autoReadOtp = async () => {
       const controller = new AbortController()
       const signal = controller.signal
 
-      const result = await navigator.credentials.get({
-        otp: { transport: ['sms'] },
-        signal,
-      })
+      const result = await navigator.credentials.get({ otp: { transport: ['sms'] }, signal })
+
 
       if (result?.code) {
         p_otp.value = result.code
