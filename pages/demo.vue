@@ -55,6 +55,15 @@ const errormsg = ref('')
 const isSendingOtp = ref(false)
 const otpController = ref(null)
 
+onMounted(() => {
+localStorage.setItem('token', '05072025100108SZDAU8WPNJJWI0K1NDBUWXGSBVNEQVMTXMMO26UIUY1QK5GSOT');
+
+
+
+
+
+});
+
 // ✅ Autofill function
 const autoReadOtp = async () => {
   if (!('OTPCredential' in window)) {
@@ -111,7 +120,7 @@ const handleSendOtp = async () => {
       mobile: mobile.value,
       resend: 'false',
       pageCode: 'mobile',
-      userToken:'05072025100108SZDAU8WPNJJWI0K1NDBUWXGSBVNEQVMTXMMO26UIUY1QK5GSOT',
+      userToken: localStorage.getItem('token') || '',
     })
 
     const response = await fetch(apiurl, {
