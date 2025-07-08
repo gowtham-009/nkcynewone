@@ -6,6 +6,7 @@
     <input
       v-model="mobileNo"
       type="tel"
+      maxlength="10"
       placeholder="Enter mobile number"
       class="w-full p-2 border rounded"
     />
@@ -15,8 +16,8 @@
       v-model="p_otp"
       type="text"
       inputmode="numeric"
-      pattern="\d{4}"
-      maxlength="4"
+      pattern="\d{4,6}"
+      maxlength="6"
       autocomplete="one-time-code"
       placeholder="Waiting for OTP..."
       class="w-full p-2 border rounded"
@@ -57,6 +58,9 @@ const { baseurl } = globalurl()
 const { htoken } = headerToken()
 const router = useRouter()
 
+// Props/Emit
+const emit = defineEmits(['updateDiv'])
+
 // State Variables
 const mobileNo = ref('')
 const p_otp = ref('')
@@ -90,6 +94,8 @@ const autoReadOtp = async () => {
     } catch (err) {
       console.warn('❌ Web OTP auto-read failed:', err)
     }
+  } else {
+    console.warn('⚠️ Web OTP not supported on this browser.')
   }
 }
 
@@ -142,7 +148,7 @@ const sendmobileotp = async (resend) => {
       }
     }, 1000)
 
-    // Handle resend UI state
+    // Handle resend state
     if (resend === 'resend') {
       otperror.value = false
       p_otp.value = ''
@@ -159,12 +165,9 @@ const sendmobileotp = async (resend) => {
       } else if (data.payload.otpStatus === '1') {
         mobileotp.value = false
         buttonText.value = 'Verify OTP'
-        emit('updateDiv', 'email') // Or navigate forward
+        emit('updateDiv', 'email') // Move to next step
       }
-    }
-
-    // ❌ Handle errors
-    else if (data.payload.status === 'error') {
+    } else if (data.payload.status === 'error') {
       const code = data.payload.code
       const message = data.payload.message || 'Something went wrong'
 
