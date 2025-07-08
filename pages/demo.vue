@@ -8,7 +8,7 @@
       class="w-full p-2 border rounded"
     />
 
-    <!-- OTP input (autofill enabled) -->
+    <!-- OTP input -->
     <input
       ref="otpInput"
       v-model="p_otp"
@@ -21,7 +21,7 @@
       class="w-full p-2 border rounded"
     />
 
-    <!-- Button to send OTP -->
+    <!-- Button -->
     <button
       @click="handleSendOtp"
       class="bg-blue-500 text-white px-4 py-2 rounded"
@@ -29,7 +29,7 @@
       Send OTP
     </button>
 
-    <!-- Show error -->
+    <!-- Error display -->
     <div v-if="errormsg" class="text-red-500">
       {{ errormsg }}
     </div>
@@ -39,6 +39,7 @@
 <script setup>
 import { ref, nextTick } from 'vue'
 import { encryptionrequestdata, decryptionresponse } from '~/utils/globaldata.js'
+
 const { baseurl } = globalurl()
 const { htoken } = headerToken()
 
@@ -47,14 +48,13 @@ const p_otp = ref('')
 const otpInput = ref(null)
 const errormsg = ref('')
 
-// 🔐 Web OTP Autofill Function
+// ✅ Auto-read OTP using WebOTP API
 const autoReadOtp = async () => {
   if ('OTPCredential' in window && 'credentials' in navigator) {
     try {
       const controller = new AbortController()
       const signal = controller.signal
 
-      // Web OTP API permissionless call
       const otp = await navigator.credentials.get({
         otp: { transport: ['sms'] },
         signal,
@@ -65,14 +65,14 @@ const autoReadOtp = async () => {
         console.log('✅ OTP auto-filled:', otp.code)
       }
     } catch (err) {
-      console.warn('❌ Web OTP auto-read failed:', err)
+      console.warn('❌ OTP auto-read failed:', err)
     }
   } else {
-    console.warn('⚠️ Web OTP not supported on this browser')
+    console.warn('⚠️ Web OTP not supported')
   }
 }
 
-// 📤 Send OTP to backend and trigger Web OTP
+// ✅ Send OTP and trigger Web OTP read
 const handleSendOtp = async () => {
   errormsg.value = ''
 
@@ -111,6 +111,7 @@ const handleSendOtp = async () => {
 
     alert('✅ OTP sent successfully')
 
+    // Start OTP autofill after DOM is updated
     await nextTick()
     autoReadOtp()
   } catch (error) {
