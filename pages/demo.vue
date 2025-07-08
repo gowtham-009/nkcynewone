@@ -1,105 +1,77 @@
 <template>
   <div class="p-6 space-y-4 max-w-md mx-auto">
-    <!-- Heading -->
-    <h2 class="text-xl font-bold text-center">Goodwill OTP Auto-Fill</h2>
+    <h2 class="text-xl font-bold text-center">Mobile OTP Verification</h2>
 
-    <!-- Mobile input -->
+    <!-- Mobile Number Input -->
     <input
-      v-model="mobile"
+      v-model="mobileNo"
       type="tel"
       placeholder="Enter mobile number"
-      class="w-full p-2 border border-gray-300 rounded"
+      class="w-full p-2 border rounded"
     />
 
-    <!-- OTP input -->
+    <!-- OTP Input -->
     <input
-      v-model="otp"
+      v-model="p_otp"
       type="text"
       inputmode="numeric"
       pattern="\d{4}"
       maxlength="4"
       autocomplete="one-time-code"
       placeholder="Waiting for OTP..."
-      class="w-full p-2 border border-gray-300 rounded"
+      class="w-full p-2 border rounded"
     />
 
     <!-- Send OTP Button -->
     <button
-      @click="handleSendOtp"
-      class="w-full bg-blue-600 text-white font-medium py-2 rounded"
+      @click="sendmobileotp('')"
+      class="w-full bg-blue-600 text-white py-2 rounded"
     >
       Send OTP
     </button>
 
-    <!-- OTP result -->
-    <div v-if="otp" class="text-green-600 font-bold text-center">
-      ✅ OTP Received: {{ otp }}
-    </div>
+    <!-- Resend OTP Button -->
+    <button
+      v-if="timeLeft === 0 && mobileotp"
+      @click="sendmobileotp('resend')"
+      class="w-full bg-gray-500 text-white py-2 rounded"
+    >
+      Resend OTP
+    </button>
 
-    <!-- Error message -->
-    <div v-if="error" class="text-red-600 text-center">
-      ❌ {{ error }}
+    <!-- Status Display -->
+    <div class="text-center mt-2">
+      <p v-if="timeLeft > 0" class="text-sm text-gray-500">⏳ Resend in {{ timeLeft }}s</p>
+      <p v-if="errormsg" class="text-red-600 text-sm mt-2">❌ {{ errormobile }}</p>
+      <p v-if="p_otp" class="text-green-600 text-sm mt-2">✅ OTP: {{ p_otp }}</p>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+import { encryptionrequestdata, decryptionresponse } from '~/utils/globaldata.js'
 
-// 🔧 Replace with your real API endpoint and logic
-const baseurl = 'https://your-api-url.com/' // <-- Replace
-const htoken = 'Bearer your-token' // <-- Replace
+const { baseurl } = globalurl()
+const { htoken } = headerToken()
+const router = useRouter()
 
-const mobile = ref('')
-const otp = ref('')
-const error = ref('')
+// State Variables
+const mobileNo = ref('')
+const p_otp = ref('')
+const phoneNumber = ref('')
+const errormsg = ref(false)
+const errormobile = ref('')
+const buttonText = ref('Send OTP')
+const resend_sh = ref(false)
+const otperror = ref(false)
+const mobileotp = ref(false)
 
-// ✅ Send OTP & auto-read after response
-const handleSendOtp = async () => {
-  error.value = ''
-  otp.value = ''
+const timeLeft = ref(0)
+let timer = null
 
-  if (!/^\d{10}$/.test(mobile.value)) {
-    error.value = 'Please enter a valid 10-digit mobile number'
-    return
-  }
-
-  try {
-    // Replace this with your real API call
-    const response = await fetch(`${baseurl}validateMobile`, {
-      method: 'POST',
-      headers: {
-        Authorization: htoken,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        payload: {
-          otpType: 'mobile',
-          mobile: mobile.value,
-          resend: 'false',
-          pageCode: 'mobile',
-          userToken: localStorage.getItem('userkey'),
-        },
-      }),
-    })
-
-    const result = await response.json()
-
-    if (result?.payload?.status !== 'ok') {
-      error.value = result.payload?.message || 'OTP send failed'
-      return
-    }
-
-    alert('✅ OTP sent. Please wait for SMS.')
-    await nextTick()
-    autoReadOtp()
-  } catch (err) {
-    console.error('❌ Send OTP Error:', err)
-    error.value = 'Something went wrong. Try again.'
-  }
-}
-
-// ✅ Auto-read OTP using Web OTP API
+// ✅ Auto Read OTP with Web OTP API
 const autoReadOtp = async () => {
   if ('OTPCredential' in window && 'credentials' in navigator) {
     try {
@@ -112,15 +84,106 @@ const autoReadOtp = async () => {
       })
 
       if (result?.code) {
-        otp.value = result.code
+        p_otp.value = result.code
         console.log('✅ OTP auto-filled:', result.code)
       }
     } catch (err) {
-      console.warn('❌ Web OTP failed:', err)
-      error.value = 'OTP auto-read failed or timed out'
+      console.warn('❌ Web OTP auto-read failed:', err)
     }
-  } else {
-    error.value = 'Web OTP not supported on this browser'
+  }
+}
+
+// ✅ Send/Resend OTP Function
+const sendmobileotp = async (resend) => {
+  errormsg.value = false
+  errormobile.value = ''
+  resend_sh.value = false
+
+  const apiurl = `${baseurl.value}validateMobile`
+  phoneNumber.value = mobileNo.value.replace(/^(\d{0,6})(\d{4})$/, '******$2')
+
+  try {
+    const encryptedPayload = await encryptionrequestdata({
+      otpType: 'mobile',
+      mobile: mobileNo.value,
+      resend: resend === 'resend' ? 'true' : 'false',
+      pageCode: 'mobile',
+      userToken: localStorage.getItem('userkey'),
+    })
+
+    const response = await fetch(apiurl, {
+      method: 'POST',
+      headers: {
+        Authorization: htoken,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ payload: encryptedPayload }),
+    })
+
+    const decryptedData = await response.json()
+    const data = await decryptionresponse(decryptedData)
+
+    console.log('📦 API Response:', data)
+
+    if (!response.ok || !data?.payload) {
+      errormsg.value = true
+      errormobile.value = data?.payload?.message || 'Failed to send OTP.'
+      return
+    }
+
+    // Start countdown
+    clearInterval(timer)
+    timeLeft.value = 10
+    timer = setInterval(() => {
+      if (timeLeft.value > 0) {
+        timeLeft.value -= 1
+      } else {
+        clearInterval(timer)
+      }
+    }, 1000)
+
+    // Handle resend UI state
+    if (resend === 'resend') {
+      otperror.value = false
+      p_otp.value = ''
+      resend_sh.value = true
+    }
+
+    // ✅ OTP sent successfully
+    if (data.payload.status === 'ok') {
+      if (data.payload.otpStatus === '0') {
+        mobileotp.value = true
+        buttonText.value = 'Verify OTP'
+        await nextTick()
+        autoReadOtp()
+      } else if (data.payload.otpStatus === '1') {
+        mobileotp.value = false
+        buttonText.value = 'Verify OTP'
+        emit('updateDiv', 'email') // Or navigate forward
+      }
+    }
+
+    // ❌ Handle errors
+    else if (data.payload.status === 'error') {
+      const code = data.payload.code
+      const message = data.payload.message || 'Something went wrong'
+
+      if (['B1002', '1005', 'B1003'].includes(code)) {
+        errormsg.value = true
+        errormobile.value = message
+      } else if (['1002', '1004'].includes(code)) {
+        alert(message)
+        localStorage.removeItem('userkey')
+        router.push('/')
+      } else {
+        errormsg.value = true
+        errormobile.value = message
+      }
+    }
+  } catch (error) {
+    console.error('❌ OTP Send Error:', error)
+    errormsg.value = true
+    errormobile.value = 'Something went wrong. Please try again.'
   }
 }
 </script>
