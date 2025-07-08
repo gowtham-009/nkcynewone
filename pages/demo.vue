@@ -19,14 +19,16 @@
       autocomplete="one-time-code"
       placeholder="Enter OTP"
       class="w-full p-2 border rounded"
+      @focus="handleOtpInputFocus"
     />
 
     <!-- Button to send OTP -->
     <button
       @click="handleSendOtp"
       class="bg-blue-500 text-white px-4 py-2 rounded"
+      :disabled="isSendingOtp"
     >
-      Send OTP
+      {{ isSendingOtp ? 'Sending...' : 'Send OTP' }}
     </button>
 
     <!-- Show error -->
@@ -46,38 +48,59 @@ const mobile = ref('')
 const p_otp = ref('')
 const otpInput = ref(null)
 const errormsg = ref('')
+const isSendingOtp = ref(false)
+const otpController = ref(null)
 
 // 🔐 Web OTP Autofill Function
 const autoReadOtp = async () => {
-  if ('OTPCredential' in window && 'credentials' in navigator) {
-    try {
-      const controller = new AbortController()
-      const signal = controller.signal
-
-      // Web OTP API permissionless call
-      const otp = await navigator.credentials.get({
-        otp: { transport: ['sms'] },
-        signal,
-      })
-
-      if (otp?.code) {
-        p_otp.value = otp.code
-        console.log('✅ OTP auto-filled:', otp.code)
-      }
-    } catch (err) {
-      console.warn('❌ Web OTP auto-read failed:', err)
-    }
-  } else {
+  if (!('OTPCredential' in window)) {
     console.warn('⚠️ Web OTP not supported on this browser')
+    return
+  }
+
+  try {
+    // Abort any previous OTP requests
+    if (otpController.value) {
+      otpController.value.abort()
+    }
+
+    otpController.value = new AbortController()
+    const signal = otpController.value.signal
+
+    const otp = await navigator.credentials.get({
+      otp: { transport: ['sms'] },
+      signal,
+    })
+
+    if (otp?.code) {
+      p_otp.value = otp.code
+      console.log('✅ OTP auto-filled:', otp.code)
+      alert('OTP auto-filled successfully!')
+    }
+  } catch (err) {
+    // Ignore abort errors
+    if (err.name !== 'AbortError') {
+      console.warn('❌ Web OTP auto-read failed:', err)
+      alert('Auto-read failed: ' + err.message)
+    }
   }
 }
 
-// 📤 Send OTP to backend and trigger Web OTP
+// Handle OTP input focus
+const handleOtpInputFocus = () => {
+  if (p_otp.value === '') {
+    autoReadOtp()
+  }
+}
+
+// 📤 Send OTP to backend
 const handleSendOtp = async () => {
   errormsg.value = ''
+  isSendingOtp.value = true
 
   if (!/^\d{10}$/.test(mobile.value)) {
     errormsg.value = 'Please enter a valid 10-digit mobile number'
+    isSendingOtp.value = false
     return
   }
 
@@ -106,16 +129,19 @@ const handleSendOtp = async () => {
 
     if (!response.ok || data.payload.status !== 'ok') {
       errormsg.value = data.payload?.message || 'OTP send failed'
+      isSendingOtp.value = false
       return
     }
 
-    alert('✅ OTP sent successfully')
-
+    alert('✅ OTP sent successfully. Please check your messages.')
     await nextTick()
-    autoReadOtp()
+    otpInput.value?.focus() // Focus the OTP input to trigger auto-read
   } catch (error) {
     console.error('🚨 Send OTP error:', error)
     errormsg.value = 'Something went wrong. Try again.'
+    alert('Failed to send OTP: ' + error.message)
+  } finally {
+    isSendingOtp.value = false
   }
 }
 </script>
