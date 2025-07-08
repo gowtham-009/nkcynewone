@@ -9,6 +9,7 @@
       maxlength="10"
       placeholder="Enter mobile number"
       class="w-full p-2 border rounded"
+      @focus="checkOTPSupport"
     />
 
     <!-- 🔢 OTP Input -->
@@ -16,9 +17,10 @@
       v-model="p_otp"
       type="text"
       inputmode="numeric"
+      pattern="[0-9]*"
       maxlength="6"
       autocomplete="one-time-code"
-      placeholder="Waiting for OTP..."
+      placeholder="Enter OTP"
       class="w-full p-2 border rounded"
     />
 
@@ -43,12 +45,13 @@
       <p v-if="timeLeft > 0" class="text-gray-500">⏳ Resend in {{ timeLeft }}s</p>
       <p v-if="errormsg" class="text-red-600">❌ {{ errormobile }}</p>
       <p v-if="p_otp" class="text-green-600">✅ OTP: {{ p_otp }}</p>
+      <p v-if="!isOTPSupported" class="text-yellow-600">⚠️ OTP autofill not supported in your browser</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { encryptionrequestdata, decryptionresponse } from '~/utils/globaldata.js'
 
@@ -67,27 +70,41 @@ const resend_sh = ref(false)
 const otperror = ref(false)
 const mobileotp = ref(false)
 const timeLeft = ref(0)
+const isOTPSupported = ref(true)
 let timer = null
+
+// Check OTP support when component mounts
+onMounted(() => {
+  checkOTPSupport()
+})
+
+// Check if Web OTP API is supported
+const checkOTPSupport = () => {
+  isOTPSupported.value = 'OTPCredential' in window
+}
 
 // ✅ Auto Read OTP
 const autoReadOtp = async () => {
-  if ('OTPCredential' in window && 'credentials' in navigator) {
-    try {
-      const controller = new AbortController()
-      const signal = controller.signal
-
-      const result = await navigator.credentials.get({ otp: { transport: ['sms'] }, signal })
-
-
-      if (result?.code) {
-        p_otp.value = result.code
-        console.log('✅ OTP auto-filled:', result.code)
-      }
-    } catch (err) {
-      console.warn('❌ Web OTP failed:', err)
+  if (!isOTPSupported.value) return
+  
+  try {
+    const content = await navigator.credentials.get({
+      otp: { transport: ['sms'] },
+      signal: new AbortController().signal
+    })
+    
+    if (content?.code) {
+      p_otp.value = content.code
+      console.log('✅ OTP auto-filled:', content.code)
     }
-  } else {
-    console.warn('⚠️ Web OTP not supported on this browser')
+  } catch (err) {
+    console.warn('❌ Web OTP failed:', err)
+    // Handle specific errors
+    if (err.name === 'AbortError') {
+      console.log('OTP request was aborted')
+    } else if (err.name === 'NotAllowedError') {
+      console.log('Permission denied for OTP autofill')
+    }
   }
 }
 
@@ -129,7 +146,6 @@ const sendmobileotp = async (resend) => {
 
     console.log('📦 OTP API Response:', data)
 
-    // ❌ Handle invalid API response
     if (!response.ok || !data?.payload) {
       errormsg.value = true
       errormobile.value = data?.payload?.message || 'Failed to send OTP'
