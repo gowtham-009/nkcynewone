@@ -116,7 +116,7 @@ onMounted(() => {
 //   }
 // }
 
-// Web OTP API listener
+
 async function startOtpListening() {
   if (!('OTPCredential' in window)) {
     alert('❌ Web OTP API not supported on this browser')
