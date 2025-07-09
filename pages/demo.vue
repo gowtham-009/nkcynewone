@@ -22,7 +22,7 @@
       autocomplete="one-time-code"
       placeholder="Enter OTP"
       class="w-full p-2 border rounded"
-      @focus="handleOtpInputFocus"
+  
     />
 
     <!-- Button to send OTP -->
@@ -88,15 +88,11 @@ const autoReadOtp = async () => {
   }
 }
 
-const handleOtpInputFocus = () => {
-  if (p_otp.value === '') {
-    autoReadOtp()
-  }
-}
+
 
 const handleSendOtp = async () => {
   errormsg.value = ''
-  isSendingOtp.value = true
+ 
 
   if (!/^\d{10}$/.test(mobile.value)) {
     errormsg.value = 'Please enter a valid 10-digit mobile number'
