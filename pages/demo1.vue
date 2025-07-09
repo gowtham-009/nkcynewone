@@ -42,7 +42,7 @@
 
 <script setup>
 import { ref } from 'vue';
-
+import { ref, nextTick } from 'vue'
 import { encryptionrequestdata, decryptionresponse } from '~/utils/globaldata.js'
 
 const { baseurl } = globalurl()
