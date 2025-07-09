@@ -52,12 +52,11 @@
   </div>
 </div>
 
+<p class="text-red-500 mt-2 text-center">{{ uploaderror }}</p>
         <div v-if="pdferrorbox" class="w-full p-1 mt-2 rounded-lg bg-red-50">
           <p class="text-sm text-red-500 text-center">Sorry we couldnt fetch you data, please upload pdf.</p>
         </div>
         <input type="file" accept="application/pdf" ref="fileInput" @change="uploadPDF" style="display: none" />
-
-
       </div>
 
       <div class="w-full flex gap-2 mt-4">
@@ -101,7 +100,7 @@ const uploadedPDF=ref('')
 const pdferrorbox = ref(false);
 const uploadTriggeredByEdit = ref(false);
 const isNewUpload = ref(false); // Add this flag to track new uploads
-
+const uploaderror = ref('');
 const isBack = ref(true);
 const isStatusValid = ref(true);
 let intervalId = null;
@@ -346,18 +345,37 @@ const camsbankdata = async () => {
 const triggerUpload = () => {
   fileInput.value?.click();
 };
-
 const uploadPDF = async (event) => {
   const file = event.target.files[0];
+  uploaderror.value = '';
   if (!file || file.type !== 'application/pdf') {
-    
+    alert('Please upload a valid PDF file.');
     return;
   }
 
-  // Create preview URL
+  // Decode raw content of the PDF
+  const arrayBuffer = await file.arrayBuffer();
+  const text = new TextDecoder("utf-8").decode(arrayBuffer);
+
+  // Check if PDF is password protected (look for /Encrypt keyword)
+  const isEncrypted = /\/Encrypt/.test(text);
+  if (isEncrypted) {
+    uploadedPDF.value=false
+    uploaderror.value = 'This PDF is password protected. Please upload an unprotected file.';
+   
+    event.target.value = ''; // Clear file input
+    return;
+  }
+
+  // Count pages
+  const matches = text.match(/\/Type\s*\/Page[^s]/g);
+  const pageCount = matches ? matches.length : 0;
+
+
+  // Preview file
   uploadedPDF.value = URL.createObjectURL(file);
 
-
+  // Upload only if conditions are met
   if (isNewUpload.value || selected.value === 'Upload Last 6 Months Bank Statement PDF') {
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -367,10 +385,11 @@ const uploadPDF = async (event) => {
     reader.readAsDataURL(file);
   }
 
-  // Reset the flag after upload
   isNewUpload.value = false;
   event.target.value = ''; // Clear for re-selection
 };
+
+
 
 
 const bankstatement = async (pdfval) => {

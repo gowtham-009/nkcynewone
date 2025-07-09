@@ -41,26 +41,31 @@
 </template>
 
 <script setup>
-
-import { ref, nextTick } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { encryptionrequestdata, decryptionresponse } from '~/utils/globaldata.js'
 
+// Globals
 const { baseurl } = globalurl()
 const { htoken } = headerToken()
-const mobile = ref('');
-const p_otp = ref('');
-const errormsg = ref('');
-const isSendingOtp = ref(false);
-const otpController = ref(null);
+
+// State variables
+const mobile = ref('')
+const p_otp = ref('')
+const errormsg = ref('')
+const isSendingOtp = ref(false)
+const otpController = ref(null)
+const otpInput = ref(null)
+
 onMounted(() => {
-localStorage.setItem('token', '05072025100108SZDAU8WPNJJWI0K1NDBUWXGSBVNEQVMTXMMO26UIUY1QK5GSOT');
+  localStorage.setItem('token', '05072025100108SZDAU8WPNJJWI0K1NDBUWXGSBVNEQVMTXMMO26UIUY1QK5GSOT')
+})
 
-});
-
-
+// Function to send OTP
 const handleSendOtp = async () => {
   errormsg.value = ''
- 
+  isSendingOtp.value = true
+
+  // Validate mobile number
   if (!/^\d{10}$/.test(mobile.value)) {
     errormsg.value = 'Please enter a valid 10-digit mobile number'
     isSendingOtp.value = false
@@ -70,6 +75,7 @@ const handleSendOtp = async () => {
   const apiurl = `${baseurl.value}validateMobile`
 
   try {
+    // Encrypt request data
     const encrypted = await encryptionrequestdata({
       otpType: 'mobile',
       mobile: mobile.value,
@@ -78,6 +84,7 @@ const handleSendOtp = async () => {
       userToken: localStorage.getItem('token') || '',
     })
 
+    // Send API request
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
@@ -92,14 +99,15 @@ const handleSendOtp = async () => {
 
     if (!response.ok || data.payload?.status !== 'ok') {
       errormsg.value = data.payload?.message || 'OTP send failed'
-      isSendingOtp.value = false
       return
     }
 
     alert('✅ OTP sent successfully. Check your SMS.')
+
+    // Focus OTP field and start listening
     await nextTick()
     otpInput.value?.focus()
-    startOtpListening() // also trigger explicitly
+    startOtpListening()
   } catch (err) {
     console.error('❌ OTP send error:', err)
     errormsg.value = 'Something went wrong. Try again.'
@@ -107,32 +115,33 @@ const handleSendOtp = async () => {
     isSendingOtp.value = false
   }
 }
+
+// Web OTP API listener
 async function startOtpListening() {
   if (!('OTPCredential' in window)) {
-    alert('❌ Web OTP API not supported on this browser');
-    return;
+    alert('❌ Web OTP API not supported on this browser')
+    return
   }
 
   try {
-    otpController.value?.abort(); // cancel any previous listener
-    otpController.value = new AbortController();
+    otpController.value?.abort() // cancel any existing listener
+    otpController.value = new AbortController()
 
-    alert('📲 Waiting for SMS...');
+    console.log('📲 Waiting for SMS...')
 
     const otp = await navigator.credentials.get({
       otp: { transport: ['sms'] },
-      signal: otpController.value.signal
-    });
+      signal: otpController.value.signal,
+    })
 
     if (otp?.code) {
-      p_otp.value = otp.code;
-      alert('✅ OTP auto-filled: ' + otp.code);
+      p_otp.value = otp.code
+      alert('✅ OTP auto-filled: ' + otp.code)
     }
-
   } catch (err) {
     if (err.name !== 'AbortError') {
-      console.warn('❌ OTP read failed:', err.message);
-      alert('❌ OTP read failed: ' + err.message);
+      console.warn('❌ OTP read failed:', err.message)
+      alert('❌ OTP read failed: ' + err.message)
     }
   }
 }
