@@ -84,9 +84,7 @@ watch(
   { immediate: true }
 )
 
-// const arrayBuffer = await file.arrayBuffer();
-// const text = new TextDecoder('utf-8').decode(arrayBuffer);
-// const isEncrypted = /\/Encrypt/.test(text);
+
 
 async function onFileSelect(event) {
   const file = event.files[0];

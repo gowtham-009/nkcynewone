@@ -75,7 +75,7 @@
 
     <div v-if="loading" class="flex justify-center items-center flex-col p-2  bg-white rounded-t-3xl dark:bg-black"
       :style="{ height: deviceHeight * 0.92 + 'px' }">
-      <ProgressSpinner />
+      <googlebouncing />
       <p class="text-sm text-blue-500 text-center">Please wait, we are fetching data from your Bank</p>
     </div>
   </div>
@@ -83,7 +83,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-
+import googlebouncing from '~/components/googlebouncing.vue';
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
 const {htoken}=headerToken()

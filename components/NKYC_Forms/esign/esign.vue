@@ -80,7 +80,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-
+import googlebouncing from '~/components/googlebouncing.vue';
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
 const {htoken}=headerToken()
