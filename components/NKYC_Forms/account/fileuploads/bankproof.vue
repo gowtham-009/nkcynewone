@@ -84,55 +84,71 @@ watch(
   { immediate: true }
 )
 
-function onFileSelect(event) {
-  const file = event.files[0]
+// const arrayBuffer = await file.arrayBuffer();
+// const text = new TextDecoder('utf-8').decode(arrayBuffer);
+// const isEncrypted = /\/Encrypt/.test(text);
+
+async function onFileSelect(event) {
+  const file = event.files[0];
   if (!file) {
-    errorMessage.value = 'No file selected.'
-    emit('update:modelValue', null)
-    emit('update:valid', false)
-    return
+    errorMessage.value = 'No file selected.';
+    emit('update:modelValue', null);
+    emit('update:valid', false);
+    return;
   }
 
-  const fileType = file.type
-  const reader = new FileReader()
+  const fileType = file.type;
+  const reader = new FileReader();
 
-  // Clean up previous blob URL if exists
+  // Clean up previous blob URL
   if (pdfBlobUrl.value) {
-    URL.revokeObjectURL(pdfBlobUrl.value)
-    pdfBlobUrl.value = null
+    URL.revokeObjectURL(pdfBlobUrl.value);
+    pdfBlobUrl.value = null;
   }
 
   if (fileType === 'application/pdf') {
-    isPdf.value = true
-    errorMessage.value = ''
-    
-    // Create a blob URL for the PDF file
-    pdfBlobUrl.value = URL.createObjectURL(file)
-    
-    // For preview purposes, we'll still use readAsDataURL
+    // Check if PDF is password protected
+    const arrayBuffer = await file.arrayBuffer();
+    const text = new TextDecoder('utf-8').decode(arrayBuffer);
+
+    const isEncrypted = /\/Encrypt/.test(text);
+    if (isEncrypted) {
+      errorMessage.value = 'This PDF is password protected. Please upload an unprotected file.';
+      emit('update:modelValue', null);
+      emit('update:valid', false);
+      return;
+    }
+
+    isPdf.value = true;
+    errorMessage.value = '';
+    pdfBlobUrl.value = URL.createObjectURL(file);
+
     reader.onload = (e) => {
-      localSrc.value = e.target.result
-      emit('update:modelValue', { 
-        src: localSrc.value, 
+      localSrc.value = e.target.result;
+      emit('update:modelValue', {
+        src: localSrc.value,
         isPdf: true,
-        file: file // Include the original file object
-      })
-      emit('update:valid', true)
-    }
-    reader.readAsDataURL(file)
+        file: file,
+      });
+      emit('update:valid', true);
+    };
+    reader.readAsDataURL(file);
   } else if (fileType.match(/^image\/(jpeg|png|jpg)$/)) {
-    isPdf.value = false
-    errorMessage.value = ''
+    isPdf.value = false;
+    errorMessage.value = '';
     reader.onload = (e) => {
-      localSrc.value = e.target.result
-      emit('update:modelValue', { src: localSrc.value, isPdf: false })
-      emit('update:valid', true)
-    }
-    reader.readAsDataURL(file)
+      localSrc.value = e.target.result;
+      emit('update:modelValue', {
+        src: localSrc.value,
+        isPdf: false,
+      });
+      emit('update:valid', true);
+    };
+    reader.readAsDataURL(file);
   } else {
-    errorMessage.value = 'Only JPG, PNG images or PDF files are allowed.'
-    emit('update:modelValue', null)
-    emit('update:valid', false)
+    errorMessage.value = 'Only JPG, PNG images or PDF files are allowed.';
+    emit('update:modelValue', null);
+    emit('update:valid', false);
   }
 }
 
