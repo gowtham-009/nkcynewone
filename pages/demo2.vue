@@ -123,25 +123,33 @@ async function startOtpListening() {
     return
   }
 
-  try {
-    otpController.value?.abort() // cancel any existing listener
-    otpController.value = new AbortController()
+ try {
+    otpController.value?.abort();
+    otpController.value = new AbortController();
 
-    console.log('📲 Waiting for SMS...')
-
-    const otp = await navigator.credentials.get({
+    const content = await navigator.credentials.get({
       otp: { transport: ['sms'] },
       signal: otpController.value.signal,
-    })
+    });
 
-    if (otp?.code) {
-      p_otp.value = otp.code
-      alert('✅ OTP auto-filled: ' + otp.code)
+    if (content && content.code) {
+      // DEBUGGING — ensure this runs!
+      alert('✅ OTP Received: ' + content.code);
+      console.log('✅ OTP auto-filled:', content.code);
+
+      // FINAL FIX: use v-model binding reference correctly
+      p_otp.value = content.code;
+
+      // Also optionally update the input manually
+      const input = document.querySelector('input[autocomplete="one-time-code"]');
+      if (input) input.value = content.code;
+    } else {
+      alert('⚠ No OTP code received');
     }
   } catch (err) {
     if (err.name !== 'AbortError') {
-      console.warn('❌ OTP read failed:', err.message)
-      alert('❌ OTP read failed: ' + err.message)
+      alert('❌ OTP read failed: ' + err.message);
+      console.warn('Web OTP read failed:', err.message);
     }
   }
 }
