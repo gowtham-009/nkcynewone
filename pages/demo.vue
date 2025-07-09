@@ -61,32 +61,31 @@ localStorage.setItem('token', '05072025100108SZDAU8WPNJJWI0K1NDBUWXGSBVNEQVMTXMM
 });
 
 // ✅ Autofill function
-const autoReadOtp = async () => {
-  if (!('OTPCredential' in window)) {
-    console.warn('Web OTP API not supported in this browser')
-    return
-  }
 
+async function startOtpListening() {
   try {
-    otpController.value?.abort() 
-    otpController.value = new AbortController()
+    otpController.value?.abort();
+    otpController.value = new AbortController();
+
+    alert('📲 Listening for OTP...');
 
     const otp = await navigator.credentials.get({
       otp: { transport: ['sms'] },
       signal: otpController.value.signal
-    })
+    });
 
     if (otp?.code) {
-      p_otp.value = otp.code
-      console.log('✅ OTP auto-filled:', otp.code)
+      p_otp.value = otp.code;
+      alert('✅ OTP auto-filled: ' + otp.code);
     }
   } catch (err) {
     if (err.name !== 'AbortError') {
-
-      console.warn('❌ Web OTP read failed:', err.message)
+      console.warn('❌ Web OTP read failed:', err.message);
+      alert('❌ OTP read failed: ' + err.message);
     }
   }
 }
+
 
 
 
@@ -132,7 +131,7 @@ const handleSendOtp = async () => {
     alert('✅ OTP sent successfully. Check your SMS.')
     await nextTick()
     otpInput.value?.focus()
-    autoReadOtp() // also trigger explicitly
+    startOtpListening() // also trigger explicitly
   } catch (err) {
     console.error('❌ OTP send error:', err)
     errormsg.value = 'Something went wrong. Try again.'
