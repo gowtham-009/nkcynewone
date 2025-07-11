@@ -37,7 +37,7 @@
         </p>
 
         <!-- Location Permission Alert -->
-        <div v-if="showLocationAlert" class="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-lg">
+        <div v-if="showLocationAlert && !isIOS" class="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-lg">
           <div class="flex items-start">
             <i class="pi pi-exclamation-triangle text-xl mr-3 mt-0.5"></i>
             <div>
@@ -52,6 +52,21 @@
             </div>
           </div>
         </div>
+
+        <div v-if="isIOS && (!latitude || !longitude)" class="w-full bg-yellow-100 border-l-4 mt-2 p-4 border-yellow-500 rounded-lg text-yellow-700">
+              <p class="font-bold">Location Access Required</p>
+            <p class="mt-1  ">
+              Safari requires manual permission. After tapping, allow location when asked.
+              If not prompted, go to:
+              <br />
+              Settings → Safari → Location → “Allow”
+            </p>
+              <button @click="tryagain()"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 mt-1 rounded-lg text-sm">
+                    <i class="pi pi-refresh mr-1"></i> Try Again
+                  </button>
+          
+          </div>
 
         <!-- Camera Component -->
         <div v-if="locationEnabled" class="w-full mt-3 flex justify-center flex-col">
@@ -163,6 +178,9 @@ const { baseurl } = globalurl();
 const {htoken}=headerToken()
 const device=ref('Desktop')
 
+const isIOS = computed(() => {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+});
 
 onMounted(() => {
   locationLoading.value = true;
@@ -175,6 +193,15 @@ onMounted(() => {
       getLocationWithTimeout(true);
     }
   }, 5000);
+
+  if (!isIOS.value) {
+  setTimeout(() => {
+    if (!locationEnabled.value) {
+      requestLocation();
+    }
+  }, 8000);
+}
+
 });
 
 
@@ -194,6 +221,17 @@ onUnmounted(() => {
     locationInterval.value = null;
   }
 });
+
+// onBeforeUnmount(() => {
+//   if (typeof window !== 'undefined') {
+//     window.removeEventListener('resize', updateHeight);
+//   }
+//   if (locationInterval.value) {
+//     clearInterval(locationInterval.value);
+//     locationInterval.value = null;
+//   }
+// });
+
 
 
 // Methods
@@ -281,9 +319,23 @@ function handleLocationError(error) {
 }
 
 function requestLocation() {
-  showLocationAlert.value = false;
   locationLoading.value = true;
-  getLocationWithTimeout();
+  showLocationAlert.value = false;
+
+  // This must be called on user gesture for iOS
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      handleLocationSuccess(position);
+    },
+    (err) => {
+      handleLocationError(err);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
+  );
 }
 
 

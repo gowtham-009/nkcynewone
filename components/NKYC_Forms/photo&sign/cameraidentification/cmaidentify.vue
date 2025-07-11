@@ -1,4 +1,5 @@
 
+
 <template>
   <div class="flex flex-col justify-center items-center">
     <div class="camera-wrapper" :class="{
@@ -7,11 +8,17 @@
     }">
       <!-- Loading text shown when camera is not active -->
       <div v-if="!cameraReady" class="absolute inset-0 flex items-center justify-center text-gray-500">
-       <LOADING/>
+        <LOADING/>
       </div>
       
-      <video ref="video" autoplay playsinline v-show="cameraReady && !imageCaptured && cameraActive" class="camera-video" />
-      <img v-if="imageCaptured" :src="capturedImage" alt="Captured Face" class="camera-image" />
+<video 
+  ref="video" 
+  autoplay 
+  playsinline 
+  muted 
+  v-show="cameraReady && !imageCaptured && cameraActive" 
+  class="camera-video"
+/>      <img v-if="imageCaptured" :src="capturedImage" alt="Captured Face" class="camera-image" />
       <canvas ref="canvas" class="hidden"></canvas>
 
       <!-- Visual guides -->
@@ -46,15 +53,14 @@
       </div>
     </div>
 
-  
+   
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import * as faceapi from 'face-api.js'
-import LOADING from '@/components/googlebouncing.vue'
-
+import LOADING from '~/components/googlebouncing.vue';
 const emit = defineEmits(['captured'])
 
 const video = ref(null)
@@ -94,10 +100,17 @@ const startCamera = async () => {
     video.value.srcObject = mediaStream
     
     // Wait for video to be ready to play
-    video.value.onloadedmetadata = () => {
-      cameraReady.value = true // Hide loading text and show video
-      startDetectionLoop()
-    }
+  video.value.onloadedmetadata = async () => {
+  cameraReady.value = true;
+
+  try {
+    await video.value.play(); // Explicit call to play for iOS
+  } catch (e) {
+    console.warn('iOS autoplay workaround: forcing play on user gesture.');
+  }
+
+  startDetectionLoop();
+};
     
   } catch (err) {
     emit('error', { message: 'Could not access camera: ' + err.message })
@@ -113,10 +126,13 @@ const distance = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y)
 
 const detectFaces = async () => {
   if (!video.value || video.value.readyState !== 4 || imageCaptured.value) return
-
+const options = new faceapi.TinyFaceDetectorOptions({
+    inputSize: 160,  // Reduce from default 416
+    scoreThreshold: 0.5
+  });
   const detections = await faceapi
-    .detectAllFaces(video.value, new faceapi.TinyFaceDetectorOptions())
-    .withFaceLandmarks()
+    .detectAllFaces(video.value, options)
+    .withFaceLandmarks();
 
   // Handle multiple faces
   if (detections.length > 1) {
@@ -153,18 +169,18 @@ const detectFaces = async () => {
   const scaleX = video.value.videoWidth / videoRect.width
   const scaleY = video.value.videoHeight / videoRect.height
 
-  const nosePosition = {
-    x: nose.x / scaleX,
-    y: nose.y / scaleY
-  }
+ const nosePosition = { x: nose.x, y: nose.y }
 
   // Calculate distance from center
-  const center = { x: FRAME_SIZE / 2, y: FRAME_SIZE / 2 }
-  const distToCenter = distance(nosePosition, center)
+const center = {
+  x: video.value.videoWidth / 2,
+  y: video.value.videoHeight / 2
+}
+  const distToCenter = Math.hypot(nosePosition.x - center.x, nosePosition.y - center.y)
 
   // Calculate score (100% when perfectly centered)
-  const maxDistance = FRAME_SIZE / 2
-  faceDistanceScore.value = Math.max(0, 100 - (distToCenter / maxDistance) * 100)
+ const maxDistance = Math.min(center.x, center.y) // Radius of video
+faceDistanceScore.value = Math.max(0, 100 - (distToCenter / maxDistance) * 100)
 
   // Check if face is centered enough
   isFaceCentered.value = distToCenter <= CENTER_TOLERANCE
@@ -176,15 +192,31 @@ const detectFaces = async () => {
 }
 
 const captureImage = () => {
-  const ctx = canvas.value.getContext('2d')
-  canvas.value.width = video.value.videoWidth
-  canvas.value.height = video.value.videoHeight
-  ctx.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height)
-  capturedImage.value = canvas.value.toDataURL('image/png')
-  emit('captured', capturedImage.value)
-  imageCaptured.value = true
-  stopCamera()
-}
+  const ctx = canvas.value.getContext('2d');
+  canvas.value.width = video.value.videoWidth;
+  canvas.value.height = video.value.videoHeight;
+
+  // Draw frame to canvas
+  ctx.drawImage(video.value, 0, 0, canvas.value.width, canvas.value.height);
+
+  // Get base64 string
+  const fullBase64 = canvas.value.toDataURL('image/png'); // includes prefix
+  const pureBase64 = fullBase64.replace(/^data:image\/(png|jpeg);base64,/, '');
+
+  // Emit fullBase64 if frontend preview needed
+  capturedImage.value = fullBase64;
+  imageCaptured.value = true;
+
+  // Stop camera
+  stopCamera();
+
+  // Emit to parent
+  emit('captured', fullBase64);
+
+  // 👇 OPTIONAL: Call API directly here
+ // postToServer(pureBase64);
+};
+
 
 const stopCamera = () => {
   if (mediaStream) {
@@ -223,18 +255,18 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Previous styles remain the same */
 .camera-wrapper {
-  width: 300px;
-  height: 300px;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   overflow: hidden;
   border: 4px solid;
   position: relative;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   transition: border-color 0.3s ease;
+  background-color: black; /* Prevent transparency flicker on iOS */
 }
-
 .camera-wrapper.border-blue-400 {
   border-color: #60a5fa;
 }
@@ -245,12 +277,11 @@ onMounted(async () => {
 
 .camera-video,
 .camera-image {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  position: absolute;
+  inset: 0;
 }
 
 .center-guide {
