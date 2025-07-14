@@ -222,15 +222,7 @@ onUnmounted(() => {
   }
 });
 
-// onBeforeUnmount(() => {
-//   if (typeof window !== 'undefined') {
-//     window.removeEventListener('resize', updateHeight);
-//   }
-//   if (locationInterval.value) {
-//     clearInterval(locationInterval.value);
-//     locationInterval.value = null;
-//   }
-// });
+
 
 
 
