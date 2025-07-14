@@ -62,7 +62,7 @@ if(route.query.RefCode){
 <style>
 .desktop {
  width: 100%;
- border: 1px solid red;
+
  display: flex;
  justify-content: center;
 } 
