@@ -302,6 +302,9 @@ function getLocationWithTimeout(isRepeated = false) {
   );
 }
 
+const tryagain = () => {
+  window.location.reload();
+};
 
 function handleLocationSuccess(position) {
   latitude.value = position.coords.latitude;
