@@ -322,9 +322,8 @@ const bankvalidation = async () => {
     bankMICR: micr.value,
     bankName: bankname.value,
     bankAddress: address.value
-
-
   });
+  
 const headertoken=htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
