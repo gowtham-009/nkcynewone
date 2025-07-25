@@ -50,11 +50,15 @@
         </div>
       </div>
       <div class="w-full">
-        <Button ref="buttonRef" :disabled="!panvalue || !visibleDate || isSending" @click="handleButtonClick"
-          class="primary_color w-full text-white py-3 text-xl border-0 wave-btn">
-          <span ref="waveRef" class="wave"></span>
-          {{ buttonText }}
-        </Button>
+     <Button 
+  ref="buttonRef" 
+  :disabled="isButtonDisabled"
+  @click="handleButtonClick"
+  class="primary_color w-full text-white py-3 text-xl border-0 wave-btn"
+>
+  <span ref="waveRef" class="wave"></span>
+  {{ buttonText }}
+</Button>
       </div>
     </div>
   </div>
@@ -69,7 +73,17 @@ import DOB from '~/components/forminputs/dateinput.vue';
 import LOGINOTP from '~/components/forminputs/loginotp.vue';
 import { encryptionrequestdata, decryptionresponse } from '~/utils/globaldata.js';
 
+import { computed } from 'vue';
 
+const isButtonDisabled = computed(() => {
+  if (loginotpbox.value) {
+    // In OTP mode, disable if OTP is empty or not 4 digits or is sending
+    return !loginotpval.value || loginotpval.value.length !== 4 || isSending.value;
+  } else {
+    // In PAN/DOB mode, disable if PAN or DOB is empty or is sending
+    return !panvalue.value || !visibleDate.value || isSending.value;
+  }
+});
 const router = useRouter()
 
 const { baseurl } = globalurl();
@@ -363,6 +377,7 @@ const handleButtonClick = async () => {
     waveRef.value.className = 'wave finish-half';
   }
 };
+
 
 watch(loginotpval, (val) => {
   loginerror.value = false;
