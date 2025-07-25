@@ -23,14 +23,17 @@
           verification
           purposes. </p>
 
-        <div class="w-full mt-2">
-          <PAN v-model="panvalue" />
-          <span class="text-red-500" v-if="panerror">{{ error }}</span>
-        </div>
+      <fieldset :disabled="boxdisable" class="w-full">
+  <div class="w-full mt-2">
+    <PAN v-model="panvalue" />
+    <span class="text-red-500" v-if="panerror">{{ error }}</span>
+  </div>
 
-        <div class="w-full mt-2" v-if="dobbox">
-          <DOB v-model="visibleDate" />
-        </div>
+  <div class="w-full mt-2" v-if="dobbox">
+    <DOB v-model="visibleDate" />
+  </div>
+</fieldset>
+
 
         <div v-if="loginotpbox" class="w-full  mt-1">
           <p class="font-medium text-gray-500 text-md dark:text-gray-400">
@@ -94,6 +97,8 @@ const tokenval = ref('');
 const resend_sh = ref(false)
 const timeLeft = ref(10);
 let timer = null;
+
+const boxdisable=ref(false)
 const emit = defineEmits(['updateDiv']);
 
 watch(panvalue, (newVal) => {
@@ -197,7 +202,7 @@ const kraaddresssubmission = async (resend) => {
 
     const data = await response.json();
     const decryptedData = await decryptionresponse(data);
-    console.log('KRA Address Submission Response:', decryptedData);
+ 
     
     if (decryptedData.payload.status == 'error' && decryptedData.payload.code == 'A1001') {
       panerror.value = true
@@ -313,6 +318,7 @@ const handleButtonClick = async () => {
     data = await panvalidation();
 
     if (data?.payload?.status === 'ok') {
+      boxdisable.value=true
       const kraData = await kraaddresssubmission();
       
       if (kraData?.payload?.status === 'ok') {
