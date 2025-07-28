@@ -226,49 +226,51 @@ const createunsignedDocument = async () => {
 };
 
 const createEsign = async () => {
- const headertoken=htoken
-  const apiurl = `${baseurl.value}esign`;
+
   console.log("pages",domainurl.value)
-  const user =await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: 'esign',
-    redirectUrl:domainurl.value+'main' ,
-    esignAction: 'createEsign',
-  });
+//  const headertoken=htoken
+//   const apiurl = `${baseurl.value}esign`;
+//   console.log("pages",domainurl.value)
+//   const user =await encryptionrequestdata({
+//     userToken: localStorage.getItem('userkey'),
+//     pageCode: 'esign',
+//     redirectUrl:domainurl.value+'main' ,
+//     esignAction: 'createEsign',
+//   });
 
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': headertoken,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ payload: user }),
-    });
+//   try {
+//     const response = await fetch(apiurl, {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': headertoken,
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({ payload: user }),
+//     });
 
-    if (!response.ok) throw new Error(`Network error: ${response.status}`);
-    const decryptedData = await response.json();
-    const data = await decryptionresponse(decryptedData);
-    console.log("decryptdata:", data)
-    if (data.payload.status === 'ok') {
+//     if (!response.ok) throw new Error(`Network error: ${response.status}`);
+//     const decryptedData = await response.json();
+//     const data = await decryptionresponse(decryptedData);
+//     console.log("decryptdata:", data)
+//     if (data.payload.status === 'ok') {
       
-      // const decoded = atob(data.payload.metaData.dataEsign);
-      // window.location.href = decoded;
-    }
-      else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
+//       // const decoded = atob(data.payload.metaData.dataEsign);
+//       // window.location.href = decoded;
+//     }
+//       else if (data.payload.status == 'error') {
+//         if (data.payload.code == '1002' || data.payload.code=='1004'){
+//              alert(data.payload.message);
+//               localStorage.removeItem('userkey')
+//               router.push('/')
+//         }
        
-}
-  } catch (error) {
-    console.error('Create Esign failed:', error.message);
-  } finally {
-    content.value = true;
-    loading.value = false;
-  }
+// }
+//   } catch (error) {
+//     console.error('Create Esign failed:', error.message);
+//   } finally {
+//     content.value = true;
+//     loading.value = false;
+//   }
 };
 
 const esignStatusCheck = async (requestId) => {
