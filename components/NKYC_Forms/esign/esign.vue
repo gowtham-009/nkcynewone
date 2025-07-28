@@ -252,8 +252,8 @@ const createEsign = async () => {
     console.log("decryptdata:", data)
     if (data.payload.status === 'ok') {
       
-      // const decoded = atob(data.payload.metaData.dataEsign);
-      // window.location.href = decoded;
+      const decoded = atob(data.payload.metaData.dataEsign);
+      window.location.href = decoded;
     }
       else if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code=='1004'){
