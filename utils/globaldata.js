@@ -124,6 +124,8 @@ export async function decryptionresponse(hexString) {
     const decoded = new TextDecoder().decode(plainBuffer);
   
     const responseData = JSON.parse(decoded);
+
+    console.log("khiu",responseData)
     return{ payload: responseData}
   } catch (error) {
     console.error('Decryption failed:', error);

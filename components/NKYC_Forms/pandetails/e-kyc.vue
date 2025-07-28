@@ -103,6 +103,8 @@ const router = useRouter();
 
 const route = useRoute()
 const { baseurl } = globalurl();
+const { domainurl } = deploymenturl();
+
 const {htoken}=headerToken()
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
@@ -166,7 +168,7 @@ const digilocker_create = async () => {
     const user =await encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "createUrl",
-        redirecUrl: "https://nkcynewone.vercel.app/main"
+        redirecUrl:domainurl+'main'
     });
 
     const payload = { payload: user };

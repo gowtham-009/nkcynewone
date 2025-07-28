@@ -8,3 +8,8 @@ export const globalurl = () => {
     return{htoken}
   }
 
+   export const deploymenturl=()=>{
+    const domainurl=ref("https://instantkyc.gwcindia.in/")
+    return{domainurl}
+  }
+

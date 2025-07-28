@@ -87,6 +87,7 @@ import googlebouncing from '~/components/googlebouncing.vue';
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
 const {htoken}=headerToken()
+const { domainurl } = deploymenturl();
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Activate F&O');
 const rippleBtn = ref(null);
@@ -306,7 +307,7 @@ const camsbankdata = async () => {
     pageCode: 'csmspdf',
     camsAction: 'createCams',
     bankIfsc: ifscvalue,
-    redirecUrl: 'https://nkcynewone.vercel.app/main',
+    redirecUrl: domainurl+'main',
 
    
   });

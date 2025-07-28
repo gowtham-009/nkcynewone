@@ -16,15 +16,16 @@ const {htoken}=headerToken()
 import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
+const { domainurl } = deploymenturl();
 
 onMounted(() => {
   const queryString = window.location.search; // e.g. "?NDUw"
-  console.log('vj', queryString);
+
 
   // Remove "?" from the beginning
   const value = queryString.startsWith('?') ? queryString.substring(1) : queryString;
 
-  console.log('Only value:', value);
+
 
   function isBase64(str) {
     try {
@@ -95,7 +96,7 @@ const routeComponents = async (token) => {
           
             const page=await pagestatus('takephoto') 
             if(page.payload.status=='ok'){
-               window.location.href='https://nkcynewone.vercel.app'
+               window.location.href=domainurl
             }
              
         }

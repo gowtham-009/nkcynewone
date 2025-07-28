@@ -84,6 +84,7 @@ import googlebouncing from '~/components/googlebouncing.vue';
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
 const {htoken}=headerToken()
+const { domainurl } = deploymenturl();
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const deviceHeight = ref(window.innerHeight);
@@ -227,10 +228,11 @@ const createunsignedDocument = async () => {
 const createEsign = async () => {
  const headertoken=htoken
   const apiurl = `${baseurl.value}esign`;
+  console.log("pages",domainurl.value)
   const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: 'esign',
-    redirectUrl: 'https://nkcynewone.vercel.app/main',
+    redirectUrl:domainurl.value+'main' ,
     esignAction: 'createEsign',
   });
 
