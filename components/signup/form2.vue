@@ -173,8 +173,8 @@ const sendmobileotp = async (resend) => {
   const response = await fetch(apiurl, {
     method: 'POST',
     headers: {
-      'Authorization': headertoken,
-      'Content-Type': 'application/json',
+      'Authorization': headertoken
+      
     },
     body: jsonString,
   });
@@ -244,7 +244,6 @@ console.log("Response Data:", data);
     alert(data.payload.message)
     localStorage.removeItem('userkey')
       router.push('/')
-     
   }
 
 } catch (error) {
@@ -290,7 +289,6 @@ const otpverfication = async () => {
   }
 
   if (data.payload.status === 'ok') {
-     
     emit('updateDiv', 'email');
   }
   else if(data.payload.status==='error' && data.payload.code=='1005' && data.payload.otpStatus=='0'){

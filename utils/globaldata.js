@@ -130,3 +130,69 @@ export async function decryptionresponse(hexString) {
     throw new Error(`Decryption failed: ${error.message}`);
   }
 }
+
+
+
+
+export async function decrypt(hexString) {
+
+ 
+  try {
+    const encKey = hexToBytes(encKeyHex);
+    const fullData = hexToBytes(hexString);
+
+    // Check if data is large enough to contain IV (16) + HMAC (32) + at least 1 byte ciphertext
+    if (fullData.length < 49) {
+      throw new Error('Invalid data length - too short to contain valid encrypted data');
+    }
+
+    const iv = fullData.slice(0, 16);
+    const hmac = fullData.slice(-32); // SHA-256 HMAC is 32 bytes
+    const cipherBytes = fullData.slice(16, -32);
+
+    // Validate HMAC
+    const hmacKey = await crypto.subtle.importKey(
+      'raw',
+      encKey,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['verify']
+    );
+
+    const isValid = await crypto.subtle.verify(
+      'HMAC',
+      hmacKey,
+      hmac,
+      new Uint8Array([...iv, ...cipherBytes])
+    );
+
+    if (!isValid) {
+      throw new Error('HMAC verification failed – data may be tampered with!');
+    }
+
+    // Decrypt AES-CBC
+    const aesKey = await crypto.subtle.importKey(
+      'raw',
+      encKey,
+      { name: 'AES-CBC' },
+      false,
+      ['decrypt']
+    );
+
+    const plainBuffer = await crypto.subtle.decrypt(
+      { name: 'AES-CBC', iv },
+      aesKey,
+      cipherBytes
+    );
+
+   
+
+     const decoded = new TextDecoder().decode(plainBuffer);
+   console.log(decoded)
+    return decoded
+  
+  } catch (error) {
+    console.error('Decryption failed:', error);
+    throw new Error(`Decryption failed: ${error.message}`);
+  }
+}

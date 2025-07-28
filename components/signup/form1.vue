@@ -66,7 +66,7 @@
 
 <script setup>
 import { ref, onMounted, watch, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import ThemeSwitch from '~/components/darkmode/darkmodesign.vue';
 import PAN from '~/components/forminputs/paninput.vue';
 import DOB from '~/components/forminputs/dateinput.vue';
@@ -85,6 +85,8 @@ const isButtonDisabled = computed(() => {
   }
 });
 const router = useRouter()
+const route=useRoute()
+
 
 const { baseurl } = globalurl();
 const { htoken } = headerToken()
@@ -128,7 +130,19 @@ watch(panvalue, (newVal) => {
   }
 });
 
-onMounted(() => {
+onMounted(async() => {
+
+  const reflogin=route.query.reflogin
+  if(reflogin){
+    const pandobdata= await decrypt(reflogin)
+    const reflogindata=pandobdata.split('~')
+    panvalue.value=reflogindata[0]
+    visibleDate.value=reflogindata[1]
+  }
+
+  
+ 
+
   localStorage.removeItem('userkey')
   const fullHeight = window.innerHeight;
   box1Height.value = fullHeight;
