@@ -176,58 +176,61 @@ const resetProgress = () => {
 
 
 const createunsignedDocument = async () => {
-    const headertoken=htoken
-  loadingen.value = true
-   startProgressAnimation();
-  const apiurl = `${baseurl.value}nkyc_document`;
-  const user =await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-  });
 
-  const payload = { payload: user };
-  const jsonString = JSON.stringify(payload);
+    console.log("pages",domainurl.value)
+//     const headertoken=htoken
+//   loadingen.value = true
+//    startProgressAnimation();
+//   const apiurl = `${baseurl.value}nkyc_document`;
+//   const user =await encryptionrequestdata({
+//     userToken: localStorage.getItem('userkey'),
+//   });
 
-  try {
-    const response = await fetch(apiurl, {
-      method: 'POST',
-      headers: {
-        'Authorization': headertoken,
-        'Content-Type': 'application/json',
-      },
-      body: jsonString,
-    });
+//   const payload = { payload: user };
+//   const jsonString = JSON.stringify(payload);
 
-    if (!response.ok) {
-      throw new Error(`Network error: ${response.status}`);
-    }
+//   try {
+//     const response = await fetch(apiurl, {
+//       method: 'POST',
+//       headers: {
+//         'Authorization': headertoken,
+//         'Content-Type': 'application/json',
+//       },
+//       body: jsonString,
+//     });
 
-    const decryptedData = await response.json();
-    const data = await decryptionresponse(decryptedData);
+//     if (!response.ok) {
+//       throw new Error(`Network error: ${response.status}`);
+//     }
 
-    console.log("Decrypted Data:", data);
-    if (data.payload.status == 'ok') {
-      completeProgress();
-       createEsign()
-    }
+//     const decryptedData = await response.json();
+//     const data = await decryptionresponse(decryptedData);
 
-      else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
+//     console.log("Decrypted Data:", data);
+//     if (data.payload.status == 'ok') {
+//       completeProgress();
+//        createEsign()
+//     }
+
+//       else if (data.payload.status == 'error') {
+//         if (data.payload.code == '1002' || data.payload.code=='1004'){
+//              alert(data.payload.message);
+//               localStorage.removeItem('userkey')
+//               router.push('/')
+//         }
        
-}
+// }
 
-  } catch (error) {
-    resetProgress();
-    console.error(error.message);
-  }
+//   } catch (error) {
+//     resetProgress();
+//     console.error(error.message);
+//   }
 };
 
 const createEsign = async () => {
 
   console.log("pages",domainurl.value)
+  
 //  const headertoken=htoken
 //   const apiurl = `${baseurl.value}esign`;
 //   console.log("pages",domainurl.value)
