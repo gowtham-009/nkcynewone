@@ -258,23 +258,18 @@ const permanentaddressdata = async () => {
           }
         });
       }
-       
       }
-
-    
       else{
         console.log(data.payload.message)
       }
-
-
-
-
     }
 
   } catch (error) {
     console.log(error.message)
   }
 }
+
+
 
 
 

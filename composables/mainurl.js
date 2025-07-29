@@ -9,7 +9,7 @@ export const globalurl = () => {
   }
 
    export const deploymenturl=()=>{
-    const domainurl=ref("https://instantkyc.gwcindia.in/")
+    const domainurl=ref("https://nkcynewone.vercel.app/")
     return{domainurl}
   }
 

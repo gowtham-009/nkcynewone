@@ -116,10 +116,10 @@ const setCommunicationAddress = async () => {
         address.value = addParts;
         
         // Note: Using PER_STATE for communication address - verify if this is correct
-        const stateCode = String(kraPan.APP_PER_STATE || '');
+        const stateCode = String(kraPan.APP_COR_STATE || '');
         state.value = kraIdentityData.stateCode?.[stateCode] || '';
-        city.value = kraPan.APP_PER_CITY || '';
-        pincode.value = kraPan.APP_PER_PINCD || '';
+        city.value = kraPan.APP_COR_CITY || '';
+        pincode.value = kraPan.APP_COR_PINCD || '';
       }
       else if (digiInfo.aadhaarUID && digiDocs.aadhaarDocument) {
         // Use digi/Aadhaar data
