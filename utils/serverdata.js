@@ -22,7 +22,7 @@ export async function getServerData() {
     }
     const data = await response.json();
     const decryptedData = await decryptionresponse(data);
-    console.log("Decrypted Datankyc:", decryptedData);
+   
     return decryptedData
   } catch (error) {
     console.error('Fetch error:', error);
