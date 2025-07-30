@@ -96,7 +96,7 @@ const routeComponents = async (token) => {
           
             const page=await pagestatus('takephoto') 
             if(page.payload.status=='ok'){
-               window.location.href=domainurl
+               window.location.href=domainurl.value
             }
              
         }
