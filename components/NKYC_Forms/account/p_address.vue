@@ -157,13 +157,8 @@ const back = async (event) => {
         const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
 
         if (mydata.payload.status == 'ok') {
-            if (statuscheck) {
-                pagestatus('brokerage'),
+            pagestatus('brokerage'),
                     emit('updateDiv', 'brokerage');
-            } else {
-                pagestatus('uploadproof'),
-                    emit('updateDiv', 'uploadproof');
-            }
             isBack.value = false;
         }
         else if (mydata.payload.status == 'error') {

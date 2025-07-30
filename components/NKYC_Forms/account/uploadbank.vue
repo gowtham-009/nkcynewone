@@ -185,13 +185,12 @@ const back = async (event) => {
         pagestatus('paddressproof'),
         emit('updateDiv', 'paddressproof');
       }
-      else{
-            pagestatus('brokerage')
-            emit('updateDiv', 'brokerage');
-      }
+     }
+     else{
+       pagestatus('uploadproof'),
+        emit('updateDiv', 'uploadproof');
      }
 
-     
 
     isBack.value = false;
     }

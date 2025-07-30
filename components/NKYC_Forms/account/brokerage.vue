@@ -156,19 +156,20 @@ const handleButtonClick = () => {
                         emit('updateDiv', 'paddressproof');
                     }
             }
+            else if (!statuscheck) {
+                await pagestatus('uploadproof');
+                emit('updateDiv', 'uploadproof');
+            }
 
-
+             else if (statuscheck && !statuscheck1) {
+                await pagestatus('uploadbank');
+                emit('updateDiv', 'uploadbank');
+            } 
             else if (statuscheck && statuscheck1) {
                 const page = await pagestatus('photosign1');
                 if (page?.payload?.status === 'ok') {
                     emit('updateDiv', 'photosign1');
                 }
-            } else if (statuscheck && !statuscheck1) {
-                await pagestatus('uploadbank');
-                emit('updateDiv', 'uploadbank');
-            } else if (!statuscheck) {
-                await pagestatus('uploadproof');
-                emit('updateDiv', 'uploadproof');
             }
 
         } else if (mydata.payload.status == 'error') {
