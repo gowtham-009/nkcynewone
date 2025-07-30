@@ -18,21 +18,27 @@
         <!-- Outer container (fixed height, rounded border) -->
         <div class="w-full flex flex-col justify-end gap-2 mt-1 rounded-lg h-[450px]">
           <!-- Scrollable content only inside this div -->
-          <div v-if="nomineescard" class="flex-1 overflow-y-auto ">
+          <div  v-if="nomineescard" class="flex-1 overflow-y-auto ">
             <div class="w-full py-1" v-if="nomineecontainer">
-              <Button @click="openNomineeDialog" class="w-full py-2 primary_color text-white" size="small">
-                {{ nomineetext }}
-              </Button>
-              <div class="flex items-center gap-2 mt-3">
-                <Checkbox v-model="skipnominee" inputId="ingredient1" name="pizza" value="Cheese" />
-                <label for="ingredient1"> Opt-Out </label>
-              </div>
+           <button
+  @click="openNomineeDialog"
+  class="w-full py-2 mt-3 border-2 rounded-lg"
+  :class="isAddButtonActive ? 'bg-blue-600 text-white border-blue-600' : 'text-blue-500 border-blue-600'"
+  size="small"
+>
+  {{ nomineetext }}
+</button>
 
-            </div>
+
+    
+
+
+
+           
+          </div>
             <div>
               <!-- Nominee list -->
-              <div class="w-full p-1 cursor-pointer mb-1 bg-blue-50 rounded-lg dark:bg-gray-600"
-                v-for="nomineeshare in nomine">
+              <div class="w-full p-1 cursor-pointer mb-1 bg-blue-50 rounded-lg dark:bg-gray-600"  v-for="nomineeshare in nomine">
                 <div class="w-full flex">
                   <div class="w-4/5">
                     <span class="text-blue-500 text-sm">
@@ -49,17 +55,17 @@
                 <div class="w-full flex gap-2 mt-1">
                   <Button @click="dialogbox(nomineeshare)" type="button" class="w-full text-white"
                     size="small">Edit</Button>
-                  <Button @click="nomineedelete(nomineeshare)" type="button"
-                    class="w-full text-white border-red-500 bg-red-500" size="small">Delete</Button>
+                  <Button @click="nomineedelete(nomineeshare)" type="button" class="w-full text-white border-red-500 bg-red-500"
+                    size="small">Delete</Button>
                 </div>
               </div>
-              <p class="text-red-500 text-md text-center">{{ errorpercent }}</p>
-
+ <p class="text-red-500 text-md text-center">{{ errorpercent }}</p>
+        
             </div>
           </div>
 
-
-
+        
+          
         </div>
 
       </div>
@@ -69,7 +75,7 @@
         <input type="text" v-model="idval" class="hidden">
         <div class="w-full">
           <Name v-model="name" />
-          <span class="text-red-500">{{ nameerror }}</span>
+           <span class="text-red-500">{{ nameerror }}</span>
 
         </div>
         <div class="w-full mt-4">
@@ -79,85 +85,84 @@
               class="w-full prime-input " />
             <span class="bottom-border"></span>
           </div>
-          <span class="text-red-500">{{ relationshiperror }}</span>
+                     <span class="text-red-500">{{ relationshiperror }}</span>
 
         </div>
         <div class="w-full mt-2">
           <DOB v-model="dob" />
-          <span class="text-red-500">{{ doberror }}</span>
+                     <span class="text-red-500">{{ doberror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Address v-model="address" />
-          <span class="text-red-500">{{ addresserror }}</span>
+                     <span class="text-red-500">{{ addresserror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Mobile v-model="mobileNo" />
-          <span class="text-red-500">{{ mobileerror }}</span>
+                     <span class="text-red-500">{{ mobileerror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Email v-model="email" />
-          <span class="text-red-500">{{ emailerror }}</span>
+                     <span class="text-red-500">{{ emailerror }}</span>
 
         </div>
         <div class="w-full mt-2">
           <div class="flex gap-2">
             <div class="flex items-center gap-2">
-              <RadioButton v-model="selected" inputId="pan" name="id" value="PAN" @change="emitSelection" />
+                <RadioButton v-model="selected" inputId="pan" name="id" value="PAN" @change="emitSelection" />
               <label for="pan" class="text-gray-500">PAN</label>
             </div>
             <div class="flex items-center gap-2">
-              <RadioButton v-model="selected" inputId="aadhar" name="id" value="Aadhar Last 4 Digits"
-                @change="emitSelection" />
+              <RadioButton v-model="selected" inputId="aadhar" name="id" value="Aadhar Last 4 Digits" @change="emitSelection" />
               <label for="aadhar" class="text-gray-500">Aadhar</label>
             </div>
             <div class="flex items-center gap-2">
-              <RadioButton v-model="selected" inputId="dl" name="id" value="Driving Licence" @change="emitSelection" />
+             <RadioButton v-model="selected" inputId="dl" name="id" value="Driving Licence" @change="emitSelection" />
               <label for="dl" class="text-gray-500">Driving Licence</label>
             </div>
           </div>
 
-
+        
 
 
 
           <span class="block text-gray-500 text-md font-normal mt-2">{{ prooftype }}</span>
 
-          <div v-if="pan" class="w-full ">
-            <Pan v-model="paninput" />
-            <span class="text-red-500" v-if="panerror">{{ error }}</span>
+          <div v-if="pan" class="w-full " >
+              <Pan v-model="paninput" />
+                        <span class="text-red-500" v-if="panerror">{{ error }}</span>
 
           </div>
-          <div v-if="aadhar" class="w-full ">
-            <Aadhar v-model="aadharinput" />
-
-
-          </div>
-          <div v-if="drivingLicence" class="w-full ">
-            <Driving v-model="drivinginput" />
-
+          <div v-if="aadhar" class="w-full " >
+              <Aadhar v-model="aadharinput" />
+                         
 
           </div>
+          <div v-if="drivingLicence" class="w-full " >
+              <Driving v-model="drivinginput" />
+                        
 
-          <span class="text-red-500">{{ iderror }}</span>
+          </div>
+
+         <span class="text-red-500">{{ iderror }}</span>
         </div>
 
 
         <div class="w-full mt-2">
           <div :class="{ 'disabled-container': isDisabled }">
             <Guardian v-model="guardian" />
-            <span class="text-red-500">{{ guardianerror }}</span>
+             <span class="text-red-500">{{ guardianerror }}</span>
           </div>
 
         </div>
         <div class="w-full mt-2">
           <Sharevalue v-model="shareval" />
-          <span class="text-red-500">{{ sharevalerror }}</span>
+                    <span class="text-red-500">{{ sharevalerror }}</span>
 
           <p class="text-right text-gray-500 text-md">Maximum limit:0 - {{ availabilelimit }}</p>
         </div>
@@ -169,20 +174,32 @@
       </Dialog>
 
       <!-- Navigation Buttons -->
-      <div class="w-full flex gap-2 mt-4">
-        <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
+      <div class="w-full ">
+          <button
+  class="w-full py-2 mt-3 border-2 rounded-lg"
+  :class="[
+    isOptedOut ? 'bg-blue-600 text-white border-blue-600' : 'text-blue-500 border-blue-600',
+    nomine.length > 0 ? 'opacity-50 cursor-not-allowed' : ''
+  ]"
+  :disabled="nomine.length > 0"
+  size="small"
+  @click="handleOptOut"
+>
+  Opt-Out
+</button>
+
+<div class="w-full flex gap-2 mt-4">
+ <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button ref="rippleBtn" @click="handleButtonClick" 
-        :disabled="!(canContinue || skipnominee) || !isStatusValid"
-        class="primary_color w-5/6 text-white py-3 text-xl border-0">
-  {{ buttonText }}
-</Button>
-        <!-- <Button ref="rippleBtn" @click="handleButtonClick" :disabled="!canContinue || !isStatusValid"
+        <Button ref="rippleBtn" @click="handleButtonClick"
+          :disabled="!canContinue || !isStatusValid"
           class="primary_color w-5/6 text-white py-3 text-xl border-0">
           {{ buttonText }}
-        </Button> -->
+        </Button>
+</div>
+       
 
       </div>
     </div>
@@ -208,11 +225,9 @@ import Sharevalue from '~/components/nomineeinputs/sharevalue.vue';
 import { pagestatus } from '~/utils/pagestatus.js'
 
 import { useRouter } from 'vue-router';
-const skipnominee = ref()
-console.log(skipnominee.value)
 const router = useRouter();
 const { baseurl } = globalurl();
-const { htoken } = headerToken()
+const {htoken}=headerToken()
 const emit = defineEmits(['updateDiv']);
 const isDisabled = ref(true)
 const nomineecontainer = ref(true)
@@ -240,9 +255,9 @@ const selectedStatement = ref('')
 
 const isStatusValid = ref(true);
 
-const pan = ref(true)
-const aadhar = ref(false)
-const drivingLicence = ref(false)
+const pan=ref(true)
+const aadhar=ref(false)
+const drivingLicence=ref(false)
 
 const paninput = ref('')
 const aadharinput = ref('')
@@ -253,15 +268,15 @@ const isAadharValid = ref(false);
 const isDrivingLicenceValid = ref(false);
 
 // error
-const nameerror = ref('')
-const relationshiperror = ref('')
-const doberror = ref('')
-const addresserror = ref('')
-const mobileerror = ref('')
-const emailerror = ref('')
-const sharevalerror = ref('')
-const iderror = ref('')
-const errorpercent = ref('')
+const nameerror=ref('')
+const relationshiperror=ref('')
+const doberror=ref('')
+const addresserror=ref('')
+const mobileerror=ref('')
+const emailerror=ref('')
+const sharevalerror=ref('')
+const iderror=ref('')
+const errorpercent=ref('')
 const guardianerror = ref('')
 const statementOptions = ref([
   { value: 'Son', name: 'Son' },
@@ -270,11 +285,11 @@ const statementOptions = ref([
   { value: 'Father', name: 'Father' },
   { value: 'Mother', name: 'Mother' },
   { value: 'Brother', name: 'Brother' },
-  { value: 'Sister', name: 'Sister' },
-  { value: 'Grand-Son', name: 'Grand-Son' },
-  { value: 'Grand-Daughter', name: 'Grand-Daughter' },
-  { value: 'Grand-Father', name: 'Grand-Father' },
-  { value: 'Grand-Mother', name: 'Grand-Mother' },
+    { value: 'Sister', name: 'Sister' },
+      { value: 'Grand-Son', name: 'Grand-Son' },
+       { value: 'Grand-Daughter', name: 'Grand-Daughter' },
+{ value: 'Grand-Father', name: 'Grand-Father' },
+{ value: 'Grand-Mother', name: 'Grand-Mother' },
 ])
 
 const name = ref('');
@@ -296,6 +311,9 @@ const isValidEmail = computed(() => {
 const nomineescard = ref(false);
 
 
+
+
+
 const selected = ref('PAN')
 const prooftype = ref('PAN')
 
@@ -315,32 +333,35 @@ const resetFormFields = () => {
   guardian.value = '';
   shareval.value = '';
   prooftype.value = 'PAN';
-  paninput.value = ''
-  aadharinput.value = ''
-  drivinginput.value = ''
+  paninput.value=''
+  aadharinput.value=''
+  drivinginput.value=''
 };
+const isAddButtonActive = ref(false);
 
 const openNomineeDialog = async () => {
-  errorpercent.value = ''
+  canContinue.value = false;
+  errorpercent.value = '';
+  isAddButtonActive.value = true; // ✅ activate style
+  isOptedOut.value=false
+
   const mydata = await getServerData();
-
-  if (mydata.payload.status == 'error') {
-    if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
+  if (mydata.payload.status === 'error') {
+    if (mydata.payload.code === '1002' || mydata.payload.code === '1004') {
       alert(mydata.payload.message);
-      localStorage.removeItem('userkey')
-      router.push('/')
+      localStorage.removeItem('userkey');
+      router.push('/');
     }
-
   }
 
   resetFormFields();
   visible.value = true;
 };
 
-
+  
 const nomineedetails = async () => {
   const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.nominee;
+  const statuscheck = mydata?.payload?.metaData?.nominee ;
 
   if (statuscheck) {
     const nominee = mydata?.payload?.metaData?.nominee;
@@ -348,7 +369,7 @@ const nomineedetails = async () => {
 
       nomineescard.value = true;
 
-
+      
 
       const nomineeList = [];
       let totalShare = 0;
@@ -379,15 +400,15 @@ const nomineedetails = async () => {
       const nomineeid = mydata?.payload?.metaData?.nominee?.IncapacitationNominee;
       sharevalue.value = nominee[`nominee${nomineeid}Share`] || 0;
 
-
-      let sharepercentage = 0
-
+  
+       let sharepercentage = 0
+     
       nomineeList.forEach(item => {
         sharepercentage += item.share
       })
 
       if (sharepercentage == 100) {
-
+  
         canContinue.value = true;
       }
       else {
@@ -400,7 +421,7 @@ const nomineedetails = async () => {
       nomineecontainer.value = totalShare < 100;
     }
   }
-};
+ };
 
 
 await nomineedetails()
@@ -435,15 +456,15 @@ watch(aadharinput, (newVal) => {
 
 
 watch(drivinginput, (newVal) => {
-
+  
   isDrivingLicenceValid.value = newVal.length >= 16; // Example minimum length
 });
 
 
 const isSaveDisabled = computed(() => {
   const share = parseFloat(shareval.value) || 0;
-
-
+  
+ 
   let isIdValid = false;
   if (selected.value === 'PAN') {
     isIdValid = isPanValid.value;
@@ -475,17 +496,17 @@ const dialogbox = (editdata) => {
   let dobDate = null;
 
   if (editdata.dob) {
-
+    
     const isoDateMatch = editdata.dob.match(/^(\d{4})-(\d{2})-(\d{2})/);
-
+    
     // Try DD/MM/YYYY format
     const slashDateMatch = editdata.dob.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-
+    
     if (isoDateMatch) {
       const [, year, month, day] = isoDateMatch;
       formattedDOB = `${day}/${month}/${year}`;
       dobDate = new Date(year, month - 1, day);
-    }
+    } 
     else if (slashDateMatch) {
       const [, day, month, year] = slashDateMatch;
       formattedDOB = editdata.dob;
@@ -508,22 +529,22 @@ const dialogbox = (editdata) => {
     const today = new Date();
     let age = today.getFullYear() - dobDate.getFullYear();
     const monthDiff = today.getMonth() - dobDate.getMonth();
-
+    
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
       age--;
     }
 
     // Enable guardian field only if under 18
     isDisabled.value = age >= 18;
-
+    
     // Set guardian error only if under 18 and guardian is empty
-    if (age >= 18) {
+     if (age >= 18) {
       guardian.value = '';
       guardianerror.value = '';
     } else if (!editdata.guardian) {
       guardianerror.value = 'Guardian is required for nominees under 18';
     }
-  }
+  } 
 
   // Set form values
   visible.value = true;
@@ -540,7 +561,7 @@ const dialogbox = (editdata) => {
   email.value = editdata.email;
   selected.value = editdata.idType;
 
-  if (selected.value === 'PAN') {
+  if(selected.value === 'PAN') {
     pan.value = true;
     aadhar.value = false;
     drivingLicence.value = false;
@@ -548,7 +569,7 @@ const dialogbox = (editdata) => {
     isAadharValid.value = false;
     isDrivingLicenceValid.value = false;
   }
-  else if (selected.value === 'Aadhar Last 4 Digits') {
+  else if(selected.value === 'Aadhar Last 4 Digits') {
     pan.value = false;
     aadhar.value = true;
     drivingLicence.value = false;
@@ -556,7 +577,7 @@ const dialogbox = (editdata) => {
     isPanValid.value = false;
     isDrivingLicenceValid.value = false;
   }
-  else if (selected.value === 'Driving Licence') {
+  else if(selected.value === 'Driving Licence') {
     pan.value = false;
     aadhar.value = false;
     drivingLicence.value = true;
@@ -574,37 +595,37 @@ const nomineesavedata = async () => {
 
   // Validate maximum nominees
   if (!idval.value && nomineeCount.value >= 10) {
-
+   
     visible.value = false;
     return;
   }
 
   try {
     // Validate required fields
-    if (!name.value || !selectedStatement.value || !dob.value || !address.value ||
-      !mobileNo.value || !email.value || !selected.value || !shareval.value) {
-
+    if (!name.value || !selectedStatement.value || !dob.value || !address.value || 
+        !mobileNo.value || !email.value || !selected.value || !shareval.value) {
+      
     }
 
     // Parse date
     let formattedDate = '';
     const dateMatch = dob.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-
+    
     if (dateMatch) {
       // DD/MM/YYYY format
       const [, day, month, year] = dateMatch;
       formattedDate = `${year}-${month}-${day}`;
-
+      
       // Validate date
       const dateObj = new Date(`${year}-${month}-${day}`);
       if (isNaN(dateObj.getTime())) {
-
+       
       }
     } else {
       // Try parsing as Date object
       const dateObj = new Date(dob.value);
       if (isNaN(dateObj.getTime())) {
-
+        
       }
       const yyyy = dateObj.getFullYear();
       const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -615,33 +636,33 @@ const nomineesavedata = async () => {
     // Validate share percentage
     const share = parseFloat(shareval.value);
     if (isNaN(share)) {
-
+     
     }
 
     // Prepare request data
     const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
     const relationship = selectedStatement.value.name || selectedStatement.value.value;
-
+    
     // Get ID number based on selected type
     let idNumber = '';
     if (selected.value === 'PAN') {
       if (!paninput.value || !isPanValid.value) {
-
+       
       }
       idNumber = paninput.value;
     } else if (selected.value === 'Aadhar Last 4 Digits') {
       if (!aadharinput.value || !isAadharValid.value) {
-
+        
       }
       idNumber = aadharinput.value;
     } else if (selected.value === 'Driving Licence') {
       if (!drivinginput.value || !isDrivingLicenceValid.value) {
-
+        
       }
       idNumber = drivinginput.value;
     }
 
-    const user = await encryptionrequestdata({
+    const user =await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: "nominee",
       nomineeName: name.value,
@@ -656,7 +677,7 @@ const nomineesavedata = async () => {
       nomineeShare: share,
       nomineeId: nomineeId,
     });
-    const headertoken = htoken
+ const headertoken=htoken
     const payload = { payload: user };
     const apiurl = `${baseurl.value}nominee`;
 
@@ -674,33 +695,33 @@ const nomineesavedata = async () => {
     }
 
     const decryptedData = await response.json();
-    const data = await decryptionresponse(decryptedData);
-    nameerror.value = ""
-    relationshiperror.value = ""
-    doberror.value = ""
-    addresserror.value = ""
-    mobileerror.value = ""
-    emailerror.value = ""
-    iderror.value = ""
-    guardianerror.value = ""
-    sharevalerror.value = ""
-
+     const data = await decryptionresponse(decryptedData);
+       nameerror.value = ""
+        relationshiperror.value = ""
+        doberror.value = ""
+        addresserror.value = ""
+        mobileerror.value=""
+        emailerror.value=""
+        iderror.value=""
+        guardianerror.value=""
+        sharevalerror.value=""
+        
     if (data.payload.status === 'ok') {
       visible.value = false;
       await nomineedetails();
       resetFormFields();
-    }
+    } 
 
-
+       
 
     else if (data.payload.status === 'error') {
-      if (data.payload.code == '1002' || data.payload.code == '1004') {
-        alert(data.payload.message);
-        localStorage.removeItem('userkey')
-        router.push('/')
-      }
-      else if (data.payload.status == 'error' && data.payload.errors.length > 0) {
-
+      if (data.payload.code == '1002' || data.payload.code=='1004') {
+       alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+      } 
+      else if(data.payload.status=='error' && data.payload.errors.length>0) {
+       
         data.payload.errors.forEach((err) => {
 
 
@@ -710,7 +731,7 @@ const nomineesavedata = async () => {
           if (err.field === 'nomineeRelation') {
             relationshiperror.value = err.message || ' ';
           }
-          if (err.field === 'nomineeDob') {
+            if (err.field === 'nomineeDob') {
             doberror.value = err.message || ' ';
           }
           if (err.field === 'nomineeAddress') {
@@ -719,16 +740,16 @@ const nomineesavedata = async () => {
           if (err.field === 'nomineeMobile') {
             mobileerror.value = err.message || ' ';
           }
-          if (err.field === 'nomineeEmail') {
+            if (err.field === 'nomineeEmail') {
             emailerror.value = err.message || ' ';
           }
-          if (err.field === 'nomineeIdNo') {
+            if (err.field === 'nomineeIdNo') {
             iderror.value = err.message || ' ';
           }
-          if (err.field === 'nomineeGuardianName') {
+           if (err.field === 'nomineeGuardianName') {
             guardianerror.value = err.message || ' ';
           }
-          if (err.field === 'nomineeShare') {
+           if (err.field === 'nomineeShare') {
             sharevalerror.value = err.message || ' ';
           }
         });
@@ -747,13 +768,13 @@ const nomineedelete = async (deleteid) => {
 
 
 
-  const user = await encryptionrequestdata({
+  const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "nominee",
     removeNominee: deleteid.id
 
   });
-  const headertoken = htoken
+const headertoken=htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
   const apiurl = `${baseurl.value}nominee`;
@@ -773,15 +794,15 @@ const nomineedelete = async (deleteid) => {
     }
 
     const decryptedData = await response.json();
-    const data = await decryptionresponse(decryptedData);
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code == '1004') {
-        alert(data.payload.message);
-        localStorage.removeItem('userkey')
-        router.push('/')
+      const data = await decryptionresponse(decryptedData);
+       if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code=='1004'){
+             alert(data.payload.message);
+              localStorage.removeItem('userkey')
+              router.push('/')
+        }
+       
       }
-
-    }
 
     nomineedetails(); // Refresh the nominee list or details
   } catch (error) {
@@ -794,11 +815,11 @@ const nomineedelete = async (deleteid) => {
 const emitSelection = () => {
   prooftype.value = selected.value;
 
-  paninput.value = ''
-  aadharinput.value = ''
-  drivinginput.value = ''
-
-  if (selected.value === 'PAN') {
+  paninput.value=''
+  aadharinput.value=''
+  drivinginput.value=''
+  
+  if(selected.value === 'PAN') {
     pan.value = true;
     aadhar.value = false;
     drivingLicence.value = false;
@@ -806,19 +827,19 @@ const emitSelection = () => {
     isAadharValid.value = false;
     isDrivingLicenceValid.value = false;
   }
-  else if (selected.value === 'Aadhar Last 4 Digits') {
+  else if(selected.value === 'Aadhar Last 4 Digits') {
     pan.value = false;
     aadhar.value = true;
     drivingLicence.value = false;
-
+ 
     isPanValid.value = false;
     isDrivingLicenceValid.value = false;
   }
-  else if (selected.value === 'Driving Licence') {
+  else if(selected.value === 'Driving Licence') {
     pan.value = false;
     aadhar.value = false;
     drivingLicence.value = true;
-
+ 
     isPanValid.value = false;
     isAadharValid.value = false;
   }
@@ -838,59 +859,61 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async () => {
+  setTimeout(async() => {
     circle.remove()
 
-    const data = await pagestatus('income')
+     const data = await pagestatus('income')
     if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code == '1004') {
-        alert(data.payload.message);
-        localStorage.removeItem('userkey')
-        router.push('/')
-      }
-    }
-    else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'income');
-      isBack.value = false;
-    }
-
+      if (data.payload.code == '1002' || data.payload.code=='1004'){
+    alert(data.payload.message);
+    localStorage.removeItem('userkey')
+    router.push('/')
+  }
+}
+ else if (data.payload.status == 'ok') {
+  emit('updateDiv', 'income');
+  isBack.value = false;
+}
+   
   },
-
-    600)
+  
+  600)
 
 };
+
+const isOptedOut = ref(false);
+const handleOptOut = () => {
+  errorpercent.value = '';
+  canContinue.value = true;
+  isOptedOut.value = true; 
+  isAddButtonActive.value = false;
+};
 const handleButtonClick = async (event) => {
-  const button = rippleBtn.value;
-  if (!button || !button.$el) return;
+
+
+  const buttonWrapper = rippleBtn.value;
+  if (!buttonWrapper) return;
+
+  const button = buttonWrapper.$el || buttonWrapper; // Use $el if it's a Vue component
+  if (!button.getBoundingClientRect) return;
 
   // Create ripple effect
   const circle = document.createElement('span');
   circle.classList.add('ripple');
 
-  const rect = button.$el.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
+  const rect = button.getBoundingClientRect();
+  const x = event.clientX ? event.clientX - rect.left : rect.width / 2;
+  const y = event.clientY ? event.clientY - rect.top : rect.height / 2;
 
   circle.style.left = `${x}px`;
   circle.style.top = `${y}px`;
-
-  button.$el.appendChild(circle);
+  button.appendChild(circle);
 
   setTimeout(async () => {
     circle.remove();
 
     try {
-      if (skipnominee.value) {
-        // Handle skip nominee case
-        const myData = await pagestatus('bank1');
-        if (myData?.payload?.status === 'ok') {
-          emit('updateDiv', 'bank1');
-        }
-        return;
-      }
-
       const data = await getServerData();
-
       if (data?.payload?.status === 'ok' && data?.payload?.metaData?.nominee?.clientCode) {
         const nominee = data.payload.metaData.nominee;
         let totalShare = 0;
@@ -900,7 +923,7 @@ const handleButtonClick = async (event) => {
           totalShare += share;
         }
 
-        if (totalShare === 100) {
+        if (totalShare === 100 || totalShare === 0) {
           const myData = await pagestatus('bank1');
           if (myData?.payload?.status === 'ok') {
             emit('updateDiv', 'bank1');
@@ -908,13 +931,15 @@ const handleButtonClick = async (event) => {
         } else {
           errorpercent.value = 'Nominee 100 percentage not met';
         }
+
       } else if (data?.payload?.status === 'error') {
-        if (data.payload.code === '1002' || data.payload.code === '1004') {
+        if (['1002', '1004'].includes(data.payload.code)) {
           alert(data.payload.message);
           localStorage.removeItem('userkey');
           router.push('/');
         }
       }
+
     } catch (err) {
       console.error('Error during server interaction:', err);
     } finally {
@@ -924,26 +949,7 @@ const handleButtonClick = async (event) => {
 };
 
 
-watch([skipnominee, nomine], ([skip, nominees]) => {
-  if (skip) {
-    // If skip nominee is checked, enable continue
-    canContinue.value = true;
-    errorpercent.value = '';
-  } else {
-    // Otherwise, check the share percentage
-    let sharepercentage = 0;
-    nominees.forEach(item => {
-      sharepercentage += item.share;
-    });
-    
-    canContinue.value = sharepercentage === 100;
-    if (!canContinue.value) {
-      errorpercent.value = 'Nominee 100 percentage not met';
-    } else {
-      errorpercent.value = '';
-    }
-  }
-}, { deep: true });
+
 // Lifecycle
 onMounted(async () => {
 
@@ -967,20 +973,22 @@ watch(dob, (newval) => {
     }
 
     if (age < 18) {
-
+    
       isDisabled.value = false;
       // When under 18, guardian becomes required
       if (!guardian.value) {
         guardianerror.value = '';
       }
     } else {
-
-      guardian.value = ''
+      
+       guardian.value=''
       isDisabled.value = true;
       guardianerror.value = '';
     }
   }
 });
+
+
 
 
 
