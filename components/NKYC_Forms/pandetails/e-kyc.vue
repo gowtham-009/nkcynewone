@@ -168,7 +168,7 @@ const digilocker_create = async () => {
     const user =await encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "createUrl",
-        redirecUrl:domainurl+'main'
+        redirecUrl:domainurl.value+'main'
     });
 
     const payload = { payload: user };
