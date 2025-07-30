@@ -22,22 +22,28 @@
                 <div class="w-full mt-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-slate-900">
                     <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
                         <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY DELIVERY</span><span
-                            class="text-sm font-normal text-gray-500">:0.5%</span></p>
+                            class="text-sm font-normal text-gray-500">:0.5%</span>
+                    </p>
                     <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
                         <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY INTRADAY</span><span
-                            class="text-sm font-normal text-gray-500">:0.1%</span></p>
+                            class="text-sm font-normal text-gray-500">:0.1%</span>
+                    </p>
                     <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
                         <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY FUTURES</span><span
-                            class="text-sm font-normal text-gray-500">:0.05%</span></p>
+                            class="text-sm font-normal text-gray-500">:0.05%</span>
+                    </p>
                     <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
                         <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">EQUITY OPTIONS</span><span
-                            class="text-sm font-normal text-gray-500">:RS.100 PER LOT OR ORDER</span></p>
+                            class="text-sm font-normal text-gray-500">:RS.100 PER LOT OR ORDER</span>
+                    </p>
                     <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
                         <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">MCX FUTURES</span><span
-                            class="text-sm font-normal text-gray-500">:0.06%</span></p>
+                            class="text-sm font-normal text-gray-500">:0.06%</span>
+                    </p>
                     <p class="flex gap-2 items-center"><i class="pi pi-check text-md text-green-500 font-semibold"></i>
                         <span class="font-semibold text-sm text-gray-800 dark:text-gray-500">MCX OPTIONS</span><span
-                            class="text-sm font-normal text-gray-500">:RS.100 PER LOT</span></p>
+                            class="text-sm font-normal text-gray-500">:RS.100 PER LOT</span>
+                    </p>
 
                 </div>
 
@@ -62,9 +68,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-import { useRouter,useRoute  } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
-const route=useRoute()
+const route = useRoute()
 const emit = defineEmits(['updateDiv']);
 
 const deviceHeight = ref(0);
@@ -88,21 +94,21 @@ const back = () => {
     circle.style.top = `${y}px`
     button.$el.appendChild(circle)
 
-    setTimeout(async() => {
+    setTimeout(async () => {
         circle.remove()
-     
- const data = await pagestatus('segment1')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
-  }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'segment1');
-  isBack.value = false;
-}
+
+        const data = await pagestatus('segment1')
+        if (data.payload.status == 'error') {
+            if (data.payload.code == '1002' || data.payload.code == '1004') {
+                alert(data.payload.message);
+                localStorage.removeItem('userkey')
+                router.push('/')
+            }
+        }
+        else if (data.payload.status == 'ok') {
+            emit('updateDiv', 'segment1');
+            isBack.value = false;
+        }
     }, 600)
 
 };
@@ -129,39 +135,52 @@ const handleButtonClick = () => {
 
     button.$el.appendChild(circle)
 
-   setTimeout(async () => {
-    circle.remove();
-    const mydata = await getServerData();
-   
-  
-    if (mydata?.payload?.status === 'ok') {
-        
-        const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
-        const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
+    setTimeout(async () => {
+        circle.remove();
+        const mydata = await getServerData();
 
-        if (statuscheck && statuscheck1) {
-            const page = await pagestatus('photosign1');
-            if (page?.payload?.status === 'ok') {
-                emit('updateDiv', 'photosign1');
+
+
+        if (mydata?.payload?.status === 'ok') {
+
+            const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
+            const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
+
+            const perm_editstatus = mydata?.payload?.metaData?.address?.permChange
+            const comm_editstatus = mydata?.payload?.metaData?.address?.commChange
+
+
+            if (perm_editstatus === '1' || comm_editstatus === '1') {
+                  const page = await pagestatus('paddressproof');
+                    if (page?.payload?.status === 'ok') {
+                        emit('updateDiv', 'paddressproof');
+                    }
             }
-        } else if (statuscheck && !statuscheck1) {
-            await pagestatus('uploadbank');
-            emit('updateDiv', 'uploadbank');
-        } else if (!statuscheck) {
-            await pagestatus('uploadproof');
-            emit('updateDiv', 'uploadproof');
+
+
+            else if (statuscheck && statuscheck1) {
+                const page = await pagestatus('photosign1');
+                if (page?.payload?.status === 'ok') {
+                    emit('updateDiv', 'photosign1');
+                }
+            } else if (statuscheck && !statuscheck1) {
+                await pagestatus('uploadbank');
+                emit('updateDiv', 'uploadbank');
+            } else if (!statuscheck) {
+                await pagestatus('uploadproof');
+                emit('updateDiv', 'uploadproof');
+            }
+
+        } else if (mydata.payload.status == 'error') {
+            if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
+                alert(mydata.payload.message);
+                localStorage.removeItem('userkey')
+                router.push('/')
+            }
+
         }
 
-    }  else if (mydata.payload.status == 'error') {
-        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
-             alert(mydata.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
-      }
-
-}, 600);
+    }, 600);
 
 };
 </script>

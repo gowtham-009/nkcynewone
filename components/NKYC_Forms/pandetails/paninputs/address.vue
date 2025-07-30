@@ -2,7 +2,9 @@
     <div class="w-full">
       <label for="pan_label" class="text-gray-500 text-md font-normal leading-3">Address <br><span class="text-sm text-gray-500 "></span></label>
       <div class="input-wrapper dark:!bg-gray-800">
-       <Textarea v-model="address" varient="filled" rows="2"  class="w-full prime-input" cols="10"  />
+       <Textarea   :value="modelValue"
+    :disabled="disabled"
+    @input="onInput" varient="filled" rows="2"  class="w-full prime-input" cols="10"  />
        <span class="bottom-border"></span>
       </div>
     
@@ -12,15 +14,12 @@
   <script setup>
   import { ref, watch } from 'vue';
   
-  const props = defineProps(['modelValue']);
-  const emit = defineEmits(['update:modelValue']);
-  
-  const address = ref(props.modelValue || '');
-  
- 
-  watch(address, (newValue) => {
-    emit('update:modelValue', newValue);
-  });
+ defineProps(['modelValue', 'disabled']);
+const emit = defineEmits(['update:modelValue']);
+
+const onInput = (event) => {
+  emit('update:modelValue', event.target.value);
+};
   </script>
   <style scoped>
 .input-wrapper {

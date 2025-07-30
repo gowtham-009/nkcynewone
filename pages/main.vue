@@ -55,6 +55,9 @@
       <div v-else-if="currentForm === 'brokerage'">
         <BROKERAGE :data="data" @updateDiv="handleUpdateDiv" />
       </div>
+       <div v-else-if="currentForm === 'paddressproof'">
+        <P_ADDRESSPROOF :data="data" @updateDiv="handleUpdateDiv" />
+      </div>
       <div v-else-if="currentForm === 'uploadproof'">
         <UPLOADPROOF :data="data" @updateDiv="handleUpdateDiv" />
       </div>
@@ -114,6 +117,7 @@ import BANK4 from '~/components/NKYC_Forms/bankdetails/bank4.vue'
 
 import SEGMENT from '~/components/NKYC_Forms/account/segment.vue'
 import BROKERAGE from '~/components/NKYC_Forms/account/brokerage.vue'
+import P_ADDRESSPROOF from '~/components/NKYC_Forms/account/p_address.vue'
 import UPLOADPROOF from '~/components/NKYC_Forms/account/uploadpan.vue'
 import UPLOADBANK from '~/components/NKYC_Forms/account/uploadbank.vue'
 import PHOTOSIGN1 from '~/components/NKYC_Forms/photo&sign/photosign.vue'
@@ -149,6 +153,7 @@ const formMap = {
   '$@bank4': 'bank4',
   '$@segments1': 'segment1',
   '$@brokerage1': 'brokerage',
+  '$@paddressproof1': 'paddressproof',
   '$@uploadproof1': 'uploadproof',
   '$@uploadincome1': 'uploadincome',
   '$@uploadbank1': 'uploadbank',

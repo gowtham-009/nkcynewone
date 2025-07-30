@@ -280,7 +280,7 @@ const proofupload = async () => {
       method: 'POST',
       headers: {
         'Authorization': headertoken
-        // Do NOT manually set 'Content-Type'
+      
       },
       body: formData,
     });
@@ -340,20 +340,32 @@ const back = (event) => {
 
   setTimeout(async () => {
     circle.remove();
+    const mydata = await getServerData();
+      const perm_editstatus = mydata?.payload?.metaData?.address?.permChange
+      const comm_editstatus = mydata?.payload?.metaData?.address?.commChange
+
+    if (mydata?.payload?.status === 'ok') {
+       if (perm_editstatus === '1' || comm_editstatus === '1') {
+                  const page = await pagestatus('paddressproof');
+                    if (page?.payload?.status === 'ok') {
+                        emit('updateDiv', 'paddressproof');
+                    }
+            }
+
+       else{
+          pagestatus('brokerage'),
+        emit('updateDiv', 'brokerage');
+       }     
+      
+    }
+    else if (mydata.payload.status == 'error') {
+            if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
+                alert(mydata.payload.message);
+                localStorage.removeItem('userkey')
+                router.push('/')
+            }
+    }
    
-    
- const data = await pagestatus('brokerage')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
-  }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'brokerage');
-  isBack.value = false;
-}
   }, 600);
 };
 

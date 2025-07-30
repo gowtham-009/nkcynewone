@@ -14,24 +14,33 @@
         <p class="text-sm  leading-5 text-gray-500 font-normal">
           Please enter your address as per the documents you have uploaded.
         </p>
+      <div class="w-full flex justify-end">
+          <span 
+            @click="toggleEditMode" 
+            class="px-2 py-2 cursor-pointer text-blue-500 bg-blue-50 rounded-lg"
+          >
+            {{ isEditMode ? 'Cancel' : 'Edit' }}
+          </span>
+        </div>
 
-
-      <div class="w-full mt-1">
-          <Address v-model="address" />
+     <div class="w-full" :class="{'opacity-50 pointer-events-none': !isEditMode && initialDataLoaded}">
+       <div class="w-full mt-1">
+          <Address v-model="address"  :disabled="!isEditMode && initialDataLoaded" />
           <span class="text-red-500">{{ addresserror }}</span>
         </div>
         <div class="w-full mt-1">
-          <State v-model="state" />
+          <State v-model="state"  :disabled="!isEditMode && initialDataLoaded" />
           <span class="text-red-500">{{ stateerror }}</span>
         </div>
         <div class="w-full mt-1">
-          <City v-model="city" />
+          <City v-model="city"  :disabled="!isEditMode && initialDataLoaded" />
           <span class="text-red-500">{{ cityerror }}</span>
         </div>
         <div class="w-full mt-1">
-          <Pincode v-model="pincode" />
+          <Pincode v-model="pincode"  :disabled="!isEditMode && initialDataLoaded" />
           <span class="text-red-500">{{ pincodeerror }}</span>
         </div>
+     </div>
 
 
       </div>
@@ -78,6 +87,9 @@ const buttonText = ref("Continue");
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
 const address = ref('');
+
+const isEditMode = ref(false);
+const initialDataLoaded = ref(false);
 
 const state = ref('');
 const city = ref('');
@@ -143,6 +155,7 @@ const setCommunicationAddress = async () => {
       pincode.value = addressData.comPincode || '';
     }
 
+     initialDataLoaded.value = true;
   } catch (error) {
     console.error('Error setting communication address:', error);
     // Reset all fields on error
@@ -154,6 +167,21 @@ const setCommunicationAddress = async () => {
 };
 
 await setCommunicationAddress();
+
+const toggleEditMode = async () => {
+  if (isEditMode.value) {
+    // Cancel: reload original data from server
+    await setCommunicationAddress();
+  } else {
+    // Enter Edit Mode: clear input fields
+    address.value = '';
+    state.value = '';
+    city.value = '';
+    pincode.value = '';
+  }
+  isEditMode.value = !isEditMode.value;
+};
+
 onMounted(() => {
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
@@ -166,18 +194,32 @@ onMounted(() => {
 const communicateaddressdata = async () => {
 
   const apiurl = `${baseurl.value}address`;
+  let user
 
-  const user =await encryptionrequestdata({
+  if(isEditMode.value){
+    user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
-
     pageCode: "info",
     communicationAddress: address.value,
     communicationCity: city.value,
     communicationState: state.value,
-    communicationPincode: pincode.value
-
+    communicationPincode: pincode.value,
+     commChange:1
 
   });
+  }
+  else{
+      user =await encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    pageCode: "info",
+    communicationAddress: address.value,
+    communicationCity: city.value,
+    communicationState: state.value,
+    communicationPincode: pincode.value,
+     commChange:0
+       });
+  }
+   
  const headertoken=htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);

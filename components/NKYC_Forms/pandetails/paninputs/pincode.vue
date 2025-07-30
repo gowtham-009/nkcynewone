@@ -16,27 +16,29 @@
       
     </div>
   </template>
-  
   <script setup>
-  import { ref, watch } from 'vue';
-  
+import { computed } from 'vue';
 
-  const props = defineProps(['modelValue']);
-  const emit = defineEmits(['update:modelValue']);
-  
-  const pincode = ref(props.modelValue || '');
-  
-  // Keep only numbers and limit to 10 digits
-  const validateInput = (e) => {
-    let value = e.target.value.replace(/\D/g, '').slice(0, 6);
-    pincode.value = value;
-    e.target.value = value;
-  };
-  
-  watch(pincode, (newValue) => {
-    emit('update:modelValue', newValue);
-  });
-  </script>
+const props = defineProps(['modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+// Computed binding for two-way sync with parent
+const pincode = computed({
+  get() {
+    return props.modelValue || '';
+  },
+  set(val) {
+    const cleaned = val.replace(/\D/g, '').slice(0, 6); // only numbers, max 6
+    emit('update:modelValue', cleaned);
+  }
+});
+
+// Optional: force input update for mobile/browser behavior
+const validateInput = (e) => {
+  pincode.value = e.target.value;
+};
+</script>
+
    <style scoped>
 .input-wrapper {
   position: relative;

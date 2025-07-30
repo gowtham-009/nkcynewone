@@ -161,23 +161,36 @@ const back = () => {
         const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
         const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
 
+           const perm_editstatus = mydata?.payload?.metaData?.address?.permChange
+       const comm_editstatus = mydata?.payload?.metaData?.address?.commChange
+
         if(mydata.payload.status=='ok'){
-             if (statuscheck && statuscheck1) {
-            pagestatus('brokerage')
-            emit('updateDiv', 'brokerage');
-        }
-        else if (statuscheck && !statuscheck1) {
+           
+        
+         if (statuscheck && !statuscheck1) {
             pagestatus('uploadbank')
             emit('updateDiv', 'uploadbank');
         }
-        else if (!statuscheck && statuscheck1) {
+           else if (!statuscheck && !statuscheck1) {
+            pagestatus('uploadbank')
+            emit('updateDiv', 'uploadbank');
+        }
+          else if (!statuscheck && statuscheck1) {
             pagestatus('uploadproof')
             emit('updateDiv', 'uploadproof');
         }
-        else if (!statuscheck && !statuscheck1) {
-            pagestatus('uploadbank')
-            emit('updateDiv', 'uploadbank');
+          else if(perm_editstatus === '1' || comm_editstatus === '1'){
+        pagestatus('paddressproof'),
+        emit('updateDiv', 'paddressproof');
+      }
+          else if (statuscheck && statuscheck1) {
+            pagestatus('brokerage')
+            emit('updateDiv', 'brokerage');
         }
+      
+     
+     
+      
         isBack.value = false;
         }
 

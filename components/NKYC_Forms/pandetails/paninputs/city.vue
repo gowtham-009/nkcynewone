@@ -20,29 +20,29 @@
       </div>
     </div>
   </template>
-  
   <script setup>
-  import { ref, watch } from 'vue';
-  
-  const props = defineProps(['modelValue']);
-  const emit = defineEmits(['update:modelValue']);
-  
-  const city = ref((props.modelValue || '').toUpperCase());
-  
-  // Clean and format input on each change
-  const formatcity = (event) => {
-    const raw = event.target.value;
-    const cleaned = raw.toUpperCase().replace(/[^A-Z.\s]/g, '');
-    city.value = cleaned;
-    event.target.value = cleaned; // ensures proper display on mobile
-  };
-  
-  // Emit value to parent
-  watch(city, (newVal) => {
-    emit('update:modelValue', newVal);
-  });
-  </script>
-  
+import { computed } from 'vue';
+
+const props = defineProps(['modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+// Create two-way binding with sanitization
+const city = computed({
+  get() {
+    return props.modelValue || '';
+  },
+  set(val) {
+    const cleaned = val.toUpperCase().replace(/[^A-Z.\s]/g, '');
+    emit('update:modelValue', cleaned);
+  }
+});
+
+// Optional: extra mobile display fix
+const formatcity = (event) => {
+  city.value = event.target.value; // triggers `set`
+};
+</script>
+
   <style scoped>
   .uppercase {
     text-transform: uppercase;

@@ -176,14 +176,23 @@ const back = async (event) => {
     const mydata = await getServerData();
     const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
 
+      const perm_editstatus = mydata?.payload?.metaData?.address?.permChange
+       const comm_editstatus = mydata?.payload?.metaData?.address?.commChange
+
     if(mydata.payload.status=='ok'){
-       if (statuscheck) {
-      pagestatus('brokerage'),
-        emit('updateDiv', 'brokerage');
-    } else {
-      pagestatus('uploadproof'),
-        emit('updateDiv', 'uploadproof');
-    }
+     if(statuscheck){
+       if(perm_editstatus === '1' || comm_editstatus === '1'){
+        pagestatus('paddressproof'),
+        emit('updateDiv', 'paddressproof');
+      }
+      else{
+            pagestatus('brokerage')
+            emit('updateDiv', 'brokerage');
+      }
+     }
+
+     
+
     isBack.value = false;
     }
     else if (mydata.payload.status == 'error') {

@@ -19,27 +19,29 @@
     </div>
   </template>
   
-  <script setup>
-  import { ref, watch } from 'vue';
-  
-  const props = defineProps(['modelValue']);
-  const emit = defineEmits(['update:modelValue']);
-  
-  const state = ref((props.modelValue || '').toUpperCase());
-  
-  // Clean and format input on each change
-  const formatstate = (event) => {
-    const raw = event.target.value;
-    const cleaned = raw.toUpperCase().replace(/[^A-Z.\s]/g, '');
-    state.value = cleaned;
-    event.target.value = cleaned; // ensures proper display on mobile
-  };
-  
-  // Emit value to parent
-  watch(state, (newVal) => {
-    emit('update:modelValue', newVal);
-  });
-  </script>
+ <script setup>
+import { computed } from 'vue';
+
+const props = defineProps(['modelValue']);
+const emit = defineEmits(['update:modelValue']);
+
+// Create two-way computed binding
+const state = computed({
+  get() {
+    return props.modelValue || '';
+  },
+  set(val) {
+    const cleaned = val.toUpperCase().replace(/[^A-Z.\s]/g, '');
+    emit('update:modelValue', cleaned);
+  }
+});
+
+// Optional (keeps input sanitized on manual typing)
+const formatstate = (event) => {
+  state.value = event.target.value;
+};
+</script>
+
   
   <style scoped>
  

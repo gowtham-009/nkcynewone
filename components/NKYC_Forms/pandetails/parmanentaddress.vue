@@ -11,33 +11,43 @@
       :style="{ height: deviceHeight * 0.92 + 'px' }">
       <div class="w-full mt-1 p-1 px-2">
         <p class="text-xl text-blue-900 font-medium dark:text-gray-400">
-          Verify your Permanent address
+          Verify your Permanent address 
         </p>
         <p class="text-sm  leading-5 text-gray-500 font-normal">
-          Please confirm your address as per the documents you have uploaded.
+          Please confirm your address as per the documents you have uploaded.  
         </p>
 
+        <div class="w-full flex justify-end">
+          <span 
+            @click="toggleEditMode" 
+            class="px-2 py-2 cursor-pointer text-blue-500 bg-blue-50 rounded-lg"
+          >
+            {{ isEditMode ? 'Cancel' : 'Edit' }}
+          </span>
+        </div>
+   <div class="w-full" :class="{'opacity-50 pointer-events-none': !isEditMode && initialDataLoaded}">
+  <div class="w-full mt-1">
+    <Address v-model="address" :disabled="!isEditMode && initialDataLoaded"/>
+    <span class="text-red-500">{{ addresserror }}</span>
+  </div>
+  <div class="w-full mt-1">
+    <State v-model="state" :disabled="!isEditMode && initialDataLoaded" />
+    <span class="text-red-500">{{ stateerror }}</span>
+  </div>
+  <div class="w-full mt-1">
+    <City v-model="city" :disabled="!isEditMode && initialDataLoaded" />
+    <span class="text-red-500">{{ cityerror }}</span>
+  </div>
+  <div class="w-full mt-1">
+    <Pincode v-model="pincode" :disabled="!isEditMode && initialDataLoaded" />
+    <span class="text-red-500">{{ pincodeerror }}</span>
+  </div>
+ 
+</div>
 
-        <div class="w-full mt-1">
-          <Address v-model="address" />
-          <span class="text-red-500">{{ addresserror }}</span>
-        </div>
-        <div class="w-full mt-1">
-          <State v-model="state" />
-          <span class="text-red-500">{{ stateerror }}</span>
-        </div>
-        <div class="w-full mt-1">
-          <City v-model="city" />
-          <span class="text-red-500">{{ cityerror }}</span>
-        </div>
-        <div class="w-full mt-1">
-          <Pincode v-model="pincode" />
-          <span class="text-red-500">{{ pincodeerror }}</span>
-        </div>
-        <div class="w-full mt-1">
-          <Addresscheck ref="commAddressRef" />
-
-        </div>
+ <div class="w-full mt-1">
+    <Addresscheck ref="commAddressRef"  />
+  </div>
 
 
 
@@ -84,6 +94,8 @@ const pincode = ref('');
 const state = ref('');
 const isBack = ref(true);
 
+const isEditMode = ref(false);
+const initialDataLoaded = ref(false);
 // DOM and UI Refs
 const commAddressRef = ref(null);
 const rippleBtn = ref(null);
@@ -114,6 +126,7 @@ onBeforeUnmount(() => {
 
 
 
+
 const setPermanentAddress = async () => {
   try {
     const mydata = await getServerData();
@@ -130,11 +143,11 @@ const setPermanentAddress = async () => {
       if (kraPan.APP_KRA_INFO) {
         // Use KRA PAN data
         const addParts = [
-          kraPan.APP_PER_ADD1 || '',
-          addressData.APP_PER_ADD2 || '', // Note: This looks like it might be a typo - should it be kraPan.APP_PER_ADD2?
-          kraPan.APP_PER_ADD3 || ''
+          kraPan.APP_PER_ADD1+' '+kraPan.APP_PER_ADD2+' '+kraPan.APP_PER_ADD3 || '',
+        
         ].filter(Boolean).join(" "); // Filter out empty parts and join with space
         
+
         address.value = addParts;
         
         const stateCode = String(kraPan.APP_PER_STATE || '');
@@ -163,7 +176,7 @@ const setPermanentAddress = async () => {
       city.value = addressData.perCity || '';
       pincode.value = addressData.perPincode || '';
     }
-
+ initialDataLoaded.value = true;
   } catch (error) {
     console.error('Error setting permanent address:', error);
     // Reset all fields on error
@@ -175,14 +188,32 @@ const setPermanentAddress = async () => {
 };
 
 await setPermanentAddress();
+const toggleEditMode = async () => {
+  if (isEditMode.value) {
+    // Cancel: reload original data from server
+    await setPermanentAddress();
+  } else {
+    // Enter Edit Mode: clear input fields
+    address.value = '';
+    state.value = '';
+    city.value = '';
+    pincode.value = '';
+  }
+  isEditMode.value = !isEditMode.value;
+};
 
 
 
 const permanentaddressdata = async () => {
 
+  
   const apiurl = `${baseurl.value}address`;
   const pageCode = commAddressRef.value?.confirm ? "address" : "communicationaddress";
-  const user =await encryptionrequestdata({
+
+  let user
+
+  if(isEditMode.value){
+    user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     comAddSameAsPermanent: commAddressRef.value?.confirm ? "YES" : "NO",
     pageCode: pageCode,
@@ -190,8 +221,26 @@ const permanentaddressdata = async () => {
     permanentCity: city.value,
     permanentState: state.value,
     permanentPincode: pincode.value,
-
+    permChange:1
   });
+  }
+  else{
+    user =await encryptionrequestdata({
+    userToken: localStorage.getItem('userkey'),
+    comAddSameAsPermanent: commAddressRef.value?.confirm ? "YES" : "NO",
+    pageCode: pageCode,
+    permanentAddress: address.value,
+    permanentCity: city.value,
+    permanentState: state.value,
+    permanentPincode: pincode.value,
+    permChange:0
+     });
+  }
+
+   
+    
+
+
   const headertoken = htoken
 
   const payload = { payload: user };
@@ -268,8 +317,6 @@ const permanentaddressdata = async () => {
     console.log(error.message)
   }
 }
-
-
 
 
 
