@@ -337,7 +337,7 @@ const resetFormFields = () => {
   aadharinput.value=''
   drivinginput.value=''
 };
-const isAddButtonActive = ref(false);
+const isAddButtonActive = ref(true);
 
 const openNomineeDialog = async () => {
   canContinue.value = false;
