@@ -18,32 +18,37 @@
         <!-- Outer container (fixed height, rounded border) -->
         <div class="w-full flex flex-col justify-end gap-2 mt-1 rounded-lg h-[450px]">
           <!-- Scrollable content only inside this div -->
-          <div  v-if="nomineescard" class="flex-1 overflow-y-auto ">
+          <div v-if="nomineescard" class="flex-1 overflow-y-auto ">
             <div class="w-full py-1" v-if="nomineecontainer">
-           <button
-  @click="openNomineeDialog"
-  class="w-full py-2 mt-3 border-2 rounded-lg"
-  :class="isAddButtonActive ? 'bg-blue-600 text-white border-blue-600' : 'text-blue-500 border-blue-600'"
-  size="small"
->
-  {{ nomineetext }}
-</button>
+              <div class="relative w-full">
+                <button @click="openNomineeDialog" class="w-full py-3 mt-3 border-2 rounded-lg text-center relative"
+                  :class="isAddButtonActive ? 'bg-blue-600 text-white border-blue-600' : 'text-blue-500 border-blue-600'"
+                  size="small">
+                  <!-- Icon on the left -->
+                  <span v-if="isAddButtonActive"
+                    class="absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-green-500">
+                    <i class="pi pi-check font-semibold text-white text-sm"></i>
+                  </span>
 
+                  <!-- Centered text -->
+                  <span class="block w-full">{{ nomineetext }}</span>
+                </button>
+              </div>
 
-    
-
-
-
-           
-          </div>
+            </div>
             <div>
               <!-- Nominee list -->
-              <div class="w-full p-1 cursor-pointer mb-1 bg-blue-50 rounded-lg dark:bg-gray-600"  v-for="nomineeshare in nomine">
+              <div class="w-full p-1 cursor-pointer mb-1 bg-blue-50 rounded-lg dark:bg-gray-600"
+                v-for="nomineeshare in nomine">
                 <div class="w-full flex">
                   <div class="w-4/5">
                     <span class="text-blue-500 text-sm">
                       Nominee Name: {{ nomineeshare.name }}
                     </span><br>
+                    <span class="text-blue-500 text-sm">
+                      Nominee DOB: {{ nomineeshare.dob }}
+                    </span><br>
+
                     <span class="text-blue-500 text-sm">
                       Relationship: {{ nomineeshare.relation }}
                     </span>
@@ -55,27 +60,27 @@
                 <div class="w-full flex gap-2 mt-1">
                   <Button @click="dialogbox(nomineeshare)" type="button" class="w-full text-white"
                     size="small">Edit</Button>
-                  <Button @click="nomineedelete(nomineeshare)" type="button" class="w-full text-white border-red-500 bg-red-500"
-                    size="small">Delete</Button>
+                  <Button @click="nomineedelete(nomineeshare)" type="button"
+                    class="w-full text-white border-red-500 bg-red-500" size="small">Delete</Button>
                 </div>
               </div>
- <p class="text-red-500 text-md text-center">{{ errorpercent }}</p>
-        
+
+
             </div>
           </div>
 
-        
-          
+
+
         </div>
 
       </div>
-
+      <p class="text-red-500 text-md text-center">{{ errorpercent }}</p>
       <!-- Dialog Modal -->
       <Dialog class="p-0" v-model:visible="visible" modal header="Add Nominee" :style="{ width: '25rem' }">
         <input type="text" v-model="idval" class="hidden">
         <div class="w-full">
           <Name v-model="name" />
-           <span class="text-red-500">{{ nameerror }}</span>
+          <span class="text-red-500">{{ nameerror }}</span>
 
         </div>
         <div class="w-full mt-4">
@@ -85,84 +90,97 @@
               class="w-full prime-input " />
             <span class="bottom-border"></span>
           </div>
-                     <span class="text-red-500">{{ relationshiperror }}</span>
+          <span class="text-red-500">{{ relationshiperror }}</span>
 
         </div>
         <div class="w-full mt-2">
           <DOB v-model="dob" />
-                     <span class="text-red-500">{{ doberror }}</span>
+          <span class="text-red-500">{{ doberror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Address v-model="address" />
-                     <span class="text-red-500">{{ addresserror }}</span>
+          <span class="text-red-500">{{ addresserror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Mobile v-model="mobileNo" />
-                     <span class="text-red-500">{{ mobileerror }}</span>
+          <span class="text-red-500">{{ mobileerror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <Email v-model="email" />
-                     <span class="text-red-500">{{ emailerror }}</span>
+          <span class="text-red-500">{{ emailerror }}</span>
 
         </div>
         <div class="w-full mt-2">
           <div class="flex gap-2">
             <div class="flex items-center gap-2">
-                <RadioButton v-model="selected" inputId="pan" name="id" value="PAN" @change="emitSelection" />
+              <RadioButton v-model="selected" inputId="pan" name="id" value="PAN" @change="emitSelection" />
               <label for="pan" class="text-gray-500">PAN</label>
             </div>
             <div class="flex items-center gap-2">
-              <RadioButton v-model="selected" inputId="aadhar" name="id" value="Aadhar Last 4 Digits" @change="emitSelection" />
+              <RadioButton v-model="selected" inputId="aadhar" name="id" value="Aadhar Last 4 Digits"
+                @change="emitSelection" />
               <label for="aadhar" class="text-gray-500">Aadhar</label>
             </div>
             <div class="flex items-center gap-2">
-             <RadioButton v-model="selected" inputId="dl" name="id" value="Driving Licence" @change="emitSelection" />
+              <RadioButton v-model="selected" inputId="dl" name="id" value="Driving Licence" @change="emitSelection" />
               <label for="dl" class="text-gray-500">Driving Licence</label>
             </div>
           </div>
 
-        
+
 
 
 
           <span class="block text-gray-500 text-md font-normal mt-2">{{ prooftype }}</span>
 
-          <div v-if="pan" class="w-full " >
-              <Pan v-model="paninput" />
-                        <span class="text-red-500" v-if="panerror">{{ error }}</span>
+          <div v-if="pan" class="w-full ">
+            <Pan v-model="paninput" />
+            <span class="text-red-500" v-if="panerror">{{ error }}</span>
 
           </div>
-          <div v-if="aadhar" class="w-full " >
-              <Aadhar v-model="aadharinput" />
-                         
+          <div v-if="aadhar" class="w-full ">
+            <Aadhar v-model="aadharinput" />
+
 
           </div>
-          <div v-if="drivingLicence" class="w-full " >
-              <Driving v-model="drivinginput" />
-                        
+          <div v-if="drivingLicence" class="w-full ">
+            <Driving v-model="drivinginput" />
+
 
           </div>
 
-         <span class="text-red-500">{{ iderror }}</span>
+          <span class="text-red-500">{{ iderror }}</span>
         </div>
 
 
         <div class="w-full mt-2">
           <div :class="{ 'disabled-container': isDisabled }">
             <Guardian v-model="guardian" />
-             <span class="text-red-500">{{ guardianerror }}</span>
+            <span class="text-red-500">{{ guardianerror }}</span>
+
+
+            <div class="w-full mt-4">
+          <span class="text-gray-500 ">Guardian Relationship*</span>
+          <div class="input-wrapper dark:!bg-gray-800">
+            <Select v-model="guardianselectedStatement" :options="guardianstatementOptions" optionLabel="name"
+              class="w-full prime-input " />
+            <span class="bottom-border"></span>
+          </div>
+          <span class="text-red-500">{{ gurdianrelationshiperror }}</span>
+
+        </div>
           </div>
 
         </div>
         <div class="w-full mt-2">
           <Sharevalue v-model="shareval" />
-                    <span class="text-red-500">{{ sharevalerror }}</span>
+          <span class="text-red-500">{{ sharevalerror }}</span>
 
           <p class="text-right text-gray-500 text-md">Maximum limit:0 - {{ availabilelimit }}</p>
         </div>
@@ -175,31 +193,34 @@
 
       <!-- Navigation Buttons -->
       <div class="w-full ">
-          <button
-  class="w-full py-2 mt-3 border-2 rounded-lg"
-  :class="[
-    isOptedOut ? 'bg-blue-600 text-white border-blue-600' : 'text-blue-500 border-blue-600',
-    nomine.length > 0 ? 'opacity-50 cursor-not-allowed' : ''
-  ]"
-  :disabled="nomine.length > 0"
-  size="small"
-  @click="handleOptOut"
->
-  Opt-Out
-</button>
+        <div class="relative w-full">
+          <button class="w-full py-3 mt-3 border-2 rounded-lg text-center relative" :class="[
+            isOptedOut ? 'bg-blue-600 text-white border-blue-600' : 'text-blue-500 border-blue-600',
+            nomine.length > 0 ? 'opacity-50 cursor-not-allowed' : ''
+          ]" :disabled="nomine.length > 0" size="small" @click="handleOptOut">
+            <!-- Icon: only when opted out -->
+            <span v-if="isOptedOut"
+              class="absolute left-3 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full bg-green-500">
+              <i class="pi pi-check text-white text-sm"></i>
+            </span>
 
-<div class="w-full flex gap-2 mt-4">
- <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button ref="rippleBtn" @click="handleButtonClick"
-          :disabled="!canContinue || !isStatusValid"
-          class="primary_color w-5/6 text-white py-3 text-xl border-0">
-          {{ buttonText }}
-        </Button>
-</div>
-       
+            <!-- Centered button label -->
+            <span class="block w-full">Opt-Out</span>
+          </button>
+        </div>
+
+
+        <div class="w-full flex gap-2 mt-4">
+          <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button ref="rippleBtn" @click="handleButtonClick" :disabled="!canContinue || !isStatusValid"
+            class="primary_color w-5/6 text-white py-3 text-xl border-0">
+            {{ buttonText }}
+          </Button>
+        </div>
+
 
       </div>
     </div>
@@ -227,7 +248,7 @@ import { pagestatus } from '~/utils/pagestatus.js'
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const emit = defineEmits(['updateDiv']);
 const isDisabled = ref(true)
 const nomineecontainer = ref(true)
@@ -253,11 +274,13 @@ const isBack = ref(true)
 
 const selectedStatement = ref('')
 
+const guardianselectedStatement=ref('')
+
 const isStatusValid = ref(true);
 
-const pan=ref(true)
-const aadhar=ref(false)
-const drivingLicence=ref(false)
+const pan = ref(true)
+const aadhar = ref(false)
+const drivingLicence = ref(false)
 
 const paninput = ref('')
 const aadharinput = ref('')
@@ -268,16 +291,18 @@ const isAadharValid = ref(false);
 const isDrivingLicenceValid = ref(false);
 
 // error
-const nameerror=ref('')
-const relationshiperror=ref('')
-const doberror=ref('')
-const addresserror=ref('')
-const mobileerror=ref('')
-const emailerror=ref('')
-const sharevalerror=ref('')
-const iderror=ref('')
-const errorpercent=ref('')
+const nameerror = ref('')
+const relationshiperror = ref('')
+const doberror = ref('')
+const addresserror = ref('')
+const mobileerror = ref('')
+const emailerror = ref('')
+const sharevalerror = ref('')
+const iderror = ref('')
+const errorpercent = ref('')
 const guardianerror = ref('')
+const gurdianrelationshiperror=ref('')
+
 const statementOptions = ref([
   { value: 'Son', name: 'Son' },
   { value: 'Daughter', name: 'Daughter' },
@@ -285,12 +310,25 @@ const statementOptions = ref([
   { value: 'Father', name: 'Father' },
   { value: 'Mother', name: 'Mother' },
   { value: 'Brother', name: 'Brother' },
-    { value: 'Sister', name: 'Sister' },
-      { value: 'Grand-Son', name: 'Grand-Son' },
-       { value: 'Grand-Daughter', name: 'Grand-Daughter' },
-{ value: 'Grand-Father', name: 'Grand-Father' },
-{ value: 'Grand-Mother', name: 'Grand-Mother' },
+  { value: 'Sister', name: 'Sister' },
+  { value: 'Grand-Son', name: 'Grand-Son' },
+  { value: 'Grand-Daughter', name: 'Grand-Daughter' },
+  { value: 'Grand-Father', name: 'Grand-Father' },
+  { value: 'Grand-Mother', name: 'Grand-Mother' },
 ])
+
+
+const guardianstatementOptions = ref([
+  { value: 'Father', name: 'Father' },
+  { value: 'Mother', name: 'Mother' },
+  { value: 'Brother', name: 'Brother' },
+  { value: 'Sister', name: 'Sister' },
+  { value: 'Grand-Son', name: 'Grand-Son' },
+  { value: 'Grand-Daughter', name: 'Grand-Daughter' },
+  { value: 'Grand-Father', name: 'Grand-Father' },
+  { value: 'Grand-Mother', name: 'Grand-Mother' },
+])
+
 
 const name = ref('');
 const dob = ref('');
@@ -331,19 +369,27 @@ const resetFormFields = () => {
   selected.value = 'PAN';
 
   guardian.value = '';
+  guardianselectedStatement.value=''
   shareval.value = '';
   prooftype.value = 'PAN';
-  paninput.value=''
-  aadharinput.value=''
-  drivinginput.value=''
+  paninput.value = ''
+  aadharinput.value = ''
+  drivinginput.value = ''
 };
 const isAddButtonActive = ref(true);
 
 const openNomineeDialog = async () => {
   canContinue.value = false;
   errorpercent.value = '';
-  isAddButtonActive.value = true; // ✅ activate style
-  isOptedOut.value=false
+  isAddButtonActive.value = true;
+  isOptedOut.value = false;
+
+  // ✅ Show error if trying to add more than 10 nominees
+  if (!idval.value && nomineeCount.value >= 10) {
+    errorpercent.value = "Only 10 nominees are allowed.";
+    visible.value = false;
+    return;
+  }
 
   const mydata = await getServerData();
   if (mydata.payload.status === 'error') {
@@ -358,10 +404,12 @@ const openNomineeDialog = async () => {
   visible.value = true;
 };
 
-  
+
+
 const nomineedetails = async () => {
+
   const mydata = await getServerData();
-  const statuscheck = mydata?.payload?.metaData?.nominee ;
+  const statuscheck = mydata?.payload?.metaData?.nominee;
 
   if (statuscheck) {
     const nominee = mydata?.payload?.metaData?.nominee;
@@ -369,7 +417,7 @@ const nomineedetails = async () => {
 
       nomineescard.value = true;
 
-      
+
 
       const nomineeList = [];
       let totalShare = 0;
@@ -388,11 +436,11 @@ const nomineedetails = async () => {
             share,
             email: nominee[`nominee${i}Email`],
             mobile: nominee[`nominee${i}Mobile`],
-
             dob: nominee[`nominee${i}Dob`],
             idType: nominee[`nominee${i}IdType`],
             idNo: nominee[`nominee${i}IdNo`],
             guardian: nominee[`nominee${i}GuardianName`],
+            gurdianrelation: nominee[`nominee${i}GuardianRelation`]
           });
         }
       }
@@ -400,28 +448,26 @@ const nomineedetails = async () => {
       const nomineeid = mydata?.payload?.metaData?.nominee?.IncapacitationNominee;
       sharevalue.value = nominee[`nominee${nomineeid}Share`] || 0;
 
-  
-       let sharepercentage = 0
-     
+
+      let sharepercentage = 0
+
       nomineeList.forEach(item => {
         sharepercentage += item.share
       })
 
       if (sharepercentage == 100) {
-  
+
         canContinue.value = true;
       }
       else {
         canContinue.value = false;
       }
-
-
       nomine.value = nomineeList;
       nomineeCount.value = nomineeList.length;
       nomineecontainer.value = totalShare < 100;
     }
   }
- };
+};
 
 
 await nomineedetails()
@@ -429,12 +475,12 @@ await nomineedetails()
 const availabilelimit = computed(() => {
   let total = 0;
   nomine.value.forEach(n => {
-    // Exclude the current nominee when editing
+
     if (n.id !== idval.value) {
       total += parseFloat(n.share);
     }
   });
-  return Math.max(100 - total, 0); // Prevent going below 0
+  return Math.max(100 - total, 0);
 });
 
 watch(paninput, (newVal) => {
@@ -456,15 +502,12 @@ watch(aadharinput, (newVal) => {
 
 
 watch(drivinginput, (newVal) => {
-  
-  isDrivingLicenceValid.value = newVal.length >= 16; // Example minimum length
+  isDrivingLicenceValid.value = newVal.length >= 16;
 });
 
 
 const isSaveDisabled = computed(() => {
   const share = parseFloat(shareval.value) || 0;
-  
- 
   let isIdValid = false;
   if (selected.value === 'PAN') {
     isIdValid = isPanValid.value;
@@ -474,9 +517,11 @@ const isSaveDisabled = computed(() => {
     isIdValid = isDrivingLicenceValid.value;
   }
 
-  // Check if guardian is required (based on age)
-  const requiresGuardian = !isDisabled.value; // isDisabled is false when under 18
+
+  const requiresGuardian = !isDisabled.value;
   const guardianValid = !requiresGuardian || (requiresGuardian && guardian.value.trim() !== '');
+  const gurdianrelation=!requiresGuardian ||(requiresGuardian&&guardianselectedStatement.value !=='')
+
 
   return (
     !selectedStatement.value ||
@@ -488,25 +533,28 @@ const isSaveDisabled = computed(() => {
     !isValidEmail.value ||
     share > availabilelimit.value ||
     !isIdValid ||
-    !guardianValid // Add guardian validation
+    !guardianValid ||
+    !gurdianrelation
   );
 });
 const dialogbox = (editdata) => {
+
+  
   let formattedDOB = '';
   let dobDate = null;
 
   if (editdata.dob) {
-    
+
     const isoDateMatch = editdata.dob.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    
+
     // Try DD/MM/YYYY format
     const slashDateMatch = editdata.dob.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-    
+
     if (isoDateMatch) {
       const [, year, month, day] = isoDateMatch;
       formattedDOB = `${day}/${month}/${year}`;
       dobDate = new Date(year, month - 1, day);
-    } 
+    }
     else if (slashDateMatch) {
       const [, day, month, year] = slashDateMatch;
       formattedDOB = editdata.dob;
@@ -529,22 +577,25 @@ const dialogbox = (editdata) => {
     const today = new Date();
     let age = today.getFullYear() - dobDate.getFullYear();
     const monthDiff = today.getMonth() - dobDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
       age--;
     }
 
     // Enable guardian field only if under 18
     isDisabled.value = age >= 18;
-    
+
     // Set guardian error only if under 18 and guardian is empty
-     if (age >= 18) {
+    if (age >= 18) {
       guardian.value = '';
       guardianerror.value = '';
+      guardianselectedStatement.value=''
+      gurdianrelationshiperror.value=''
     } else if (!editdata.guardian) {
       guardianerror.value = 'Guardian is required for nominees under 18';
+      gurdianrelationshiperror.value='Gurdian relationship is required for nominees under 18'
     }
-  } 
+  }
 
   // Set form values
   visible.value = true;
@@ -555,13 +606,17 @@ const dialogbox = (editdata) => {
     option => option.value === editdata.relation || option.name === editdata.relation
   ) || statementOptions.value[0];
 
+  guardianselectedStatement.value=guardianstatementOptions.value.find(
+    option =>option.value===editdata.gurdianrelation || option.name=== editdata.gurdianrelation
+  )|| guardianstatementOptions.value[0]
+
   dob.value = formattedDOB;
   address.value = editdata.address;
   mobileNo.value = editdata.mobile;
   email.value = editdata.email;
   selected.value = editdata.idType;
 
-  if(selected.value === 'PAN') {
+  if (selected.value === 'PAN') {
     pan.value = true;
     aadhar.value = false;
     drivingLicence.value = false;
@@ -569,7 +624,7 @@ const dialogbox = (editdata) => {
     isAadharValid.value = false;
     isDrivingLicenceValid.value = false;
   }
-  else if(selected.value === 'Aadhar Last 4 Digits') {
+  else if (selected.value === 'Aadhar Last 4 Digits') {
     pan.value = false;
     aadhar.value = true;
     drivingLicence.value = false;
@@ -577,7 +632,7 @@ const dialogbox = (editdata) => {
     isPanValid.value = false;
     isDrivingLicenceValid.value = false;
   }
-  else if(selected.value === 'Driving Licence') {
+  else if (selected.value === 'Driving Licence') {
     pan.value = false;
     aadhar.value = false;
     drivingLicence.value = true;
@@ -591,41 +646,43 @@ const dialogbox = (editdata) => {
   prooftype.value = editdata.idType;
 };
 const nomineesavedata = async () => {
+ 
   visible.value = true;
+
 
   // Validate maximum nominees
   if (!idval.value && nomineeCount.value >= 10) {
-   
+
     visible.value = false;
     return;
   }
 
   try {
     // Validate required fields
-    if (!name.value || !selectedStatement.value || !dob.value || !address.value || 
-        !mobileNo.value || !email.value || !selected.value || !shareval.value) {
-      
+    if (!name.value || !selectedStatement.value || !dob.value || !address.value ||
+      !mobileNo.value || !email.value || !selected.value || !shareval.value) {
+
     }
 
     // Parse date
     let formattedDate = '';
     const dateMatch = dob.value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-    
+
     if (dateMatch) {
       // DD/MM/YYYY format
       const [, day, month, year] = dateMatch;
       formattedDate = `${year}-${month}-${day}`;
-      
+
       // Validate date
       const dateObj = new Date(`${year}-${month}-${day}`);
       if (isNaN(dateObj.getTime())) {
-       
+
       }
     } else {
-      // Try parsing as Date object
+ 
       const dateObj = new Date(dob.value);
       if (isNaN(dateObj.getTime())) {
-        
+
       }
       const yyyy = dateObj.getFullYear();
       const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -633,36 +690,38 @@ const nomineesavedata = async () => {
       formattedDate = `${yyyy}-${mm}-${dd}`;
     }
 
-    // Validate share percentage
+   
     const share = parseFloat(shareval.value);
     if (isNaN(share)) {
-     
+
     }
 
-    // Prepare request data
+  
     const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
     const relationship = selectedStatement.value.name || selectedStatement.value.value;
-    
+
+    const gurdianrelationval=guardianselectedStatement.value.name
+
     // Get ID number based on selected type
     let idNumber = '';
     if (selected.value === 'PAN') {
       if (!paninput.value || !isPanValid.value) {
-       
+
       }
       idNumber = paninput.value;
     } else if (selected.value === 'Aadhar Last 4 Digits') {
       if (!aadharinput.value || !isAadharValid.value) {
-        
+
       }
       idNumber = aadharinput.value;
     } else if (selected.value === 'Driving Licence') {
       if (!drivinginput.value || !isDrivingLicenceValid.value) {
-        
+
       }
       idNumber = drivinginput.value;
     }
 
-    const user =await encryptionrequestdata({
+    const user = await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: "nominee",
       nomineeName: name.value,
@@ -674,10 +733,11 @@ const nomineesavedata = async () => {
       nomineeIdNo: idNumber,
       nomineeDob: formattedDate,
       nomineeGuardianName: guardian.value,
+      nomineeGuardianRelation:gurdianrelationval,
       nomineeShare: share,
       nomineeId: nomineeId,
     });
- const headertoken=htoken
+    const headertoken = htoken
     const payload = { payload: user };
     const apiurl = `${baseurl.value}nominee`;
 
@@ -695,33 +755,45 @@ const nomineesavedata = async () => {
     }
 
     const decryptedData = await response.json();
-     const data = await decryptionresponse(decryptedData);
-       nameerror.value = ""
-        relationshiperror.value = ""
-        doberror.value = ""
-        addresserror.value = ""
-        mobileerror.value=""
-        emailerror.value=""
-        iderror.value=""
-        guardianerror.value=""
-        sharevalerror.value=""
-        
-    if (data.payload.status === 'ok') {
-      visible.value = false;
-      await nomineedetails();
-      resetFormFields();
-    } 
+    const data = await decryptionresponse(decryptedData);
+    nameerror.value = ""
+    relationshiperror.value = ""
+    doberror.value = ""
+    addresserror.value = ""
+    mobileerror.value = ""
+    emailerror.value = ""
+    iderror.value = ""
+    guardianerror.value = ""
+    gurdianrelationshiperror.value=""
+    sharevalerror.value = ""
 
-       
+    
+    if (data.payload.status === 'ok') {
+  visible.value = false;
+  await nomineedetails();
+  resetFormFields();
+
+  const totalShare = nomine.value.reduce((sum, nominee) => sum + parseFloat(nominee.share), 0);
+  if(totalShare==100){
+    alert('100')
+
+    canContinue.value=true
+    isStatusValid.value=true
+  }
+
+  
+}
+
+
 
     else if (data.payload.status === 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004') {
-       alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-      } 
-      else if(data.payload.status=='error' && data.payload.errors.length>0) {
-       
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+      else if (data.payload.status == 'error' && data.payload.errors.length > 0) {
+
         data.payload.errors.forEach((err) => {
 
 
@@ -731,7 +803,7 @@ const nomineesavedata = async () => {
           if (err.field === 'nomineeRelation') {
             relationshiperror.value = err.message || ' ';
           }
-            if (err.field === 'nomineeDob') {
+          if (err.field === 'nomineeDob') {
             doberror.value = err.message || ' ';
           }
           if (err.field === 'nomineeAddress') {
@@ -740,16 +812,19 @@ const nomineesavedata = async () => {
           if (err.field === 'nomineeMobile') {
             mobileerror.value = err.message || ' ';
           }
-            if (err.field === 'nomineeEmail') {
+          if (err.field === 'nomineeEmail') {
             emailerror.value = err.message || ' ';
           }
-            if (err.field === 'nomineeIdNo') {
+          if (err.field === 'nomineeIdNo') {
             iderror.value = err.message || ' ';
           }
-           if (err.field === 'nomineeGuardianName') {
-            guardianerror.value = err.message || ' ';
+          if (err.field === 'nomineeGuardianName') {
+            gurdianrelationshiperror.value = err.message || ' ';
           }
-           if (err.field === 'nomineeShare') {
+          if(err.field==='nomineeGuardianRelation'){
+
+          }
+          if (err.field === 'nomineeShare') {
             sharevalerror.value = err.message || ' ';
           }
         });
@@ -768,13 +843,13 @@ const nomineedelete = async (deleteid) => {
 
 
 
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "nominee",
     removeNominee: deleteid.id
 
   });
-const headertoken=htoken
+  const headertoken = htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
   const apiurl = `${baseurl.value}nominee`;
@@ -794,15 +869,15 @@ const headertoken=htoken
     }
 
     const decryptedData = await response.json();
-      const data = await decryptionresponse(decryptedData);
-       if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
+    const data = await decryptionresponse(decryptedData);
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
+
+    }
 
     nomineedetails(); // Refresh the nominee list or details
   } catch (error) {
@@ -815,11 +890,11 @@ const headertoken=htoken
 const emitSelection = () => {
   prooftype.value = selected.value;
 
-  paninput.value=''
-  aadharinput.value=''
-  drivinginput.value=''
-  
-  if(selected.value === 'PAN') {
+  paninput.value = ''
+  aadharinput.value = ''
+  drivinginput.value = ''
+
+  if (selected.value === 'PAN') {
     pan.value = true;
     aadhar.value = false;
     drivingLicence.value = false;
@@ -827,19 +902,19 @@ const emitSelection = () => {
     isAadharValid.value = false;
     isDrivingLicenceValid.value = false;
   }
-  else if(selected.value === 'Aadhar Last 4 Digits') {
+  else if (selected.value === 'Aadhar Last 4 Digits') {
     pan.value = false;
     aadhar.value = true;
     drivingLicence.value = false;
- 
+
     isPanValid.value = false;
     isDrivingLicenceValid.value = false;
   }
-  else if(selected.value === 'Driving Licence') {
+  else if (selected.value === 'Driving Licence') {
     pan.value = false;
     aadhar.value = false;
     drivingLicence.value = true;
- 
+
     isPanValid.value = false;
     isAadharValid.value = false;
   }
@@ -859,45 +934,78 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
 
-     const data = await pagestatus('income')
+    const data = await pagestatus('income')
     if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
-  }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'income');
-  isBack.value = false;
-}
-   
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      emit('updateDiv', 'income');
+      isBack.value = false;
+    }
+
   },
-  
-  600)
+
+    600)
 
 };
 
 const isOptedOut = ref(false);
 const handleOptOut = () => {
+
+  if (nomine.value.length > 0) {
+    errorpercent.value = 'Opt-Out is not allowed when nominee(s) exist';
+    return;
+  }
+
   errorpercent.value = '';
   canContinue.value = true;
-  isOptedOut.value = true; 
+  isOptedOut.value = true;
   isAddButtonActive.value = false;
 };
+
 const handleButtonClick = async (event) => {
+  const nomineedob = [];
+  const nomineeval = nomine.value;
+  let underageNomineeExists = false;
 
+  const today = new Date();
+  nomineeval.forEach(item => {
+    nomineedob.push(item.dob);
 
+    const dob = new Date(item.dob);
+    const age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    const dayDiff = today.getDate() - dob.getDate();
+
+    // Adjust if birthday hasn't occurred yet this year
+    const actualAge = (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) ? age - 1 : age;
+
+    if (actualAge < 18) {
+      underageNomineeExists = true;
+    }
+  });
+
+  // If any nominee is under 18, show error and exit
+  if (underageNomineeExists) {
+    errorpercent.value = 'All nominees must be at least 18 years old.';
+    isStatusValid.value = false;
+    return;
+  }
+
+  // Ripple effect
   const buttonWrapper = rippleBtn.value;
   if (!buttonWrapper) return;
 
-  const button = buttonWrapper.$el || buttonWrapper; // Use $el if it's a Vue component
+  const button = buttonWrapper.$el || buttonWrapper;
   if (!button.getBoundingClientRect) return;
 
-  // Create ripple effect
   const circle = document.createElement('span');
   circle.classList.add('ripple');
 
@@ -949,6 +1057,21 @@ const handleButtonClick = async (event) => {
 };
 
 
+watch(nomine, () => {
+  let total = nomine.value.reduce((acc, cur) => acc + parseFloat(cur.share), 0);
+
+  if (nomine.value.length === 0) {
+    canContinue.value = false;
+    // errorpercent.value = 'Please add at least one nominee';
+  } else if (total !== 100) {
+    canContinue.value = false;
+    errorpercent.value = 'Nominee 100 percentage not met';
+  } else {
+    canContinue.value = true;
+    errorpercent.value = '';
+  }
+}, { deep: true });
+
 
 // Lifecycle
 onMounted(async () => {
@@ -973,17 +1096,19 @@ watch(dob, (newval) => {
     }
 
     if (age < 18) {
-    
+
       isDisabled.value = false;
       // When under 18, guardian becomes required
       if (!guardian.value) {
         guardianerror.value = '';
+        gurdianrelationshiperror.value=''
       }
     } else {
-      
-       guardian.value=''
+
+      guardian.value = ''
       isDisabled.value = true;
       guardianerror.value = '';
+      gurdianrelationshiperror.value=''
     }
   }
 });
