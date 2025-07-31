@@ -36,6 +36,10 @@ const formatguardian = (event) => {
 };
 
 // Emit value to parent
+watch(() => props.modelValue, (newVal) => {
+  guardian.value = (newVal || '').toUpperCase();
+});
+
 watch(guardian, (newVal) => {
   emit('update:modelValue', newVal);
 });

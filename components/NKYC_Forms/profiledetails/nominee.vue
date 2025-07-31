@@ -319,6 +319,7 @@ const statementOptions = ref([
 
 
 const guardianstatementOptions = ref([
+  
   { value: 'Father', name: 'Father' },
   { value: 'Mother', name: 'Mother' },
   { value: 'Brother', name: 'Brother' },
@@ -369,7 +370,7 @@ const resetFormFields = () => {
   selected.value = 'PAN';
 
   guardian.value = '';
-  guardianselectedStatement.value=''
+  guardianselectedStatement.value=null
   shareval.value = '';
   prooftype.value = 'PAN';
   paninput.value = ''
@@ -539,7 +540,7 @@ const isSaveDisabled = computed(() => {
 });
 const dialogbox = (editdata) => {
 
-  
+  console.log("editdata", editdata)
   let formattedDOB = '';
   let dobDate = null;
 
@@ -589,7 +590,7 @@ const dialogbox = (editdata) => {
     if (age >= 18) {
       guardian.value = '';
       guardianerror.value = '';
-      guardianselectedStatement.value=''
+      guardianselectedStatement.value=null
       gurdianrelationshiperror.value=''
     } else if (!editdata.guardian) {
       guardianerror.value = 'Guardian is required for nominees under 18';
@@ -606,10 +607,7 @@ const dialogbox = (editdata) => {
     option => option.value === editdata.relation || option.name === editdata.relation
   ) || statementOptions.value[0];
 
-  guardianselectedStatement.value=guardianstatementOptions.value.find(
-    option =>option.value===editdata.gurdianrelation || option.name=== editdata.gurdianrelation
-  )|| guardianstatementOptions.value[0]
-
+  
   dob.value = formattedDOB;
   address.value = editdata.address;
   mobileNo.value = editdata.mobile;
@@ -642,6 +640,11 @@ const dialogbox = (editdata) => {
   }
 
   guardian.value = editdata.guardian;
+
+  guardianselectedStatement.value=guardianstatementOptions.value.find(
+    option =>option.value===editdata.gurdianrelation || option.name=== editdata.gurdianrelation
+  )
+
   shareval.value = editdata.share;
   prooftype.value = editdata.idType;
 };
@@ -698,9 +701,9 @@ const nomineesavedata = async () => {
 
   
     const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
-    const relationship = selectedStatement.value.name || selectedStatement.value.value;
+    const relationship = selectedStatement.value.name 
 
-    const gurdianrelationval=guardianselectedStatement.value.name
+    const gurdianrelationval=guardianselectedStatement.value.name || ''
 
     // Get ID number based on selected type
     let idNumber = '';
@@ -720,7 +723,8 @@ const nomineesavedata = async () => {
       }
       idNumber = drivinginput.value;
     }
-
+console.log("oijioj",guardian.value)
+    
     const user = await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: "nominee",
@@ -766,6 +770,7 @@ const nomineesavedata = async () => {
     guardianerror.value = ""
     gurdianrelationshiperror.value=""
     sharevalerror.value = ""
+    guardianselectedStatement.value=""
 
     
     if (data.payload.status === 'ok') {
@@ -775,7 +780,7 @@ const nomineesavedata = async () => {
 
   const totalShare = nomine.value.reduce((sum, nominee) => sum + parseFloat(nominee.share), 0);
   if(totalShare==100){
-    alert('100')
+
 
     canContinue.value=true
     isStatusValid.value=true
@@ -973,10 +978,12 @@ const handleOptOut = () => {
 const handleButtonClick = async (event) => {
   const nomineedob = [];
   const nomineeval = nomine.value;
-  let underageNomineeExists = false;
+  let atLeastOneAdult = false; // Changed from underageNomineeExists
 
   const today = new Date();
   nomineeval.forEach(item => {
+    if (!item.dob) return; // Skip if no dob
+    
     nomineedob.push(item.dob);
 
     const dob = new Date(item.dob);
@@ -987,19 +994,19 @@ const handleButtonClick = async (event) => {
     // Adjust if birthday hasn't occurred yet this year
     const actualAge = (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) ? age - 1 : age;
 
-    if (actualAge < 18) {
-      underageNomineeExists = true;
+    if (actualAge >= 18) {
+      atLeastOneAdult = true;
     }
   });
 
-  // If any nominee is under 18, show error and exit
-  if (underageNomineeExists) {
-    errorpercent.value = 'All nominees must be at least 18 years old.';
+  // If no nominee is 18 or above, show error and exit
+  if (!atLeastOneAdult) {
+    errorpercent.value = 'At least one nominee must be at least 18 years old.';
     isStatusValid.value = false;
     return;
   }
 
-  // Ripple effect
+  // Rest of your existing code for ripple effect and server interaction
   const buttonWrapper = rippleBtn.value;
   if (!buttonWrapper) return;
 
@@ -1056,7 +1063,6 @@ const handleButtonClick = async (event) => {
   }, 600);
 };
 
-
 watch(nomine, () => {
   let total = nomine.value.reduce((acc, cur) => acc + parseFloat(cur.share), 0);
 
@@ -1108,7 +1114,8 @@ watch(dob, (newval) => {
       guardian.value = ''
       isDisabled.value = true;
       guardianerror.value = '';
-      gurdianrelationshiperror.value=''
+      gurdianrelationshiperror.value=null
+      guardianselectedStatement.value=''
     }
   }
 });
