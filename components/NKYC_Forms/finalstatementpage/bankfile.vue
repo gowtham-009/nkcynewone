@@ -307,7 +307,7 @@ const camsbankdata = async () => {
     pageCode: 'csmspdf',
     camsAction: 'createCams',
     bankIfsc: ifscvalue,
-    redirecUrl: domainurl+'main',
+    redirecUrl: domainurl.value+'main',
 
    
   });
