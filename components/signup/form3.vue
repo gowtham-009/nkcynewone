@@ -418,12 +418,17 @@ const otpverfication = async () => {
     console.error(error.message)
   }
 }
-
 function otpclear() {
-  buttonText.value = 'Next'
-  emailbox.value = false
-  isSending.value = false;;
-  e_otp.value = ''
+  buttonText.value = 'Next';
+  emailbox.value = false;
+  isSending.value = false;
+  e_otp.value = '';
+  
+  // Immediately validate the current email and update button state
+  const isValid = validateEmail(emailid.value);
+  isStatusValid.value = isValid;
+  erroremail.value = !isValid;
+  emailerror.value = isValid ? '' : 'Please enter a valid email address';
 }
 
 
