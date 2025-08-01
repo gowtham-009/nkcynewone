@@ -931,6 +931,10 @@ const dialogeventdata = async () => {
     nameerror.value = "Nominee name is required";
     isValid = false;
   }
+  else if (name.value.trim().length < 3) {
+    nameerror.value = "Nominee name must be at least minimum characters";
+    isValid = false;
+  }
 
   // Relationship validation
   if (!selectedStatement.value) {
@@ -962,6 +966,10 @@ const dialogeventdata = async () => {
   // Address validation
   if (!address.value || address.value.trim() === "") {
     addresserror.value = "Address is required";
+    isValid = false;
+  }
+  else if (address.value.trim().length < 3) {
+    addresserror.value = "Address must be at minimum characters";
     isValid = false;
   }
 

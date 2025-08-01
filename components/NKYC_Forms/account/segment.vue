@@ -19,26 +19,26 @@
 
 
         <div class="grid grid-cols-1 gap-2 mt-2">
-          <button v-for="option in options" :key="option.value" @click="toggleSelection(option.value)" :class="[
-            'w-full text-left px-3 py-2 rounded-2xl border-2 transition-all shadow-sm relative',
-            selected.includes(option.value)
-              ? 'bg-blue-600 border-blue-600 text-white'
-              : 'bg-white border-gray-300 text-black dark:bg-gray-800 dark:text-white'
-          ]">
-            <!-- Top row: label and check icon -->
-            <div class="flex justify-between items-center">
-              <p class="text-md font-semibold">
-                {{ option.label }}
-              </p>
-              <i v-if="selected.includes(option.value)"
-                class="pi pi-check text-green-500 text-xl rounded-full bg-green-100 p-2"></i>
-            </div>
+        <button v-for="option in options" :key="option.value" @click="toggleSelection(option.value)" :class="[
+    'w-full text-left px-3 py-2 rounded-2xl border-2 transition-all shadow-sm relative',
+    selected.includes(option.value)
+      ? 'bg-blue-600 border-blue-600 text-white'
+      : 'bg-white border-gray-300 text-black dark:bg-gray-800 dark:text-white'
+  ]">
+  <!-- Top row: label and check icon -->
+  <div class="flex justify-between items-center">
+    <p class="text-md font-semibold">
+      {{ option.label }}
+    </p>
+    <i v-if="selected.includes(option.value)" 
+       class="pi pi-check text-white text-sm rounded-full bg-green-500 p-1"></i>
+  </div>
 
-            <!-- Subtext -->
-            <p class="text-sm  opacity-70">
-              {{ option.subtext }}
-            </p>
-          </button>
+  <!-- Subtext -->
+  <p class="text-sm opacity-70">
+    {{ option.subtext }}
+  </p>
+</button>
         </div>
              <span class="text-red-500">{{ segmenterror }}</span>
 

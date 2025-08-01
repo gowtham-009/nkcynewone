@@ -138,7 +138,6 @@ const validateEmail = (email) => {
   const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return re.test(String(email).toLowerCase());
 };
-
 // Function to validate email format
 const isValidEmail = computed(() => {
   return validateEmail(emailid.value);
@@ -146,22 +145,25 @@ const isValidEmail = computed(() => {
 
 const isButtonDisabled = computed(() => {
   if (emailbox.value) {
-    // In OTP mode, disable if OTP isn't complete
+    // In OTP mode - disable if OTP isn't complete
     return e_otp.value.length !== 5;
   } else {
-    // In email mode, disable if email isn't valid
-    return !isValidEmail.value;
+    // In email mode - disable if email is empty or invalid
+    return !emailid.value || !validateEmail(emailid.value);
   }
 });
 
 
 watch(emailid, (newValue) => {
-  if (newValue && !validateEmail(newValue)) {
-    erroremail.value = true;
-    emailerror.value = '';
+  if (newValue) {
+    const isValid = validateEmail(newValue);
+    erroremail.value = !isValid;
+    emailerror.value = isValid ? '' : 'Please enter a valid email address';
+    isStatusValid.value = isValid;
   } else {
     erroremail.value = false;
     emailerror.value = '';
+    isStatusValid.value = false;
   }
 });
 
@@ -226,9 +228,10 @@ const back = () => {
 
 const sendemailotp = async (resend) => {
 const headertoken=htoken
-    if (!validateEmail(emailid.value)) {
+   if (!validateEmail(emailid.value)) {
     erroremail.value = true;
     emailerror.value = 'Please enter a valid email address';
+    isStatusValid.value = false;
     return;
   }
 
