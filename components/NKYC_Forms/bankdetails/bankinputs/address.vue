@@ -40,7 +40,7 @@ function format(val) {
   return val
     .toUpperCase()
     .replace(/[^A-Z0-9./\s]/g, '')
-    .slice(0, 100);
+   
 }
 </script>
 
