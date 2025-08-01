@@ -1003,7 +1003,7 @@ const dialogeventdata = async () => {
   } 
   else if (selected.value === 'Aadhar Last 4 Digits') {
     if (!aadharinput.value) {
-      error.value = "ype Last 4 Digits Only";
+      error.value = "Type Last 4 Digits Only";
       isValid = false;
     } else if (!isAadharValid.value) {
       error.value = "Please enter exactly 4 digits of your Aadhar";
