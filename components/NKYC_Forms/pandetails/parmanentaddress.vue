@@ -48,10 +48,6 @@
         <div class="w-full mt-1">
           <Addresscheck ref="commAddressRef" />
         </div>
-
-
-
-
       </div>
 
       <!-- Buttons -->
@@ -142,6 +138,7 @@ const setPermanentAddress = async () => {
     if (!addressData || Object.keys(addressData).length === 0 || !addressData.perPincode) {
       if (kraPan.APP_KRA_INFO) {
         // Use KRA PAN data
+        
         const addParts = [
           kraPan.APP_PER_ADD1 + ' ' + kraPan.APP_PER_ADD2 + ' ' + kraPan.APP_PER_ADD3 || '',
 
@@ -161,15 +158,21 @@ const setPermanentAddress = async () => {
         state.value = addressData.perState || '';
         city.value = addressData.perCity || '';
         pincode.value = addressData.perPincode || '';
+        const peraddress=addressData.sameAsPermanent
       }
     }
     else {
+   
       // Use address data if available
+
+      
       const addParts = [
         addressData.perAddress,
         addressData.perAddressLine2,
         addressData.perAddressLine3
       ].filter(Boolean).join(" "); // Filter out empty/undefined parts
+
+
 
       address.value = addParts;
       state.value = addressData.perState || '';

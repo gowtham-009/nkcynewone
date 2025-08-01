@@ -52,6 +52,18 @@
   </div>
 </div>
 
+<div class="rounded-md bg-red-50 p-4 mt-2" v-if="camserror">
+    <div class="flex">
+      <div class="shrink-0">
+       <i class="pi pi-info-circle text-lg text-red-500"></i>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-red-800">Cams verification could not be completed at the moment, Try after 10 mins</h3>
+       
+      </div>
+    </div>
+  </div>
+
 <p class="text-red-500 mt-2 text-center">{{ uploaderror }}</p>
         <div v-if="pdferrorbox" class="w-full p-1 mt-2 rounded-lg bg-red-50">
           <p class="text-sm text-red-500 text-center">Sorry we couldnt fetch you data, please upload pdf.</p>
@@ -104,6 +116,8 @@ const isNewUpload = ref(false); // Add this flag to track new uploads
 const uploaderror = ref('');
 const isBack = ref(true);
 const isStatusValid = ref(true);
+
+const camserror=ref(false)
 let intervalId = null;
 import { useRouter } from 'vue-router';
 const router = useRouter();
@@ -224,7 +238,7 @@ onMounted(async() => {
 let checkCount = 0; 
 
 const camsbankdatacheck = async () => {
- 
+ camserror.value=false
   const headertoken=htoken
   const apiurl = `${baseurl.value}cams`;
   const user =await encryptionrequestdata({
@@ -290,13 +304,18 @@ const camsbankdatacheck = async () => {
        
       }
 
+      else{
+        camserror.value=true
+      }
+
   } catch (error) {
+    camserror.value=false
     console.error('camsbankdatacheck error:', error.message);
   }
 };
 
 const camsbankdata = async () => {
-
+camserror.value=false
   const headertoken=htoken
   const mydata = await getServerData();
   const ifscvalue = mydata?.payload?.metaData?.bank?.bank1IFSC;
@@ -338,7 +357,12 @@ const camsbankdata = async () => {
        
       }
 
+      else{
+        camserror.value=true
+      }
+
   } catch (error) {
+    camserror.value=false
     console.error('camsbankdata error:', error.message);
   }
 };

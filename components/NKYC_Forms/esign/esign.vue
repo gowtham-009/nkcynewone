@@ -18,6 +18,21 @@
             <div class="font-normal text-sm text-gray-500">{{ step.text }}</div>
           </div>
         </div>
+
+
+  <div class="rounded-md bg-red-50 p-4 mt-2" v-if="esignerror">
+    <div class="flex">
+      <div class="shrink-0">
+       <i class="pi pi-info-circle text-lg text-red-500"></i>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-red-800">Aadhaar service down, Try after 30 mins</h3>
+       
+      </div>
+    </div>
+  </div>
+
+
   <div v-if="loadingen" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
     <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
       {{ syncStatus.icon }} {{ syncStatus.title }}
@@ -78,6 +93,7 @@
 </template>
 
 <script setup>
+
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import googlebouncing from '~/components/googlebouncing.vue';
@@ -97,6 +113,8 @@ const isStatusValid = ref(true);
 const isBack = ref(true);
 const route = useRoute();
 const loadingen=ref(false)
+
+const esignerror=ref(false)
 
 const steps = [
   { label: 'A.', text: 'Click Next Step' },
@@ -177,7 +195,7 @@ const resetProgress = () => {
 
 const createunsignedDocument = async () => {
 
-    console.log("pages",domainurl.value)
+    esignerror.value=false
     const headertoken=htoken
   loadingen.value = true
    startProgressAnimation();
@@ -221,7 +239,12 @@ const createunsignedDocument = async () => {
        
 }
 
+else{
+   esignerror.value=true
+}
+
   } catch (error) {
+     esignerror.value=true
     resetProgress();
     console.error(error.message);
   }
@@ -230,7 +253,7 @@ const createunsignedDocument = async () => {
 const createEsign = async () => {
 
 
-  
+  esignerror.value=false
  const headertoken=htoken
   const apiurl = `${baseurl.value}esign`;
 
@@ -268,7 +291,12 @@ const createEsign = async () => {
         }
        
 }
+
+else{
+   esignerror.value=true
+}
   } catch (error) {
+    esignerror.value=true
     console.error('Create Esign failed:', error.message);
   } finally {
     content.value = true;
@@ -277,6 +305,7 @@ const createEsign = async () => {
 };
 
 const esignStatusCheck = async (requestId) => {
+   esignerror.value=false
   const apiurl = `${baseurl.value}esign`;
   const user =await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
@@ -347,9 +376,12 @@ const data = await decryptionresponse(decryptedData);
               localStorage.removeItem('userkey')
               router.push('/')
         }
-       
+       else{
+         esignerror.value=true
+       }
 }
   } catch (error) {
+     esignerror.value=true
     console.error('Status check failed:', error.message);
   }
 };

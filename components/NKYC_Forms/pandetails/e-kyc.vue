@@ -62,6 +62,19 @@
                 </div>
 
 
+                <div class="rounded-md bg-red-50 p-4 mt-2" v-if="digierror">
+    <div class="flex">
+      <div class="shrink-0">
+       <i class="pi pi-info-circle text-lg text-red-500"></i>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-red-800">Digilocker service down, Try after 30 mins</h3>
+       
+      </div>
+    </div>
+  </div>
+
+
             </div>
 
             <div class="w-full flex gap-2">
@@ -104,7 +117,7 @@ const router = useRouter();
 const route = useRoute()
 const { baseurl } = globalurl();
 const { domainurl } = deploymenturl();
-
+const digierror=ref(false)
 const {htoken}=headerToken()
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
@@ -162,6 +175,7 @@ const back = () => {
 
 
 const digilocker_create = async () => {
+    digierror.value=false
     const apiurl = baseurl.value + 'digilocker';
      const headertoken=htoken
     const authorization = headertoken;
@@ -202,7 +216,11 @@ const digilocker_create = async () => {
         }
        
       }
+      else{
+          digierror.value=true
+      }
     } catch (error) {
+          digierror.value=true
         console.error('Error:', error.message);
 
     }
@@ -216,6 +234,7 @@ const digilocker_create = async () => {
 
 
 const digilocker_request = async () => {
+      digierror.value=false
     const apiurl = baseurl.value + 'digilocker';
  const headertoken=htoken
     const authorization = headertoken;
@@ -264,15 +283,15 @@ const digilocker_request = async () => {
 
 
     } catch (error) {
+          digierror.value=true
         console.error('Error:', error.message);
     }
-    finally {
-
-    }
+   
 };
 
 
 const digilocker_getfiles = async (requestid) => {
+      digierror.value=false
     const apiurl = baseurl.value + 'digilocker';
  const headertoken=htoken
     const authorization = headertoken;
@@ -319,19 +338,21 @@ const digilocker_getfiles = async (requestid) => {
         }
        
       }
+      else{
+          digierror.value=true
+      }
 
     } catch (error) {
+          digierror.value=true
         console.error('Error:', error.message);
     }
-    finally {
-
-    }
+   
 };
 
 
 
 const digilocker_getaadhardoc = async (requestid) => {
-
+      digierror.value=false
     const apiurl = baseurl.value + 'digilocker';
  const headertoken=htoken
     const authorization = headertoken;
@@ -376,9 +397,12 @@ const digilocker_getaadhardoc = async (requestid) => {
       }
 
        
-
+else{
+      digierror.value=true
+}
 
     } catch (error) {
+          digierror.value=true
         console.error('Error:', error.message);
     }
     finally {
