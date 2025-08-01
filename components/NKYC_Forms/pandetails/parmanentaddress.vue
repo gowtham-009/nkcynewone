@@ -158,7 +158,14 @@ const setPermanentAddress = async () => {
         state.value = addressData.perState || '';
         city.value = addressData.perCity || '';
         pincode.value = addressData.perPincode || '';
-        const peraddress=addressData.sameAsPermanent
+       const sameAsPermanent = addressData.sameAsPermanent;
+
+// Set checkbox to true if value is "YES", else false
+if (commAddressRef.value?.confirm) {
+  
+  commAddressRef.value.confirm.value = sameAsPermanent === 'YES';
+}
+
       }
     }
     else {
