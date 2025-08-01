@@ -204,17 +204,16 @@ onMounted(() => {
 
 });
 
-
-function retake() {
+const retake = () => {
   visible.value = false;
-  imageCaptured.value = null; // Clear the captured image
-  isStatusValid.value = true; // Reset validation status
+  imageCaptured.value = null; 
+  isStatusValid.value = true;
   
-  // Call the retake method on the camera component if it exists
+  // Call the retake method on the camera component
   if (cameraComponent.value && cameraComponent.value.retakePhoto) {
     cameraComponent.value.retakePhoto();
   }
-}
+};
 onUnmounted(() => {
   if (locationInterval.value) {
     clearInterval(locationInterval.value);

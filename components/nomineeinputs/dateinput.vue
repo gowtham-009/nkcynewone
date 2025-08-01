@@ -1,5 +1,5 @@
 <template>
-  <span class="text-md text-gray-500">DOB*</span>
+  
   <div class="date-wrapper w-full rounded-lg">
     <Calendar
       v-model="internalDate"

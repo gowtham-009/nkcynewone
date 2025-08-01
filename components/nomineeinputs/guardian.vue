@@ -1,6 +1,5 @@
 <template>
   <div class="w-full">
-    <span class="text-md text-gray-500">Nominee's guardian*</span>
     <div class="input-wrapper dark:!bg-gray-800">
     <InputText
       type="text"

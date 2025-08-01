@@ -248,6 +248,15 @@ const facePositionStatus = computed(() => {
   return 'Perfect!'
 })
 
+const retakePhoto = () => {
+  imageCaptured.value = false;
+  capturedImage.value = null;
+  startCamera(); // Restart the camera
+};
+
+defineExpose({
+  retakePhoto
+});
 onMounted(async () => {
   await loadModels()
   startCamera()

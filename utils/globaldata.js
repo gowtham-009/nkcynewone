@@ -25,7 +25,7 @@ export async function encryptionrequestdata(newData) {
     ...data,
     ...newData
   };
-    // return mergedData
+    //  return mergedData
 
 
   const jsonData = JSON.stringify(mergedData);

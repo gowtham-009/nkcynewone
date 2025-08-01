@@ -79,14 +79,17 @@
       <Dialog class="p-0" v-model:visible="visible" modal header="Add Nominee" :style="{ width: '25rem' }">
         <input type="text" v-model="idval" class="hidden">
         <div class="w-full">
-          <Name v-model="name" />
+          <span class="text-md text-gray-500">Nominee's name*</span>
+          <Name v-model="name" @click="nameerror = ''"
+        @input="nameerror = ''"/>
           <span class="text-red-500">{{ nameerror }}</span>
 
         </div>
         <div class="w-full mt-4">
           <span class="text-gray-500 ">Relationship*</span>
           <div class="input-wrapper dark:!bg-gray-800">
-            <Select v-model="selectedStatement" :options="statementOptions" optionLabel="name"
+            <Select v-model="selectedStatement" :options="statementOptions" optionLabel="name"  @click="relationshiperror = ''"
+        @input="relationshiperror = ''"
               class="w-full prime-input " />
             <span class="bottom-border"></span>
           </div>
@@ -94,26 +97,43 @@
 
         </div>
         <div class="w-full mt-2">
-          <DOB v-model="dob" />
+          <span class="text-md text-gray-500">DOB*</span>
+          <DOB v-model="dob"  @click="doberror = ''"
+        @input="doberror = ''"/>
           <span class="text-red-500">{{ doberror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
-          <Address v-model="address" />
+          <label for="pan_label" class="text-gray-500 text-md font-normal leading-3">Address* </label>
+          <Address v-model="address"  @click="addresserror = ''"
+        @input="addresserror = ''"/>
           <span class="text-red-500">{{ addresserror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
-          <Mobile v-model="mobileNo" />
+
+          <div class="w-full flex justify">
+            <span class="text-md text-gray-500">Mobile no*</span>
+            
+          </div>
+          <Mobile v-model="mobileNo" @click="mobileerror = ''"
+        @input="mobileerror = ''"/>
           <span class="text-red-500">{{ mobileerror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
-          <Email v-model="email" />
-          <span class="text-red-500">{{ emailerror }}</span>
+          <div class="w-full flex justify-between">
+            <span class="text-md text-gray-500">Email ID*</span>
+           
+          </div>
+
+
+          <Email v-model="email" @click="emailerror = ''"
+        @input="emailerror = ''"/>
+           <span class="text-red-500">{{ emailerror }}</span>
 
         </div>
         <div class="w-full mt-2">
@@ -137,55 +157,65 @@
 
 
 
-          <span class="block text-gray-500 text-md font-normal mt-2">{{ prooftype }}</span>
+        <span class="block text-gray-500 text-md font-normal mt-2">{{ prooftype }}</span>
 
-          <div v-if="pan" class="w-full ">
-            <Pan v-model="paninput" />
-            <span class="text-red-500" v-if="panerror">{{ error }}</span>
+   <!-- PAN Input -->
+<div v-if="pan" class="w-full">
+  <Pan v-model="paninput" @click="panerror = ''" @input="panerror = ''"/>
+  <span class="text-red-500">{{ panerror }}</span>
+</div>
 
-          </div>
-          <div v-if="aadhar" class="w-full ">
-            <Aadhar v-model="aadharinput" />
+<!-- Aadhar Input -->
+<div v-if="aadhar" class="w-full">
+  <Aadhar v-model="aadharinput" @click="error = ''" @input="error = ''"/>
+  <span class="text-red-500">{{ error }}</span>
+</div>
 
+<!-- Driving Licence Input -->
+<div v-if="drivingLicence" class="w-full">
+  <Driving v-model="drivinginput" @click="error = ''" @input="error = ''"/>
+  <span class="text-red-500">{{ error }}</span>
+</div>
+         
+         
 
-          </div>
-          <div v-if="drivingLicence" class="w-full ">
-            <Driving v-model="drivinginput" />
-
-
-          </div>
-
-          <span class="text-red-500">{{ iderror }}</span>
+          
         </div>
 
 
         <div class="w-full mt-2">
           <div :class="{ 'disabled-container': isDisabled }">
-            <Guardian v-model="guardian" />
+            <span class="text-md text-gray-500">Nominee's guardian*</span>
+
+            <Guardian v-model="guardian" @click="guardianerror = ''"
+        @input="guardianerror = ''"/>
             <span class="text-red-500">{{ guardianerror }}</span>
 
 
             <div class="w-full mt-4">
-          <span class="text-gray-500 ">Guardian Relationship*</span>
-          <div class="input-wrapper dark:!bg-gray-800">
-            <Select v-model="guardianselectedStatement" :options="guardianstatementOptions" optionLabel="name"
-              class="w-full prime-input " />
-            <span class="bottom-border"></span>
-          </div>
-          <span class="text-red-500">{{ gurdianrelationshiperror }}</span>
+              <span class="text-gray-500 ">Guardian Relationship*</span>
+              <div class="input-wrapper dark:!bg-gray-800">
+                <Select v-model="guardianselectedStatement" :options="guardianstatementOptions" optionLabel="name" @click="gurdianrelationshiperror = ''"
+        @input="gurdianrelationshiperror = ''"
+                  class="w-full prime-input " />
+                <span class="bottom-border"></span>
+              </div>
+              <span class="text-red-500">{{ gurdianrelationshiperror }}</span>
 
-        </div>
+            </div>
           </div>
 
         </div>
         <div class="w-full mt-2">
-          <Sharevalue v-model="shareval" />
+          <span class="text-md text-gray-500">ADFAS Share %*</span>
+          <Sharevalue v-model="shareval"  @click="sharevalerror = ''"
+        @input="sharevalerror = ''" />
           <span class="text-red-500">{{ sharevalerror }}</span>
 
           <p class="text-right text-gray-500 text-md">Maximum limit:0 - {{ availabilelimit }}</p>
         </div>
         <div class="w-full mt-3">
-          <Button :disabled="isSaveDisabled" label="Save" @click="nomineesavedata"
+          <Button  label="Save" @click="dialogeventdata()"
             class="primary_color w-full text-white py-2" />
 
         </div>
@@ -246,6 +276,9 @@ import Sharevalue from '~/components/nomineeinputs/sharevalue.vue';
 import { pagestatus } from '~/utils/pagestatus.js'
 
 import { useRouter } from 'vue-router';
+
+const isOptedOut = ref(false);
+
 const router = useRouter();
 const { baseurl } = globalurl();
 const { htoken } = headerToken()
@@ -274,7 +307,7 @@ const isBack = ref(true)
 
 const selectedStatement = ref('')
 
-const guardianselectedStatement=ref('')
+const guardianselectedStatement = ref('')
 
 const isStatusValid = ref(true);
 
@@ -286,9 +319,9 @@ const paninput = ref('')
 const aadharinput = ref('')
 const drivinginput = ref('')
 
-const isPanValid = ref(false);
-const isAadharValid = ref(false);
-const isDrivingLicenceValid = ref(false);
+// const isPanValid = ref(false);
+// const isAadharValid = ref(false);
+// const isDrivingLicenceValid = ref(false);
 
 // error
 const nameerror = ref('')
@@ -301,7 +334,7 @@ const sharevalerror = ref('')
 const iderror = ref('')
 const errorpercent = ref('')
 const guardianerror = ref('')
-const gurdianrelationshiperror=ref('')
+const gurdianrelationshiperror = ref('')
 
 const statementOptions = ref([
   { value: 'Son', name: 'Son' },
@@ -319,7 +352,7 @@ const statementOptions = ref([
 
 
 const guardianstatementOptions = ref([
-  
+
   { value: 'Father', name: 'Father' },
   { value: 'Mother', name: 'Mother' },
   { value: 'Brother', name: 'Brother' },
@@ -338,11 +371,6 @@ const mobileNo = ref('')
 const email = ref('')
 
 const nomine = ref([]);
-
-const isValidEmail = computed(() => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value);
-});
-
 
 
 
@@ -370,7 +398,7 @@ const resetFormFields = () => {
   selected.value = 'PAN';
 
   guardian.value = '';
-  guardianselectedStatement.value=null
+  guardianselectedStatement.value = null
   shareval.value = '';
   prooftype.value = 'PAN';
   paninput.value = ''
@@ -385,6 +413,19 @@ const openNomineeDialog = async () => {
   isAddButtonActive.value = true;
   isOptedOut.value = false;
 
+
+  nameerror.value = "";
+  relationshiperror.value = "";
+  doberror.value = "";
+  addresserror.value = "";
+  mobileerror.value = "";
+  emailerror.value = "";
+  sharevalerror.value = "";
+  guardianerror.value = "";
+  gurdianrelationshiperror.value = "";
+  panerror.value = "";
+  error.value = "";
+  
   // ✅ Show error if trying to add more than 10 nominees
   if (!idval.value && nomineeCount.value >= 10) {
     errorpercent.value = "Only 10 nominees are allowed.";
@@ -484,27 +525,8 @@ const availabilelimit = computed(() => {
   return Math.max(100 - total, 0);
 });
 
-watch(paninput, (newVal) => {
-  if (newVal.length === 10) {
-    const pattern = /^[A-Za-z]{5}\d{4}[A-Za-z]{1}$/;
-    isPanValid.value = pattern.test(newVal);
-    panerror.value = !isPanValid.value;
-    error.value = isPanValid.value ? '' : 'Please enter a valid PAN no';
-  } else {
-    isPanValid.value = false;
-    panerror.value = false;
-  }
-});
 
 
-watch(aadharinput, (newVal) => {
-  isAadharValid.value = newVal.length === 4 && /^\d+$/.test(newVal);
-});
-
-
-watch(drivinginput, (newVal) => {
-  isDrivingLicenceValid.value = newVal.length >= 16;
-});
 
 
 const isSaveDisabled = computed(() => {
@@ -521,7 +543,7 @@ const isSaveDisabled = computed(() => {
 
   const requiresGuardian = !isDisabled.value;
   const guardianValid = !requiresGuardian || (requiresGuardian && guardian.value.trim() !== '');
-  const gurdianrelation=!requiresGuardian ||(requiresGuardian&&guardianselectedStatement.value !=='')
+  const gurdianrelation = !requiresGuardian || (requiresGuardian && guardianselectedStatement.value !== '')
 
 
   return (
@@ -540,7 +562,6 @@ const isSaveDisabled = computed(() => {
 });
 const dialogbox = (editdata) => {
 
-  console.log("editdata", editdata)
   let formattedDOB = '';
   let dobDate = null;
 
@@ -590,11 +611,11 @@ const dialogbox = (editdata) => {
     if (age >= 18) {
       guardian.value = '';
       guardianerror.value = '';
-      guardianselectedStatement.value=null
-      gurdianrelationshiperror.value=''
+      guardianselectedStatement.value = null
+      gurdianrelationshiperror.value = ''
     } else if (!editdata.guardian) {
       guardianerror.value = 'Guardian is required for nominees under 18';
-      gurdianrelationshiperror.value='Gurdian relationship is required for nominees under 18'
+      gurdianrelationshiperror.value = 'Gurdian relationship is required for nominees under 18'
     }
   }
 
@@ -607,7 +628,7 @@ const dialogbox = (editdata) => {
     option => option.value === editdata.relation || option.name === editdata.relation
   ) || statementOptions.value[0];
 
-  
+
   dob.value = formattedDOB;
   address.value = editdata.address;
   mobileNo.value = editdata.mobile;
@@ -641,16 +662,18 @@ const dialogbox = (editdata) => {
 
   guardian.value = editdata.guardian;
 
-  guardianselectedStatement.value=guardianstatementOptions.value.find(
-    option =>option.value===editdata.gurdianrelation || option.name=== editdata.gurdianrelation
+  guardianselectedStatement.value = guardianstatementOptions.value.find(
+    option => option.value === editdata.gurdianrelation || option.name === editdata.gurdianrelation
   )
 
   shareval.value = editdata.share;
   prooftype.value = editdata.idType;
 };
-const nomineesavedata = async () => {
- 
-  visible.value = true;
+const nomineesavedata = async (optvalue) => {
+
+ if(!optvalue){
+   visible.value = true;
+ }
 
 
   // Validate maximum nominees
@@ -682,7 +705,7 @@ const nomineesavedata = async () => {
 
       }
     } else {
- 
+
       const dateObj = new Date(dob.value);
       if (isNaN(dateObj.getTime())) {
 
@@ -693,17 +716,26 @@ const nomineesavedata = async () => {
       formattedDate = `${yyyy}-${mm}-${dd}`;
     }
 
-   
+
     const share = parseFloat(shareval.value);
     if (isNaN(share)) {
 
     }
 
-  
-    const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
-    const relationship = selectedStatement.value.name 
 
-    const gurdianrelationval=guardianselectedStatement.value.name || ''
+    const nomineeId = idval.value ? idval.value : nomineeCount.value + 1;
+
+    let gurdianrelationval = '';
+
+    if (guardianselectedStatement.value && guardianselectedStatement.value.name) {
+      gurdianrelationval = guardianselectedStatement.value.name;
+
+    } else {
+      console.log();
+    }
+
+    const relationship = selectedStatement.value.name
+
 
     // Get ID number based on selected type
     let idNumber = '';
@@ -723,9 +755,18 @@ const nomineesavedata = async () => {
       }
       idNumber = drivinginput.value;
     }
-console.log("oijioj",guardian.value)
+
+let user
+  if(optvalue=='true'){
+      user = await encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: "nominee",
+     optoutStatus:"true"
+    });
+
     
-    const user = await encryptionrequestdata({
+  }else{
+      user = await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: "nominee",
       nomineeName: name.value,
@@ -737,10 +778,11 @@ console.log("oijioj",guardian.value)
       nomineeIdNo: idNumber,
       nomineeDob: formattedDate,
       nomineeGuardianName: guardian.value,
-      nomineeGuardianRelation:gurdianrelationval,
+      nomineeGuardianRelation: gurdianrelationval,
       nomineeShare: share,
       nomineeId: nomineeId,
     });
+  }
     const headertoken = htoken
     const payload = { payload: user };
     const apiurl = `${baseurl.value}nominee`;
@@ -768,26 +810,26 @@ console.log("oijioj",guardian.value)
     emailerror.value = ""
     iderror.value = ""
     guardianerror.value = ""
-    gurdianrelationshiperror.value=""
+    gurdianrelationshiperror.value = ""
     sharevalerror.value = ""
-    guardianselectedStatement.value=""
+    guardianselectedStatement.value = ""
 
-    
+
     if (data.payload.status === 'ok') {
-  visible.value = false;
-  await nomineedetails();
-  resetFormFields();
+      visible.value = false;
+      await nomineedetails();
+      resetFormFields();
 
-  const totalShare = nomine.value.reduce((sum, nominee) => sum + parseFloat(nominee.share), 0);
-  if(totalShare==100){
+      const totalShare = nomine.value.reduce((sum, nominee) => sum + parseFloat(nominee.share), 0);
+      if (totalShare == 100) {
 
 
-    canContinue.value=true
-    isStatusValid.value=true
-  }
+        canContinue.value = true
+        isStatusValid.value = true
+      }
 
-  
-}
+
+    }
 
 
 
@@ -824,10 +866,10 @@ console.log("oijioj",guardian.value)
             iderror.value = err.message || ' ';
           }
           if (err.field === 'nomineeGuardianName') {
-            gurdianrelationshiperror.value = err.message || ' ';
+            guardianerror.value = err.message || ' ';
           }
-          if(err.field==='nomineeGuardianRelation'){
-
+          if (err.field === 'nomineeGuardianRelation') {
+            gurdianrelationshiperror.value = err.message || ' ';
           }
           if (err.field === 'nomineeShare') {
             sharevalerror.value = err.message || ' ';
@@ -842,6 +884,171 @@ console.log("oijioj",guardian.value)
     visible.value = false;
   }
 };
+
+const isValidEmail = computed(() => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email.value);
+});
+
+const isPanValid = computed(() => {
+  const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+  return paninput.value ? panRegex.test(paninput.value) : false;
+});
+
+const isAadharValid = computed(() => {
+  const aadharRegex = /^\d{4}$/;
+  return aadharinput.value ? aadharRegex.test(aadharinput.value) : false;
+});
+
+const isDrivingLicenceValid = computed(() => {
+  const dlRegex = /^[A-Za-z0-9]{16}$/;
+  return drivinginput.value ? dlRegex.test(drivinginput.value) : false;
+});
+
+const isValidMobile = computed(() => {
+  return mobileNo.value ? /^\d{10}$/.test(mobileNo.value) : false;
+});
+// Update the dialogeventdata function with proper validation
+const dialogeventdata = async () => {
+  // Reset all error messages
+  nameerror.value = "";
+  relationshiperror.value = "";
+  doberror.value = "";
+  addresserror.value = "";
+  mobileerror.value = "";
+  emailerror.value = "";
+  sharevalerror.value = "";
+  guardianerror.value = "";
+  gurdianrelationshiperror.value = "";
+  panerror.value = "";
+  error.value = "";
+  
+  // Validate required fields
+  let isValid = true;
+
+  // Name validation
+  if (!name.value || name.value.trim() === "") {
+    nameerror.value = "Nominee name is required";
+    isValid = false;
+  }
+
+  // Relationship validation
+  if (!selectedStatement.value) {
+    relationshiperror.value = "Relationship is required";
+    isValid = false;
+  }
+
+  // Date of Birth validation
+  if (!dob.value) {
+    doberror.value = "Date of birth is required";
+    isValid = false;
+  } else {
+    // Additional age validation
+    const dobDate = new Date(dob.value);
+    const today = new Date();
+    let age = today.getFullYear() - dobDate.getFullYear();
+    const monthDiff = today.getMonth() - dobDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+      age--;
+    }
+    
+    if (age < 0) {
+      doberror.value = "Invalid date of birth";
+      isValid = false;
+    }
+  }
+
+  // Address validation
+  if (!address.value || address.value.trim() === "") {
+    addresserror.value = "Address is required";
+    isValid = false;
+  }
+
+  // Mobile number validation - exactly 10 digits
+  if (!mobileNo.value) {
+    mobileerror.value = "Mobile number is required";
+    isValid = false;
+  } else if (!isValidMobile.value) {
+    mobileerror.value = "Type 10 digits of Mobile Number";
+    isValid = false;
+  }
+
+  // Email validation
+  if (!email.value) {
+    emailerror.value = "Email is required";
+    isValid = false;
+  } else if (!isValidEmail.value) {
+    emailerror.value = "Ensure proper email id format";
+    isValid = false;
+  }
+
+  // ID validation based on selected type
+  if (selected.value === 'PAN') {
+    if (!paninput.value) {
+      panerror.value = "PAN is required";
+      isValid = false;
+    } else if (!isPanValid.value) {
+      panerror.value = "Type 10 Alphanumeric Characters";
+      isValid = false;
+    }
+  } 
+  else if (selected.value === 'Aadhar Last 4 Digits') {
+    if (!aadharinput.value) {
+      error.value = "ype Last 4 Digits Only";
+      isValid = false;
+    } else if (!isAadharValid.value) {
+      error.value = "Please enter exactly 4 digits of your Aadhar";
+      isValid = false;
+    }
+  } 
+  else if (selected.value === 'Driving Licence') {
+    if (!drivinginput.value) {
+      error.value = "Driving Licence is required";
+      isValid = false;
+    } else if (!isDrivingLicenceValid.value) {
+      error.value = "Type all Alphanumeric Characters (without any special characters and spaces)";
+      isValid = false;
+    }
+  }
+
+  // Guardian validation if nominee is under 18
+  if (!isDisabled.value) {
+    if (!guardian.value || guardian.value.trim() === "") {
+      guardianerror.value = "Guardian is required for nominees under 18";
+      isValid = false;
+    }
+    if (!guardianselectedStatement.value) {
+      gurdianrelationshiperror.value = "Guardian relationship is required";
+      isValid = false;
+    }
+  }
+
+  // Share percentage validation
+  if (!shareval.value) {
+    sharevalerror.value = "Share percentage is required";
+    isValid = false;
+  } else {
+    const share = parseFloat(shareval.value);
+    if (isNaN(share)) {
+      sharevalerror.value = "Invalid share percentage";
+      isValid = false;
+    } else if (share < 0) {
+      sharevalerror.value = "Share percentage cannot be negative";
+      isValid = false;
+    } else if (share > availabilelimit.value) {
+      sharevalerror.value = `Share percentage cannot exceed ${availabilelimit.value}%`;
+      isValid = false;
+    }
+  }
+
+  // If all validations pass, save the nominee
+  if (isValid) {
+    await nomineesavedata();
+  }
+};
+
+
 
 const nomineedelete = async (deleteid) => {
 
@@ -895,15 +1102,18 @@ const nomineedelete = async (deleteid) => {
 const emitSelection = () => {
   prooftype.value = selected.value;
 
-  paninput.value = ''
-  aadharinput.value = ''
-  drivinginput.value = ''
+  // Clear all ID-related errors when switching proof types
+  panerror.value = '';
+  error.value = '';
+
+  paninput.value = '';
+  aadharinput.value = '';
+  drivinginput.value = '';
 
   if (selected.value === 'PAN') {
     pan.value = true;
     aadhar.value = false;
     drivingLicence.value = false;
-
     isAadharValid.value = false;
     isDrivingLicenceValid.value = false;
   }
@@ -911,7 +1121,6 @@ const emitSelection = () => {
     pan.value = false;
     aadhar.value = true;
     drivingLicence.value = false;
-
     isPanValid.value = false;
     isDrivingLicenceValid.value = false;
   }
@@ -919,12 +1128,10 @@ const emitSelection = () => {
     pan.value = false;
     aadhar.value = false;
     drivingLicence.value = true;
-
     isPanValid.value = false;
     isAadharValid.value = false;
   }
 }
-
 // Event Handlers
 const back = () => {
   const button = rippleBtnback.value
@@ -961,7 +1168,7 @@ const back = () => {
 
 };
 
-const isOptedOut = ref(false);
+
 const handleOptOut = () => {
 
   if (nomine.value.length > 0) {
@@ -976,23 +1183,17 @@ const handleOptOut = () => {
 };
 
 const handleButtonClick = async (event) => {
+
   const nomineedob = [];
   const nomineeval = nomine.value;
 
-  if(nomineeval.length>0){
-      let atLeastOneAdult = false; // Changed from underageNomineeExists
-     if (!atLeastOneAdult) {
-    errorpercent.value = 'At least one nominee must be at least 18 years old.';
-    isStatusValid.value = false;
-    return;
-  }
-  }
 
 
+  let atLeastOneAdult = false;
   const today = new Date();
   nomineeval.forEach(item => {
     if (!item.dob) return; // Skip if no dob
-    
+
     nomineedob.push(item.dob);
 
     const dob = new Date(item.dob);
@@ -1000,9 +1201,9 @@ const handleButtonClick = async (event) => {
     const monthDiff = today.getMonth() - dob.getMonth();
     const dayDiff = today.getDate() - dob.getDate();
 
-    console.log("hgyi",nomine.value)
 
- 
+
+
 
     // Adjust if birthday hasn't occurred yet this year
     const actualAge = (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) ? age - 1 : age;
@@ -1013,7 +1214,19 @@ const handleButtonClick = async (event) => {
   });
 
   // If no nominee is 18 or above, show error and exit
-  
+  if (nomineeval.length > 0) {
+    // Changed from underageNomineeExists
+
+    if (!atLeastOneAdult) {
+      errorpercent.value = 'At least one nominee must be at least 18 years old.';
+      isStatusValid.value = false;
+      return;
+    }
+  }
+
+  if(isOptedOut.value==true){
+    nomineesavedata('true')
+  }
 
   // Rest of your existing code for ripple effect and server interaction
   const buttonWrapper = rippleBtn.value;
@@ -1037,8 +1250,11 @@ const handleButtonClick = async (event) => {
     circle.remove();
 
     try {
+
       const data = await getServerData();
-      if (data?.payload?.status === 'ok' && data?.payload?.metaData?.nominee?.clientCode) {
+
+      if (data?.payload?.status === 'ok') {
+
         const nominee = data.payload.metaData.nominee;
         let totalShare = 0;
 
@@ -1048,6 +1264,7 @@ const handleButtonClick = async (event) => {
         }
 
         if (totalShare === 100 || totalShare === 0) {
+
           const myData = await pagestatus('bank1');
           if (myData?.payload?.status === 'ok') {
             emit('updateDiv', 'bank1');
@@ -1116,15 +1333,15 @@ watch(dob, (newval) => {
       // When under 18, guardian becomes required
       if (!guardian.value) {
         guardianerror.value = '';
-        gurdianrelationshiperror.value=''
+        gurdianrelationshiperror.value = ''
       }
     } else {
 
       guardian.value = ''
       isDisabled.value = true;
       guardianerror.value = '';
-      gurdianrelationshiperror.value=null
-      guardianselectedStatement.value=''
+      gurdianrelationshiperror.value = null
+      guardianselectedStatement.value = ''
     }
   }
 });

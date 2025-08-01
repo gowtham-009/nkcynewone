@@ -17,13 +17,13 @@
                     <span class="text-gray-500 text-md font-medium">Upload Address</span>
                     <div class="grid grid-cols-1 gap-3 dark:bg-gray-800">
                         <div v-if="addressbox"
-                            class="overflow-hidden rounded-lg mt-2 bg-white shadow-lg dark:border-white dark:bg-gray-800">
+                            class="overflow-hidden rounded-lg mt-2 bg-white border-2 border-dashed border-gray-300">
                             <div class="px-2 py-2">
                                 <Addressproof v-model:modelValue="imageSrcaddress" v-model:valid="isImageValid" />
                             </div>
                         </div>
 
-                        <div v-if="addressoverwite" class="w-full p-1 flex justify-center items-center flex-col">
+                        <div v-if="addressoverwite" class="w-full p-1 flex justify-center items-center flex-col border-2 border-dashed border-gray-300" >
                             <div class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="addressoverzoom()">
                                 <img :src="addressoverwitesrc" alt="" class="w-32 h-40 rounded-lg">
                                 <Dialog v-model:visible="visible" modal header="View" :style="{ width: '25rem' }">

@@ -18,23 +18,24 @@
           <div class="grid grid-cols-1 gap-3">
             <div>
               <div v-if="pancard"
-                class="overflow-hidden flex w-full justify-center items-center rounded-lg mt-2 bg-white shadow-lg dark:border-white" >
-                <div class="px-2 py-2 w-full" >
+                class="overflow-hidden flex w-full justify-center items-center rounded-lg mt-2 bg-white border-2 border-dashed border-gray-300">
+                <div class="px-2 py-2 w-full">
                   <PAN v-model:src="imageSrcpan" v-model:valid="isImageValid" />
                 </div>
               </div>
 
-              <div v-if="panoverwite" class="w-full flex flex-col justify-center items-center p-1" >
-                  <div  class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="panoverzoom()" >
+              <div v-if="panoverwite" class="w-full flex flex-col justify-center items-center p-1 border-2 border-dashed border-gray-300">
+                <div class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="panoverzoom()">
                   <img :src="panoverwitesrc" alt="" class="w-32 h-40 rounded-lg">
 
-                   <Dialog v-model:visible="visible1" modal header="View" :style="{ width: '25rem' }">
-                  <img :src="panoverwitesrc" alt="PAN Image" class="shadow-md rounded-xl w-full mb-1"
-                    style="filter: grayscale(100%)" />
-                </Dialog>
+                  <Dialog v-model:visible="visible1" modal header="View" :style="{ width: '25rem' }">
+                    <img :src="panoverwitesrc" alt="PAN Image" class="shadow-md rounded-xl w-full mb-1"
+                      style="filter: grayscale(100%)" />
+                  </Dialog>
                 </div>
 
-                <Button type="button" @click="viewpanoverwrite()" class="w-full bg-blue-500 text-white border-0">Remove</Button>
+                <Button type="button" @click="viewpanoverwrite()"
+                  class="w-full bg-blue-500 text-white border-0">Remove</Button>
               </div>
 
               <div v-if="digipan" class="w-full p-1 flex justify-center bg-gray-100 rounded-lg shadow-sm">
@@ -81,7 +82,6 @@
         </Button>
         <Button type="button" ref="rippleBtn" @click="handleButtonClick"
           :disabled="!(panoverwitesrc || (imageSrcpan && isImageValid && isStatusValid))"
-
           class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
           {{ buttonText }}
         </Button>
@@ -111,39 +111,39 @@ const isImageValid = ref(false)
 const digipan = ref(false)
 const digisrc = ref('')
 const visible = ref(false)
-const panoverwite=ref(false)
-const panoverwitesrc=ref(null)
-const visible1=ref(false)
+const panoverwite = ref(false)
+const panoverwitesrc = ref(null)
+const visible1 = ref(false)
 
-const errorimage=ref(false)
-const imageerror=ref('')
+const errorimage = ref(false)
+const imageerror = ref('')
 
 const getsegmentdata = async () => {
   const headertoken = htoken;
   const mydata = await getServerData();
   const imageauth = headertoken;
   const userToken = localStorage.getItem('userkey');
-  const segments = mydata?.payload?.metaData?.proofs?.pancard ;
+  const segments = mydata?.payload?.metaData?.proofs?.pancard;
 
   if (
-  
+
     mydata?.payload?.metaData?.digi_info?.aadhaarUID && mydata?.payload?.metaData?.digi_docs?.aadhaarDocument
   ) {
 
-    
-   if (segments) {
-  pancard.value = false;
-  panoverwite.value = true;
-  const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
-  
-  panoverwitesrc.value = imgSrc;
-  isImageValid.value = true;  
-  isStatusValid.value = true;
 
-}
-    else{
-       pancard.value=true
-    panoverwite.value=false
+    if (segments) {
+      pancard.value = false;
+      panoverwite.value = true;
+      const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
+
+      panoverwitesrc.value = imgSrc;
+      isImageValid.value = true;
+      isStatusValid.value = true;
+
+    }
+    else {
+      pancard.value = true
+      panoverwite.value = false
     }
   }
 
@@ -153,8 +153,8 @@ const getsegmentdata = async () => {
   if (digilockpan) {
     const panslice = digilockpan.replace(/\.pdf$/i, ".png");
     if (panslice === pancardName) {
-        panoverwite.value = false;
-      pancard.value = false; 
+      panoverwite.value = false;
+      pancard.value = false;
       digipan.value = true
       const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${pancardName}`;
       digisrc.value = imgSrc
@@ -167,7 +167,7 @@ const getsegmentdata = async () => {
 
 watch([imageSrcpan, isImageValid], ([src, valid]) => {
   if (src && valid) {
-    isStatusValid.value = true; 
+    isStatusValid.value = true;
   }
 });
 
@@ -248,10 +248,10 @@ const resetProgress = () => {
 
 
 const proofupload = async () => {
-  errorimage.value=false
+  errorimage.value = false
   if (!imageSrcpan.value) {
-      errorimage.value=true
-      imageerror.value="Please upload file in valid format"
+    errorimage.value = true
+    imageerror.value = "Please upload file in valid format"
     return;
   }
 
@@ -265,7 +265,7 @@ const proofupload = async () => {
     const blob = await response.blob();
 
     // Create encrypted JSON payload
-    const encryptedPayload =await encryptionrequestdata({
+    const encryptedPayload = await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: 'uploadbank',
     });
@@ -280,7 +280,7 @@ const proofupload = async () => {
       method: 'POST',
       headers: {
         'Authorization': headertoken
-      
+
       },
       body: formData,
     });
@@ -310,13 +310,13 @@ const proofupload = async () => {
     }
 
     else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
+
+    }
   } catch (error) {
     resetProgress();
     console.error('Upload failed:', error.message);
@@ -341,31 +341,31 @@ const back = (event) => {
   setTimeout(async () => {
     circle.remove();
     const mydata = await getServerData();
-      const perm_editstatus = mydata?.payload?.metaData?.address?.permChange
-      const comm_editstatus = mydata?.payload?.metaData?.address?.commChange
+    const perm_editstatus = mydata?.payload?.metaData?.address?.permChange
+    const comm_editstatus = mydata?.payload?.metaData?.address?.commChange
 
     if (mydata?.payload?.status === 'ok') {
-       if (perm_editstatus === '1' || comm_editstatus === '1') {
-                  const page = await pagestatus('paddressproof');
-                    if (page?.payload?.status === 'ok') {
-                        emit('updateDiv', 'paddressproof');
-                    }
-            }
+      if (perm_editstatus === '1' || comm_editstatus === '1') {
+        const page = await pagestatus('paddressproof');
+        if (page?.payload?.status === 'ok') {
+          emit('updateDiv', 'paddressproof');
+        }
+      }
 
-       else{
-          pagestatus('brokerage'),
-        emit('updateDiv', 'brokerage');
-       }     
-      
+      else {
+        pagestatus('brokerage'),
+          emit('updateDiv', 'brokerage');
+      }
+
     }
     else if (mydata.payload.status == 'error') {
-            if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
-                alert(mydata.payload.message);
-                localStorage.removeItem('userkey')
-                router.push('/')
-            }
+      if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
+        alert(mydata.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
     }
-   
+
   }, 600);
 };
 
@@ -389,7 +389,7 @@ const handleButtonClick = async (event) => {
 
     // Fetch server data
     const mydata = await getServerData();
-    
+
     // Handle error response
     if (mydata.payload?.status === 'error') {
       if (mydata.payload.code === '1002' || mydata.payload.code === '1004') {
@@ -406,10 +406,10 @@ const handleButtonClick = async (event) => {
     // Case 1: Digilock PAN exists
     if (digilockpan) {
       const panslice = digilockpan.replace(/\.pdf$/i, ".png");
-      
+
       if (panslice === pancardName) {
         const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
-        
+
         if (statuscheck1) {
           const nextPage = await pagestatus('photosign1');
           if (nextPage.payload.status === 'ok') {
@@ -420,11 +420,11 @@ const handleButtonClick = async (event) => {
           emit('updateDiv', 'uploadbank');
         }
       }
-    } 
+    }
     // Case 2: PAN overwrite is true and pancardName exists
     else if (panoverwite.value === true && pancardName) {
       const bankcheck = mydata?.payload?.metaData?.bank?.bank1HolderName;
-      
+
       if (bankcheck) {
         await pagestatus('photosign1');
         emit('updateDiv', 'photosign1');
@@ -434,7 +434,7 @@ const handleButtonClick = async (event) => {
         emit('updateDiv', 'uploadbank');
         isStatusValid.value = false;
       }
-    } 
+    }
     // Default case
     else {
       proofupload();
