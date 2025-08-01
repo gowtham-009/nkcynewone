@@ -19,7 +19,10 @@
           <div class="w-full mt-3">
             <div class="w-full" :class="{ 'disabled-div': emailbox }"
               :style="emailbox ? { pointerEvents: 'none', opacity: 0.5 } : {}">
-              <EmailInput v-model="emailid" />
+              <EmailInput 
+  v-model="emailid" 
+  :class="{ 'valid-input': validateEmail(emailid), 'invalid-input': emailid && !validateEmail(emailid) }"
+/>
               <span v-if="erroremail" class="text-red-500">{{ emailerror }}</span>
             </div>
           </div>
