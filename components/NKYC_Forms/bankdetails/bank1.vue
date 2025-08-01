@@ -29,12 +29,13 @@
               </div>
 
             </div>
- <span class="text-red-500">{{ accnotypeerror }}</span>
+              <span class="text-red-500">{{ accnotypeerror }}</span>
           </div>
 
           <div>
             <span class="text-gray-500  text-sm">Account No</span>
-            <Accno v-model="accno" />
+            <Accno v-model="accno"  @click="accnoerror = ''"
+        @input="accnoerror = ''" />
              <span class="text-red-500">{{ accnoerror }}</span>
 
           </div>
@@ -42,7 +43,8 @@
 
           <div>
             <span class="text-gray-500  text-sm">IFSC Code</span>
-            <IFSC v-model="ifsc" />
+            <IFSC v-model="ifsc"  @click="ifscerror = ''"
+        @input="ifscerror = ''" />
                   <span class="text-red-500">{{ ifscerror }}</span>
 
           </div>
@@ -50,21 +52,24 @@
 
           <div>
             <span class="text-gray-500  text-sm">MICR Code</span>
-            <MICR v-model="micr" />
+            <MICR v-model="micr"  @click="micrerror = ''"
+        @input="micrerror = ''" />
                   <span class="text-red-500">{{ micrerror }}</span>
 
           </div>
 
           <div>
             <span class="text-gray-500  text-sm">Bank Name</span>
-            <Bankname v-model="bankname" />
+            <Bankname v-model="bankname"  @click="banknameerror = ''"
+        @input="banknameerror = ''" />
                   <span class="text-red-500">{{ banknameerror }}</span>
 
           </div>
 
           <div>
 <span class="text-gray-500  text-sm">BanK Address</span>
-            <Address v-model="address" />
+            <Address v-model="address"  @click="addresserror = ''"
+        @input="addresserror = ''" />
                   <span class="text-red-500">{{ addresserror }}</span>
 
           </div>
@@ -100,7 +105,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button @click="handleButtonClick" ref="rippleBtn" :disabled="!bankname || !accno || !ifsc || !micr || !address || !isStatusValid"
+        <Button @click="handleButtonClick" ref="rippleBtn" :disabled="!bankname || (!accno || accno.length < 5) || (!ifsc || ifsc.length < 11 )|| (!micr || micr.length<5) || (!address || address.length<5) || !isStatusValid"
           class="primary_color  w-5/6 text-white  py-3 text-xl border-0">
           {{ buttonText }}
         </Button>

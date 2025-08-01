@@ -12,12 +12,14 @@
         </p>
 
         <div class="w-full mt-1 ">
-          <Father v-model="father" />
+          <Father v-model="father"  @click="fathererror = ''"
+        @input="fathererror = ''" />
             <span class="text-red-500">{{ fathererror }}</span>
 
         </div>
         <div class="w-full mt-1">
-          <Mother v-model="mother" />
+          <Mother v-model="mother"  @click="mothererror = ''"
+        @input="mothererror = ''" />
                       <span class="text-red-500">{{ mothererror }}</span>
 
         </div>
@@ -36,7 +38,7 @@
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!father || !mother || !isStatusValid"
+        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="(!father || father.length < 3) || (!mother || mother.length < 3) || !isStatusValid"
           class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
           {{ buttonText }}
         </Button>

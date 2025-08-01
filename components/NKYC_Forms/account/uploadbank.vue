@@ -186,7 +186,7 @@ const back = async (event) => {
         emit('updateDiv', 'paddressproof');
       }
      }
-     else{
+     else {
        pagestatus('uploadproof'),
         emit('updateDiv', 'uploadproof');
      }

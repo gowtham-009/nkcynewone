@@ -25,19 +25,23 @@
 
      <div class="w-full" :class="{'opacity-50 pointer-events-none': !isEditMode && initialDataLoaded}">
        <div class="w-full mt-1">
-          <Address v-model="address"  :disabled="!isEditMode && initialDataLoaded" />
+          <Address v-model="address" @click="addresserror = ''"
+        @input="addresserror = ''"  :disabled="!isEditMode && initialDataLoaded" />
           <span class="text-red-500">{{ addresserror }}</span>
         </div>
         <div class="w-full mt-1">
-          <State v-model="state"  :disabled="!isEditMode && initialDataLoaded" />
+          <State v-model="state" @click="stateerror = ''"
+        @input="stateerror = ''" :disabled="!isEditMode && initialDataLoaded" />
           <span class="text-red-500">{{ stateerror }}</span>
         </div>
         <div class="w-full mt-1">
-          <City v-model="city"  :disabled="!isEditMode && initialDataLoaded" />
+          <City v-model="city" @click="cityerror = ''"
+        @input="cityerror = ''" :disabled="!isEditMode && initialDataLoaded" />
           <span class="text-red-500">{{ cityerror }}</span>
         </div>
         <div class="w-full mt-1">
-          <Pincode v-model="pincode"  :disabled="!isEditMode && initialDataLoaded" />
+          <Pincode v-model="pincode" @click="pincodeerror = ''"
+        @input="pincodeerror = ''" :disabled="!isEditMode && initialDataLoaded" />
           <span class="text-red-500">{{ pincodeerror }}</span>
         </div>
      </div>
@@ -51,7 +55,7 @@
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
         </Button>
         <Button type="button" ref="rippleBtn" @click="handleButtonClick"
-          :disabled="!address || !state || !city || !pincode || !isaddress"
+          :disabled="(!address || address.length < 3) || (!state || state.length < 3)||( !city || city.length < 3) || (!pincode || pincode.length < 6)"
           class=" primary_color wave-btn text-white w-5/6 py-3 text-xl border-0  ">
           {{ buttonText }}
           <span v-if="isAnimating" class="wave"></span>

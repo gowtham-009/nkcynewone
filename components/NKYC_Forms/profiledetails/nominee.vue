@@ -978,7 +978,16 @@ const handleOptOut = () => {
 const handleButtonClick = async (event) => {
   const nomineedob = [];
   const nomineeval = nomine.value;
-  let atLeastOneAdult = false; // Changed from underageNomineeExists
+
+  if(nomineeval.length>0){
+      let atLeastOneAdult = false; // Changed from underageNomineeExists
+     if (!atLeastOneAdult) {
+    errorpercent.value = 'At least one nominee must be at least 18 years old.';
+    isStatusValid.value = false;
+    return;
+  }
+  }
+
 
   const today = new Date();
   nomineeval.forEach(item => {
@@ -991,6 +1000,10 @@ const handleButtonClick = async (event) => {
     const monthDiff = today.getMonth() - dob.getMonth();
     const dayDiff = today.getDate() - dob.getDate();
 
+    console.log("hgyi",nomine.value)
+
+ 
+
     // Adjust if birthday hasn't occurred yet this year
     const actualAge = (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) ? age - 1 : age;
 
@@ -1000,11 +1013,7 @@ const handleButtonClick = async (event) => {
   });
 
   // If no nominee is 18 or above, show error and exit
-  if (!atLeastOneAdult) {
-    errorpercent.value = 'At least one nominee must be at least 18 years old.';
-    isStatusValid.value = false;
-    return;
-  }
+  
 
   // Rest of your existing code for ripple effect and server interaction
   const buttonWrapper = rippleBtn.value;
