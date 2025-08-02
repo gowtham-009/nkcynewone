@@ -9,7 +9,8 @@ export const globalurl = () => {
   }
 
    export const deploymenturl=()=>{
-    const domainurl=ref("https://nkcynewone.vercel.app/")
+     const domainurl=ref("https://nkcynewone.vercel.app/")
+ //   const domainurl=ref("http://localhost:3000")
     return{domainurl}
   }
 

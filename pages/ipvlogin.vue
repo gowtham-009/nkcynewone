@@ -64,7 +64,6 @@ onMounted(() => {
 
 const routeComponents = async (token) => {
   const user =await encryptionrequestdata({
-     pageCode:'takephoto',
     userToken: token
   });
   const headertoken=htoken
@@ -91,11 +90,11 @@ const routeComponents = async (token) => {
     if(data.payload.status=='ok' && data.payload.metaData.token){
         localStorage.setItem('userkey',data.payload.metaData.token)
         if(data.payload.metaData.token){
-          
-            const page=await pagestatus('takephoto') 
-            if(page.payload.status=='ok'){
-               window.location.href=domainurl.value
-            }
+            window.location.href=domainurl.value
+          //  const page=await pagestatus('takephoto') 
+            // if(page.payload.status=='ok'){
+             
+            // }
              
         }
       
