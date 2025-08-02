@@ -113,13 +113,6 @@ const pincodeerror = ref('')
 const updateHeight = () => {
   deviceHeight.value = window.innerHeight;
 };
-onMounted(() => {
-  window.addEventListener('resize', updateHeight);
-});
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateHeight);
-});
-
 
 
 
@@ -151,6 +144,15 @@ const setPermanentAddress = async () => {
         state.value = kraIdentityData.stateCode?.[stateCode] || '';
         city.value = kraPan.APP_PER_CITY || '';
         pincode.value = kraPan.APP_PER_PINCD || '';
+
+         const sameAsPermanent = addressData.sameAsPermanent;
+      if(sameAsPermanent==='YES'){
+         commAddressRef.value.confirm = true
+      }
+      else{
+        commAddressRef.value.confirm = false
+      }
+
       }
       else if (digiInfo.aadhaarUID && digiDocs.aadhaarDocument) {
         // Use digi/Aadhaar data
@@ -158,13 +160,15 @@ const setPermanentAddress = async () => {
         state.value = addressData.perState || '';
         city.value = addressData.perCity || '';
         pincode.value = addressData.perPincode || '';
-       const sameAsPermanent = addressData.sameAsPermanent;
+       
+        const sameAsPermanent = addressData.sameAsPermanent;
+      if(sameAsPermanent==='YES'){
+         commAddressRef.value.confirm = true
+      }
+      else{
+        commAddressRef.value.confirm = false
+      }
 
-// Set checkbox to true if value is "YES", else false
-if (commAddressRef.value?.confirm) {
-  
-  commAddressRef.value.confirm.value = sameAsPermanent === 'YES';
-}
 
       }
     }
@@ -185,6 +189,16 @@ if (commAddressRef.value?.confirm) {
       state.value = addressData.perState || '';
       city.value = addressData.perCity || '';
       pincode.value = addressData.perPincode || '';
+
+
+      const sameAsPermanent = addressData.sameAsPermanent;
+      if(sameAsPermanent==='YES'){
+         commAddressRef.value.confirm = true
+      }
+      else{
+        commAddressRef.value.confirm = false
+      }
+     
     }
     initialDataLoaded.value = true;
   } catch (error) {
@@ -197,7 +211,18 @@ if (commAddressRef.value?.confirm) {
   }
 };
 
+
+onMounted(async() => {
+  window.addEventListener('resize', updateHeight);
 await setPermanentAddress();
+   
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateHeight);
+});
+
+
+// await setPermanentAddress();
 const toggleEditMode = async () => {
   if (isEditMode.value) {
     // Cancel: reload original data from server
@@ -319,7 +344,7 @@ const permanentaddressdata = async () => {
         }
       }
       else {
-        console.log(data.payload.message)
+      
       }
     }
 

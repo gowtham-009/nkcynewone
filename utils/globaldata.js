@@ -25,7 +25,7 @@ export async function encryptionrequestdata(newData) {
     ...data,
     ...newData
   };
-  //  return mergedData
+    // return mergedData
 
 
   const jsonData = JSON.stringify(mergedData);
@@ -190,7 +190,7 @@ export async function decrypt(hexString) {
    
 
      const decoded = new TextDecoder().decode(plainBuffer);
-   console.log(decoded)
+
     return decoded
   
   } catch (error) {

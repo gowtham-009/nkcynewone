@@ -46,17 +46,15 @@ onMounted(() => {
     const decodedNumber = Number(decoded);
 
     if (!isNaN(decodedNumber)) {
-      console.log('✅ Base64 Value:', value);
-      console.log('🔢 Decoded Number:', decodedNumber);
+     
       routeComponents(value)
     } else {
-      console.log('✅ Base64 Value:', value);
-      console.log('🔤 Decoded String:', decoded);
+   
          localStorage.removeItem('userkey')
     router.push('/')
     }
   } else {
-    console.log('❌ Not a Base64 value:', value);
+   
     localStorage.removeItem('userkey')
     router.push('/')
   }

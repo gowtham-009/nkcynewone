@@ -277,7 +277,7 @@ const createEsign = async () => {
     if (!response.ok) throw new Error(`Network error: ${response.status}`);
     const decryptedData = await response.json();
     const data = await decryptionresponse(decryptedData);
-    console.log("decryptdata:", data)
+
     if (data.payload.status === 'ok') {
       
       const decoded = atob(data.payload.metaData.dataEsign);

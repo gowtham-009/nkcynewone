@@ -104,7 +104,7 @@ const setMobileData = async () => {
   try {
     const mydata = await getServerData();
     const kraresdata=getEncryptionData()
-    console.log("KRA Data:", kraresdata);
+  
     const appKraMobile = kraresdata?.kradata?.decryptdata?.payload?.metaData?.KYC_DATA?.APP_MOB_NO || '';
     const profileMobile = mydata?.payload?.metaData?.profile?.mobileNo;
      const kraMobile = mydata?.payload?.metaData?.kraPan?.APP_MOB_NO;
@@ -182,7 +182,7 @@ const sendmobileotp = async (resend) => {
   const decryptedData = await response.json(); // Read body regardless of status
 const data = await decryptionresponse(decryptedData);
 
-console.log("Response Data:", data);
+
   if (!response.ok) {
     console.error("Error:", data.message);
     errormsg.value = data.message; // Show in UI
