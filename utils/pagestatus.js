@@ -4,7 +4,6 @@ export async function pagestatus(pagecode) {
   const apiUrl = "https://nnkyc.w3webtechnologies.co.in/api/v1/update_pagestatus";
   const userkey = localStorage.getItem('userkey');
 
-  // Define profileCode mapping based on pagecode
   const profileCodeMap = {
    mobile:3,
    email:6,
@@ -37,7 +36,7 @@ export async function pagestatus(pagecode) {
    thankyou:100,
   };
 
-  const profilecode = profileCodeMap[pagecode] || 0; // fallback to 0 if not matched
+  const profilecode = profileCodeMap[pagecode] || 0;
 
   const encryptedUser = await encryptionrequestdata({
     userToken: userkey,

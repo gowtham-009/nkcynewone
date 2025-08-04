@@ -25,7 +25,7 @@ export async function encryptionrequestdata(newData) {
     ...data,
     ...newData
   };
-      // return mergedData
+    //  return mergedData
 
 
   const jsonData = JSON.stringify(mergedData);
@@ -72,7 +72,7 @@ export async function encryptionrequestdata(newData) {
 
 export async function decryptionresponse(hexString) {
 
-      // return hexString
+      //  return hexString
   try {
     const encKey = hexToBytes(encKeyHex);
     const fullData = hexToBytes(hexString.payload);
@@ -143,16 +143,15 @@ export async function decrypt(hexString) {
     const encKey = hexToBytes(encKeyHex);
     const fullData = hexToBytes(hexString);
 
-    // Check if data is large enough to contain IV (16) + HMAC (32) + at least 1 byte ciphertext
     if (fullData.length < 49) {
       throw new Error('Invalid data length - too short to contain valid encrypted data');
     }
 
     const iv = fullData.slice(0, 16);
-    const hmac = fullData.slice(-32); // SHA-256 HMAC is 32 bytes
+    const hmac = fullData.slice(-32); 
     const cipherBytes = fullData.slice(16, -32);
 
-    // Validate HMAC
+    
     const hmacKey = await crypto.subtle.importKey(
       'raw',
       encKey,
@@ -172,7 +171,7 @@ export async function decrypt(hexString) {
       throw new Error('HMAC verification failed – data may be tampered with!');
     }
 
-    // Decrypt AES-CBC
+ 
     const aesKey = await crypto.subtle.importKey(
       'raw',
       encKey,

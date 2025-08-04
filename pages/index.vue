@@ -17,7 +17,6 @@ import { useRouter, useRoute } from 'vue-router';
 import form1 from '~/components/signup/form1.vue';
 import { getServerData } from '~/utils/serverdata.js';
 
-
 const router = useRouter();
 const route = useRoute();
 const currentForm = ref('pan');
