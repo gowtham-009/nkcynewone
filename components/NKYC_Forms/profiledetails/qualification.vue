@@ -34,21 +34,28 @@
 
           </div>
         </div>
-               <span class="text-red-500">{{ qulificationerror }}</span>
+        <span class="text-red-500">{{ qulificationerror }}</span>
 
 
       </div>
 
 
-      <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!selected || !isStatusValid"
-          class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-          {{ buttonText }}
-        </Button>
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
+        <div class="w-full flex gap-2">
+          <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!selected || !isStatusValid"
+            class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
+            {{ buttonText }}
+          </Button>
+        </div>
       </div>
 
 
@@ -63,7 +70,7 @@ import { pagestatus } from '~/utils/pagestatus.js'
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const deviceHeight = ref(0);
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
@@ -72,7 +79,7 @@ const activebox = ref('marriedbox');
 const isStatusValid = ref(true);
 const isBack = ref(true);
 const emit = defineEmits(['updateDiv']);
-const qulificationerror=ref('')
+const qulificationerror = ref('')
 
 // qualification Status
 const selected = ref("");
@@ -86,7 +93,7 @@ const options = [
 ];
 
 const selectMaritalStatus = (value) => {
-  qulificationerror.value=''
+  qulificationerror.value = ''
   selected.value = value;
 
 };
@@ -98,13 +105,13 @@ const profilesetinfo = async () => {
 
   if (statuscheck) {
 
-    selected.value = mydata?.payload?.metaData?.personal?.education 
+    selected.value = mydata?.payload?.metaData?.personal?.education
 
   }
   else {
-    selected.value =  ''
+    selected.value = ''
   }
-  
+
 };
 
 
@@ -116,6 +123,9 @@ onMounted(() => {
     deviceHeight.value = window.innerHeight;
   });
 });
+
+const offlineerror=ref(false)
+const offerror=ref('')
 
 const back = () => {
   const button = rippleBtnback.value
@@ -130,22 +140,28 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
+offlineerror.value=false
+  if (!navigator.onLine) {
 
-    
- const data = await pagestatus('clientinfo')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
   }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'clientinfo');
-  isBack.value = false;
-}
+
+    const data = await pagestatus('clientinfo')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      emit('updateDiv', 'clientinfo');
+      isBack.value = false;
+    }
 
 
   }, 600)
@@ -154,13 +170,13 @@ const back = () => {
 
 const personalinfo = async () => {
   const apiurl = `${baseurl.value}personal_info`;
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "tradingexperience",
     education: selected.value,
 
   });
-const headertoken=htoken
+  const headertoken = htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
   try {
@@ -184,31 +200,31 @@ const headertoken=htoken
         emit('updateDiv', 'tradingexperience');
       }
 
-       else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
+      else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code == '1004') {
+          alert(data.payload.message);
+          localStorage.removeItem('userkey')
+          router.push('/')
         }
 
-        
-       else if(data.payload.status=='error' && data.payload.errors.length>0) {
-      qulificationerror.value=""
 
-   
-    
-  data.payload.errors.forEach((err) => {
-    
+        else if (data.payload.status == 'error' && data.payload.errors.length > 0) {
+          qulificationerror.value = ""
 
-    if (err.field === 'education' && !selected.value) {
-      qulificationerror.value = err.message || ' ';
-    }
 
- 
- 
-  });
-}
-       
+
+          data.payload.errors.forEach((err) => {
+
+
+            if (err.field === 'education' && !selected.value) {
+              qulificationerror.value = err.message || ' ';
+            }
+
+
+
+          });
+        }
+
       }
 
 
@@ -236,6 +252,13 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+    offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     personalinfo()
     isStatusValid.value = false;
   }, 600)

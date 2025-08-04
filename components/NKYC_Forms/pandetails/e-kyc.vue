@@ -63,30 +63,38 @@
 
 
                 <div class="rounded-md bg-red-50 p-4 mt-2" v-if="digierror">
-    <div class="flex">
-      <div class="shrink-0">
-       <i class="pi pi-info-circle text-lg text-red-500"></i>
-      </div>
-      <div class="ml-3">
-        <h3 class="text-sm font-medium text-red-800">Digilocker service down, Try after 30 mins</h3>
-       
-      </div>
-    </div>
-  </div>
+                    <div class="flex">
+                        <div class="shrink-0">
+                            <i class="pi pi-info-circle text-lg text-red-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-red-800">Digilocker service down, Try after 30 mins</h3>
+
+                        </div>
+                    </div>
+                </div>
 
 
             </div>
 
-            <div class="w-full flex gap-2">
-                <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-                    class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-                    <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-                </Button>
-                <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!isFormdisabled"
-                    class=" primary_color text-white w-5/6 py-3 text-xl border-0  ">
-                    {{ buttonText }}
+            <div class="w-full">
+                <transition name="fade">
+                    <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+                        <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+                    </div>
+                </transition>
 
-                </Button>
+                <div class="w-full flex gap-2">
+                    <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+                        class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+                        <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+                    </Button>
+                    <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!isFormdisabled"
+                        class=" primary_color text-white w-5/6 py-3 text-xl border-0  ">
+                        {{ buttonText }}
+
+                    </Button>
+                </div>
             </div>
 
 
@@ -117,8 +125,8 @@ const router = useRouter();
 const route = useRoute()
 const { baseurl } = globalurl();
 const { domainurl } = deploymenturl();
-const digierror=ref(false)
-const {htoken}=headerToken()
+const digierror = ref(false)
+const { htoken } = headerToken()
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
 const rippleBtnback = ref(null)
@@ -141,48 +149,18 @@ onMounted(() => {
 
 
 const emit = defineEmits(['updateDiv']);
-const back = () => {
-    const button = rippleBtnback.value
-    const circle = document.createElement('span')
-    circle.classList.add('ripple')
 
-    const rect = button.$el.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
-
-    circle.style.left = `${x}px`
-    circle.style.top = `${y}px`
-    button.$el.appendChild(circle)
-
-    setTimeout(async() => {
-        circle.remove()
-       
- const data = await pagestatus('main')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
-  }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'main');
-  isBack.value = false;
-}
-    }, 600)
-
-}
 
 
 const digilocker_create = async () => {
-    digierror.value=false
+    digierror.value = false
     const apiurl = baseurl.value + 'digilocker';
-     const headertoken=htoken
+    const headertoken = htoken
     const authorization = headertoken;
-    const user =await encryptionrequestdata({
+    const user = await encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "createUrl",
-        redirecUrl:domainurl.value+'main'
+        redirecUrl: domainurl.value + 'main'
     });
 
     const payload = { payload: user };
@@ -209,18 +187,18 @@ const digilocker_create = async () => {
             window.location.href = url;
         }
         else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
+            if (data.payload.code == '1002' || data.payload.code == '1004') {
+                alert(data.payload.message);
+                localStorage.removeItem('userkey')
+                router.push('/')
+            }
+
         }
-       
-      }
-      else{
-          digierror.value=true
-      }
+        else {
+            digierror.value = true
+        }
     } catch (error) {
-          digierror.value=true
+        digierror.value = true
         console.error('Error:', error.message);
 
     }
@@ -234,11 +212,11 @@ const digilocker_create = async () => {
 
 
 const digilocker_request = async () => {
-      digierror.value=false
+    digierror.value = false
     const apiurl = baseurl.value + 'digilocker';
- const headertoken=htoken
+    const headertoken = htoken
     const authorization = headertoken;
-        const user =await encryptionrequestdata({
+    const user = await encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "getDetails",
         digilockerReqId: route.query.requestId
@@ -260,20 +238,20 @@ const digilocker_request = async () => {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-           const decryptedData = await response.json();
+        const decryptedData = await response.json();
         const data = await decryptionresponse(decryptedData);
         if (data.payload.status == 'ok') {
             digilocker_getfiles(data)
 
         }
         else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
+            if (data.payload.code == '1002' || data.payload.code == '1004') {
+                alert(data.payload.message);
+                localStorage.removeItem('userkey')
+                router.push('/')
+            }
+
         }
-       
-      }
 
         else {
             content.value = true
@@ -283,24 +261,24 @@ const digilocker_request = async () => {
 
 
     } catch (error) {
-          digierror.value=true
+        digierror.value = true
         console.error('Error:', error.message);
     }
-   
+
 };
 
 
 const digilocker_getfiles = async (requestid) => {
-      digierror.value=false
+    digierror.value = false
     const apiurl = baseurl.value + 'digilocker';
- const headertoken=htoken
+    const headertoken = htoken
     const authorization = headertoken;
-        const files = requestid.payload.metaData.fileIds;
+    const files = requestid.payload.metaData.fileIds;
 
 
 
 
-    const user =await encryptionrequestdata({
+    const user = await encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "getFiles",
         digilockerReqId: requestid.payload.metaData.requestId,
@@ -323,41 +301,41 @@ const digilocker_getfiles = async (requestid) => {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-       
-             const decryptedData = await response.json();
+
+        const decryptedData = await response.json();
         const data = await decryptionresponse(decryptedData);
         if (data.payload.status == 'ok') {
 
             digilocker_getaadhardoc(requestid.payload.metaData.requestId)
         }
         else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
+            if (data.payload.code == '1002' || data.payload.code == '1004') {
+                alert(data.payload.message);
+                localStorage.removeItem('userkey')
+                router.push('/')
+            }
+
         }
-       
-      }
-      else{
-          digierror.value=true
-      }
+        else {
+            digierror.value = true
+        }
 
     } catch (error) {
-          digierror.value=true
+        digierror.value = true
         console.error('Error:', error.message);
     }
-   
+
 };
 
 
 
 const digilocker_getaadhardoc = async (requestid) => {
-      digierror.value=false
+    digierror.value = false
     const apiurl = baseurl.value + 'digilocker';
- const headertoken=htoken
+    const headertoken = htoken
     const authorization = headertoken;
 
-    const user =await encryptionrequestdata({
+    const user = await encryptionrequestdata({
         userToken: localStorage.getItem('userkey'),
         digilockerAction: "createAadhaar",
         digilockerReqId: requestid,
@@ -380,7 +358,7 @@ const digilocker_getaadhardoc = async (requestid) => {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-            const decryptedData = await response.json();
+        const decryptedData = await response.json();
         const data = await decryptionresponse(decryptedData);
         if (data.payload.status == 'ok') {
 
@@ -388,21 +366,21 @@ const digilocker_getaadhardoc = async (requestid) => {
             emit('updateDiv', 'parmanentaddress');
         }
         else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
-      }
+            if (data.payload.code == '1002' || data.payload.code == '1004') {
+                alert(data.payload.message);
+                localStorage.removeItem('userkey')
+                router.push('/')
+            }
 
-       
-else{
-      digierror.value=true
-}
+        }
+
+
+        else {
+            digierror.value = true
+        }
 
     } catch (error) {
-          digierror.value=true
+        digierror.value = true
         console.error('Error:', error.message);
     }
     finally {
@@ -410,6 +388,8 @@ else{
     }
 };
 
+const offlineerror=ref(false)
+const offerror=ref('')
 
 
 
@@ -427,29 +407,74 @@ const handleButtonClick = () => {
 
     button.$el.appendChild(circle)
 
-    setTimeout(async() => {
+    setTimeout(async () => {
         circle.remove()
+
+         offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
+
         const mydata = await getServerData();
-        if(mydata.payload.status=='ok'){
+        if (mydata.payload.status == 'ok') {
             digilocker_create()
-        isFormdisabled.value = false
+            isFormdisabled.value = false
         }
-      else if (mydata.payload.status == 'error') {
-        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
-             alert(mydata.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
+        else if (mydata.payload.status == 'error') {
+            if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
+                alert(mydata.payload.message);
+                localStorage.removeItem('userkey')
+                router.push('/')
+            }
+
         }
-       
-      }
-      
-       
+
+
     }, 600)
 };
 
 
 
+const back = () => {
+    const button = rippleBtnback.value
+    const circle = document.createElement('span')
+    circle.classList.add('ripple')
 
+    const rect = button.$el.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const y = event.clientY - rect.top
+
+    circle.style.left = `${x}px`
+    circle.style.top = `${y}px`
+    button.$el.appendChild(circle)
+
+    setTimeout(async () => {
+        circle.remove()
+           offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
+        const data = await pagestatus('main')
+        if (data.payload.status == 'error') {
+            if (data.payload.code == '1002' || data.payload.code == '1004') {
+                alert(data.payload.message);
+                localStorage.removeItem('userkey')
+                router.push('/')
+            }
+        }
+        else if (data.payload.status == 'ok') {
+            emit('updateDiv', 'main');
+            isBack.value = false;
+        }
+    }, 600)
+
+}
 
 
 

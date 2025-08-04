@@ -23,10 +23,6 @@
                             </p>
                         </div>
                     </div>
-
-                  
-
-
                 </div>
         
 
@@ -130,7 +126,13 @@
         </Button>
         </Dialog>
 
-      <div class="w-full flex gap-2">
+     <div class="w-full">
+       <transition name="fade">
+  <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+    <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+  </div>
+</transition>
+       <div class="w-full flex gap-2">
         <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
@@ -141,6 +143,7 @@
     {{ buttonText }}
   </Button>
       </div>
+     </div>
 
 
     </div>
@@ -179,6 +182,9 @@ const rippleBtnback = ref(null)
 const buttonText = ref("Continue");
 const canvasRef = ref(null);
 const loading = ref(false)
+
+const offlineerror=ref(false)
+const offerror=ref('')
 
 const isStatusValid = ref(true);
 const isBack = ref(true);
@@ -249,6 +255,15 @@ const checkCanvasContent = () => {
 
 
 const getsegmentdatadialog = async () => {
+
+  
+   offlineerror.value=false
+  if (!navigator.onLine) {
+    visible.value = false;
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.additional_docs;
   if (statuscheck) {
@@ -535,6 +550,13 @@ const back = () => {
 
   setTimeout(async() => {
     circle.remove()
+
+     offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
  const data = await pagestatus('photoproceed')
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code=='1004'){
@@ -624,7 +646,12 @@ const handleButtonClick = async () => {
 
   setTimeout(async () => {
     circle.remove();
-    
+     offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     if (initialSignatureLoaded.value && !isSignatureModified.value) {
       const page = await pagestatus('esign');
       if (page?.payload?.status === 'ok') {

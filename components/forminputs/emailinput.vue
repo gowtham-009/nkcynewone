@@ -1,11 +1,19 @@
 <template>
   <div class="input-wrapper">
-    <InputText id="email" class="prime-input w-full border-2  dark:!bg-gray-800" v-model="email" variant="filled"
-      placeholder="Your Email ID" @blur="validateEmail" autocomplete="off" />
+    <InputText
+      id="email"
+      class="prime-input w-full border-2 dark:!bg-gray-800"
+      v-model="email"
+      variant="filled"
+      placeholder="Your Email ID"
+      autocomplete="off"
+      @blur="validateEmail"
+      @keypress="handleKeypress"
+      @input="handleInput"
+    />
     <span class="bottom-border"></span>
   </div>
 </template>
-
 <script setup>
 import { ref, watch } from 'vue';
 import InputText from 'primevue/inputtext';
@@ -21,14 +29,36 @@ watch(email, (newVal) => {
   emit('update:modelValue', newVal);
 });
 
+// Converts lowercase letters to uppercase and prevents non-alphabet input
+const handleKeypress = (event) => {
+  const key = event.key;
+  if (/^[a-z]$/.test(key)) {
+    // Convert lowercase to uppercase manually
+    event.preventDefault();
+    email.value += key.toUpperCase();
+  } else if (/^[A-Z0-9@._-]$/.test(key)) {
+    // Allow uppercase letters, digits, and typical email characters
+    return;
+  } else {
+    // Block anything else
+    event.preventDefault();
+  }
+};
+
+// In case of paste or autocomplete, force uppercase conversion
+const handleInput = (event) => {
+  email.value = event.target.value.toUpperCase();
+};
+
 const validateEmail = () => {
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
   if (!emailPattern.test(email.value)) {
     console.log('Please enter a valid email address');
-    // You can add error handling logic here if needed.
+    // You can show a message to the user here.
   }
 };
 </script>
+
 
 <style scoped>
 .input-wrapper {

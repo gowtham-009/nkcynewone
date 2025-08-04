@@ -4,7 +4,7 @@
       <div class="input-wrapper dark:!bg-gray-800">
        <Textarea   :value="modelValue"
     :disabled="disabled"
-    @input="onInput" varient="filled" rows="2"  class="w-full prime-input" cols="10"  />
+    @input="onInput" varient="filled" rows="5"  class="w-full prime-input" cols="10"  />
        <span class="bottom-border"></span>
       </div>
     

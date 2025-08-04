@@ -32,7 +32,13 @@
       <div class="w-full">
 
 
-        <div class="w-full flex gap-2">
+        <div class="w-full">
+           <transition name="fade">
+  <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+    <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+  </div>
+</transition>
+          <div class="w-full flex gap-2">
           <Button @click="back()" ref="rippleBtnback"
             class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900" :disabled="!isBack">
             <i class="pi pi-angle-left text-3xl dark:text-white"></i>
@@ -41,6 +47,7 @@
             class=" primary_color wave-btn text-white w-5/6 py-3 text-xl border-0  ">
             {{ buttonText }}
           </Button>
+        </div>
         </div>
 
       </div>
@@ -95,7 +102,8 @@ const getsegmentdata = async () => {
   }
   
 };
-
+const offlineerror=ref(false)
+const offerror=ref('')
 onMounted(async () => {
   await getsegmentdata()
   deviceHeight.value = window.innerHeight;
@@ -132,7 +140,12 @@ const back = () => {
 
   setTimeout(async () => {
     circle.remove()
-    circle.remove()
+    offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
   const data = await pagestatus('photosign1')
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code=='1004'){
@@ -152,6 +165,12 @@ const back = () => {
 
 const documentsavebtn = async () => {
 
+   offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
 
   const apiurl = `${baseurl.value}additional_docs`;
   const user =await encryptionrequestdata({
@@ -222,7 +241,12 @@ const handleButtonClick = () => {
 
   setTimeout(async () => {
     circle.remove()
-
+     offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
 
     const page = await pagestatus('signdraw')
    if (page.payload.status == 'error') {

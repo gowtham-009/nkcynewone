@@ -49,7 +49,15 @@
           </div>
         </div>
       </div>
+    
+
       <div class="w-full">
+        <transition name="fade">
+  <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+    <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+  </div>
+</transition>
+
      <Button 
   ref="buttonRef" 
   :disabled="isButtonDisabled"
@@ -112,6 +120,9 @@ const tokenval = ref('');
 
 const resend_sh = ref(false)
 const timeLeft = ref(10);
+
+
+
 let timer = null;
 
 const boxdisable=ref(false)
@@ -131,6 +142,9 @@ watch(panvalue, (newVal) => {
 });
 
 onMounted(async() => {
+
+
+ 
 
   const reflogin=route.query.reflogin
   if(reflogin){
@@ -166,7 +180,15 @@ onUnmounted(() => {
   clearInterval(timer);
 });
 
+const offlineerror=ref(false)
+const offerror=ref('')
 const panvalidation = async () => {
+    offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
   const apiurl = `${baseurl.value}pan_verification`;
   const user = await encryptionrequestdata({
     pageCode: 'pan',
@@ -188,6 +210,7 @@ const panvalidation = async () => {
     })
 
     if (!response.ok) {
+ 
       throw new Error(`Network error: ${response.status}`);
     }
     
@@ -195,12 +218,21 @@ const panvalidation = async () => {
     return await decryptionresponse(data);
      
   } catch (error) {
+   
     console.error('PAN validation error:', error.message)
     return { payload: { status: 'error', message: error.message } }
   }
 }
 
 const kraaddresssubmission = async (resend) => {
+
+   offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
   const apiurl = `${baseurl.value}kra_pan`;
   const userkey = localStorage.getItem('userkey') || '';
 
@@ -264,6 +296,14 @@ const kraaddresssubmission = async (resend) => {
 };
 
 const otpverfication = async () => {
+
+   offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
   const apiurl = `${baseurl.value}login_verification`;
   const encrypted = await encryptionrequestdata({
     userToken: tokenval.value,
@@ -402,6 +442,9 @@ watch(loginotpval, (val) => {
 </script>
 
 <style scoped>
+
+
+
 .wave-btn {
   position: relative;
   overflow: hidden;

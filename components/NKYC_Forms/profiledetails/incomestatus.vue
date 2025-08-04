@@ -27,19 +27,26 @@
             {{ option.label }}
           </button>
         </div>
-            <span class="text-red-500">{{ incomeerror }}</span>
+        <span class="text-red-500">{{ incomeerror }}</span>
       </div>
 
 
-      <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!selected || !isStatusValid"
-          class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-          {{ buttonText }}
-        </Button>
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
+        <div class="w-full flex gap-2">
+          <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!selected || !isStatusValid"
+            class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
+            {{ buttonText }}
+          </Button>
+        </div>
       </div>
 
 
@@ -52,7 +59,7 @@
 import { ref, onMounted } from 'vue';
 import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const emit = defineEmits(['updateDiv']);
@@ -63,7 +70,7 @@ const rippleBtn = ref(null);
 const isStatusValid = ref(true);
 const rippleBtnback = ref(null)
 const isBack = ref(true);
-const incomeerror=ref('')
+const incomeerror = ref('')
 const selected = ref("");
 const options = [
   { label: "Below 1 lakh", value: "BELOW 1 LAC" },
@@ -75,7 +82,7 @@ const options = [
 ];
 
 const selectMaritalStatus = (value) => {
-  incomeerror.value=''
+  incomeerror.value = ''
   selected.value = value;
 };
 
@@ -93,43 +100,12 @@ const profilesetinfo = async () => {
 
   } catch (error) {
     console.error('Error in profilesetinfo:', error);
-    
+
   }
 };
 
 
 await profilesetinfo()
-const back = () => {
-  const button = rippleBtnback.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
-
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
-
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-  button.$el.appendChild(circle)
-
-  setTimeout(async() => {
-    circle.remove()
-  const data = await pagestatus('occupation')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
-  }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'occupation');
-  isBack.value = false;
-}
-  }, 600)
-
-};
-
 
 onMounted(() => {
   deviceHeight.value = window.innerHeight;
@@ -140,14 +116,14 @@ onMounted(() => {
 
 const personalinfo = async () => {
   const apiurl = `${baseurl.value}personal_info`;
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "nominee",
 
     annualIncome: selected.value,
 
   });
-const headertoken=htoken
+  const headertoken = htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
   try {
@@ -171,33 +147,33 @@ const headertoken=htoken
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'nominee');
       }
-         else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
+      else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code == '1004') {
+          alert(data.payload.message);
+          localStorage.removeItem('userkey')
+          router.push('/')
         }
 
-           else if(data.payload.status=='error' && data.payload.errors.length>0){
-  
+        else if (data.payload.status == 'error' && data.payload.errors.length > 0) {
 
-   
-    
-  data.payload.errors.forEach((err) => {
-    
 
-    if (err.field === 'annualIncome' && !selected.value) {
-      incomeerror.value = err.message || ' ';
-    }
 
- 
- 
-  });
-}
-       
+
+          data.payload.errors.forEach((err) => {
+
+
+            if (err.field === 'annualIncome' && !selected.value) {
+              incomeerror.value = err.message || ' ';
+            }
+
+
+
+          });
+        }
+
       }
 
-    
+
 
     }
 
@@ -205,6 +181,10 @@ const headertoken=htoken
     console.log(error.message)
   }
 }
+
+
+const offlineerror=ref(false)
+const offerror=ref('')
 
 const handleButtonClick = () => {
   const button = rippleBtn.value
@@ -222,8 +202,59 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+
+     offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
+
     personalinfo()
     isStatusValid.value = false;
   }, 600)
 };   
+
+const back = () => {
+  const button = rippleBtnback.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+  button.$el.appendChild(circle)
+
+  setTimeout(async () => {
+    circle.remove()
+
+     offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
+  
+    const data = await pagestatus('occupation')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      emit('updateDiv', 'occupation');
+      isBack.value = false;
+    }
+  }, 600)
+
+};
+
+
 </script>

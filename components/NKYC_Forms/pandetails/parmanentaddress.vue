@@ -1,6 +1,6 @@
 <template>
   <div class="primary_color">
-    <!-- Header -->
+  
     <div class="flex justify-between primary_color items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
       <logo style="width: 40px; height: 40px;" />
       <profile />
@@ -51,7 +51,13 @@
       </div>
 
       <!-- Buttons -->
-      <div class="w-full flex gap-2">
+      <div class="w-full">
+         <transition name="fade">
+  <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+    <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+  </div>
+</transition>
+        <div class="w-full flex gap-2">
         <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
           class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
           <i class="pi pi-angle-left text-3xl dark:text-white"></i>
@@ -64,6 +70,7 @@
           <span v-if="isAnimating" class="wave"></span>
         </Button>
       </div>
+      </div>
     </div>
   </div>
 </template>
@@ -75,7 +82,6 @@ import State from '~/components/NKYC_Forms/pandetails/paninputs/state.vue';
 import City from '~/components/NKYC_Forms/pandetails/paninputs/city.vue';
 import Pincode from '~/components/NKYC_Forms/pandetails/paninputs/pincode.vue';
 import Addresscheck from '~/components/NKYC_Forms/pandetails/paninputs/confirmcheckbox.vue';
-
 import { pagestatus } from '~/utils/pagestatus.js'
 import { useRouter } from 'vue-router';
 const router = useRouter();
@@ -147,7 +153,7 @@ const setPermanentAddress = async () => {
 
          const sameAsPermanent = addressData.sameAsPermanent;
       if(sameAsPermanent==='YES'){
-         commAddressRef.value.confirm = true
+         commAddressRef.value.confirm = true 
       }
       else{
         commAddressRef.value.confirm = false
@@ -174,8 +180,6 @@ const setPermanentAddress = async () => {
     }
     else {
    
-      // Use address data if available
-
       
       const addParts = [
         addressData.perAddress,
@@ -215,6 +219,7 @@ const setPermanentAddress = async () => {
 onMounted(async() => {
   window.addEventListener('resize', updateHeight);
 await setPermanentAddress();
+// commAddressRef.value.confirm = true
    
 });
 onBeforeUnmount(() => {
@@ -356,7 +361,8 @@ const permanentaddressdata = async () => {
 
 
 
-
+const offlineerror=ref(false)
+const offerror=ref('')
 // Handle continue button click
 const handleButtonClick = (event) => {
 
@@ -376,7 +382,13 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove()
+ offlineerror.value=false
+  if (!navigator.onLine) {
 
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     permanentaddressdata()
     isaddress.value = false
 
@@ -400,7 +412,13 @@ function back() {
 
   setTimeout(async () => {
     circle.remove()
+ offlineerror.value=false
+  if (!navigator.onLine) {
 
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     const data = await pagestatus('main')
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {

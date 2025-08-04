@@ -80,17 +80,15 @@
         <input type="text" v-model="idval" class="hidden">
         <div class="w-full">
           <span class="text-md text-gray-500">Nominee's name*</span>
-          <Name v-model="name" @click="nameerror = ''"
-        @input="nameerror = ''"/>
+          <Name v-model="name" @click="nameerror = ''" @input="nameerror = ''" />
           <span class="text-red-500">{{ nameerror }}</span>
 
         </div>
         <div class="w-full mt-4">
           <span class="text-gray-500 ">Relationship*</span>
           <div class="input-wrapper dark:!bg-gray-800">
-            <Select v-model="selectedStatement" :options="statementOptions" optionLabel="name"  @click="relationshiperror = ''"
-        @input="relationshiperror = ''"
-              class="w-full prime-input " />
+            <Select v-model="selectedStatement" :options="statementOptions" optionLabel="name"
+              @click="relationshiperror = ''" @input="relationshiperror = ''" class="w-full prime-input " />
             <span class="bottom-border"></span>
           </div>
           <span class="text-red-500">{{ relationshiperror }}</span>
@@ -98,16 +96,14 @@
         </div>
         <div class="w-full mt-2">
           <span class="text-md text-gray-500">DOB*</span>
-          <DOB v-model="dob"  @click="doberror = ''"
-        @input="doberror = ''"/>
+          <DOB v-model="dob" @click="doberror = ''" @input="doberror = ''" />
           <span class="text-red-500">{{ doberror }}</span>
 
         </div>
 
         <div class="w-full mt-2">
           <label for="pan_label" class="text-gray-500 text-md font-normal leading-3">Address* </label>
-          <Address v-model="address"  @click="addresserror = ''"
-        @input="addresserror = ''"/>
+          <Address v-model="address" @click="addresserror = ''" @input="addresserror = ''" />
           <span class="text-red-500">{{ addresserror }}</span>
 
         </div>
@@ -116,10 +112,9 @@
 
           <div class="w-full flex justify">
             <span class="text-md text-gray-500">Mobile no*</span>
-            
+
           </div>
-          <Mobile v-model="mobileNo" @click="mobileerror = ''"
-        @input="mobileerror = ''"/>
+          <Mobile v-model="mobileNo" @click="mobileerror = ''" @input="mobileerror = ''" />
           <span class="text-red-500">{{ mobileerror }}</span>
 
         </div>
@@ -127,13 +122,12 @@
         <div class="w-full mt-2">
           <div class="w-full flex justify-between">
             <span class="text-md text-gray-500">Email ID*</span>
-           
+
           </div>
 
 
-          <Email v-model="email" @click="emailerror = ''"
-        @input="emailerror = ''"/>
-           <span class="text-red-500">{{ emailerror }}</span>
+          <Email v-model="email" @click="emailerror = ''" @input="emailerror = ''" />
+          <span class="text-red-500">{{ emailerror }}</span>
 
         </div>
         <div class="w-full mt-2">
@@ -157,29 +151,29 @@
 
 
 
-        <span class="block text-gray-500 text-md font-normal mt-2">{{ prooftype }}</span>
+          <span class="block text-gray-500 text-md font-normal mt-2">{{ prooftype }}</span>
 
-   <!-- PAN Input -->
-<div v-if="pan" class="w-full">
-  <Pan v-model="paninput" @click="panerror = ''" @input="panerror = ''"/>
-  <span class="text-red-500">{{ panerror }}</span>
-</div>
+          <!-- PAN Input -->
+          <div v-if="pan" class="w-full">
+            <Pan v-model="paninput" @click="panerror = ''" @input="panerror = ''" />
+            <span class="text-red-500">{{ panerror }}</span>
+          </div>
 
-<!-- Aadhar Input -->
-<div v-if="aadhar" class="w-full">
-  <Aadhar v-model="aadharinput" @click="error = ''" @input="error = ''"/>
-  <span class="text-red-500">{{ error }}</span>
-</div>
+          <!-- Aadhar Input -->
+          <div v-if="aadhar" class="w-full">
+            <Aadhar v-model="aadharinput" @click="error = ''" @input="error = ''" />
+            <span class="text-red-500">{{ error }}</span>
+          </div>
 
-<!-- Driving Licence Input -->
-<div v-if="drivingLicence" class="w-full">
-  <Driving v-model="drivinginput" @click="error = ''" @input="error = ''"/>
-  <span class="text-red-500">{{ error }}</span>
-</div>
-         
-         
+          <!-- Driving Licence Input -->
+          <div v-if="drivingLicence" class="w-full">
+            <Driving v-model="drivinginput" @click="error = ''" @input="error = ''" />
+            <span class="text-red-500">{{ error }}</span>
+          </div>
 
-          
+
+
+
         </div>
 
 
@@ -187,16 +181,15 @@
           <div :class="{ 'disabled-container': isDisabled }">
             <span class="text-md text-gray-500">Nominee's guardian*</span>
 
-            <Guardian v-model="guardian" @click="guardianerror = ''"
-        @input="guardianerror = ''"/>
+            <Guardian v-model="guardian" @click="guardianerror = ''" @input="guardianerror = ''" />
             <span class="text-red-500">{{ guardianerror }}</span>
 
 
             <div class="w-full mt-4">
               <span class="text-gray-500 ">Guardian Relationship*</span>
               <div class="input-wrapper dark:!bg-gray-800">
-                <Select v-model="guardianselectedStatement" :options="guardianstatementOptions" optionLabel="name" @click="gurdianrelationshiperror = ''"
-        @input="gurdianrelationshiperror = ''"
+                <Select v-model="guardianselectedStatement" :options="guardianstatementOptions" optionLabel="name"
+                  @click="gurdianrelationshiperror = ''" @input="gurdianrelationshiperror = ''"
                   class="w-full prime-input " />
                 <span class="bottom-border"></span>
               </div>
@@ -208,21 +201,24 @@
         </div>
         <div class="w-full mt-2">
           <span class="text-md text-gray-500">ADFAS Share %*</span>
-          <Sharevalue v-model="shareval"  @click="sharevalerror = ''"
-        @input="sharevalerror = ''" />
+          <Sharevalue v-model="shareval" @click="sharevalerror = ''" @input="sharevalerror = ''" />
           <span class="text-red-500">{{ sharevalerror }}</span>
 
           <p class="text-right text-gray-500 text-md">Maximum limit:0 - {{ availabilelimit }}</p>
         </div>
         <div class="w-full mt-3">
-          <Button  label="Save" @click="dialogeventdata()"
-            class="primary_color w-full text-white py-2" />
+          <Button label="Save" @click="dialogeventdata()" class="primary_color w-full text-white py-2" />
 
         </div>
       </Dialog>
 
       <!-- Navigation Buttons -->
-      <div class="w-full ">
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
         <div class="relative w-full">
           <button class="w-full py-3 mt-3 border-2 rounded-lg text-center relative" :class="[
             isOptedOut ? 'bg-blue-600 text-white border-blue-600' : 'text-blue-500 border-blue-600',
@@ -289,6 +285,9 @@ const idval = ref('')
 
 const shareval = ref('');
 
+const offlineerror=ref(false)
+const offerror=ref('')
+
 const visible = ref(false);
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
@@ -319,9 +318,6 @@ const paninput = ref('')
 const aadharinput = ref('')
 const drivinginput = ref('')
 
-// const isPanValid = ref(false);
-// const isAadharValid = ref(false);
-// const isDrivingLicenceValid = ref(false);
 
 // error
 const nameerror = ref('')
@@ -425,7 +421,7 @@ const openNomineeDialog = async () => {
   gurdianrelationshiperror.value = "";
   panerror.value = "";
   error.value = "";
-  
+
   // ✅ Show error if trying to add more than 10 nominees
   if (!idval.value && nomineeCount.value >= 10) {
     errorpercent.value = "Only 10 nominees are allowed.";
@@ -671,9 +667,17 @@ const dialogbox = (editdata) => {
 };
 const nomineesavedata = async (optvalue) => {
 
- if(!optvalue){
-   visible.value = true;
- }
+    offlineerror.value=false
+  if (!navigator.onLine) {
+     visible.value = false
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
+
+  if (!optvalue) {
+    visible.value = true;
+  }
 
 
   // Validate maximum nominees
@@ -756,33 +760,33 @@ const nomineesavedata = async (optvalue) => {
       idNumber = drivinginput.value;
     }
 
-let user
-  if(optvalue=='true'){
+    let user
+    if (optvalue == 'true') {
       user = await encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
-      pageCode: "nominee",
-     optoutStatus:"true"
-    });
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "nominee",
+        optoutStatus: "true"
+      });
 
-    
-  }else{
+
+    } else {
       user = await encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
-      pageCode: "nominee",
-      nomineeName: name.value,
-      nomineeRelation: relationship,
-      nomineeAddress: address.value,
-      nomineeMobile: mobileNo.value,
-      nomineeEmail: email.value,
-      nomineeIdType: selected.value,
-      nomineeIdNo: idNumber,
-      nomineeDob: formattedDate,
-      nomineeGuardianName: guardian.value,
-      nomineeGuardianRelation: gurdianrelationval,
-      nomineeShare: share,
-      nomineeId: nomineeId,
-    });
-  }
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "nominee",
+        nomineeName: name.value,
+        nomineeRelation: relationship,
+        nomineeAddress: address.value,
+        nomineeMobile: mobileNo.value,
+        nomineeEmail: email.value,
+        nomineeIdType: selected.value,
+        nomineeIdNo: idNumber,
+        nomineeDob: formattedDate,
+        nomineeGuardianName: guardian.value,
+        nomineeGuardianRelation: gurdianrelationval,
+        nomineeShare: share,
+        nomineeId: nomineeId,
+      });
+    }
     const headertoken = htoken
     const payload = { payload: user };
     const apiurl = `${baseurl.value}nominee`;
@@ -922,7 +926,7 @@ const dialogeventdata = async () => {
   gurdianrelationshiperror.value = "";
   panerror.value = "";
   error.value = "";
-  
+
   // Validate required fields
   let isValid = true;
 
@@ -932,7 +936,7 @@ const dialogeventdata = async () => {
     isValid = false;
   }
   else if (name.value.trim().length < 3) {
-    nameerror.value = "Nominee name must be at least minimum characters";
+    nameerror.value = "Nominee name must be minimum of 3 characters";
     isValid = false;
   }
 
@@ -952,11 +956,11 @@ const dialogeventdata = async () => {
     const today = new Date();
     let age = today.getFullYear() - dobDate.getFullYear();
     const monthDiff = today.getMonth() - dobDate.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
       age--;
     }
-    
+
     if (age < 0) {
       doberror.value = "Invalid date of birth";
       isValid = false;
@@ -969,7 +973,7 @@ const dialogeventdata = async () => {
     isValid = false;
   }
   else if (address.value.trim().length < 3) {
-    addresserror.value = "Address must be at minimum characters";
+    addresserror.value = "Address must be  minimum of 3 characters";
     isValid = false;
   }
 
@@ -997,10 +1001,10 @@ const dialogeventdata = async () => {
       panerror.value = "PAN is required";
       isValid = false;
     } else if (!isPanValid.value) {
-      panerror.value = "Type 10 Alphanumeric Characters";
+      panerror.value = "(eg. ABCDE1234F) Please enter valid PAN";
       isValid = false;
     }
-  } 
+  }
   else if (selected.value === 'Aadhar Last 4 Digits') {
     if (!aadharinput.value) {
       error.value = "Type Last 4 Digits Only";
@@ -1009,7 +1013,7 @@ const dialogeventdata = async () => {
       error.value = "Please enter exactly 4 digits of your Aadhar";
       isValid = false;
     }
-  } 
+  }
   else if (selected.value === 'Driving Licence') {
     if (!drivinginput.value) {
       error.value = "Driving Licence is required";
@@ -1156,7 +1160,13 @@ const back = () => {
 
   setTimeout(async () => {
     circle.remove()
+  offlineerror.value=false
+  if (!navigator.onLine) {
 
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     const data = await pagestatus('income')
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
@@ -1191,6 +1201,14 @@ const handleOptOut = () => {
 };
 
 const handleButtonClick = async (event) => {
+
+    offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
 
   const nomineedob = [];
   const nomineeval = nomine.value;
@@ -1232,7 +1250,7 @@ const handleButtonClick = async (event) => {
     }
   }
 
-  if(isOptedOut.value==true){
+  if (isOptedOut.value == true) {
     nomineesavedata('true')
   }
 

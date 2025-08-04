@@ -84,7 +84,13 @@
          
             <div class="w-full">
 
-                <div class="w-full flex gap-2">
+               <div class="w-full">
+                 <transition name="fade">
+  <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+    <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+  </div>
+</transition>
+                 <div class="w-full flex gap-2">
                     <Button @click="back()" ref="rippleBtnback"  class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900" :disabled="!isBack">
                        
                         <i class="pi pi-angle-left text-3xl dark:text-white"></i>
@@ -94,6 +100,7 @@
                         {{ buttonText }}
                     </Button>
                 </div>
+               </div>
             </div>
 
         </div>
@@ -138,7 +145,8 @@ onMounted(async() => {
 
 
 
-
+const offlineerror=ref(false)
+const offerror=ref('')
 
 const emit = defineEmits(['updateDiv']);
 const back = () => {
@@ -156,6 +164,12 @@ const back = () => {
 
     setTimeout(async () => {
         circle.remove()
+          offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
         const mydata = await getServerData();
 
         const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
@@ -223,6 +237,13 @@ const handleButtonClick = () => {
 
     setTimeout(async () => {
         circle.remove()
+
+          offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
         const mydata = await getServerData();
         const statuscheck = mydata?.payload?.metaData?.proofs?.ipvImg || '';
        if(mydata.payload.status=='ok'){

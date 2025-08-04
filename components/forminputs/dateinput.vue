@@ -1,6 +1,6 @@
 <template>
-  <div class="date-input-container">
-    <label class="input-label">Date of Birth as per PAN</label>
+  <div class="date-input-container" >
+    <label class="input-label font-medium text-gray-500 text-md dark:text-gray-400">Date of Birth as per PAN</label>
     <div 
       class="date-input-wrapper"
       @click="focusInput"
@@ -501,17 +501,16 @@ const isDateDisabled = (date) => {
 <style scoped>
 .date-input-container {
   width: 100%;
-  max-width: 400px;
+ 
   margin: 0 auto;
   position: relative;
 }
 
 .input-label {
   display: block;
-  font-weight: 600;
-  font-size: 0.875rem;
+ 
   margin-bottom: 6px;
-  color: #374151;
+  
 }
 
 .date-input-wrapper {

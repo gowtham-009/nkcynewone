@@ -32,21 +32,28 @@
             </button>
           </div>
         </div>
-               <span class="text-red-500">{{tradingerror }}</span>
+        <span class="text-red-500">{{ tradingerror }}</span>
 
 
       </div>
 
 
-      <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!selected || !isStatusValid"
-          class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-          {{ buttonText }}
-        </Button>
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
+        <div class="w-full flex gap-2">
+          <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!selected || !isStatusValid"
+            class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
+            {{ buttonText }}
+          </Button>
+        </div>
       </div>
 
 
@@ -58,7 +65,7 @@
 import { ref, onMounted } from 'vue';
 import { pagestatus } from '~/utils/pagestatus.js'
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const deviceHeight = ref(0);
 const buttonText = ref("Next");
 const rippleBtn = ref(null);
@@ -67,7 +74,7 @@ const emit = defineEmits(['updateDiv']);
 const rippleBtnback = ref(null)
 const isStatusValid = ref(true);
 const isBack = ref(true);
-const tradingerror=ref('')
+const tradingerror = ref('')
 import { useRouter } from 'vue-router';
 const router = useRouter();
 // qualification Status
@@ -81,7 +88,7 @@ const options = [
 ];
 
 const selectMaritalStatus = (value) => {
-  tradingerror.value=''
+  tradingerror.value = ''
   selected.value = value;
 };
 
@@ -90,12 +97,12 @@ const profilesetinfo = async () => {
   const mydata = await getServerData();
   const statuscheck = mydata?.payload?.metaData?.personal?.tradingExperience;
   if (statuscheck) {
-    selected.value = mydata?.payload?.metaData?.personal?.tradingExperience 
+    selected.value = mydata?.payload?.metaData?.personal?.tradingExperience
   }
-  else  {
+  else {
     selected.value = ''
   }
- 
+
 };
 
 await profilesetinfo()
@@ -105,6 +112,9 @@ onMounted(() => {
     deviceHeight.value = window.innerHeight;
   });
 });
+
+const offlineerror=ref(false)
+const offerror=ref('')
 
 const back = () => {
   const button = rippleBtnback.value
@@ -116,20 +126,27 @@ const back = () => {
   circle.style.left = `${x}px`
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
- const data = await pagestatus('qualification')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
+     offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
   }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'qualification');
-  isBack.value = false;
-}
+    const data = await pagestatus('qualification')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      emit('updateDiv', 'qualification');
+      isBack.value = false;
+    }
 
   }, 600)
 
@@ -138,13 +155,13 @@ const back = () => {
 
 const personalinfo = async () => {
   const apiurl = `${baseurl.value}personal_info`;
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "occupation",
     tradingExperience: selected.value,
 
   });
-const headertoken=htoken
+  const headertoken = htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
   try {
@@ -168,32 +185,32 @@ const headertoken=htoken
         emit('updateDiv', 'occupation');
       }
 
-       else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
+      else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code == '1004') {
+          alert(data.payload.message);
+          localStorage.removeItem('userkey')
+          router.push('/')
         }
 
-               else if(data.payload.status=='error' && data.payload.errors.length>0){
-      tradingerror.value=""
+        else if (data.payload.status == 'error' && data.payload.errors.length > 0) {
+          tradingerror.value = ""
 
-   
-    
-  data.payload.errors.forEach((err) => {
-    
 
-    if (err.field === 'tradingExperience' && !selected.value) {
-      tradingerror.value = err.message || ' ';
-    }
- 
-  });
-}
-       
+
+          data.payload.errors.forEach((err) => {
+
+
+            if (err.field === 'tradingExperience' && !selected.value) {
+              tradingerror.value = err.message || ' ';
+            }
+
+          });
+        }
+
       }
 
 
-      
+
 
 
     }
@@ -218,6 +235,12 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+     offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     personalinfo()
     isStatusValid.value = false;
   }, 600)

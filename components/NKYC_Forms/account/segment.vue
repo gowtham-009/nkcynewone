@@ -19,42 +19,58 @@
 
 
         <div class="grid grid-cols-1 gap-2 mt-2">
-        <button v-for="option in options" :key="option.value" @click="toggleSelection(option.value)" :class="[
-    'w-full text-left px-3 py-2 rounded-2xl border-2 transition-all shadow-sm relative',
-    selected.includes(option.value)
-      ? 'bg-blue-600 border-blue-600 text-white'
-      : 'bg-white border-gray-300 text-black dark:bg-gray-800 dark:text-white'
-  ]">
-  <!-- Top row: label and check icon -->
-  <div class="flex justify-between items-center">
-    <p class="text-md font-semibold">
-      {{ option.label }}
-    </p>
-    <i v-if="selected.includes(option.value)" 
-       class="pi pi-check text-white text-sm rounded-full bg-green-500 p-1"></i>
-  </div>
+          <button v-for="option in options" :key="option.value" @click="toggleSelection(option.value)" :class="[
+            'w-full text-left px-3 py-2 rounded-2xl border-2 transition-all shadow-sm relative',
+            selected.includes(option.value)
+              ? 'bg-blue-600 border-blue-600 text-white'
+              : 'bg-white border-gray-300 text-black dark:bg-gray-800 dark:text-white'
+          ]">
+            <!-- Top row: label and check icon -->
+          <div class="w-full flex justify-between ">
+              <div class="w-5/6" >
+              <p class="text-md font-semibold">
+                {{ option.label }}
+              </p>
 
-  <!-- Subtext -->
-  <p class="text-sm opacity-70">
-    {{ option.subtext }}
-  </p>
-</button>
+                <p class="text-sm opacity-70">
+              {{ option.subtext }}
+            </p>
+             
+            </div>
+
+            <div class="w-1/6 flex justify-center items-center" >
+                 <i v-if="selected.includes(option.value)"
+                class="pi pi-check text-white text-sm rounded-full shadow-lg bg-green-500 p-2"></i>
+            </div>
+          </div>
+
+    
+          
+          </button>
         </div>
-             <span class="text-red-500">{{ segmenterror }}</span>
+        <span class="text-red-500">{{ segmenterror }}</span>
 
 
       </div>
 
       <!-- Submit Button -->
-      <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="selected.length === 0 || !isStatusValid"
-          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
-          {{ buttonText }}
-        </Button>
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
+        <div class="w-full flex gap-2">
+          <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button type="button" ref="rippleBtn" @click="handleButtonClick"
+            :disabled="selected.length === 0 || !isStatusValid"
+            class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
+            {{ buttonText }}
+          </Button>
+        </div>
       </div>
     </div>
   </div>
@@ -67,11 +83,11 @@ const router = useRouter();
 
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const selected = ref(['equity', 'fno', 'commodities']);
-const isStatusValid = ref(true); 
-const isBack = ref(true); 
-const segmenterror=ref('')
+const isStatusValid = ref(true);
+const isBack = ref(true);
+const segmenterror = ref('')
 const options = [
   {
     label: 'Equity',
@@ -91,7 +107,7 @@ const options = [
 ];
 
 const toggleSelection = (value) => {
-  segmenterror.value=''
+  segmenterror.value = ''
   const index = selected.value.indexOf(value);
   if (index > -1) {
     selected.value.splice(index, 1);
@@ -147,7 +163,7 @@ const rippleBtnback = ref(null)
 const segmentdata = async () => {
   const apiurl = `${baseurl.value}segments`;
 
-  // Map from selected options (e.g., equity, fno, commodities) to segment flags
+  
   const segmentFlags = {
     nseCASH: "NO",
     bseCASH: "NO",
@@ -180,12 +196,12 @@ const segmentdata = async () => {
     segmentFlags.MCX = "YES";
   }
 
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "brokerage",
     ...segmentFlags
   });
- const headertoken=htoken
+  const headertoken = htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
 
@@ -204,33 +220,34 @@ const segmentdata = async () => {
     }
 
     const decryptedData = await response.json();
-   const data = await decryptionresponse(decryptedData);
-    segmenterror.value=''
+    const data = await decryptionresponse(decryptedData);
+    segmenterror.value = ''
     if (data.payload.status === 'ok') {
       emit('updateDiv', 'brokerage');
     }
-     else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-
-         else if (data.payload.status == 'error' && data.payload.code=='I1001') {
-       
-      segmenterror.value=data.payload.message
-}
-       
+    else if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
 
-     
+      else if (data.payload.status == 'error' && data.payload.code == 'I1001') {
+
+        segmenterror.value = data.payload.message
+      }
+
+    }
+
+
 
   } catch (error) {
     console.error(error.message);
   }
 };
 
-
+const offlineerror=ref(false)
+const offerror=ref('')
 
 const back = () => {
   const button = rippleBtnback.value
@@ -248,18 +265,25 @@ const back = () => {
   setTimeout(async () => {
     circle.remove()
 
- const data = await pagestatus('bank4')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
+     offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
   }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'bank4');
-  isBack.value = false;
-}
+
+    const data = await pagestatus('bank4')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      emit('updateDiv', 'bank4');
+      isBack.value = false;
+    }
   }, 600)
 
 };
@@ -288,6 +312,12 @@ const handleButtonClick = () => {
 
   setTimeout(async () => {
     circle.remove()
+     offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     segmentdata()
     isStatusValid.value = false;
   }, 600)

@@ -12,15 +12,13 @@
         </p>
 
         <div class="w-full mt-1 ">
-          <Father v-model="father"  @click="fathererror = ''"
-        @input="fathererror = ''" />
-            <span class="text-red-500">{{ fathererror }}</span>
+          <Father v-model="father" @click="fathererror = ''" @input="fathererror = ''" />
+          <span class="text-red-500">{{ fathererror }}</span>
 
         </div>
         <div class="w-full mt-1">
-          <Mother v-model="mother"  @click="mothererror = ''"
-        @input="mothererror = ''" />
-                      <span class="text-red-500">{{ mothererror }}</span>
+          <Mother v-model="mother" @click="mothererror = ''" @input="mothererror = ''" />
+          <span class="text-red-500">{{ mothererror }}</span>
 
         </div>
 
@@ -33,15 +31,23 @@
 
       </div>
 
-      <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="(!father || father.length < 3) || (!mother || mother.length < 3) || !isStatusValid"
-          class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-          {{ buttonText }}
-        </Button>
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
+        <div class="w-full flex gap-2">
+          <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button type="button" ref="rippleBtn" @click="handleButtonClick"
+            :disabled="(!father || father.length < 3) || (!mother || mother.length < 3) || !isStatusValid"
+            class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
+            {{ buttonText }}
+          </Button>
+        </div>
       </div>
 
 
@@ -64,7 +70,7 @@ import { pagestatus } from '~/utils/pagestatus.js'
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const emit = defineEmits(['updateDiv']);
 
 const deviceHeight = ref(0);
@@ -75,15 +81,15 @@ const rippleBtnback = ref(null)
 const father = ref("");
 const mother = ref("");
 
-const fathererror=ref('')
-const mothererror=ref('')
+const fathererror = ref('')
+const mothererror = ref('')
 
 const isStatusValid = ref(true);
 const isBack = ref(true);
 const profilesetinfo = async () => {
   try {
     const mydata = await getServerData();
-    
+
     // Safely access nested properties with optional chaining
     const kraPan = mydata?.payload?.metaData?.kraPan || {};
     const personal = mydata?.payload?.metaData?.personal || {};
@@ -96,18 +102,18 @@ const profilesetinfo = async () => {
         // Use KRA data as primary source
         father.value = kraPan.APP_F_NAME || '';
         mother.value = kraPan.APP_M_NAME || personal.motherName || '';
-      } 
+      }
       else if (digiInfo.aadhaarUID && digiDocs.aadhaarDocument) {
         // Fall back to digi info if available
         father.value = personal.fatherName || '';
         mother.value = personal.motherName || '';
       }
-    } 
+    }
     else {
       // Use personal data if available (checking both father and mother names)
       father.value = personal.fatherName || '';
       mother.value = personal.motherName || '';
-      
+
       // If either name is missing, try to fall back to other sources
       if (!father.value && kraPan.APP_KRA_INFO) {
         father.value = kraPan.APP_F_NAME || '';
@@ -116,7 +122,7 @@ const profilesetinfo = async () => {
         mother.value = kraPan.APP_M_NAME || personal.motherName || '';
       }
     }
-    
+
   } catch (error) {
     console.error('Error processing profile info:', error);
     // Set default empty values in case of error
@@ -137,14 +143,14 @@ onMounted(() => {
 
 const personalinfo = async () => {
   const apiurl = `${baseurl.value}personal_info`;
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "qualification",
     fatherName: father.value,
     motherName: mother.value,
 
   });
- const headertoken=htoken
+  const headertoken = htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
   try {
@@ -164,41 +170,41 @@ const personalinfo = async () => {
     else {
       const decryptedData = await response.json()
       const data = await decryptionresponse(decryptedData);
-          fathererror.value=""
-     mothererror.value =""
+      fathererror.value = ""
+      mothererror.value = ""
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'qualification');
       }
 
-        else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
+      else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code == '1004') {
+          alert(data.payload.message);
+          localStorage.removeItem('userkey')
+          router.push('/')
         }
 
-         else if(data.payload.status=='error' && data.payload.errors.length>0){
-  
-   
-    
-  data.payload.errors.forEach((err) => {
-    
+        else if (data.payload.status == 'error' && data.payload.errors.length > 0) {
 
-    if (err.field === 'fatherName' && !father.value) {
-      fathererror.value = err.message || ' ';
-    }
-    if (err.field === 'motherName' && !mother.value) {
-      mothererror.value = err.message || ' ';
-    }
- 
- 
-  });
-}
-       
+
+
+          data.payload.errors.forEach((err) => {
+
+
+            if (err.field === 'fatherName' && !father.value) {
+              fathererror.value = err.message || ' ';
+            }
+            if (err.field === 'motherName' && !mother.value) {
+              mothererror.value = err.message || ' ';
+            }
+
+
+          });
+        }
+
       }
 
 
-   
+
 
     }
 
@@ -206,6 +212,9 @@ const personalinfo = async () => {
     console.log(error.message)
   }
 }
+
+const offlineerror=ref(false)
+const offerror=ref('')
 
 const handleButtonClick = () => {
 
@@ -224,6 +233,13 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+     offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     personalinfo()
     isStatusValid.value = false;
   }, 600)
@@ -245,22 +261,28 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
+ offlineerror.value=false
+  if (!navigator.onLine) {
 
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
 
     const data = await pagestatus('info')
     if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
-  }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'info');
-  isBack.value = false;
-}
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      emit('updateDiv', 'info');
+      isBack.value = false;
+    }
   }, 600)
 
 };

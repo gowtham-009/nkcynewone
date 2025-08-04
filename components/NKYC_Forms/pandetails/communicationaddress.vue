@@ -14,52 +14,56 @@
         <p class="text-sm  leading-5 text-gray-500 font-normal">
           Please enter your address as per the documents you have uploaded.
         </p>
-      <div class="w-full flex justify-end">
-          <span 
-            @click="toggleEditMode" 
-            class="px-2 py-2 cursor-pointer text-blue-500 bg-blue-50 rounded-lg"
-          >
+        <div class="w-full flex justify-end">
+          <span @click="toggleEditMode" class="px-2 py-2 cursor-pointer text-blue-500 bg-blue-50 rounded-lg">
             {{ isEditMode ? 'Cancel' : 'Edit' }}
           </span>
         </div>
 
-     <div class="w-full" :class="{'opacity-50 pointer-events-none': !isEditMode && initialDataLoaded}">
-       <div class="w-full mt-1">
-          <Address v-model="address" @click="addresserror = ''"
-        @input="addresserror = ''"  :disabled="!isEditMode && initialDataLoaded" />
-          <span class="text-red-500">{{ addresserror }}</span>
+        <div class="w-full" :class="{ 'opacity-50 pointer-events-none': !isEditMode && initialDataLoaded }">
+          <div class="w-full mt-1">
+            <Address v-model="address" @click="addresserror = ''" @input="addresserror = ''"
+              :disabled="!isEditMode && initialDataLoaded" />
+            <span class="text-red-500">{{ addresserror }}</span>
+          </div>
+          <div class="w-full mt-1">
+            <State v-model="state" @click="stateerror = ''" @input="stateerror = ''"
+              :disabled="!isEditMode && initialDataLoaded" />
+            <span class="text-red-500">{{ stateerror }}</span>
+          </div>
+          <div class="w-full mt-1">
+            <City v-model="city" @click="cityerror = ''" @input="cityerror = ''"
+              :disabled="!isEditMode && initialDataLoaded" />
+            <span class="text-red-500">{{ cityerror }}</span>
+          </div>
+          <div class="w-full mt-1">
+            <Pincode v-model="pincode" @click="pincodeerror = ''" @input="pincodeerror = ''"
+              :disabled="!isEditMode && initialDataLoaded" />
+            <span class="text-red-500">{{ pincodeerror }}</span>
+          </div>
         </div>
-        <div class="w-full mt-1">
-          <State v-model="state" @click="stateerror = ''"
-        @input="stateerror = ''" :disabled="!isEditMode && initialDataLoaded" />
-          <span class="text-red-500">{{ stateerror }}</span>
-        </div>
-        <div class="w-full mt-1">
-          <City v-model="city" @click="cityerror = ''"
-        @input="cityerror = ''" :disabled="!isEditMode && initialDataLoaded" />
-          <span class="text-red-500">{{ cityerror }}</span>
-        </div>
-        <div class="w-full mt-1">
-          <Pincode v-model="pincode" @click="pincodeerror = ''"
-        @input="pincodeerror = ''" :disabled="!isEditMode && initialDataLoaded" />
-          <span class="text-red-500">{{ pincodeerror }}</span>
-        </div>
-     </div>
 
 
       </div>
 
-      <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick"
-          :disabled="(!address || address.length < 3) || (!state || state.length < 3)||( !city || city.length < 3) || (!pincode || pincode.length < 6)"
-          class=" primary_color wave-btn text-white w-5/6 py-3 text-xl border-0  ">
-          {{ buttonText }}
-          <span v-if="isAnimating" class="wave"></span>
-        </Button>
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
+        <div class="w-full flex gap-2">
+          <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button type="button" ref="rippleBtn" @click="handleButtonClick"
+            :disabled="(!address || address.length < 3) || (!state || state.length < 3) || (!city || city.length < 3) || (!pincode || pincode.length < 6)"
+            class=" primary_color wave-btn text-white w-5/6 py-3 text-xl border-0  ">
+            {{ buttonText }}
+            <span v-if="isAnimating" class="wave"></span>
+          </Button>
+        </div>
       </div>
 
 
@@ -85,7 +89,7 @@ const router = useRouter();
 const emit = defineEmits(['updateDiv']);
 
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const deviceHeight = ref(0);
 const buttonText = ref("Continue");
 const rippleBtn = ref(null);
@@ -103,15 +107,15 @@ const isBack = ref(true);
 
 
 //errorlist
-const addresserror=ref('')
-const stateerror=ref('')
-const cityerror=ref('')
-const pincodeerror=ref('')
+const addresserror = ref('')
+const stateerror = ref('')
+const cityerror = ref('')
+const pincodeerror = ref('')
 
 const setCommunicationAddress = async () => {
   try {
     const mydata = await getServerData();
-    
+
     // Safely access nested properties with defaults
     const kraPan = mydata?.payload?.metaData?.kraPan || {};
     const addressData = mydata?.payload?.metaData?.address || {};
@@ -128,9 +132,9 @@ const setCommunicationAddress = async () => {
           kraPan.APP_COR_ADD2 || '',
           kraPan.APP_COR_ADD3 || ''
         ].filter(Boolean).join(" ");
-        
+
         address.value = addParts;
-        
+
         // Note: Using PER_STATE for communication address - verify if this is correct
         const stateCode = String(kraPan.APP_COR_STATE || '');
         state.value = kraIdentityData.stateCode?.[stateCode] || '';
@@ -144,7 +148,7 @@ const setCommunicationAddress = async () => {
         city.value = addressData.comCity || '';
         pincode.value = addressData.comPincode || '';
       }
-    } 
+    }
     else {
       // Use communication address data if available
       const addParts = [
@@ -152,14 +156,14 @@ const setCommunicationAddress = async () => {
         addressData.comAddressLine2,
         addressData.comAddressLine3
       ].filter(Boolean).join(" ");
-      
+
       address.value = addParts;
       state.value = addressData.comState || '';
       city.value = addressData.comCity || '';
       pincode.value = addressData.comPincode || '';
     }
 
-     initialDataLoaded.value = true;
+    initialDataLoaded.value = true;
   } catch (error) {
     console.error('Error setting communication address:', error);
     // Reset all fields on error
@@ -200,31 +204,31 @@ const communicateaddressdata = async () => {
   const apiurl = `${baseurl.value}address`;
   let user
 
-  if(isEditMode.value){
-    user =await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: "info",
-    communicationAddress: address.value,
-    communicationCity: city.value,
-    communicationState: state.value,
-    communicationPincode: pincode.value,
-     commChange:1
+  if (isEditMode.value) {
+    user = await encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: "info",
+      communicationAddress: address.value,
+      communicationCity: city.value,
+      communicationState: state.value,
+      communicationPincode: pincode.value,
+      commChange: 1
 
-  });
+    });
   }
-  else{
-      user =await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
-    pageCode: "info",
-    communicationAddress: address.value,
-    communicationCity: city.value,
-    communicationState: state.value,
-    communicationPincode: pincode.value,
-     commChange:0
-       });
+  else {
+    user = await encryptionrequestdata({
+      userToken: localStorage.getItem('userkey'),
+      pageCode: "info",
+      communicationAddress: address.value,
+      communicationCity: city.value,
+      communicationState: state.value,
+      communicationPincode: pincode.value,
+      commChange: 0
+    });
   }
-   
- const headertoken=htoken
+
+  const headertoken = htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
   try {
@@ -244,10 +248,10 @@ const communicateaddressdata = async () => {
     else {
       const decryptedData = await response.json()
       const data = await decryptionresponse(decryptedData);
-    addresserror.value=""
-     cityerror.value =""
-     stateerror.value=""
-     pincodeerror.value=""
+      addresserror.value = ""
+      cityerror.value = ""
+      stateerror.value = ""
+      pincodeerror.value = ""
       if (data.payload.status == 'ok') {
         const mydata = await pagestatus('info')
         if (mydata.payload.status == 'ok') {
@@ -258,42 +262,45 @@ const communicateaddressdata = async () => {
         }
       }
 
-     else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
+      else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code == '1004') {
+          alert(data.payload.message);
+          localStorage.removeItem('userkey')
+          router.push('/')
         }
 
-          else if(data.payload.status=='error' && data.payload.errors.length>0) {
-      
-   
-     data.payload.errors.forEach((err) => {
-    
+        else if (data.payload.status == 'error' && data.payload.errors.length > 0) {
 
-    if (err.field === 'communicationAddress' && !address.value) {
-      addresserror.value = err.message || ' ';
-    }
-    if (err.field === 'communicationCity' && !city.value) {
-      cityerror.value = err.message || ' ';
-    }
-    if (err.field === 'communicationState' && !state.value) {
-      stateerror.value = err.message || ' ';
-    }
-    if (err.field === 'communicationPincode' && !pincode.value) {
-      pincodeerror.value = err.message || ' ';
-    }
-  });
-}
-       
+
+          data.payload.errors.forEach((err) => {
+
+
+            if (err.field === 'communicationAddress' && !address.value) {
+              addresserror.value = err.message || ' ';
+            }
+            if (err.field === 'communicationCity' && !city.value) {
+              cityerror.value = err.message || ' ';
+            }
+            if (err.field === 'communicationState' && !state.value) {
+              stateerror.value = err.message || ' ';
+            }
+            if (err.field === 'communicationPincode' && !pincode.value) {
+              pincodeerror.value = err.message || ' ';
+            }
+          });
+        }
+
       }
-    
+
     }
 
   } catch (error) {
     console.log(error.message)
   }
 }
+
+const offlineerror=ref(false)
+const offerror=ref('')
 
 const handleButtonClick = () => {
 
@@ -313,6 +320,13 @@ const handleButtonClick = () => {
   setTimeout(() => {
     circle.remove()
 
+ offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     communicateaddressdata()
     isaddress.value = false;
   }, 600)
@@ -336,20 +350,27 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
- const data = await pagestatus('parmanentaddress')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
+     offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
   }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'parmanentaddress');
-  isBack.value = false;
-}
+    const data = await pagestatus('parmanentaddress')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      emit('updateDiv', 'parmanentaddress');
+      isBack.value = false;
+    }
   }, 600)
 
 };

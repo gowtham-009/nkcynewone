@@ -24,7 +24,8 @@
                 </div>
               </div>
 
-              <div v-if="panoverwite" class="w-full flex flex-col justify-center items-center p-1 border-2 border-dashed border-gray-300">
+              <div v-if="panoverwite"
+                class="w-full flex flex-col justify-center items-center p-1 border-2 border-dashed border-gray-300">
                 <div class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="panoverzoom()">
                   <img :src="panoverwitesrc" alt="" class="w-32 h-40 rounded-lg">
 
@@ -75,16 +76,23 @@
       </div>
 
       <!-- Submit Buttons -->
-      <div class="w-full flex gap-2">
-        <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick"
-          :disabled="!(panoverwitesrc || (imageSrcpan && isImageValid && isStatusValid))"
-          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
-          {{ buttonText }}
-        </Button>
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
+        <div class="w-full flex gap-2">
+          <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button type="button" ref="rippleBtn" @click="handleButtonClick"
+            :disabled="!(panoverwitesrc || (imageSrcpan && isImageValid && isStatusValid))"
+            class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
+            {{ buttonText }}
+          </Button>
+        </div>
       </div>
     </div>
   </div>
@@ -114,6 +122,9 @@ const visible = ref(false)
 const panoverwite = ref(false)
 const panoverwitesrc = ref(null)
 const visible1 = ref(false)
+
+const offlineerror=ref(false)
+const offerror=ref('')
 
 const errorimage = ref(false)
 const imageerror = ref('')
@@ -340,6 +351,12 @@ const back = (event) => {
 
   setTimeout(async () => {
     circle.remove();
+      offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     const mydata = await getServerData();
     const perm_editstatus = mydata?.payload?.metaData?.address?.permChange
     const comm_editstatus = mydata?.payload?.metaData?.address?.commChange
@@ -387,6 +404,12 @@ const handleButtonClick = async (event) => {
     // Remove ripple after animation
     setTimeout(() => circle.remove(), 600);
 
+      offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     // Fetch server data
     const mydata = await getServerData();
 

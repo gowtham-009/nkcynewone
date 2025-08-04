@@ -23,7 +23,8 @@
                             </div>
                         </div>
 
-                        <div v-if="addressoverwite" class="w-full p-1 flex justify-center items-center flex-col border-2 border-dashed border-gray-300" >
+                        <div v-if="addressoverwite"
+                            class="w-full p-1 flex justify-center items-center flex-col border-2 border-dashed border-gray-300">
                             <div class="w-32 h-40 rounded-lg cursor-pointer mb-2" @click="addressoverzoom()">
                                 <img :src="addressoverwitesrc" alt="" class="w-32 h-40 rounded-lg">
                                 <Dialog v-model:visible="visible" modal header="View" :style="{ width: '25rem' }">
@@ -60,16 +61,23 @@
                 </div>
             </div>
 
-            <div class="w-full flex gap-2">
-                <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
-                    class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-                    <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-                </Button>
-                <Button type="button" ref="rippleBtn" @click="handleButtonClick"
-                    :disabled="!((addressoverwitesrc || (imageSrcaddress && isImageValid)) && isStatusValid)"
-                    class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
-                    {{ buttonText }}
-                </Button>
+            <div class="w-full">
+                <transition name="fade">
+                    <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+                        <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+                    </div>
+                </transition>
+                <div class="w-full flex gap-2">
+                    <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
+                        class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+                        <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+                    </Button>
+                    <Button type="button" ref="rippleBtn" @click="handleButtonClick"
+                        :disabled="!((addressoverwitesrc || (imageSrcaddress && isImageValid)) && isStatusValid)"
+                        class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0">
+                        {{ buttonText }}
+                    </Button>
+                </div>
             </div>
         </div>
     </div>
@@ -140,12 +148,12 @@ function viewaddressoverwrite() {
 function addressoverzoom() {
     visible.value = true
 }
-
+const offlineerror=ref(false)
+const offerror=ref('')
 const back = async (event) => {
     const button = rippleBtnback.value;
     const circle = document.createElement('span');
     circle.classList.add('ripple');
-
     const rect = button.$el.getBoundingClientRect();
     circle.style.left = `${event.clientX - rect.left}px`;
     circle.style.top = `${event.clientY - rect.top}px`;
@@ -153,12 +161,20 @@ const back = async (event) => {
 
     setTimeout(async () => {
         circle.remove();
+
+         offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
+
         const mydata = await getServerData();
         const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
 
         if (mydata.payload.status == 'ok') {
             pagestatus('brokerage'),
-                    emit('updateDiv', 'brokerage');
+                emit('updateDiv', 'brokerage');
             isBack.value = false;
         }
         else if (mydata.payload.status == 'error') {
@@ -262,26 +278,26 @@ const proofupload = async () => {
         if (data.payload.status === 'ok') {
             completeProgress();
             const mydata = await getServerData();
-              const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
+            const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
             const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
 
             if (mydata?.payload?.status === 'ok') {
 
                 if (statuscheck && statuscheck1) {
-                const page = await pagestatus('photosign1');
-                if (page?.payload?.status === 'ok') {
-                    emit('updateDiv', 'photosign1');
+                    const page = await pagestatus('photosign1');
+                    if (page?.payload?.status === 'ok') {
+                        emit('updateDiv', 'photosign1');
+                    }
+                } else if (statuscheck && !statuscheck1) {
+                    await pagestatus('uploadbank');
+                    emit('updateDiv', 'uploadbank');
+                } else if (!statuscheck) {
+                    await pagestatus('uploadproof');
+                    emit('updateDiv', 'uploadproof');
                 }
-            } else if (statuscheck && !statuscheck1) {
-                await pagestatus('uploadbank');
-                emit('updateDiv', 'uploadbank');
-            } else if (!statuscheck) {
-                await pagestatus('uploadproof');
-                emit('updateDiv', 'uploadproof');
-            }
 
             }
-        
+
 
 
         } else if (data.payload.status == 'error') {
@@ -313,14 +329,20 @@ const handleButtonClick = (event) => {
 
     setTimeout(async () => {
         circle.remove();
+         offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
         const mydata = await getServerData();
         const addresscardName = mydata?.payload?.metaData?.proofs?.permanentAddress1;
-        
+
         const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
         const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
 
         if (addressoverwite.value === true && addresscardName) {
-           if (statuscheck && statuscheck1) {
+            if (statuscheck && statuscheck1) {
                 const page = await pagestatus('photosign1');
                 if (page?.payload?.status === 'ok') {
                     emit('updateDiv', 'photosign1');

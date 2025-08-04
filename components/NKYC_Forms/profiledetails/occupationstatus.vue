@@ -27,19 +27,26 @@
             {{ option.label }}
           </button>
         </div>
-                       <span class="text-red-500">{{ occupationerror }}</span>
+        <span class="text-red-500">{{ occupationerror }}</span>
 
       </div>
 
-      <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!selected || !isStatusValid"
-          class="primary_color  text-white w-5/6 py-3 text-xl border-0">
-          {{ buttonText }}
-        </Button>
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
+        <div class="w-full flex gap-2">
+          <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!selected || !isStatusValid"
+            class="primary_color  text-white w-5/6 py-3 text-xl border-0">
+            {{ buttonText }}
+          </Button>
+        </div>
       </div>
 
 
@@ -55,7 +62,7 @@ import { pagestatus } from '~/utils/pagestatus.js'
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const deviceHeight = ref(0);
 const activebox = ref('marriedbox');
 const emit = defineEmits(['updateDiv']);
@@ -65,7 +72,7 @@ const rippleBtnback = ref(null)
 const isStatusValid = ref(true);
 const selected = ref("");
 const isBack = ref(true);
-const occupationerror=ref('')
+const occupationerror = ref('')
 const options = [
   { label: "Agriculturist ", value: "AGRICULTURIST " },
   { label: "Business", value: "BUSINESS" },
@@ -80,7 +87,7 @@ const options = [
 ];
 
 const selectMaritalStatus = (value) => {
-  occupationerror.value=''
+  occupationerror.value = ''
   selected.value = value;
 
 
@@ -99,44 +106,11 @@ const profilesetinfo = async () => {
 
   } catch (error) {
     console.error('Error in profilesetinfo:', error);
-    
+
   }
 };
 
 await profilesetinfo()
-
-const back = () => {
-  const button = rippleBtnback.value
-  const circle = document.createElement('span')
-  circle.classList.add('ripple')
-
-  const rect = button.$el.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
-
-  circle.style.left = `${x}px`
-  circle.style.top = `${y}px`
-  button.$el.appendChild(circle)
-
-  setTimeout(async() => {
-    circle.remove()
-
- const data = await pagestatus('tradingexperience')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
-  }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'tradingexperience');
-  isBack.value = false;
-}
-
-  }, 600)
-
-};
 
 
 onMounted(() => {
@@ -148,13 +122,13 @@ onMounted(() => {
 
 const personalinfo = async () => {
   const apiurl = `${baseurl.value}personal_info`;
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: "income",
     occupation: selected.value,
 
   });
- const headertoken=htoken
+  const headertoken = htoken
   const payload = { payload: user };
   const jsonString = JSON.stringify(payload);
   try {
@@ -177,40 +151,44 @@ const personalinfo = async () => {
       if (data.payload.status == 'ok') {
         emit('updateDiv', 'income');
       }
-        else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
+      else if (data.payload.status == 'error') {
+        if (data.payload.code == '1002' || data.payload.code == '1004') {
+          alert(data.payload.message);
+          localStorage.removeItem('userkey')
+          router.push('/')
         }
 
-          else if(data.payload.status=='error' && data.payload.errors.length>0) {
-      occupationerror.value=""
+        else if (data.payload.status == 'error' && data.payload.errors.length > 0) {
+          occupationerror.value = ""
 
-   
-    
-  data.payload.errors.forEach((err) => {
-    
 
-    if (err.field === 'occupation' && !selected.value) {
-      occupationerror.value = err.message || ' ';
-    }
 
- 
- 
-  });
-}
+          data.payload.errors.forEach((err) => {
 
-       
+
+            if (err.field === 'occupation' && !selected.value) {
+              occupationerror.value = err.message || ' ';
+            }
+
+
+
+          });
+        }
+
+
       }
 
-     
+
     }
 
   } catch (error) {
     console.log(error.message)
   }
 }
+
+const offlineerror=ref(false)
+const offerror=ref('')
+
 const handleButtonClick = () => {
   const button = rippleBtn.value
   const circle = document.createElement('span')
@@ -227,8 +205,58 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
+
+     offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     personalinfo()
-isStatusValid.value=false
+    isStatusValid.value = false
   }, 600)
 }; 
+
+
+
+const back = () => {
+  const button = rippleBtnback.value
+  const circle = document.createElement('span')
+  circle.classList.add('ripple')
+
+  const rect = button.$el.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+
+  circle.style.left = `${x}px`
+  circle.style.top = `${y}px`
+  button.$el.appendChild(circle)
+
+  setTimeout(async () => {
+    circle.remove()
+ offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
+    const data = await pagestatus('tradingexperience')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      emit('updateDiv', 'tradingexperience');
+      isBack.value = false;
+    }
+
+  }, 600)
+
+};
+
 </script>

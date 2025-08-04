@@ -95,15 +95,22 @@
                     </div>
                 </div>
             </div>
-            <div class="w-full flex gap-2">
-                <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-                    class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-                    <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-                </Button>
-                <Button type="button" ref="rippleBtn" :disabled="!isFormValid" label="Continue"
-                    @click="handleButtonClick" class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-                    {{ buttonText }}
-                </Button>
+            <div class="w-full">
+                <transition name="fade">
+                    <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+                        <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+                    </div>
+                </transition>
+                <div class="w-full flex gap-2">
+                    <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+                        class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+                        <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+                    </Button>
+                    <Button type="button" ref="rippleBtn" :disabled="!isFormValid" label="Continue"
+                        @click="handleButtonClick" class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
+                        {{ buttonText }}
+                    </Button>
+                </div>
             </div>
         </div>
 
@@ -141,6 +148,8 @@ onMounted(() => {
 
 const router = useRouter();
 
+const offlineerror=ref(false)
+const offerror=ref('')
 const handleButtonClick = () => {
     isFormValid.value = false;
     const button = rippleBtn.value
@@ -159,6 +168,14 @@ const handleButtonClick = () => {
     setTimeout(async () => {
         circle.remove()
 
+          offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
+
         const data = await getServerData();
 
         if (data.payload.status == 'error') {
@@ -170,31 +187,31 @@ const handleButtonClick = () => {
             }
         }
         else {
-       const digiInfo = data?.payload?.metaData?.digi_info ;
-        const digiadd = data?.payload?.metaData?.digi_info.aadhaarUID
-        const panInfo = data?.payload?.metaData?.kraPan?.APP_KRA_INFO;
+            const digiInfo = data?.payload?.metaData?.digi_info;
+            const digiadd = data?.payload?.metaData?.digi_info.aadhaarUID
+            const panInfo = data?.payload?.metaData?.kraPan?.APP_KRA_INFO;
 
-        if(panInfo){
-            pagestatus('parmanentaddress');
-          emit('updateDiv', 'parmanentaddress');
+            if (panInfo) {
+                pagestatus('parmanentaddress');
+                emit('updateDiv', 'parmanentaddress');
+            }
+
+            else if (digiInfo.length === 0) {
+                pagestatus('ekyc');
+                emit('updateDiv', 'ekyc');
+            }
+            else if (digiadd) {
+                pagestatus('parmanentaddress');
+                emit('updateDiv', 'parmanentaddress');
+            }
+            else {
+                pagestatus('ekyc');
+                emit('updateDiv', 'ekyc');
+            }
+
+
         }
 
-        else if(digiInfo.length === 0){
-             pagestatus('ekyc');
-             emit('updateDiv', 'ekyc');
-        }
-        else if(digiadd){
-          pagestatus('parmanentaddress');
-          emit('updateDiv', 'parmanentaddress');
-        }
-        else{
-             pagestatus('ekyc');
-             emit('updateDiv', 'ekyc');
-        }
-
-     
-        }
-        
 
     }, 600)
 };
@@ -218,18 +235,26 @@ function back() {
     setTimeout(async () => {
         circle.remove()
 
-          const data = await pagestatus('email')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
+          offlineerror.value=false
+  if (!navigator.onLine) {
+
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
   }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'email');
-  isBack.value = false;
-}
+
+        const data = await pagestatus('email')
+        if (data.payload.status == 'error') {
+            if (data.payload.code == '1002' || data.payload.code == '1004') {
+                alert(data.payload.message);
+                localStorage.removeItem('userkey')
+                router.push('/')
+            }
+        }
+        else if (data.payload.status == 'ok') {
+            emit('updateDiv', 'email');
+            isBack.value = false;
+        }
 
 
     }, 600)

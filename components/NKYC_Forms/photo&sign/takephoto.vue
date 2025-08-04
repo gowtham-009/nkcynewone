@@ -37,50 +37,50 @@
         </p>
 
         <!-- Location Permission Alert -->
-        <div v-if="showLocationAlert && !isIOS" class="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-lg">
+        <div v-if="showLocationAlert && !isIOS"
+          class="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-lg">
           <div class="flex items-start">
             <i class="pi pi-exclamation-triangle text-xl mr-3 mt-0.5"></i>
             <div>
               <p class="font-bold">Location Access Required</p>
-              <p class="mt-1">We need your location to verify your identity. Please enable location services in your {{ device }} settings.</p>
+              <p class="mt-1">We need your location to verify your identity. Please enable location services in your {{
+                device }} settings.</p>
               <div class="flex gap-2 mt-3">
-                <button @click="requestLocation" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+                <button @click="requestLocation"
+                  class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
                   <i class="pi pi-refresh mr-1"></i> Try Again
                 </button>
-              
+
               </div>
             </div>
           </div>
         </div>
 
-        <div v-if="isIOS && (!latitude || !longitude)" class="w-full bg-yellow-100 border-l-4 mt-2 p-4 border-yellow-500 rounded-lg text-yellow-700">
-              <p class="font-bold">Location Access Required</p>
-            <p class="mt-1  ">
-              Safari requires manual permission. After tapping, allow location when asked.
-              If not prompted, go to:
-              <br />
-              Settings → Safari → Location → “Allow”
-            </p>
-              <button @click="tryagain()"
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 mt-1 rounded-lg text-sm">
-                    <i class="pi pi-refresh mr-1"></i> Try Again
-                  </button>
-          
-          </div>
+        <div v-if="isIOS && (!latitude || !longitude)"
+          class="w-full bg-yellow-100 border-l-4 mt-2 p-4 border-yellow-500 rounded-lg text-yellow-700">
+          <p class="font-bold">Location Access Required</p>
+          <p class="mt-1  ">
+            Safari requires manual permission. After tapping, allow location when asked.
+            If not prompted, go to:
+            <br />
+            Settings → Safari → Location → “Allow”
+          </p>
+          <button @click="tryagain()"
+            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 mt-1 rounded-lg text-sm">
+            <i class="pi pi-refresh mr-1"></i> Try Again
+          </button>
+
+        </div>
 
         <!-- Camera Component -->
         <div v-if="locationEnabled" class="w-full mt-3 flex justify-center flex-col">
-          <CMAIDENTIFY 
-      ref="cameraComponent"
-      @captured="onImageCaptured" 
-      @error="onCameraError" 
-    />
+          <CMAIDENTIFY ref="cameraComponent" @captured="onImageCaptured" @error="onCameraError" />
         </div>
 
-        <div v-if="ipverror" class="w-100 p-1 bg-red-100 mt-2 px-2 rounded-lg" >
+        <div v-if="ipverror" class="w-100 p-1 bg-red-100 mt-2 px-2 rounded-lg">
           <p class="text-sm text-red-500 text-center leading-5">{{ ipvlimiterror }}</p>
         </div>
-       
+
         <div v-if="loadingprogress" class="max-w-md mx-auto p-2 px-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
           <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
             {{ syncStatus.icon }} {{ syncStatus.title }}
@@ -102,7 +102,7 @@
         <!-- Camera Error Alert -->
         <div v-if="cameraError" class="mt-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg">
           <div class="flex items-center">
-          
+
             <div>
               <p class="font-bold">Camera Error</p>
               <p>{{ cameraError }}</p>
@@ -110,36 +110,43 @@
           </div>
         </div>
       </div>
- <Dialog v-model:visible="visible" modal header="Failed" :style="{ width: '25rem' }">
-      <p>Hi, Your Image Quality is 0%</p>
-      <p>Hi, We could not verify your face.</p>
-      <p>1. Ensure your face is facing towards light source</p>
-      <p>2. Click 'Take Picture'</p>
-      <p>We will verify and move you to Next Step</p>
+      <Dialog v-model:visible="visible" modal header="Failed" :style="{ width: '25rem' }">
+        <p>Hi, Your Image Quality is 0%</p>
+        <p>Hi, We could not verify your face.</p>
+        <p>1. Ensure your face is facing towards light source</p>
+        <p>2. Click 'Take Picture'</p>
+        <p>We will verify and move you to Next Step</p>
 
-      <p>Note: We need your image quality to meet minimum 85% and above for succesfull verfication</p>
+        <p>Note: We need your image quality to meet minimum 85% and above for succesfull verfication</p>
 
-      <div class="w-full flex justify-end">
-        <Button type="button" @click="retake()" class="bg-blue-500 border-0 text-md text-white">Retake</Button>
-      </div>
- </Dialog>
+        <div class="w-full flex justify-end">
+          <Button type="button" @click="retake()" class="bg-blue-500 border-0 text-md text-white">Retake</Button>
+        </div>
+      </Dialog>
       <!-- Action Buttons -->
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
         <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" :disabled="!imageCaptured || !isStatusValid" ref="rippleBtn" @click="handleButtonClick"
-          class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-          {{ buttonText }}
-        </Button>
+          <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button type="button" :disabled="!imageCaptured || !isStatusValid" ref="rippleBtn" @click="handleButtonClick"
+            class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
+            {{ buttonText }}
+          </Button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted,onUnmounted, computed, watch } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import CMAIDENTIFY from '~/components/NKYC_Forms/photo&sign/cameraidentification/cmaidentify.vue';
 const emit = defineEmits(['updateDiv']);
@@ -150,33 +157,30 @@ const router = useRouter();
 const cameraComponent = ref(null);
 // Device & UI State
 const deviceHeight = ref(window.innerHeight);
-
 const buttonText = ref("Next");
 const isBack = ref(true);
-
-const ipverror=ref(false)
-const ipvlimiterror=ref('')
+const ipverror = ref(false)
+const ipvlimiterror = ref('')
 // Location State
 const locationEnabled = ref(false);
 const locationLoading = ref(true);
 const showLocationAlert = ref(false);
 const latitude = ref(null);
 const longitude = ref(null);
-
 const locationInterval = ref(null);
-
 // Camera & Image State
 const imageCaptured = ref(null);
 const cameraError = ref(null);
 const isStatusValid = ref(true);
 const loadingprogress = ref(false)
-
-const visible=ref(false)
-
+const visible = ref(false)
 // Configuration
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
-const device=ref('Desktop')
+const { htoken } = headerToken()
+const device = ref('Desktop')
+
+const offlineerror=ref(false)
+const offerror=ref('')
 
 const isIOS = computed(() => {
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -195,20 +199,20 @@ onMounted(() => {
   }, 5000);
 
   if (!isIOS.value) {
-  setTimeout(() => {
-    if (!locationEnabled.value) {
-      requestLocation();
-    }
-  }, 8000);
-}
+    setTimeout(() => {
+      if (!locationEnabled.value) {
+        requestLocation();
+      }
+    }, 8000);
+  }
 
 });
 
 const retake = () => {
   visible.value = false;
-  imageCaptured.value = null; 
+  imageCaptured.value = null;
   isStatusValid.value = true;
-  
+
   // Call the retake method on the camera component
   if (cameraComponent.value && cameraComponent.value.retakePhoto) {
     cameraComponent.value.retakePhoto();
@@ -220,11 +224,6 @@ onUnmounted(() => {
     locationInterval.value = null;
   }
 });
-
-
-
-
-
 // Methods
 function setupResizeListener() {
   const updateDeviceInfo = () => {
@@ -252,7 +251,7 @@ async function checkLocationPermission() {
     if (navigator.permissions) {
       const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });
       handlePermissionState(permissionStatus.state);
-      
+
       permissionStatus.onchange = () => {
         handlePermissionState(permissionStatus.state);
       };
@@ -277,7 +276,7 @@ function handlePermissionState(state) {
 }
 
 function getLocationWithTimeout(isRepeated = false) {
-  
+
   navigator.geolocation.getCurrentPosition(
     (position) => {
       handleLocationSuccess(position);
@@ -429,10 +428,10 @@ const resetProgress = () => {
 };
 
 const ipvfunction = async () => {
-   ipverror.value=false
-  if(!imageCaptured.value){
-    ipverror.value=true
-    ipvlimiterror.value="Ipv image invalid"
+  ipverror.value = false
+  if (!imageCaptured.value) {
+    ipverror.value = true
+    ipvlimiterror.value = "Ipv image invalid"
     return
   }
   loadingprogress.value = true
@@ -445,9 +444,9 @@ const ipvfunction = async () => {
     // Fetch binary blob of the captured image
     const response = await fetch(imageCaptured.value); // imageCaptured should be a blob URL (e.g., from canvas)
     const blob = await response.blob();
-const headertoken=htoken
+    const headertoken = htoken
     // Encrypt metadata
-    const user =await encryptionrequestdata({
+    const user = await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: "photoproceed",
       location: `${location.latitute},${location.longitude}`,
@@ -477,40 +476,40 @@ const headertoken=htoken
     }
 
     const decryptedData = await uploadResponse.json();
-   
+
     const data = await decryptionresponse(decryptedData);
-    if (data.payload.status == 'ok' ) {
-     completeProgress();
+    if (data.payload.status == 'ok') {
+      completeProgress();
       if (data.payload.metaData.is_real === 'true' && data.payload.metaData.realValue >= 0.6) {
         pagestatus('photoproceed');
         emit('updateDiv', 'photoproceed');
       } else {
-       visible.value=true
+        visible.value = true
       }
     }
 
 
-    else if(data.payload.status == 'error'&& data.payload.code == 'L1002'){
-      loadingprogress.value=false
-      ipvlimiterror.value=data.payload.message
-      ipverror.value=true
-     
+    else if (data.payload.status == 'error' && data.payload.code == 'L1002') {
+      loadingprogress.value = false
+      ipvlimiterror.value = data.payload.message
+      ipverror.value = true
+
     }
 
-   else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             loadingprogress.value=false
-          alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
+    else if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        loadingprogress.value = false
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
+
+    }
 
 
 
   } catch (error) {
-   resetProgress();
+    resetProgress();
     console.error('IPv Upload Failed:', error.message);
   }
 };
@@ -532,18 +531,24 @@ const back = () => {
 
   setTimeout(async () => {
     circle.remove()
-     const data = await pagestatus('photosign1')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
+    offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
   }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'photosign1');
-  isBack.value = false;
-}
+    const data = await pagestatus('photosign1')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      emit('updateDiv', 'photosign1');
+      isBack.value = false;
+    }
   }, 600)
 
 };
@@ -566,13 +571,15 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
- ipvfunction();
-      isStatusValid.value = false;
-   
-    // if (!loadingprogress.value && imageCaptured.value && isStatusValid.value) {
-    //   ipvfunction();
-    //   isStatusValid.value = false;
-    // }
+    offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
+    ipvfunction();
+    isStatusValid.value = false;
+
 
   }, 600)
 };

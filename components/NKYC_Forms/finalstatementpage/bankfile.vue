@@ -38,50 +38,56 @@
         </div>
 
         <div v-if="uploadedPDF" class="w-full bg-gray-100 p-3 rounded-xl mt-3 dark:bg-gray-800">
-  <div class="flex items-center justify-between">
-    <a
-      :href="uploadedPDF" target="_blank"
-      class="text-blue-600 font-semibold underline hover:text-blue-800 dark:text-blue-400">
-      View Uploaded Bank Statement
-    </a>
-    <button
-      @click="editPDF"
-      class="ml-4 text-sm px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition">
-      Edit
-    </button>
-  </div>
-</div>
+          <div class="flex items-center justify-between">
+            <a :href="uploadedPDF" target="_blank"
+              class="text-blue-600 font-semibold underline hover:text-blue-800 dark:text-blue-400">
+              View Uploaded Bank Statement
+            </a>
+            <button @click="editPDF"
+              class="ml-4 text-sm px-3 py-1 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition">
+              Edit
+            </button>
+          </div>
+        </div>
 
-<div class="rounded-md bg-red-50 p-4 mt-2" v-if="camserror">
-    <div class="flex">
-      <div class="shrink-0">
-       <i class="pi pi-info-circle text-lg text-red-500"></i>
-      </div>
-      <div class="ml-3">
-        <h3 class="text-sm font-medium text-red-800">Cams verification could not be completed at the moment, Try after 10 mins</h3>
-       
-      </div>
-    </div>
-  </div>
+        <div class="rounded-md bg-red-50 p-4 mt-2" v-if="camserror">
+          <div class="flex">
+            <div class="shrink-0">
+              <i class="pi pi-info-circle text-lg text-red-500"></i>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Cams verification could not be completed at the moment,
+                Try after 10 mins</h3>
 
-<p class="text-red-500 mt-2 text-center">{{ uploaderror }}</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-red-500 mt-2 text-center">{{ uploaderror }}</p>
         <div v-if="pdferrorbox" class="w-full p-1 mt-2 rounded-lg bg-red-50">
           <p class="text-sm text-red-500 text-center">Sorry we couldnt fetch you data, please upload pdf.</p>
         </div>
         <input type="file" accept="application/pdf" ref="fileInput" @change="uploadPDF" style="display: none" />
       </div>
 
-      <div class="w-full flex gap-2 mt-4">
-        <Button ref="rippleBtnback" @click="back()" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
+        <div class="w-full flex gap-2 mt-4">
+          <Button ref="rippleBtnback" @click="back()" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
 
-        <Button type="button" @click="handleButtonClick"
-          :disabled="selected !== 'Upload Last 6 Months Bank Statement PDF'  " ref="rippleBtn"
-          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
-          {{ buttonText }}
-        </Button>
+          <Button type="button" @click="handleButtonClick"
+            :disabled="selected !== 'Upload Last 6 Months Bank Statement PDF'" ref="rippleBtn"
+            class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
+            {{ buttonText }}
+          </Button>
+        </div>
       </div>
     </div>
 
@@ -98,7 +104,7 @@ import { useRoute } from 'vue-router';
 import googlebouncing from '~/components/googlebouncing.vue';
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const { domainurl } = deploymenturl();
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Activate F&O');
@@ -109,7 +115,7 @@ const loading = ref(false);
 const fileInput = ref(null);
 const selected = ref('');
 const route = useRoute();
-const uploadedPDF=ref('')
+const uploadedPDF = ref('')
 const pdferrorbox = ref(false);
 const uploadTriggeredByEdit = ref(false);
 const isNewUpload = ref(false); // Add this flag to track new uploads
@@ -117,15 +123,16 @@ const uploaderror = ref('');
 const isBack = ref(true);
 const isStatusValid = ref(true);
 
-const camserror=ref(false)
+const camserror = ref(false)
 let intervalId = null;
 import { useRouter } from 'vue-router';
 const router = useRouter();
-
-const getdatapdf = async() => {
+const offlineerror=ref(false)
+const offerror=ref('')
+const getdatapdf = async () => {
   const mydata = await getServerData();
   const bankpdf = mydata?.payload?.metaData?.proofs?.bankStatement;
-  if(bankpdf) {
+  if (bankpdf) {
     const headertoken = htoken;
     const imageauth = headertoken;
     const userToken = localStorage.getItem('userkey');
@@ -147,24 +154,24 @@ const options = [
   }
 ];
 
-const toggleSelection = async(value) => {
+const toggleSelection = async (value) => {
   selected.value = value;
   if (value === 'CAMS') {
-    uploadedPDF.value=false
-      const mydata = await getServerData();
-      if(mydata.payload.status=='ok'){
-        camsbankdata();
+    uploadedPDF.value = false
+    const mydata = await getServerData();
+    if (mydata.payload.status == 'ok') {
+      camsbankdata();
+    }
+    else if (mydata.payload.status == 'error') {
+      if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
+        alert(mydata.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
-     else if (mydata.payload.status == 'error') {
-        if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
-             alert(mydata.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
-      }
+
+    }
   } else if (value === 'Upload Last 6 Months Bank Statement PDF') {
-    pdferrorbox.value=false
+    pdferrorbox.value = false
     buttonText.value = 'Upload Bank Statement';
   }
 };
@@ -189,7 +196,7 @@ function extractTimestamp(filename) {
 }
 
 const initPage = async () => {
-    
+
   const queryval = route.query.ecres;
   const mydata = await getServerData();
 
@@ -203,7 +210,7 @@ const initPage = async () => {
     content.value = false;
     loading.value = true;
     intervalId = setInterval(() => {
-   
+
       camsbankdatacheck();
     }, 5000);
   } else if (statuscheck2 || statuscheck) {
@@ -212,7 +219,7 @@ const initPage = async () => {
 
     if (time2 >= time1) {
       selected.value = 'CAMS';
-      uploadedPDF.value=false
+      uploadedPDF.value = false
     } else {
 
       await getdatapdf()
@@ -227,7 +234,7 @@ const editPDF = () => {
   isNewUpload.value = true; // Set flag when editing
   triggerUpload();
 };
-onMounted(async() => {
+onMounted(async () => {
 
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -235,13 +242,13 @@ onMounted(async() => {
   initPage();
 });
 
-let checkCount = 0; 
+let checkCount = 0;
 
 const camsbankdatacheck = async () => {
- camserror.value=false
-  const headertoken=htoken
+  camserror.value = false
+  const headertoken = htoken
   const apiurl = `${baseurl.value}cams`;
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: 'thankyou',
     camsAction: 'checkCamsStatus',
@@ -262,7 +269,7 @@ const camsbankdatacheck = async () => {
     const meta = data.payload?.metaData;
 
     if (data.payload.status === 'ok') {
-    
+
       const clienttrnxid1 = meta?.cams_create?.clienttrnxid;
       const clienttrnxid2 = meta?.cams_data?.clienttxnid;
       const consentStatus = meta?.cams_create?.consentStatus;
@@ -296,27 +303,27 @@ const camsbankdatacheck = async () => {
     }
 
     else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
 
-      else{
-        camserror.value=true
-      }
+    }
+
+    else {
+      camserror.value = true
+    }
 
   } catch (error) {
-    camserror.value=false
+    camserror.value = false
     console.error('camsbankdatacheck error:', error.message);
   }
 };
 
 const camsbankdata = async () => {
-camserror.value=false
-  const headertoken=htoken
+  camserror.value = false
+  const headertoken = htoken
   const mydata = await getServerData();
   const ifscvalue = mydata?.payload?.metaData?.bank?.bank1IFSC;
 
@@ -326,9 +333,9 @@ camserror.value=false
     pageCode: 'csmspdf',
     camsAction: 'createCams',
     bankIfsc: ifscvalue,
-    redirecUrl: domainurl.value+'main',
+    redirecUrl: domainurl.value + 'main',
 
-   
+
   });
 
 
@@ -349,20 +356,20 @@ camserror.value=false
       window.location.href = data.payload.metaData.redirectionurl;
     }
     else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
 
-      else{
-        camserror.value=true
-      }
+    }
+
+    else {
+      camserror.value = true
+    }
 
   } catch (error) {
-    camserror.value=false
+    camserror.value = false
     console.error('camsbankdata error:', error.message);
   }
 };
@@ -385,9 +392,9 @@ const uploadPDF = async (event) => {
   // Check if PDF is password protected (look for /Encrypt keyword)
   const isEncrypted = /\/Encrypt/.test(text);
   if (isEncrypted) {
-    uploadedPDF.value=false
+    uploadedPDF.value = false
     uploaderror.value = 'This PDF is password protected. Please upload an unprotected file.';
-   
+
     event.target.value = ''; // Clear file input
     return;
   }
@@ -424,12 +431,12 @@ const bankstatement = async (pdfval) => {
     const response = await fetch(pdfval);
     const blob = await response.blob();
 
-    const user =await encryptionrequestdata({
+    const user = await encryptionrequestdata({
       userToken: localStorage.getItem('userkey'),
       pageCode: 'thankyou'
     });
-    
-    const headertoken=htoken
+
+    const headertoken = htoken
     const formData = new FormData();
     formData.append('bankStatement', blob, 'bankstatement.pdf');
     formData.append('payload', JSON.stringify({ payload: user }));
@@ -451,14 +458,14 @@ const bankstatement = async (pdfval) => {
         emit('updateDiv', 'thankyou');
       }
     }
-  else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
+    else if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
       }
+
+    }
 
   } catch (error) {
     console.error('bankstatement error:', error.message);
@@ -480,7 +487,12 @@ const handleButtonClick = async (event) => {
 
   setTimeout(async () => {
     circle.remove();
-    
+     offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
+  }
     // If PDF already exists, directly move to thank you page
     if (uploadedPDF.value) {
       const pageroute = await pagestatus('thankyou');
@@ -489,14 +501,14 @@ const handleButtonClick = async (event) => {
       }
 
       else if (pageroute.payload.status == 'error') {
-      if (pageroute.payload.code == '1002' || pageroute.payload.code=='1004'){
-    alert(pageroute.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
-  }
-}
+        if (pageroute.payload.code == '1002' || pageroute.payload.code == '1004') {
+          alert(pageroute.payload.message);
+          localStorage.removeItem('userkey')
+          router.push('/')
+        }
+      }
 
-    } 
+    }
     // Else trigger upload
     else {
       triggerUpload();
@@ -521,18 +533,24 @@ const back = async () => {
 
   setTimeout(async () => {
     circle.remove();
-   const data = await pagestatus('esign')
-    if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
+     offlineerror.value=false
+  if (!navigator.onLine) {
+      offlineerror.value=true
+      offerror.value='No internet connection please try again!'
+   return
   }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'esign');
-  isBack.value = false;
-}
+    const data = await pagestatus('esign')
+    if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      emit('updateDiv', 'esign');
+      isBack.value = false;
+    }
   }, 600);
 };
 </script>
