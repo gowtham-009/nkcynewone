@@ -72,7 +72,7 @@ export async function encryptionrequestdata(newData) {
 
 export async function decryptionresponse(hexString) {
 
-      // return hexString
+      //  return hexString
   try {
     const encKey = hexToBytes(encKeyHex);
     const fullData = hexToBytes(hexString.payload);

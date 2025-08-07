@@ -155,6 +155,7 @@ onMounted(() => {
 
  const unixTimestamp = Math.floor(Date.now() / 1000)
 
+
   localStorage.setItem('componentLoadTime', unixTimestamp-3600);
 
   deviceHeight.value = window.innerHeight;
@@ -181,6 +182,9 @@ onUnmounted(() => {
 
 
 const currtime=Math.floor(Date.now() / 1000)
+
+
+
 
 const sendmobileotp = async (resend) => {
 
@@ -410,13 +414,13 @@ const mobile_signup = async (event) => {
   setTimeout(async () => {
     circle.remove();
 
-     offlineerror.value=false
-  if (!navigator.onLine) {
+    offlineerror.value=false
+    if (!navigator.onLine) {
 
-      offlineerror.value=true
-      offerror.value='No internet connection please try again!'
-   return
-  }
+        offlineerror.value=true
+        offerror.value='No internet connection please try again!'
+    return
+    }
 
     if (mobileotp.value == true) {
 
