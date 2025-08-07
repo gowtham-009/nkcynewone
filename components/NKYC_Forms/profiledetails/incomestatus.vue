@@ -72,6 +72,10 @@ const rippleBtnback = ref(null)
 const isBack = ref(true);
 const incomeerror = ref('')
 const selected = ref("");
+
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
+
 const options = [
   { label: "Below 1 lakh", value: "BELOW 1 LAC" },
   { label: "1 lakh to 5 lakhs", value: "1-5 LAC" },
@@ -108,6 +112,8 @@ const profilesetinfo = async () => {
 await profilesetinfo()
 
 onMounted(() => {
+  const unixTimestamp = Math.floor(Date.now() / 1000)
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -145,7 +151,20 @@ const personalinfo = async () => {
       const data = await decryptionresponse(decryptedData);
       incomeerror.value = ""
       if (data.payload.status == 'ok') {
-        emit('updateDiv', 'nominee');
+       
+
+         const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "income",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'nominee');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
       else if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code == '1004') {
@@ -249,8 +268,21 @@ const back = () => {
       }
     }
     else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'occupation');
-      isBack.value = false;
+      
+
+       const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "income",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'occupation');
+             isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
     }
   }, 600)
 

@@ -76,6 +76,8 @@ const isStatusValid = ref(true);
 const isBack = ref(true);
 const tradingerror = ref('')
 import { useRouter } from 'vue-router';
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 const router = useRouter();
 // qualification Status
 const selected = ref("");
@@ -107,6 +109,10 @@ const profilesetinfo = async () => {
 
 await profilesetinfo()
 onMounted(() => {
+  const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -144,8 +150,21 @@ const back = () => {
       }
     }
     else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'qualification');
-      isBack.value = false;
+      
+
+      const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "tradingexperience",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+             emit('updateDiv', 'qualification');
+              isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
     }
 
   }, 600)
@@ -182,8 +201,21 @@ const personalinfo = async () => {
       const decryptedData = await response.json()
       const data = await decryptionresponse(decryptedData);
       if (data.payload.status == 'ok') {
-        emit('updateDiv', 'occupation');
+        
+         const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "tradingexperience",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'occupation');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
+
 
       else if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code == '1004') {

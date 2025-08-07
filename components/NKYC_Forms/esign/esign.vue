@@ -20,81 +20,79 @@
         </div>
 
 
-  <div class="rounded-md bg-red-50 p-4 mt-2" v-if="esignerror">
-    <div class="flex">
-      <div class="shrink-0">
-       <i class="pi pi-info-circle text-lg text-red-500"></i>
+        <div class="rounded-md bg-red-50 p-4 mt-2" v-if="esignerror">
+          <div class="flex">
+            <div class="shrink-0">
+              <i class="pi pi-info-circle text-lg text-red-500"></i>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Aadhaar service down, Try after 30 mins</h3>
+
+            </div>
+          </div>
+        </div>
+
+
+        <div v-if="loadingen" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+          <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
+            {{ syncStatus.icon }} {{ syncStatus.title }}
+          </h2>
+
+          <p class="text-gray-600 dark:text-gray-300 mb-2">
+            {{ syncStatus.message }}
+          </p>
+
+          <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+            <div
+              class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+              :style="{ width: progress + '%' }">
+              {{ progress.toFixed(2) }}%
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div class="ml-3">
-        <h3 class="text-sm font-medium text-red-800">Aadhaar service down, Try after 30 mins</h3>
-       
-      </div>
-    </div>
-  </div>
 
 
-  <div v-if="loadingen" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-1">
-      {{ syncStatus.icon }} {{ syncStatus.title }}
-    </h2>
 
-    <p class="text-gray-600 dark:text-gray-300 mb-2">
-      {{ syncStatus.message }}
-    </p>
 
-    <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
-      <div
-        class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
-        :style="{ width: progress + '%' }"
-      >
-        {{ progress.toFixed(2) }}%
-      </div>
-    </div>
-  </div>
-
-      </div>
-
-      
-      
-
-    <div class="w-full">
-       <transition name="fade">
-  <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
-    <p class="text-red-500 text-center text-md">{{ offerror }}</p>
-  </div>
-</transition>
+      <div class="w-full">
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
         <div class="w-full flex gap-2">
-        <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
-        <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!isStatusValid"
-          class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
-          {{ buttonText }}
-        </Button>
+          <Button @click="back()" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
+          <Button type="button" ref="rippleBtn" @click="handleButtonClick" :disabled="!isStatusValid"
+            class=" primary_color  text-white w-5/6 py-3 text-xl border-0  ">
+            {{ buttonText }}
+          </Button>
+        </div>
       </div>
     </div>
-    </div>
 
-   
-       <div v-if="loadingen" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">
-      {{ syncStatus.icon }} {{ syncStatus.title }}
-    </h2>
 
-    <p class="text-gray-600 dark:text-gray-300 mb-4">
-      {{ syncStatus.message }}
-    </p>
+    <div v-if="loadingen" class="max-w-md mx-auto p-3 bg-white dark:bg-gray-800 shadow-lg rounded-lg ">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+        {{ syncStatus.icon }} {{ syncStatus.title }}
+      </h2>
 
-    <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
-      <div
-        class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
-        :style="{ width: progress + '%' }"
-      >
-        {{ progress.toFixed(2) }}%
+      <p class="text-gray-600 dark:text-gray-300 mb-4">
+        {{ syncStatus.message }}
+      </p>
+
+      <div class="w-full bg-gray-400 dark:bg-gray-700 rounded-full h-6 overflow-hidden relative">
+        <div
+          class="bg-blue-600 h-6 text-white text-sm font-medium text-center flex items-center justify-center transition-all duration-300 ease-in-out"
+          :style="{ width: progress + '%' }">
+          {{ progress.toFixed(2) }}%
+        </div>
       </div>
     </div>
-  </div>
 
   </div>
 </template>
@@ -106,7 +104,7 @@ import { useRoute } from 'vue-router';
 import googlebouncing from '~/components/googlebouncing.vue';
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
-const {htoken}=headerToken()
+const { htoken } = headerToken()
 const { domainurl } = deploymenturl();
 import { useRouter } from 'vue-router';
 const router = useRouter();
@@ -119,9 +117,11 @@ const loading = ref(false);
 const isStatusValid = ref(true);
 const isBack = ref(true);
 const route = useRoute();
-const loadingen=ref(false)
+const loadingen = ref(false)
 
-const esignerror=ref(false)
+const esignerror = ref(false)
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 
 const steps = [
   { label: 'A.', text: 'Click Next Step' },
@@ -133,6 +133,11 @@ const steps = [
 ];
 
 onMounted(() => {
+  const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
+
   if (route.query.documentId) {
     esignStatusCheck(route.query.documentId);
   }
@@ -149,25 +154,25 @@ const progressInterval = ref(null);
 const syncStatus = computed(() => {
   if (progress.value <= 30) {
     return {
-     
+
       title: 'Syncing',
       message: 'Saving...'
     };
   } else if (progress.value <= 80) {
     return {
-     
+
       title: 'Syncing',
       message: 'Verifying...'
     };
   } else if (progress.value < 100) {
     return {
-      
+
       title: 'Syncing',
       message: 'Completing...'
     };
   } else {
     return {
-      
+
       title: 'Syncing',
       message: 'Esign Generate successfully!'
     };
@@ -202,12 +207,12 @@ const resetProgress = () => {
 
 const createunsignedDocument = async () => {
 
-    esignerror.value=false
-    const headertoken=htoken
+  esignerror.value = false
+  const headertoken = htoken
   loadingen.value = true
-   startProgressAnimation();
+  startProgressAnimation();
   const apiurl = `${baseurl.value}nkyc_document`;
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
   });
 
@@ -231,27 +236,27 @@ const createunsignedDocument = async () => {
     const decryptedData = await response.json();
     const data = await decryptionresponse(decryptedData);
 
- 
+
     if (data.payload.status == 'ok') {
       completeProgress();
-       createEsign()
+      createEsign()
     }
 
-      else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
-}
+    else if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
 
-else{
-   esignerror.value=true
-}
+    }
+
+    else {
+      esignerror.value = true
+    }
 
   } catch (error) {
-     esignerror.value=true
+    esignerror.value = true
     resetProgress();
     console.error(error.message);
   }
@@ -260,14 +265,14 @@ else{
 const createEsign = async () => {
 
 
-  esignerror.value=false
- const headertoken=htoken
+  esignerror.value = false
+  const headertoken = htoken
   const apiurl = `${baseurl.value}esign`;
 
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
     pageCode: 'esign',
-    redirectUrl:domainurl.value+'main' ,
+    redirectUrl: domainurl.value + 'main',
     esignAction: 'createEsign',
   });
 
@@ -286,24 +291,24 @@ const createEsign = async () => {
     const data = await decryptionresponse(decryptedData);
 
     if (data.payload.status === 'ok') {
-      
+
       const decoded = atob(data.payload.metaData.dataEsign);
       window.location.href = decoded;
     }
-      else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       
-}
+    else if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
 
-else{
-   esignerror.value=true
-}
+    }
+
+    else {
+      esignerror.value = true
+    }
   } catch (error) {
-    esignerror.value=true
+    esignerror.value = true
     console.error('Create Esign failed:', error.message);
   } finally {
     content.value = true;
@@ -312,20 +317,20 @@ else{
 };
 
 const esignStatusCheck = async (requestId) => {
-   esignerror.value=false
+  esignerror.value = false
   const apiurl = `${baseurl.value}esign`;
-  const user =await encryptionrequestdata({
+  const user = await encryptionrequestdata({
     userToken: localStorage.getItem('userkey'),
 
     esignId: requestId,
     esignAction: 'checkEsignStatus',
   });
-const headertoken=htoken
+  const headertoken = htoken
   try {
     const response = await fetch(apiurl, {
       method: 'POST',
       headers: {
-        'Authorization':headertoken,
+        'Authorization': headertoken,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ payload: user }),
@@ -333,7 +338,7 @@ const headertoken=htoken
 
     if (!response.ok) throw new Error(`Network error: ${response.status}`);
     const decryptedData = await response.json();
-const data = await decryptionresponse(decryptedData);
+    const data = await decryptionresponse(decryptedData);
     if (data.payload.status === 'ok') {
       content.value = false;
       loading.value = true;
@@ -351,7 +356,7 @@ const data = await decryptionresponse(decryptedData);
           bseCD, bseMF,
           MCXcategory, ICEX, mseCD
         } = statuscheck;
-        
+
         const onlyCashYes =
           nseCASH === 'YES' &&
           bseCASH === 'YES' &&
@@ -368,33 +373,59 @@ const data = await decryptionresponse(decryptedData);
           ICEX !== 'YES' &&
           mseCD !== 'YES';
         if (onlyCashYes) {
-          pagestatus('thankyou');
-          emit('updateDiv', 'thankyou');
+
+
+          const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "esign",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
+
+          if (heartbeatdata.payload.status === 'ok') {
+            pagestatus('thankyou');
+            emit('updateDiv', 'thankyou');
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
         } else {
-          pagestatus('bankfile');
-          emit('updateDiv', 'bankfile');
+
+
+          const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "esign",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
+
+          if (heartbeatdata.payload.status === 'ok') {
+            pagestatus('bankfile');
+            emit('updateDiv', 'bankfile');
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
         }
       }
     }
 
-      else if (data.payload.status == 'error') {
-        if (data.payload.code == '1002' || data.payload.code=='1004'){
-             alert(data.payload.message);
-              localStorage.removeItem('userkey')
-              router.push('/')
-        }
-       else{
-         esignerror.value=true
-       }
-}
+    else if (data.payload.status == 'error') {
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+      else {
+        esignerror.value = true
+      }
+    }
   } catch (error) {
-     esignerror.value=true
+    esignerror.value = true
     console.error('Status check failed:', error.message);
   }
 };
 
-const offlineerror=ref(false)
-const offerror=ref('')
+const offlineerror = ref(false)
+const offerror = ref('')
 
 const handleButtonClick = () => {
 
@@ -414,14 +445,14 @@ const handleButtonClick = () => {
 
   setTimeout(() => {
     circle.remove()
-     offlineerror.value=false
-  if (!navigator.onLine) {
-      offlineerror.value=true
-      offerror.value='No internet connection please try again!'
-   return
-  }
+    offlineerror.value = false
+    if (!navigator.onLine) {
+      offlineerror.value = true
+      offerror.value = 'No internet connection please try again!'
+      return
+    }
 
-  if (!loadingen.value && isStatusValid.value) {
+    if (!loadingen.value && isStatusValid.value) {
       createunsignedDocument();
       isStatusValid.value = false;
     }
@@ -441,27 +472,38 @@ const back = () => {
   circle.style.top = `${y}px`
   button.$el.appendChild(circle)
 
-  setTimeout(async() => {
+  setTimeout(async () => {
     circle.remove()
-   offlineerror.value=false
-  if (!navigator.onLine) {
-      offlineerror.value=true
-      offerror.value='No internet connection please try again!'
-   return
-  }
-    
- const data = await pagestatus('signdraw')
+    offlineerror.value = false
+    if (!navigator.onLine) {
+      offlineerror.value = true
+      offerror.value = 'No internet connection please try again!'
+      return
+    }
+
+    const data = await pagestatus('signdraw')
     if (data.payload.status == 'error') {
-      if (data.payload.code == '1002' || data.payload.code=='1004'){
-    alert(data.payload.message);
-    localStorage.removeItem('userkey')
-    router.push('/')
-  }
-}
- else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'signdraw');
-  isBack.value = false;
-}
+      if (data.payload.code == '1002' || data.payload.code == '1004') {
+        alert(data.payload.message);
+        localStorage.removeItem('userkey')
+        router.push('/')
+      }
+    }
+    else if (data.payload.status == 'ok') {
+      const heartbeatdata = await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "esign",
+        startTime: localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+      if (heartbeatdata.payload.status === 'ok') {
+        emit('updateDiv', 'signdraw');
+        isBack.value = false;
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
+    }
 
   }, 600)
 
@@ -469,7 +511,6 @@ const back = () => {
 
 </script>
 <style scoped>
-
 .ripple {
   position: absolute;
   width: 100px;
@@ -486,6 +527,7 @@ const back = () => {
     transform: scale(0);
     opacity: 1;
   }
+
   to {
     transform: scale(2);
     opacity: 0;
@@ -497,7 +539,12 @@ const back = () => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

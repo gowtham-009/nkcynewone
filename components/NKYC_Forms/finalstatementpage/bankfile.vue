@@ -122,7 +122,8 @@ const isNewUpload = ref(false); // Add this flag to track new uploads
 const uploaderror = ref('');
 const isBack = ref(true);
 const isStatusValid = ref(true);
-
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 const camserror = ref(false)
 let intervalId = null;
 import { useRouter } from 'vue-router';
@@ -285,7 +286,19 @@ const camsbankdatacheck = async () => {
         clearInterval(intervalId);
         const mydata = await pagestatus('thankyou');
         if (mydata.payload.status === 'ok') {
-          emit('updateDiv', 'thankyou');
+            const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "bankfile",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'thankyou');
+
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
         }
       } else {
         checkCount++;
@@ -454,8 +467,20 @@ const bankstatement = async (pdfval) => {
     if (data.payload.status === 'ok') {
       const pageroute = await pagestatus('thankyou');
       if (pageroute.payload.status === 'ok') {
-        pdferrorbox.value = false;
-        emit('updateDiv', 'thankyou');
+           
+           const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "bankfile",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              pdferrorbox.value = false;
+              emit('updateDiv', 'thankyou');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
     }
     else if (data.payload.status == 'error') {
@@ -497,7 +522,20 @@ const handleButtonClick = async (event) => {
     if (uploadedPDF.value) {
       const pageroute = await pagestatus('thankyou');
       if (pageroute.payload.status === 'ok') {
-        emit('updateDiv', 'thankyou');
+     
+
+         const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "bankfile",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+                emit('updateDiv', 'thankyou');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
 
       else if (pageroute.payload.status == 'error') {
@@ -521,11 +559,9 @@ const back = async () => {
   const button = rippleBtnback.value;
   const circle = document.createElement('span');
   circle.classList.add('ripple');
-
   const rect = button.$el.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
-
   circle.style.left = `${x}px`;
   circle.style.top = `${y}px`;
 
@@ -548,8 +584,21 @@ const back = async () => {
       }
     }
     else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'esign');
+    
+
+       const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "bankfile",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+                emit('updateDiv', 'esign');
       isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
     }
   }, 600);
 };

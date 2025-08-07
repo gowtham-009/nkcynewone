@@ -94,7 +94,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import Bankupload from '~/components/NKYC_Forms/account/fileuploads/bankproof.vue';
-
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 const emit = defineEmits(['updateDiv']);
 import { useRouter } from 'vue-router';
 const router = useRouter();
@@ -201,22 +202,80 @@ const back = async (event) => {
     if (mydata.payload.status == 'ok') {
       if (statuscheck) {
         if (perm_editstatus === '1' || comm_editstatus === '1') {
-          pagestatus('paddressproof'),
+         
+
+            const heartbeatdata = await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "uploadbank",
+        startTime: localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+      if (heartbeatdata.payload.status === 'ok') {
+
+         pagestatus('paddressproof'),
             emit('updateDiv', 'paddressproof');
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
         }
         else {
-          pagestatus('brokerage'),
+         
+
+            const heartbeatdata = await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "uploadbank",
+        startTime: localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+      if (heartbeatdata.payload.status === 'ok') {
+
+       pagestatus('brokerage'),
             emit('updateDiv', 'brokerage');
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
         }
       }
       else if (digistatus && digiaddpath) {
+       
+          const heartbeatdata = await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "uploadbank",
+        startTime: localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+      if (heartbeatdata.payload.status === 'ok') {
+
         pagestatus('uploadproof'),
           emit('updateDiv', 'uploadproof');
+
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
       }
 
       else {
-        pagestatus('brokerage'),
+        
+
+
+          const heartbeatdata = await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "uploadbank",
+        startTime: localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+      if (heartbeatdata.payload.status === 'ok') {
+
+      pagestatus('brokerage'),
           emit('updateDiv', 'brokerage');
+
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
       }
 
 
@@ -336,7 +395,20 @@ const proofupload = async () => {
       completeProgress();
       const mydata = await pagestatus('photosign1');
       if (mydata?.payload?.status === 'ok') {
-        emit('updateDiv', 'photosign1');
+
+        const heartbeatdata = await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "uploadbank",
+        startTime: localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+      if (heartbeatdata.payload.status === 'ok') {
+
+      emit('updateDiv', 'photosign1');
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
       }
     } else if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
@@ -379,8 +451,23 @@ const handleButtonClick = (event) => {
     const mydata = await getServerData();
     const bankcardName = mydata?.payload?.metaData?.proofs?.bank;
     if (bankoverwite.value === true && bankcardName) {
-      await pagestatus('photosign1');
+      
+
+      const heartbeatdata = await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "uploadbank",
+        startTime: localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+      if (heartbeatdata.payload.status === 'ok') {
+
+   await pagestatus('photosign1');
       emit('updateDiv', 'photosign1');
+
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
     }
     else if (mydata.payload.status == 'error') {
       if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
@@ -402,6 +489,10 @@ const handleButtonClick = (event) => {
 };
 
 onMounted(async () => {
+   const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   await getsegmentdata();
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;

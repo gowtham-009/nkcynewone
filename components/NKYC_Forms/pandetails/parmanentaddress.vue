@@ -1,6 +1,6 @@
 <template>
   <div class="primary_color">
-  
+
     <div class="flex justify-between primary_color items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
       <logo style="width: 40px; height: 40px;" />
       <profile />
@@ -24,23 +24,23 @@
         </div>
         <div class="w-full" :class="{ 'opacity-50 pointer-events-none': !isEditMode && initialDataLoaded }">
           <div class="w-full mt-1">
-            <Address v-model="address"   @click="addresserror = ''"
-        @input="addresserror = ''" :disabled="!isEditMode && initialDataLoaded" />
+            <Address v-model="address" @click="addresserror = ''" @input="addresserror = ''"
+              :disabled="!isEditMode && initialDataLoaded" />
             <span class="text-red-500">{{ addresserror }}</span>
           </div>
           <div class="w-full mt-1">
-            <State v-model="state"   @click="stateerror = ''"
-        @input="stateerror = ''" :disabled="!isEditMode && initialDataLoaded" />
+            <State v-model="state" @click="stateerror = ''" @input="stateerror = ''"
+              :disabled="!isEditMode && initialDataLoaded" />
             <span class="text-red-500">{{ stateerror }}</span>
           </div>
           <div class="w-full mt-1">
-            <City v-model="city"  @click="cityerror = ''"
-        @input="cityerror = ''"  :disabled="!isEditMode && initialDataLoaded" />
+            <City v-model="city" @click="cityerror = ''" @input="cityerror = ''"
+              :disabled="!isEditMode && initialDataLoaded" />
             <span class="text-red-500">{{ cityerror }}</span>
           </div>
           <div class="w-full mt-1">
-            <Pincode v-model="pincode"  @click="pincodeerror = ''"
-        @input="pincodeerror = ''" :disabled="!isEditMode && initialDataLoaded" />
+            <Pincode v-model="pincode" @click="pincodeerror = ''" @input="pincodeerror = ''"
+              :disabled="!isEditMode && initialDataLoaded" />
             <span class="text-red-500">{{ pincodeerror }}</span>
           </div>
         </div>
@@ -52,24 +52,24 @@
 
       <!-- Buttons -->
       <div class="w-full">
-         <transition name="fade">
-  <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
-    <p class="text-red-500 text-center text-md">{{ offerror }}</p>
-  </div>
-</transition>
+        <transition name="fade">
+          <div v-if="offlineerror" class="w-full px-2 py-2 mb-2 bg-red-100 rounded-lg">
+            <p class="text-red-500 text-center text-md">{{ offerror }}</p>
+          </div>
+        </transition>
         <div class="w-full flex gap-2">
-        <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
-          class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
-          <i class="pi pi-angle-left text-3xl dark:text-white"></i>
-        </Button>
+          <Button @click="back" ref="rippleBtnback" :disabled="!isBack"
+            class="primary_color cursor-pointer border-0 text-white w-1/6 dark:bg-slate-900">
+            <i class="pi pi-angle-left text-3xl dark:text-white"></i>
+          </Button>
 
-        <Button type="button" @click="handleButtonClick" ref="rippleBtn"
-          :disabled="(!address || address.length < 3) || (!state || state.length < 3)||( !city || city.length < 3) || (!pincode || pincode.length < 6) || !isaddress"
-          class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
-          {{ buttonText }}
-          <span v-if="isAnimating" class="wave"></span>
-        </Button>
-      </div>
+          <Button type="button" @click="handleButtonClick" ref="rippleBtn"
+            :disabled="(!address || address.length < 3) || (!state || state.length < 3) || (!city || city.length < 3) || (!pincode || pincode.length < 6) || !isaddress"
+            class="primary_color wave-btn text-white w-5/6 py-3 text-xl border-0 relative overflow-hidden">
+            {{ buttonText }}
+            <span v-if="isAnimating" class="wave"></span>
+          </Button>
+        </div>
       </div>
     </div>
   </div>
@@ -84,6 +84,9 @@ import Pincode from '~/components/NKYC_Forms/pandetails/paninputs/pincode.vue';
 import Addresscheck from '~/components/NKYC_Forms/pandetails/paninputs/confirmcheckbox.vue';
 import { pagestatus } from '~/utils/pagestatus.js'
 import { useRouter } from 'vue-router';
+
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 const router = useRouter();
 // Form Refs
 const { baseurl } = globalurl();
@@ -137,7 +140,7 @@ const setPermanentAddress = async () => {
     if (!addressData || Object.keys(addressData).length === 0 || !addressData.perPincode) {
       if (kraPan.APP_KRA_INFO) {
         // Use KRA PAN data
-        
+
         const addParts = [
           kraPan.APP_PER_ADD1 + ' ' + kraPan.APP_PER_ADD2 + ' ' + kraPan.APP_PER_ADD3 || '',
 
@@ -151,13 +154,13 @@ const setPermanentAddress = async () => {
         city.value = kraPan.APP_PER_CITY || '';
         pincode.value = kraPan.APP_PER_PINCD || '';
 
-         const sameAsPermanent = addressData.sameAsPermanent;
-      if(sameAsPermanent==='YES'){
-         commAddressRef.value.confirm = true 
-      }
-      else{
-        commAddressRef.value.confirm = false
-      }
+        const sameAsPermanent = addressData.sameAsPermanent;
+        if (sameAsPermanent === 'YES') {
+          commAddressRef.value.confirm = true
+        }
+        else {
+          commAddressRef.value.confirm = false
+        }
 
       }
       else if (digiInfo.aadhaarUID && digiDocs.aadhaarDocument) {
@@ -166,21 +169,21 @@ const setPermanentAddress = async () => {
         state.value = addressData.perState || '';
         city.value = addressData.perCity || '';
         pincode.value = addressData.perPincode || '';
-       
+
         const sameAsPermanent = addressData.sameAsPermanent;
-      if(sameAsPermanent==='YES'){
-         commAddressRef.value.confirm = true
-      }
-      else{
-        commAddressRef.value.confirm = false
-      }
+        if (sameAsPermanent === 'YES') {
+          commAddressRef.value.confirm = true
+        }
+        else {
+          commAddressRef.value.confirm = false
+        }
 
 
       }
     }
     else {
-   
-      
+
+
       const addParts = [
         addressData.perAddress,
         addressData.perAddressLine2,
@@ -196,13 +199,13 @@ const setPermanentAddress = async () => {
 
 
       const sameAsPermanent = addressData.sameAsPermanent;
-      if(sameAsPermanent==='YES'){
-         commAddressRef.value.confirm = true
+      if (sameAsPermanent === 'YES') {
+        commAddressRef.value.confirm = true
       }
-      else{
+      else {
         commAddressRef.value.confirm = false
       }
-     
+
     }
     initialDataLoaded.value = true;
   } catch (error) {
@@ -216,11 +219,16 @@ const setPermanentAddress = async () => {
 };
 
 
-onMounted(async() => {
+onMounted(async () => {
+  const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
+
   window.addEventListener('resize', updateHeight);
-await setPermanentAddress();
-// commAddressRef.value.confirm = true
-   
+  await setPermanentAddress();
+  // commAddressRef.value.confirm = true
+
 });
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateHeight);
@@ -245,7 +253,6 @@ const toggleEditMode = async () => {
 
 
 const permanentaddressdata = async () => {
-
 
   const apiurl = `${baseurl.value}address`;
   const pageCode = commAddressRef.value?.confirm ? "address" : "communicationaddress";
@@ -277,10 +284,6 @@ const permanentaddressdata = async () => {
     });
   }
 
-
-
-
-
   const headertoken = htoken
 
   const payload = { payload: user };
@@ -311,13 +314,36 @@ const permanentaddressdata = async () => {
         if (isConfirmed) {
           const mydata = await pagestatus('info')
           if (mydata.payload.status == 'ok') {
-            emit('updateDiv', 'info');
+
+            const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "parmanentaddress",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'info');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
+
+
           }
 
         } else {
+          const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "parmanentaddress",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
 
-          emit('updateDiv', 'communicationaddress');
-
+          if (heartbeatdata.payload.status === 'ok') {
+            emit('updateDiv', 'communicationaddress');
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
         }
       }
 
@@ -349,7 +375,7 @@ const permanentaddressdata = async () => {
         }
       }
       else {
-      
+
       }
     }
 
@@ -361,12 +387,10 @@ const permanentaddressdata = async () => {
 
 
 
-const offlineerror=ref(false)
-const offerror=ref('')
+const offlineerror = ref(false)
+const offerror = ref('')
 // Handle continue button click
 const handleButtonClick = (event) => {
-
-
   const button = rippleBtn.value
   const circle = document.createElement('span')
   circle.classList.add('ripple')
@@ -382,13 +406,16 @@ const handleButtonClick = (event) => {
 
   setTimeout(() => {
     circle.remove()
- offlineerror.value=false
-  if (!navigator.onLine) {
+    offlineerror.value = false
+    if (!navigator.onLine) {
 
-      offlineerror.value=true
-      offerror.value='No internet connection please try again!'
-   return
-  }
+      offlineerror.value = true
+      offerror.value = 'No internet connection please try again!'
+      return
+    }
+
+
+
     permanentaddressdata()
     isaddress.value = false
 
@@ -412,13 +439,13 @@ function back() {
 
   setTimeout(async () => {
     circle.remove()
- offlineerror.value=false
-  if (!navigator.onLine) {
+    offlineerror.value = false
+    if (!navigator.onLine) {
 
-      offlineerror.value=true
-      offerror.value='No internet connection please try again!'
-   return
-  }
+      offlineerror.value = true
+      offerror.value = 'No internet connection please try again!'
+      return
+    }
     const data = await pagestatus('main')
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
@@ -428,8 +455,26 @@ function back() {
       }
     }
     else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'main');
-      isBack.value = false;
+
+
+      const heartbeatdata = await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "parmanentaddress",
+        startTime: localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+      if (heartbeatdata.payload.status === 'ok') {
+
+        emit('updateDiv', 'main');
+        isBack.value = false;
+   
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
+
+
+
     }
   }, 600)
 

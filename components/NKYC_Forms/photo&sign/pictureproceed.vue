@@ -79,6 +79,8 @@ const isBack = ref(true); // Assuming you have a way to determine if the back bu
 const isStatusValid = ref(true); // Assuming you have a way to determine if the status is valid
 const { baseurl } = globalurl();
 const { htoken } = headerToken()
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 const question1 = ref('')
 const question2 = ref('')
 const question3 = ref('')
@@ -105,6 +107,9 @@ const getsegmentdata = async () => {
 const offlineerror=ref(false)
 const offerror=ref('')
 onMounted(async () => {
+  const unixTimestamp = Math.floor(Date.now() / 1000)
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   await getsegmentdata()
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
@@ -122,7 +127,20 @@ const retake = async () => {
     router.push('/')
   }
   else if (page.payload.status == 'ok') {
-    emit('updateDiv', 'takephoto');
+   
+
+     const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "photoproceed",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+               emit('updateDiv', 'takephoto');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
   }
 }
 const back = () => {
@@ -155,8 +173,21 @@ const back = () => {
   }
 }
  else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'photosign1');
-  isBack.value = false;
+  
+
+   const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "photoproceed",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'photosign1');
+              isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
 }
   }, 600)
 
@@ -251,21 +282,34 @@ const handleButtonClick = () => {
     const page = await pagestatus('signdraw')
    if (page.payload.status == 'error') {
         if (page.payload.code == '1002' || page.payload.code=='1004'){
-             alert(page.payload.message);
+              alert(page.payload.message);
               localStorage.removeItem('userkey')
               router.push('/')
         }
-       
       }
     else if (page.payload.status == 'ok') {
       const mydata = await getServerData();
       const statuscheck = mydata?.payload?.metaData?.additional_docs;
       if (statuscheck.length === 0) {
-       
         documentsavebtn();
       }
-      emit('updateDiv', 'signdraw');
-      isStatusValid.value = false;
+     
+
+       const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "photoproceed",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'signdraw');
+                isStatusValid.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
+
+      
     }
 
 

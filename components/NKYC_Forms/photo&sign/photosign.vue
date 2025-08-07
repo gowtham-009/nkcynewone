@@ -110,6 +110,8 @@
 <script setup>
 
 import { ref, onMounted } from 'vue';
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 
 const deviceHeight = ref(0);
 const rippleBtn = ref(null);
@@ -132,6 +134,9 @@ const getsegmentdata = async () => {
 
 }
 onMounted(async() => {
+     const unixTimestamp = Math.floor(Date.now() / 1000)
+     localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
     await getsegmentdata()
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
@@ -182,24 +187,89 @@ const back = () => {
            
         
          if (statuscheck && !statuscheck1) {
-            pagestatus('uploadbank')
-            emit('updateDiv', 'uploadbank');
+           
+
+              const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "photosign1",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+               pagestatus('uploadbank')
+               emit('updateDiv', 'uploadbank');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
         }
            else if (!statuscheck && !statuscheck1) {
-            pagestatus('uploadbank')
-            emit('updateDiv', 'uploadbank');
+            
+
+              const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "photosign1",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              pagestatus('uploadbank')
+              emit('updateDiv', 'uploadbank');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
         }
           else if (!statuscheck && statuscheck1) {
-            pagestatus('uploadproof')
-            emit('updateDiv', 'uploadproof');
+            
+
+              const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "photosign1",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+             pagestatus('uploadproof')
+             emit('updateDiv', 'uploadproof');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
         }
           else if(perm_editstatus === '1' || comm_editstatus === '1'){
-        pagestatus('paddressproof'),
-        emit('updateDiv', 'paddressproof');
+        
+
+          const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "photosign1",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              pagestatus('paddressproof'),
+              emit('updateDiv', 'paddressproof');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
           else if (statuscheck && statuscheck1) {
-            pagestatus('brokerage')
+            
+
+              const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "photosign1",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              pagestatus('brokerage')
             emit('updateDiv', 'brokerage');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
         }
       
      
@@ -248,11 +318,38 @@ const handleButtonClick = () => {
         const statuscheck = mydata?.payload?.metaData?.proofs?.ipvImg || '';
        if(mydata.payload.status=='ok'){
          if (statuscheck) {
-            pagestatus('photoproceed'),
+            
+
+
+                  const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "photosign1",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              pagestatus('photoproceed'),
                 emit('updateDiv', 'photoproceed');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
         } else {
-            pagestatus('takephoto'),
+            
+
+                  const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "photosign1",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+             pagestatus('takephoto'),
                 emit('updateDiv', 'takephoto');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
         }
 isStatusValid.value = false;
        }

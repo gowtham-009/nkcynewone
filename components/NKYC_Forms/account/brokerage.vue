@@ -111,7 +111,8 @@ import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
 const route = useRoute()
 const emit = defineEmits(['updateDiv']);
-
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 const deviceHeight = ref(0);
 
 const buttonText = ref("Next");
@@ -161,6 +162,10 @@ const back = () => {
 };
 
 onMounted(() => {
+     const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
@@ -201,28 +206,76 @@ const handleButtonClick = () => {
 
             const perm_editstatus = mydata?.payload?.metaData?.address?.permChange
             const comm_editstatus = mydata?.payload?.metaData?.address?.commChange
-
-
             if (perm_editstatus === '1' || comm_editstatus === '1') {
                 const page = await pagestatus('paddressproof');
                 if (page?.payload?.status === 'ok') {
+                    const heartbeatdata = await heartbeat_timestamp({
+                    userToken: localStorage.getItem('userkey'),
+                    pageCode: "brokerage",
+                    startTime: localStorage.getItem('componentLoadTime'),
+                    endTime: currtime.toString()
+                });
+                if (heartbeatdata.payload.status === 'ok') {
                     emit('updateDiv', 'paddressproof');
+                } else {
+                    console.error('Error sending heartbeat data:', heartbeatdata.message);
+                }
+                   
                 }
             }
             else if (!statuscheck) {
-                await pagestatus('uploadproof');
+                const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "brokerage",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
+
+          if (heartbeatdata.payload.status === 'ok') {
+            await pagestatus('uploadproof');
                 emit('updateDiv', 'uploadproof');
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
+
+               
             }
 
             else if (statuscheck && !statuscheck1) {
-                await pagestatus('uploadbank');
+              
+
+                const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "brokerage",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
+
+          if (heartbeatdata.payload.status === 'ok') {
+             await pagestatus('uploadbank');
                 emit('updateDiv', 'uploadbank');
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
             }
             else if (statuscheck && statuscheck1) {
-                const page = await pagestatus('photosign1');
+               
+
+                 const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "brokerage",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
+
+          if (heartbeatdata.payload.status === 'ok') {
+             const page = await pagestatus('photosign1');
                 if (page?.payload?.status === 'ok') {
                     emit('updateDiv', 'photosign1');
                 }
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
             }
 
         } else if (mydata.payload.status == 'error') {

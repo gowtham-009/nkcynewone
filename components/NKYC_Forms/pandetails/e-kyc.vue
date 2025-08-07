@@ -135,7 +135,13 @@ const content = ref(true)
 const loading = ref(false)
 const isFormdisabled = ref(true)
 const isBack = ref(true);
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 onMounted(() => {
+     const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
@@ -182,9 +188,21 @@ const digilocker_create = async () => {
         const decryptedData = await response.json();
         const data = await decryptionresponse(decryptedData);
         if (data.payload.status == 'ok') {
+             const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "ekyc",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
 
-            const url = data.payload.metaData.url
+          if (heartbeatdata.payload.status === 'ok') {
+           const url = data.payload.metaData.url
             window.location.href = url;
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
+
+            
         }
         else if (data.payload.status == 'error') {
             if (data.payload.code == '1002' || data.payload.code == '1004') {
@@ -362,8 +380,21 @@ const digilocker_getaadhardoc = async (requestid) => {
         const data = await decryptionresponse(decryptedData);
         if (data.payload.status == 'ok') {
 
+             const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "ekyc",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
+
+          if (heartbeatdata.payload.status === 'ok') {
             pagestatus('parmanentaddress')
             emit('updateDiv', 'parmanentaddress');
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
+
+           
         }
         else if (data.payload.status == 'error') {
             if (data.payload.code == '1002' || data.payload.code == '1004') {
@@ -469,8 +500,20 @@ const back = () => {
             }
         }
         else if (data.payload.status == 'ok') {
-            emit('updateDiv', 'main');
+            const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "ekyc",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
+
+          if (heartbeatdata.payload.status === 'ok') {
+             emit('updateDiv', 'main');
             isBack.value = false;
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
+           
         }
     }, 600)
 

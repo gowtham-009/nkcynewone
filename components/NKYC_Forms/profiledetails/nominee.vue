@@ -269,6 +269,9 @@ import RadioButton from 'primevue/radiobutton'
 import Guardian from '~/components/nomineeinputs/guardian.vue';
 
 import Sharevalue from '~/components/nomineeinputs/sharevalue.vue';
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
+
 import { pagestatus } from '~/utils/pagestatus.js'
 
 import { useRouter } from 'vue-router';
@@ -1176,8 +1179,22 @@ const back = () => {
       }
     }
     else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'income');
+    
+
+       const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "nominee",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+                emit('updateDiv', 'income');
       isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
+
     }
 
   },
@@ -1293,7 +1310,20 @@ const handleButtonClick = async (event) => {
 
           const myData = await pagestatus('bank1');
           if (myData?.payload?.status === 'ok') {
-            emit('updateDiv', 'bank1');
+           
+
+             const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "nominee",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+               emit('updateDiv', 'bank1');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
           }
         } else {
           errorpercent.value = 'Nominee 100 percentage not met';
@@ -1333,6 +1363,8 @@ watch(nomine, () => {
 
 // Lifecycle
 onMounted(async () => {
+    const unixTimestamp = Math.floor(Date.now() / 1000)
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {

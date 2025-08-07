@@ -173,9 +173,22 @@ const back = async (event) => {
         const statuscheck = mydata?.payload?.metaData?.kraPan?.APP_KRA_INFO;
 
         if (mydata.payload.status == 'ok') {
-            pagestatus('brokerage'),
+              
+
+            const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "paddressproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+                pagestatus('brokerage'),
                 emit('updateDiv', 'brokerage');
-            isBack.value = false;
+                isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
         }
         else if (mydata.payload.status == 'error') {
             if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
@@ -284,16 +297,55 @@ const proofupload = async () => {
             if (mydata?.payload?.status === 'ok') {
 
                 if (statuscheck && statuscheck1) {
-                    const page = await pagestatus('photosign1');
+                  
+
+                     const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "paddressproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+                const page = await pagestatus('photosign1');
                     if (page?.payload?.status === 'ok') {
                         emit('updateDiv', 'photosign1');
                     }
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
                 } else if (statuscheck && !statuscheck1) {
+                    
+
+            const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "paddressproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
                     await pagestatus('uploadbank');
                     emit('updateDiv', 'uploadbank');
+            } else {
+                   console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
                 } else if (!statuscheck) {
-                    await pagestatus('uploadproof');
+                    
+            const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "paddressproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              await pagestatus('uploadproof');
                     emit('updateDiv', 'uploadproof');
+
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
                 }
 
             }
@@ -330,11 +382,11 @@ const handleButtonClick = (event) => {
     setTimeout(async () => {
         circle.remove();
          offlineerror.value=false
-  if (!navigator.onLine) {
-      offlineerror.value=true
-      offerror.value='No internet connection please try again!'
-   return
-  }
+        if (!navigator.onLine) {
+            offlineerror.value=true
+            offerror.value='No internet connection please try again!'
+        return
+        }
         const mydata = await getServerData();
         const addresscardName = mydata?.payload?.metaData?.proofs?.permanentAddress1;
 
@@ -343,16 +395,56 @@ const handleButtonClick = (event) => {
 
         if (addressoverwite.value === true && addresscardName) {
             if (statuscheck && statuscheck1) {
-                const page = await pagestatus('photosign1');
+               
+
+            const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "paddressproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+               const page = await pagestatus('photosign1');
                 if (page?.payload?.status === 'ok') {
                     emit('updateDiv', 'photosign1');
                 }
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
             } else if (statuscheck && !statuscheck1) {
-                await pagestatus('uploadbank');
+                
+
+            const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "paddressproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+             await pagestatus('uploadbank');
                 emit('updateDiv', 'uploadbank');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
+
             } else if (!statuscheck) {
-                await pagestatus('uploadproof');
+               
+            const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "paddressproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              await pagestatus('uploadproof');
                 emit('updateDiv', 'uploadproof');
+
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
             }
         }
         else if (mydata.payload.status == 'error') {

@@ -111,6 +111,8 @@ const addresserror = ref('')
 const stateerror = ref('')
 const cityerror = ref('')
 const pincodeerror = ref('')
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 
 const setCommunicationAddress = async () => {
   try {
@@ -191,6 +193,10 @@ const toggleEditMode = async () => {
 };
 
 onMounted(() => {
+  const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -257,7 +263,20 @@ const communicateaddressdata = async () => {
         if (mydata.payload.status == 'ok') {
           const mydata = await pagestatus('info')
           if (mydata.payload.status == 'ok') {
+            
+
+              const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "communicationaddress",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
             emit('updateDiv', 'info');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
           }
         }
       }
@@ -368,8 +387,20 @@ const back = () => {
       }
     }
     else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'parmanentaddress');
-      isBack.value = false;
+        const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "communicationaddress",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'parmanentaddress');
+              isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
+     
     }
   }, 600)
 

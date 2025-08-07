@@ -2,6 +2,7 @@
   <div class="primary_color">
     <div class="flex justify-between primary_color items-center px-3" :style="{ height: deviceHeight * 0.08 + 'px' }">
       <logo style="width: 40px; height: 40px;" />
+    
       <profile />
     </div>
     <div class="flex justify-between  p-1 px-2 flex-col bg-white rounded-t-3xl dark:bg-black"
@@ -79,8 +80,10 @@ import { useRoute, useRouter } from 'vue-router'
 import phoneOTP from '~/components/forminputs/otpinput.vue'
 import MobileInput from '~/components/forminputs/mobileinput.vue';
 import Checkbox from '~/components/forminputs/remembercheckbox.vue';
-import { ref, onMounted, watch, onUnmounted } from 'vue';
+import { ref, onMounted, watch, onUnmounted, onBeforeUnmount  } from 'vue';
 import { encryptionrequestdata } from '~/utils/globaldata.js'
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+
 import { getServerData } from '~/utils/serverdata.js'
 import { getEncryptionData } from '~/utils/kradata.js'
 import { pagestatus } from '~/utils/pagestatus.js'
@@ -107,6 +110,7 @@ const router = useRouter();
 
 const offlineerror=ref(false)
 const offerror=ref('')
+
 
 const setMobileData = async () => {
   try {
@@ -143,17 +147,30 @@ const setMobileData = async () => {
 
 await setMobileData();
 
+
+
+
 onMounted(() => {
+  
+
+ const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp-3600);
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
 
+    setTimeout(() => {
+  
+  }, 60000);
+
 });
 
 onUnmounted(() => {
   clearInterval(timer);
+  
 });
 
 
@@ -161,6 +178,9 @@ onUnmounted(() => {
 
 
 
+
+
+const currtime=Math.floor(Date.now() / 1000)
 
 const sendmobileotp = async (resend) => {
 
@@ -220,10 +240,24 @@ const sendmobileotp = async (resend) => {
 
     }
     else if (data.payload.status === 'ok' && data.payload.otpStatus == '1') {
-
+     
       mobileotp.value = false
       buttonText.value = 'Verify Otp'
-      emit('updateDiv', 'email');
+     
+      const heartbeatdata=await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "mobile",
+        startTime:localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+     if (heartbeatdata.payload.status === 'ok') {
+  
+         emit('updateDiv', 'email');
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
+     
     }
     else if (data.payload.status == 'error' && data.payload.code == 'B1002' && data.payload.otpStatus == 0) {
       errormsg.value = true
@@ -297,7 +331,21 @@ const otpverfication = async () => {
     }
 
     if (data.payload.status === 'ok') {
-      emit('updateDiv', 'email');
+
+      const heartbeatdata=await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "mobile",
+        startTime:localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+     if (heartbeatdata.payload.status === 'ok') {
+  
+         emit('updateDiv', 'email');
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
+     
     }
     else if (data.payload.status === 'error' && data.payload.code == '1005' && data.payload.otpStatus == '0') {
       otperror.value = true

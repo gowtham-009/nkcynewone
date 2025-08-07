@@ -85,6 +85,7 @@ import emailOTP from '~/components/forminputs/emailotp.vue'
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import EmailInput from '~/components/forminputs/emailinput.vue';
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
 
 import { encryptionrequestdata } from '~/utils/globaldata.js'
 import { getServerData } from '~/utils/serverdata.js'
@@ -114,7 +115,7 @@ const e_otp = ref('')
 
 const {htoken}=headerToken()
 
-
+const currtime=Math.floor(Date.now() / 1000)
 const emailid = ref('')
 const setEmailData = async () => {
   try {
@@ -189,15 +190,14 @@ watch(isValidEmail, (newValue) => {
   }
 });
 onMounted(() => {
+const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp-3600);
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
-
-
-
-
-
 });
 
 const offlineerror=ref(false)
@@ -236,8 +236,22 @@ const back = () => {
   }
 }
  else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'mobile');
+
+  const heartbeatdata=await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "email",
+        startTime:localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+     if (heartbeatdata.payload.status === 'ok') {
+  
+         emit('updateDiv', 'mobile');
   isBack.value = false;
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
+ 
 }
 
   
@@ -328,8 +342,21 @@ otperror.value=false
 
       else if (data.payload.status == 'ok' && data.payload.otpStatus == 1) {
         emailbox.value = false
-        pagestatus('main')
+        const heartbeatdata=await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "email",
+        startTime:localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+     if (heartbeatdata.payload.status === 'ok') {
+  
+         pagestatus('main')
         emit('updateDiv', 'main');
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
+       
       }
       else if (data.payload.status == 'error' && data.payload.code == 'C1002') {
         erroremail.value = true
@@ -400,8 +427,23 @@ const otpverfication = async () => {
       const decryptedData = await response.json()
       const  data= await decryptionresponse(decryptedData);
       if (data.payload.status == 'ok') {
-        pagestatus('main')
+
+         const heartbeatdata=await heartbeat_timestamp({
+        userToken: localStorage.getItem('userkey'),
+        pageCode: "email",
+        startTime:localStorage.getItem('componentLoadTime'),
+        endTime: currtime.toString()
+      });
+
+     if (heartbeatdata.payload.status === 'ok') {
+  
+         pagestatus('main')
         emit('updateDiv', 'main');
+      } else {
+        console.error('Error sending heartbeat data:', heartbeatdata.message);
+      }
+     
+       
       }
       else if (data.payload.status === 'error' && data.payload.code === 'C1006') {
         otperror.value = true

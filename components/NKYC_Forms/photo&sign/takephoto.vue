@@ -182,11 +182,17 @@ const device = ref('Desktop')
 const offlineerror=ref(false)
 const offerror=ref('')
 
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
+
 const isIOS = computed(() => {
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 });
 
 onMounted(() => {
+  const unixTimestamp = Math.floor(Date.now() / 1000)
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   locationLoading.value = true;
   setupResizeListener();
   checkLocationPermission();
@@ -481,8 +487,21 @@ const ipvfunction = async () => {
     if (data.payload.status == 'ok') {
       completeProgress();
       if (data.payload.metaData.is_real === 'true' && data.payload.metaData.realValue >= 0.6) {
-        pagestatus('photoproceed');
-        emit('updateDiv', 'photoproceed');
+       
+         const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "takephoto",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+               pagestatus('photoproceed');
+               emit('updateDiv', 'photoproceed');
+
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       } else {
         visible.value = true
       }
@@ -546,8 +565,21 @@ const back = () => {
       }
     }
     else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'photosign1');
-      isBack.value = false;
+      
+
+       const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "takephoto",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'photosign1');
+              isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
     }
   }, 600)
 

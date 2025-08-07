@@ -80,6 +80,8 @@ const isStatusValid = ref(true);
 const isBack = ref(true);
 const emit = defineEmits(['updateDiv']);
 const qulificationerror = ref('')
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 
 // qualification Status
 const selected = ref("");
@@ -118,6 +120,10 @@ const profilesetinfo = async () => {
 await profilesetinfo()
 
 onMounted(() => {
+   const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -159,8 +165,21 @@ offlineerror.value=false
       }
     }
     else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'clientinfo');
+    
+
+      const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "qualification",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+                emit('updateDiv', 'clientinfo');
       isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
     }
 
 
@@ -197,7 +216,20 @@ const personalinfo = async () => {
       const decryptedData = await response.json()
       const data = await decryptionresponse(decryptedData);
       if (data.payload.status == 'ok') {
-        emit('updateDiv', 'tradingexperience');
+       
+
+         const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "qualification",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'tradingexperience');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
 
       else if (data.payload.status == 'error') {

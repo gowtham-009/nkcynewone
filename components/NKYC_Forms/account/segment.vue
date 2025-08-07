@@ -82,6 +82,9 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const emit = defineEmits(['updateDiv']);
+
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 const { baseurl } = globalurl();
 const { htoken } = headerToken()
 const selected = ref(['equity', 'fno', 'commodities']);
@@ -223,7 +226,20 @@ const segmentdata = async () => {
     const data = await decryptionresponse(decryptedData);
     segmenterror.value = ''
     if (data.payload.status === 'ok') {
-      emit('updateDiv', 'brokerage');
+      
+
+        const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "segment1",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'brokerage');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
     }
     else if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
@@ -281,14 +297,31 @@ const back = () => {
       }
     }
     else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'bank4');
-      isBack.value = false;
+      
+
+       const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "segment1",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+             emit('updateDiv', 'bank4');
+              isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
     }
   }, 600)
 
 };
 
 onMounted(() => {
+   const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;

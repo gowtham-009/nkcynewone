@@ -73,6 +73,9 @@ const isStatusValid = ref(true);
 const selected = ref("");
 const isBack = ref(true);
 const occupationerror = ref('')
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
+
 const options = [
   { label: "Agriculturist ", value: "AGRICULTURIST " },
   { label: "Business", value: "BUSINESS" },
@@ -114,6 +117,10 @@ await profilesetinfo()
 
 
 onMounted(() => {
+   const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -149,7 +156,20 @@ const personalinfo = async () => {
       const decryptedData = await response.json()
       const data = await decryptionresponse(decryptedData);
       if (data.payload.status == 'ok') {
-        emit('updateDiv', 'income');
+     
+         const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "occupation",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+                 emit('updateDiv', 'income');
+
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
       else if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code == '1004') {
@@ -251,8 +271,19 @@ const back = () => {
       }
     }
     else if (data.payload.status == 'ok') {
-      emit('updateDiv', 'tradingexperience');
-      isBack.value = false;
+       const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "occupation",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+               emit('updateDiv', 'tradingexperience');
+               isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
     }
 
   }, 600)

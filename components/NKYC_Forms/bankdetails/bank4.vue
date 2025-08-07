@@ -98,6 +98,9 @@ import { ref, onMounted } from 'vue';
 
 const emit = defineEmits(['updateDiv']);
 import { useRouter } from 'vue-router';
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
+
 const router = useRouter();
 const bankerror = ref(false)
 const isBack = ref(true);
@@ -155,6 +158,9 @@ await profilesetinfo()
 
 
 onMounted(() => {
+  const unixTimestamp = Math.floor(Date.now() / 1000)
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
   });
@@ -186,7 +192,20 @@ const handleButtonClick = () => {
   }
     const mydata = await pagestatus('segment1')
     if (mydata.payload.status == 'ok') {
-      emit('updateDiv', 'segment1');
+      
+
+      const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "bank4",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'segment1');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
     }
     else if (mydata.payload.status == 'error') {
         if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
@@ -239,8 +258,21 @@ const back = () => {
   }
 }
  else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'bank1');
+
+
+  const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "bank4",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+                emit('updateDiv', 'bank1');
   isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
 }
 
 },

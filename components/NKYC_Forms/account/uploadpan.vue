@@ -106,6 +106,10 @@ const router = useRouter();
 const emit = defineEmits(['updateDiv']);
 const { baseurl } = globalurl();
 const { htoken } = headerToken()
+
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
+
 const deviceHeight = ref(window.innerHeight);
 const buttonText = ref('Next');
 const rippleBtn = ref(null);
@@ -310,13 +314,40 @@ const proofupload = async () => {
       const statuscheck1 = mydata?.payload?.metaData?.bank?.bank1HolderName;
 
       if (statuscheck1) {
-        const nextPage = await pagestatus('photosign1');
+
+         const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "uploadproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+               const nextPage = await pagestatus('photosign1');
         if (nextPage.payload.status === 'ok') {
           emit('updateDiv', 'photosign1');
         }
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
+
+       
       } else {
-        await pagestatus('uploadbank');
-        emit('updateDiv', 'uploadbank');
+        
+
+          const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "uploadproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              await pagestatus('uploadbank');
+               emit('updateDiv', 'uploadbank');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
     }
 
@@ -363,15 +394,42 @@ const back = (event) => {
 
     if (mydata?.payload?.status === 'ok') {
       if (perm_editstatus === '1' || comm_editstatus === '1') {
-        const page = await pagestatus('paddressproof');
+      
+
+         const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "uploadproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+                const page = await pagestatus('paddressproof');
         if (page?.payload?.status === 'ok') {
           emit('updateDiv', 'paddressproof');
         }
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
 
       else {
-        pagestatus('brokerage'),
+       
+
+            const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "uploadproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              pagestatus('brokerage'),
           emit('updateDiv', 'brokerage');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
+
       }
 
     }
@@ -436,11 +494,37 @@ const handleButtonClick = async (event) => {
         if (statuscheck1) {
           const nextPage = await pagestatus('photosign1');
           if (nextPage.payload.status === 'ok') {
-            emit('updateDiv', 'photosign1');
+           
+
+             const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "uploadproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'photosign1');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
           }
         } else {
-          await pagestatus('uploadbank');
+         
+
+          const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "uploadproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+               await pagestatus('uploadbank');
           emit('updateDiv', 'uploadbank');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
         }
       }
     }
@@ -449,13 +533,41 @@ const handleButtonClick = async (event) => {
       const bankcheck = mydata?.payload?.metaData?.bank?.bank1HolderName;
 
       if (bankcheck) {
-        await pagestatus('photosign1');
+        
+
+          const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "uploadproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+             await pagestatus('photosign1');
         emit('updateDiv', 'photosign1');
         isStatusValid.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       } else {
-        await pagestatus('uploadbank');
+        
+
+                    const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "uploadproof",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+             await pagestatus('uploadbank');
         emit('updateDiv', 'uploadbank');
         isStatusValid.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
+
+
       }
     }
     // Default case
@@ -471,6 +583,11 @@ const handleButtonClick = async (event) => {
 };
 
 onMounted(async () => {
+  const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
+
   await getsegmentdata();
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;

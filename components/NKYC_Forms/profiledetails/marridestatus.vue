@@ -109,6 +109,9 @@
 import { ref, onMounted } from 'vue';
 import { pagestatus } from '~/utils/pagestatus.js'
 import { useRouter } from 'vue-router';
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
+
 const router = useRouter();
 const { baseurl } = globalurl();
 const { htoken } = headerToken()
@@ -215,6 +218,10 @@ const profilesetinfo = async () => {
 
 await profilesetinfo()
 onMounted(() => {
+   const unixTimestamp = Math.floor(Date.now() / 1000)
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -258,7 +265,20 @@ const personalinfo = async () => {
     commonerror.value = "";
 
     if (data?.payload?.status === 'ok') {
-      emit('updateDiv', 'clientinfo');
+       const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "info",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+             emit('updateDiv', 'clientinfo');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
+
+      
     } else if (data?.payload?.status === 'error') {
       const code = data.payload.code;
       const message = data.payload.message;
@@ -362,8 +382,21 @@ offlineerror.value=false
         }
       }
       else if(data.payload.status === 'ok'){
-        emit('updateDiv', 'communicationaddress');
-        isBack.value = false;
+        
+
+         const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "info",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+           emit('updateDiv', 'communicationaddress');
+           isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
   }
   else if(mydata.payload.metaData.address.sameAsPermanent === 'YES'){
@@ -377,12 +410,23 @@ offlineerror.value=false
         }
       }
       else if(data.payload.status === 'ok'){
-        emit('updateDiv', 'parmanentaddress');
-        isBack.value = false;
+       
+
+          const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "info",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+               emit('updateDiv', 'parmanentaddress');
+               isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
-      
-    
-    
+       
   }
  }
 

@@ -197,7 +197,8 @@ const isImageUploaded = ref(false);
 
 const { baseurl } = globalurl();
 const {htoken}=headerToken()
-
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 
 
 const getsegmentdata = async () => {
@@ -403,6 +404,10 @@ const getMousePos = (event) => {
 
 
 onMounted(async () => {
+   const unixTimestamp = Math.floor(Date.now() / 1000)
+
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   await getsegmentdata()
  
   deviceHeight.value = window.innerHeight;
@@ -510,9 +515,23 @@ const headertoken=htoken
     const data = await decryptionresponse(decryptedData);
     if (data.payload.status === 'ok') {
       completeProgress();
-        isSignatureUploaded.value = true;
-       pagestatus('esign')
-      emit('updateDiv', 'esign');
+       
+
+
+            const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "signdraw",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+               isSignatureUploaded.value = true;
+                pagestatus('esign')
+                emit('updateDiv', 'esign');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
     }
 
     
@@ -566,8 +585,21 @@ const back = () => {
   }
 }
  else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'photoproceed');
-  isBack.value = false;
+ 
+
+   const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "signdraw",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'photoproceed');
+              isBack.value = false;
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
 }
   }, 600)
 
@@ -655,7 +687,20 @@ const handleButtonClick = async () => {
     if (initialSignatureLoaded.value && !isSignatureModified.value) {
       const page = await pagestatus('esign');
       if (page?.payload?.status === 'ok') {
-        emit('updateDiv', 'esign');
+        
+
+         const heartbeatdata = await heartbeat_timestamp({
+              userToken: localStorage.getItem('userkey'),
+              pageCode: "signdraw",
+              startTime: localStorage.getItem('componentLoadTime'),
+              endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+              emit('updateDiv', 'esign');
+            } else {
+              console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
       }
     } else {
       await uploadsign();

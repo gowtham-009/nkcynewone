@@ -126,9 +126,10 @@ import { useRouter } from 'vue-router';
 
 
 import { pagestatus } from '~/utils/pagestatus.js'
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
 
 
-
+const currtime = Math.floor(Date.now() / 1000)
 
 
 const emit = defineEmits(['updateDiv']);
@@ -140,6 +141,12 @@ const deviceHeight = ref(0);
 const isBack = ref(true); // Assuming the back button is enabled by default
 const isFormValid = ref(true); // Assuming the form is valid by default
 onMounted(() => {
+
+    const unixTimestamp = Math.floor(Date.now() / 1000)
+
+    localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
+
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
         deviceHeight.value = window.innerHeight;
@@ -148,8 +155,8 @@ onMounted(() => {
 
 const router = useRouter();
 
-const offlineerror=ref(false)
-const offerror=ref('')
+const offlineerror = ref(false)
+const offerror = ref('')
 const handleButtonClick = () => {
     isFormValid.value = false;
     const button = rippleBtn.value
@@ -168,13 +175,13 @@ const handleButtonClick = () => {
     setTimeout(async () => {
         circle.remove()
 
-          offlineerror.value=false
-  if (!navigator.onLine) {
+        offlineerror.value = false
+        if (!navigator.onLine) {
 
-      offlineerror.value=true
-      offerror.value='No internet connection please try again!'
-   return
-  }
+            offlineerror.value = true
+            offerror.value = 'No internet connection please try again!'
+            return
+        }
 
         const data = await getServerData();
 
@@ -192,21 +199,78 @@ const handleButtonClick = () => {
             const panInfo = data?.payload?.metaData?.kraPan?.APP_KRA_INFO;
 
             if (panInfo) {
-                pagestatus('parmanentaddress');
-                emit('updateDiv', 'parmanentaddress');
+
+                const heartbeatdata = await heartbeat_timestamp({
+                    userToken: localStorage.getItem('userkey'),
+                    pageCode: "main",
+                    startTime: localStorage.getItem('componentLoadTime'),
+                    endTime: currtime.toString()
+                });
+
+                if (heartbeatdata.payload.status === 'ok') {
+                    pagestatus('parmanentaddress');
+                    emit('updateDiv', 'parmanentaddress');
+                } else {
+                    console.error('Error sending heartbeat data:', heartbeatdata.message);
+                }
+
+
             }
 
             else if (digiInfo.length === 0) {
-                pagestatus('ekyc');
-                emit('updateDiv', 'ekyc');
+
+                const heartbeatdata = await heartbeat_timestamp({
+                    userToken: localStorage.getItem('userkey'),
+                    pageCode: "main",
+                    startTime: localStorage.getItem('componentLoadTime'),
+                    endTime: currtime.toString()
+                });
+
+                if (heartbeatdata.payload.status === 'ok') {
+                    pagestatus('ekyc');
+                    emit('updateDiv', 'ekyc');
+                } else {
+                    console.error('Error sending heartbeat data:', heartbeatdata.message);
+                }
+
             }
             else if (digiadd) {
-                pagestatus('parmanentaddress');
-                emit('updateDiv', 'parmanentaddress');
+
+                const heartbeatdata = await heartbeat_timestamp({
+                    userToken: localStorage.getItem('userkey'),
+                    pageCode: "main",
+                    startTime: localStorage.getItem('componentLoadTime'),
+                    endTime: currtime.toString()
+                });
+
+                if (heartbeatdata.payload.status === 'ok') {
+
+                    pagestatus('parmanentaddress');
+                    emit('updateDiv', 'parmanentaddress');
+                } else {
+                    console.error('Error sending heartbeat data:', heartbeatdata.message);
+                }
+
+
             }
             else {
-                pagestatus('ekyc');
-                emit('updateDiv', 'ekyc');
+
+                const heartbeatdata = await heartbeat_timestamp({
+                    userToken: localStorage.getItem('userkey'),
+                    pageCode: "main",
+                    startTime: localStorage.getItem('componentLoadTime'),
+                    endTime: currtime.toString()
+                });
+
+                if (heartbeatdata.payload.status === 'ok') {
+
+                    pagestatus('ekyc');
+                    emit('updateDiv', 'ekyc');
+                } else {
+                    console.error('Error sending heartbeat data:', heartbeatdata.message);
+                }
+
+
             }
 
 
@@ -235,13 +299,13 @@ function back() {
     setTimeout(async () => {
         circle.remove()
 
-          offlineerror.value=false
-  if (!navigator.onLine) {
+        offlineerror.value = false
+        if (!navigator.onLine) {
 
-      offlineerror.value=true
-      offerror.value='No internet connection please try again!'
-   return
-  }
+            offlineerror.value = true
+            offerror.value = 'No internet connection please try again!'
+            return
+        }
 
         const data = await pagestatus('email')
         if (data.payload.status == 'error') {
@@ -252,8 +316,23 @@ function back() {
             }
         }
         else if (data.payload.status == 'ok') {
-            emit('updateDiv', 'email');
-            isBack.value = false;
+
+            const heartbeatdata = await heartbeat_timestamp({
+                userToken: localStorage.getItem('userkey'),
+                pageCode: "main",
+                startTime: localStorage.getItem('componentLoadTime'),
+                endTime: currtime.toString()
+            });
+
+            if (heartbeatdata.payload.status === 'ok') {
+
+                emit('updateDiv', 'email');
+                isBack.value = false;
+            } else {
+                console.error('Error sending heartbeat data:', heartbeatdata.message);
+            }
+
+
         }
 
 

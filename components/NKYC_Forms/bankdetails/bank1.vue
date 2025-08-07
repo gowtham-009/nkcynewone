@@ -140,6 +140,8 @@ import MICR from '~/components/NKYC_Forms/bankdetails/bankinputs/micr.vue'
 import Address from '~/components/NKYC_Forms/bankdetails/bankinputs/address.vue'
 const emit = defineEmits(['updateDiv']);
 import { useRouter } from 'vue-router';
+import { heartbeat_timestamp } from '~/utils/heartbeat.js'
+const currtime = Math.floor(Date.now() / 1000)
 const router = useRouter();
 
 import { pagestatus } from '~/utils/pagestatus.js'
@@ -205,6 +207,9 @@ const emitSelection = () => {
 }
 
 onMounted(() => {
+   const unixTimestamp = Math.floor(Date.now() / 1000)
+  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
     deviceHeight.value = window.innerHeight;
@@ -365,7 +370,20 @@ const headertoken=htoken
     if (data.payload.status=='ok'&&(data.payload.metaData.bankVerifyStatus == 1 || data.payload.metaData.bankVerifyStatus == 0)) {
       errorbox.value = false
        completeProgress();
-      emit('updateDiv', 'bank4');
+
+       const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "bank1",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
+
+          if (heartbeatdata.payload.status === 'ok') {
+            emit('updateDiv', 'bank4');
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
+      
 
     }
     else if (data.payload.status == 'error' && data.payload.code=='H1002') {
@@ -494,8 +512,21 @@ function back() {
   }
 }
  else if (data.payload.status == 'ok') {
-  emit('updateDiv', 'nominee');
+  
+
+    const heartbeatdata = await heartbeat_timestamp({
+            userToken: localStorage.getItem('userkey'),
+            pageCode: "bank1",
+            startTime: localStorage.getItem('componentLoadTime'),
+            endTime: currtime.toString()
+          });
+
+          if (heartbeatdata.payload.status === 'ok') {
+           emit('updateDiv', 'nominee');
   isBack.value = false;
+          } else {
+            console.error('Error sending heartbeat data:', heartbeatdata.message);
+          }
 }
   }, 600)
 
