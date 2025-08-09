@@ -222,7 +222,7 @@ const setPermanentAddress = async () => {
 onMounted(async () => {
   const unixTimestamp = Math.floor(Date.now() / 1000)
 
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
 
   window.addEventListener('resize', updateHeight);
@@ -261,7 +261,7 @@ const permanentaddressdata = async () => {
 
   if (isEditMode.value) {
     user = await encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
+      userToken: sessionStorage.getItem('userkey'),
       comAddSameAsPermanent: commAddressRef.value?.confirm ? "YES" : "NO",
       pageCode: pageCode,
       permanentAddress: address.value,
@@ -273,7 +273,7 @@ const permanentaddressdata = async () => {
   }
   else {
     user = await encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
+      userToken: sessionStorage.getItem('userkey'),
       comAddSameAsPermanent: commAddressRef.value?.confirm ? "YES" : "NO",
       pageCode: pageCode,
       permanentAddress: address.value,
@@ -316,9 +316,9 @@ const permanentaddressdata = async () => {
           if (mydata.payload.status == 'ok') {
 
             const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "parmanentaddress",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -333,9 +333,9 @@ const permanentaddressdata = async () => {
 
         } else {
           const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "parmanentaddress",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 
@@ -350,7 +350,7 @@ const permanentaddressdata = async () => {
       else if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code == '1004') {
           alert(data.payload.message);
-          localStorage.removeItem('userkey')
+          sessionStorage.removeItem('userkey')
           router.push('/')
         }
 
@@ -450,7 +450,7 @@ function back() {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
     }
@@ -458,9 +458,9 @@ function back() {
 
 
       const heartbeatdata = await heartbeat_timestamp({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         pageCode: "parmanentaddress",
-        startTime: localStorage.getItem('componentLoadTime'),
+        startTime: sessionStorage.getItem('componentLoadTime'),
         endTime: currtime.toString()
       });
 

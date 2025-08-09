@@ -98,7 +98,7 @@ const getsegmentdata = async () => {
     clientname.value = mydata?.payload?.metaData?.profile?.clientName
     const segments = mydata?.payload?.metaData?.proofs?.ipvImg;
     const imageauth = headertoken;
-      const userToken = localStorage.getItem('userkey');
+      const userToken = sessionStorage.getItem('userkey');
       const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
       srcUrl.value = imgSrc; 
   }
@@ -108,7 +108,7 @@ const offlineerror=ref(false)
 const offerror=ref('')
 onMounted(async () => {
   const unixTimestamp = Math.floor(Date.now() / 1000)
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
   await getsegmentdata()
   deviceHeight.value = window.innerHeight;
@@ -123,16 +123,16 @@ const retake = async () => {
   const page = await pagestatus('takephoto')
   if ((page?.payload?.status == 'error' && page?.payload?.message == 'User Not Found.') || (page?.payload?.status == 'error' && page?.payload?.message == 'Missing Usertoken parameters.')) {
     alert('Session has expired, please login.');
-    localStorage.removeItem('userkey')
+    sessionStorage.removeItem('userkey')
     router.push('/')
   }
   else if (page.payload.status == 'ok') {
    
 
      const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "photoproceed",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -168,7 +168,7 @@ const back = () => {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code=='1004'){
     alert(data.payload.message);
-    localStorage.removeItem('userkey')
+    sessionStorage.removeItem('userkey')
     router.push('/')
   }
 }
@@ -176,9 +176,9 @@ const back = () => {
   
 
    const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "photoproceed",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -205,7 +205,7 @@ const documentsavebtn = async () => {
 
   const apiurl = `${baseurl.value}additional_docs`;
   const user =await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
     pageCode: "signdraw",
     documentConsentMode: question1.value || 'Electronic',
     contractNoteMode: question2.value || 'Electronic',
@@ -245,7 +245,7 @@ const documentsavebtn = async () => {
     else if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code=='1004'){
              alert(data.payload.message);
-              localStorage.removeItem('userkey')
+              sessionStorage.removeItem('userkey')
               router.push('/')
         }
        
@@ -283,7 +283,7 @@ const handleButtonClick = () => {
    if (page.payload.status == 'error') {
         if (page.payload.code == '1002' || page.payload.code=='1004'){
               alert(page.payload.message);
-              localStorage.removeItem('userkey')
+              sessionStorage.removeItem('userkey')
               router.push('/')
         }
       }
@@ -296,9 +296,9 @@ const handleButtonClick = () => {
      
 
        const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "photoproceed",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 

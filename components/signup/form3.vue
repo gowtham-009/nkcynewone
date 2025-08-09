@@ -192,7 +192,7 @@ watch(isValidEmail, (newValue) => {
 onMounted(() => {
 const unixTimestamp = Math.floor(Date.now() / 1000)
 
-  localStorage.setItem('componentLoadTime', unixTimestamp-3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp-3600);
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
@@ -231,16 +231,16 @@ const back = () => {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code=='1004'){
     alert(data.payload.message);
-    localStorage.removeItem('userkey')
+    sessionStorage.removeItem('userkey')
     router.push('/')
   }
 }
  else if (data.payload.status == 'ok') {
 
   const heartbeatdata=await heartbeat_timestamp({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         pageCode: "email",
-        startTime:localStorage.getItem('componentLoadTime'),
+        startTime:sessionStorage.getItem('componentLoadTime'),
         endTime: currtime.toString()
       });
 
@@ -292,7 +292,7 @@ const headertoken=htoken
     email: emailid.value,
     resend: 'false',
     pageCode: "email",
-    userToken: localStorage.getItem('userkey')
+    userToken: sessionStorage.getItem('userkey')
   });
 
   const payload = { payload: user };
@@ -343,9 +343,9 @@ otperror.value=false
       else if (data.payload.status == 'ok' && data.payload.otpStatus == 1) {
         emailbox.value = false
         const heartbeatdata=await heartbeat_timestamp({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         pageCode: "email",
-        startTime:localStorage.getItem('componentLoadTime'),
+        startTime:sessionStorage.getItem('componentLoadTime'),
         endTime: currtime.toString()
       });
 
@@ -375,14 +375,14 @@ otperror.value=false
       else if (data.payload.status == 'error' && data.payload.code == '1002') {
 
         alert(data.payload.message)
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
 
       }
 
       else if (data.payload.status == 'error' && data.payload.code == '1004') {
         alert(data.payload.message)
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
 
       }
@@ -400,7 +400,7 @@ const otpverfication = async () => {
   isStatusValid.value = false;
   const apiurl = baseurl.value + 'validateEmail'
   const user = await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
     email: emailid.value,
     verifyotp: "false",
     otpCode: e_otp.value,
@@ -429,9 +429,9 @@ const otpverfication = async () => {
       if (data.payload.status == 'ok') {
 
          const heartbeatdata=await heartbeat_timestamp({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         pageCode: "email",
-        startTime:localStorage.getItem('componentLoadTime'),
+        startTime:sessionStorage.getItem('componentLoadTime'),
         endTime: currtime.toString()
       });
 
@@ -460,14 +460,14 @@ const otpverfication = async () => {
       else if (data.payload.status == 'error' && data.payload.code == '1002') {
         errormsg.value = true
         errormobile.value = data.payload.message
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
 
       }
       else if (data.payload.status == 'error' && data.payload.code == '1004') {
         errormsg.value = true
         errormobile.value = data.payload.message
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
 
       }

@@ -208,7 +208,7 @@ const emitSelection = () => {
 
 onMounted(() => {
    const unixTimestamp = Math.floor(Date.now() / 1000)
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
@@ -331,7 +331,7 @@ const bankvalidation = async () => {
 
   const apiurl = `${baseurl.value}bank`;
   const user =await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
     pageCode: "bank4",
     bankAccType: selected.value,
     bankAccNo: accno.value,
@@ -372,9 +372,9 @@ const headertoken=htoken
        completeProgress();
 
        const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "bank1",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 
@@ -399,7 +399,7 @@ const headertoken=htoken
         if (data.payload.code == '1002' || data.payload.code=='1004')
         {
              alert(data.payload.message);
-              localStorage.removeItem('userkey')
+              sessionStorage.removeItem('userkey')
               router.push('/')
         }
           else if(data.payload.status=='error' && data.payload.errors.length>0) {
@@ -507,7 +507,7 @@ function back() {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code=='1004'){
     alert(data.payload.message);
-    localStorage.removeItem('userkey')
+    sessionStorage.removeItem('userkey')
     router.push('/')
   }
 }
@@ -515,9 +515,9 @@ function back() {
   
 
     const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "bank1",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 

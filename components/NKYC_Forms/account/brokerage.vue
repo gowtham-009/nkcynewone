@@ -149,7 +149,7 @@ const back = () => {
         if (data.payload.status == 'error') {
             if (data.payload.code == '1002' || data.payload.code == '1004') {
                 alert(data.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
         }
@@ -164,7 +164,7 @@ const back = () => {
 onMounted(() => {
      const unixTimestamp = Math.floor(Date.now() / 1000)
 
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
@@ -210,9 +210,9 @@ const handleButtonClick = () => {
                 const page = await pagestatus('paddressproof');
                 if (page?.payload?.status === 'ok') {
                     const heartbeatdata = await heartbeat_timestamp({
-                    userToken: localStorage.getItem('userkey'),
+                    userToken: sessionStorage.getItem('userkey'),
                     pageCode: "brokerage",
-                    startTime: localStorage.getItem('componentLoadTime'),
+                    startTime: sessionStorage.getItem('componentLoadTime'),
                     endTime: currtime.toString()
                 });
                 if (heartbeatdata.payload.status === 'ok') {
@@ -225,9 +225,9 @@ const handleButtonClick = () => {
             }
             else if (!statuscheck) {
                 const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "brokerage",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 
@@ -245,9 +245,9 @@ const handleButtonClick = () => {
               
 
                 const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "brokerage",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 
@@ -262,9 +262,9 @@ const handleButtonClick = () => {
                
 
                  const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "brokerage",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 
@@ -281,7 +281,7 @@ const handleButtonClick = () => {
         } else if (mydata.payload.status == 'error') {
             if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
                 alert(mydata.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
 

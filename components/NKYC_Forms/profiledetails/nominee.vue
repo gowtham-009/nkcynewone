@@ -436,7 +436,7 @@ const openNomineeDialog = async () => {
   if (mydata.payload.status === 'error') {
     if (mydata.payload.code === '1002' || mydata.payload.code === '1004') {
       alert(mydata.payload.message);
-      localStorage.removeItem('userkey');
+      sessionStorage.removeItem('userkey');
       router.push('/');
     }
   }
@@ -766,7 +766,7 @@ const nomineesavedata = async (optvalue) => {
     let user
     if (optvalue == 'true') {
       user = await encryptionrequestdata({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         pageCode: "nominee",
         optoutStatus: "true"
       });
@@ -774,7 +774,7 @@ const nomineesavedata = async (optvalue) => {
 
     } else {
       user = await encryptionrequestdata({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         pageCode: "nominee",
         nomineeName: name.value,
         nomineeRelation: relationship,
@@ -843,7 +843,7 @@ const nomineesavedata = async (optvalue) => {
     else if (data.payload.status === 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
       else if (data.payload.status == 'error' && data.payload.errors.length > 0) {
@@ -1071,7 +1071,7 @@ const nomineedelete = async (deleteid) => {
 
 
   const user = await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
     pageCode: "nominee",
     removeNominee: deleteid.id
 
@@ -1100,7 +1100,7 @@ const nomineedelete = async (deleteid) => {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
 
@@ -1174,7 +1174,7 @@ const back = () => {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
     }
@@ -1182,9 +1182,9 @@ const back = () => {
     
 
        const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "nominee",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -1313,9 +1313,9 @@ const handleButtonClick = async (event) => {
            
 
              const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "nominee",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -1332,7 +1332,7 @@ const handleButtonClick = async (event) => {
       } else if (data?.payload?.status === 'error') {
         if (['1002', '1004'].includes(data.payload.code)) {
           alert(data.payload.message);
-          localStorage.removeItem('userkey');
+          sessionStorage.removeItem('userkey');
           router.push('/');
         }
       }
@@ -1364,7 +1364,7 @@ watch(nomine, () => {
 // Lifecycle
 onMounted(async () => {
     const unixTimestamp = Math.floor(Date.now() / 1000)
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {

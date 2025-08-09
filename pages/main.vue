@@ -183,7 +183,8 @@ watch(() => route.query.form, (newForm) => {
 })
 
 onMounted(async () => {
-  const token = localStorage.getItem('userkey');
+  
+  const token = sessionStorage.getItem('userkey');
 
   if (!token) {
     authenticated.value = false;
@@ -200,7 +201,7 @@ onMounted(async () => {
     const mydata = await getServerData();
 
     if (mydata.payload && mydata.payload.status === 'error') {
-      localStorage.removeItem('userkey');
+      sessionStorage.removeItem('userkey');
       router.push('/');
       return;
     }
@@ -235,7 +236,7 @@ onMounted(async () => {
 
   } catch (error) {
     console.error('Error fetching server data:', error);
-    localStorage.removeItem('userkey');
+    sessionStorage.removeItem('userkey');
     router.push('/');
   }
 });

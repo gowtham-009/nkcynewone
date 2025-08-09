@@ -219,7 +219,7 @@ const profilesetinfo = async () => {
 await profilesetinfo()
 onMounted(() => {
    const unixTimestamp = Math.floor(Date.now() / 1000)
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
 
   deviceHeight.value = window.innerHeight;
@@ -232,7 +232,7 @@ onMounted(() => {
 const personalinfo = async () => {
   const apiurl = `${baseurl.value}personal_info`;
   const user =await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
     pageCode: "clientinfo",
     gender: selectedgender.value,
     maritalStatus: selected.value,
@@ -266,9 +266,9 @@ const personalinfo = async () => {
 
     if (data?.payload?.status === 'ok') {
        const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "info",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -285,7 +285,7 @@ const personalinfo = async () => {
 
       if (code === '1002' || code === '1004') {
         alert(message);
-        localStorage.removeItem('userkey');
+        sessionStorage.removeItem('userkey');
         router.push('/');
       } else if (code === 'F1002') {
         commonerror.value = message || "Something went wrong.";
@@ -377,7 +377,7 @@ offlineerror.value=false
      if (data.payload.status === 'error') {
         if (data.payload.code === '1002' || data.payload.code === '1004') {
           alert(data.payload.message);
-          localStorage.removeItem('userkey');
+          sessionStorage.removeItem('userkey');
           router.push('/');
         }
       }
@@ -385,9 +385,9 @@ offlineerror.value=false
         
 
          const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "info",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -405,7 +405,7 @@ offlineerror.value=false
      if (data.payload.status === 'error') {
         if (data.payload.code === '1002' || data.payload.code === '1004') {
           alert(data.payload.message);
-          localStorage.removeItem('userkey');
+          sessionStorage.removeItem('userkey');
           router.push('/');
         }
       }
@@ -413,9 +413,9 @@ offlineerror.value=false
        
 
           const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "info",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -433,7 +433,7 @@ offlineerror.value=false
   else if (mydata.payload.status == 'error') {
       if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
             alert(mydata.payload.message);
-            localStorage.removeItem('userkey')
+            sessionStorage.removeItem('userkey')
             router.push('/')
       }
 }

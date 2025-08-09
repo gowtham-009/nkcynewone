@@ -137,7 +137,7 @@ const getsegmentdata = async () => {
   const headertoken = htoken;
   const mydata = await getServerData();
   const imageauth = headertoken;
-  const userToken = localStorage.getItem('userkey');
+  const userToken = sessionStorage.getItem('userkey');
   const segments = mydata?.payload?.metaData?.proofs?.pancard;
 
   if (
@@ -281,7 +281,7 @@ const proofupload = async () => {
 
     // Create encrypted JSON payload
     const encryptedPayload = await encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
+      userToken: sessionStorage.getItem('userkey'),
       pageCode: 'uploadbank',
     });
 
@@ -316,9 +316,9 @@ const proofupload = async () => {
       if (statuscheck1) {
 
          const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "uploadproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -336,9 +336,9 @@ const proofupload = async () => {
         
 
           const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "uploadproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -354,7 +354,7 @@ const proofupload = async () => {
     else if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
 
@@ -397,9 +397,9 @@ const back = (event) => {
       
 
          const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "uploadproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -417,9 +417,9 @@ const back = (event) => {
        
 
             const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "uploadproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -436,7 +436,7 @@ const back = (event) => {
     else if (mydata.payload.status == 'error') {
       if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
         alert(mydata.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
     }
@@ -475,7 +475,7 @@ const handleButtonClick = async (event) => {
     if (mydata.payload?.status === 'error') {
       if (mydata.payload.code === '1002' || mydata.payload.code === '1004') {
         alert(mydata.payload.message);
-        localStorage.removeItem('userkey');
+        sessionStorage.removeItem('userkey');
         router.push('/');
       }
       return;
@@ -497,9 +497,9 @@ const handleButtonClick = async (event) => {
            
 
              const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "uploadproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -513,9 +513,9 @@ const handleButtonClick = async (event) => {
          
 
           const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "uploadproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -536,9 +536,9 @@ const handleButtonClick = async (event) => {
         
 
           const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "uploadproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -553,9 +553,9 @@ const handleButtonClick = async (event) => {
         
 
                     const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "uploadproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -585,7 +585,7 @@ const handleButtonClick = async (event) => {
 onMounted(async () => {
   const unixTimestamp = Math.floor(Date.now() / 1000)
 
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
 
   await getsegmentdata();

@@ -119,7 +119,7 @@ await profilesetinfo()
 onMounted(() => {
    const unixTimestamp = Math.floor(Date.now() / 1000)
 
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
@@ -130,7 +130,7 @@ onMounted(() => {
 const personalinfo = async () => {
   const apiurl = `${baseurl.value}personal_info`;
   const user = await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
     pageCode: "income",
     occupation: selected.value,
 
@@ -158,9 +158,9 @@ const personalinfo = async () => {
       if (data.payload.status == 'ok') {
      
          const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "occupation",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -174,7 +174,7 @@ const personalinfo = async () => {
       else if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code == '1004') {
           alert(data.payload.message);
-          localStorage.removeItem('userkey')
+          sessionStorage.removeItem('userkey')
           router.push('/')
         }
 
@@ -266,15 +266,15 @@ const back = () => {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
     }
     else if (data.payload.status == 'ok') {
        const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "occupation",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 

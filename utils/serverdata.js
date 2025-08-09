@@ -2,7 +2,7 @@ import { encryptionrequestdata } from '~/utils/globaldata.js';
 import { decryptionresponse } from '~/utils/globaldata.js';
 export async function getServerData() {
   const apiUrl = "https://nnkyc.w3webtechnologies.co.in/api/v1/nkyc_data";
-  const userkey = localStorage.getItem('userkey') 
+  const userkey = sessionStorage.getItem('userkey') 
   const encryptedUser =await encryptionrequestdata({
     userToken: userkey,
   });

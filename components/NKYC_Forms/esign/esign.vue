@@ -135,7 +135,7 @@ const steps = [
 onMounted(() => {
   const unixTimestamp = Math.floor(Date.now() / 1000)
 
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
 
   if (route.query.documentId) {
@@ -213,7 +213,7 @@ const createunsignedDocument = async () => {
   startProgressAnimation();
   const apiurl = `${baseurl.value}nkyc_document`;
   const user = await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
   });
 
   const payload = { payload: user };
@@ -245,7 +245,7 @@ const createunsignedDocument = async () => {
     else if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
 
@@ -270,7 +270,7 @@ const createEsign = async () => {
   const apiurl = `${baseurl.value}esign`;
 
   const user = await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
     pageCode: 'esign',
     redirectUrl: domainurl.value + 'main',
     esignAction: 'createEsign',
@@ -298,7 +298,7 @@ const createEsign = async () => {
     else if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
 
@@ -320,7 +320,7 @@ const esignStatusCheck = async (requestId) => {
   esignerror.value = false
   const apiurl = `${baseurl.value}esign`;
   const user = await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
 
     esignId: requestId,
     esignAction: 'checkEsignStatus',
@@ -376,9 +376,9 @@ const esignStatusCheck = async (requestId) => {
 
 
           const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "esign",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 
@@ -392,9 +392,9 @@ const esignStatusCheck = async (requestId) => {
 
 
           const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "esign",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 
@@ -411,7 +411,7 @@ const esignStatusCheck = async (requestId) => {
     else if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
       else {
@@ -485,15 +485,15 @@ const back = () => {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
     }
     else if (data.payload.status == 'ok') {
       const heartbeatdata = await heartbeat_timestamp({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         pageCode: "esign",
-        startTime: localStorage.getItem('componentLoadTime'),
+        startTime: sessionStorage.getItem('componentLoadTime'),
         endTime: currtime.toString()
       });
 

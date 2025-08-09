@@ -195,7 +195,7 @@ const toggleEditMode = async () => {
 onMounted(() => {
   const unixTimestamp = Math.floor(Date.now() / 1000)
 
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
@@ -212,7 +212,7 @@ const communicateaddressdata = async () => {
 
   if (isEditMode.value) {
     user = await encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
+      userToken: sessionStorage.getItem('userkey'),
       pageCode: "info",
       communicationAddress: address.value,
       communicationCity: city.value,
@@ -224,7 +224,7 @@ const communicateaddressdata = async () => {
   }
   else {
     user = await encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
+      userToken: sessionStorage.getItem('userkey'),
       pageCode: "info",
       communicationAddress: address.value,
       communicationCity: city.value,
@@ -266,9 +266,9 @@ const communicateaddressdata = async () => {
             
 
               const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "communicationaddress",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -284,7 +284,7 @@ const communicateaddressdata = async () => {
       else if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code == '1004') {
           alert(data.payload.message);
-          localStorage.removeItem('userkey')
+          sessionStorage.removeItem('userkey')
           router.push('/')
         }
 
@@ -382,15 +382,15 @@ const back = () => {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
     }
     else if (data.payload.status == 'ok') {
         const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "communicationaddress",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 

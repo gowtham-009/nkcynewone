@@ -156,7 +156,7 @@ onMounted(() => {
  const unixTimestamp = Math.floor(Date.now() / 1000)
 
 
-  localStorage.setItem('componentLoadTime', unixTimestamp-3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp-3600);
 
   deviceHeight.value = window.innerHeight;
   window.addEventListener('resize', () => {
@@ -196,7 +196,7 @@ const sendmobileotp = async (resend) => {
     mobile: mobileNo.value,
     resend: 'false',
     pageCode: "mobile",
-    userToken: localStorage.getItem('userkey')
+    userToken: sessionStorage.getItem('userkey')
   });
   const headertoken = htoken
   const payload = { payload: user };
@@ -249,9 +249,9 @@ const sendmobileotp = async (resend) => {
       buttonText.value = 'Verify Otp'
      
       const heartbeatdata=await heartbeat_timestamp({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         pageCode: "mobile",
-        startTime:localStorage.getItem('componentLoadTime'),
+        startTime:sessionStorage.getItem('componentLoadTime'),
         endTime: currtime.toString()
       });
 
@@ -281,14 +281,14 @@ const sendmobileotp = async (resend) => {
     }
     else if (data.payload.status == 'error' && data.payload.code == '1002') {
       alert(data.payload.message)
-      localStorage.removeItem('userkey')
+      sessionStorage.removeItem('userkey')
       router.push('/')
 
     }
 
     else if (data.payload.status == 'error' && data.payload.code == '1004') {
       alert(data.payload.message)
-      localStorage.removeItem('userkey')
+      sessionStorage.removeItem('userkey')
       router.push('/')
     }
 
@@ -303,7 +303,7 @@ const sendmobileotp = async (resend) => {
 const otpverfication = async () => {
   isStatusValid.value = false;
   errormobile.value = '';
-  const usekey = localStorage.getItem('userkey')
+  const usekey = sessionStorage.getItem('userkey')
   const apiurl = `${baseurl.value}validateMobile`;
   const user = await encryptionrequestdata({
     userToken: usekey,
@@ -337,9 +337,9 @@ const otpverfication = async () => {
     if (data.payload.status === 'ok') {
 
       const heartbeatdata=await heartbeat_timestamp({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         pageCode: "mobile",
-        startTime:localStorage.getItem('componentLoadTime'),
+        startTime:sessionStorage.getItem('componentLoadTime'),
         endTime: currtime.toString()
       });
 
@@ -365,14 +365,14 @@ const otpverfication = async () => {
 
     else if (data.payload.status == 'error' && data.payload.code == '1002') {
       alert(data.payload.message)
-      localStorage.removeItem('userkey')
+      sessionStorage.removeItem('userkey')
       router.push('/')
 
     }
 
     else if (data.payload.status == 'error' && data.payload.code == '1004') {
       alert(data.payload.message)
-      localStorage.removeItem('userkey')
+      sessionStorage.removeItem('userkey')
       router.push('/')
 
     }

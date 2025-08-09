@@ -157,7 +157,7 @@ onMounted(async() => {
   
  
 
-  localStorage.removeItem('userkey')
+  sessionStorage.removeItem('userkey')
   const fullHeight = window.innerHeight;
   box1Height.value = fullHeight;
   box2Height.value = 0;
@@ -234,14 +234,14 @@ const kraaddresssubmission = async (resend) => {
    return
   }
   const apiurl = `${baseurl.value}kra_pan`;
-  const userkey = localStorage.getItem('userkey') || '';
+  const userkey = sessionStorage.getItem('userkey') || '';
 
   const encryptedPayload = await encryptionrequestdata({
     panNo: panvalue.value,
     dob: visibleDate.value,
     pageCode: "mobile",
     userToken: userkey,
-   referralCode: localStorage.getItem('RefCode') || '',
+   referralCode: sessionStorage.getItem('RefCode') || '',
   });
 
   const headertoken = htoken
@@ -360,7 +360,7 @@ const handleButtonClick = async () => {
    
     
     if (data?.payload?.status === 'ok') {
-      localStorage.setItem('userkey', tokenval.value);
+      sessionStorage.setItem('userkey', tokenval.value);
     
       const mydata = await getServerData();
    
@@ -394,7 +394,7 @@ const handleButtonClick = async () => {
         const kycData = metaData?.KYC_DATA;
 
         if (kycData?.APP_KRA_INFO || kycData?.APP_ERROR_DESC) {
-          localStorage.setItem('userkey', kraData.payload.userKey);
+          sessionStorage.setItem('userkey', kraData.payload.userKey);
           router.push('/main');
         } else if (metaData?.loginStatus === 0) {
           // Start 60s OTP timer

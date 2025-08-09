@@ -50,12 +50,12 @@ onMounted(() => {
       routeComponents(value)
     } else {
    
-         localStorage.removeItem('userkey')
+         sessionStorage.removeItem('userkey')
     router.push('/')
     }
   } else {
    
-    localStorage.removeItem('userkey')
+    sessionStorage.removeItem('userkey')
     router.push('/')
   }
 });
@@ -88,7 +88,7 @@ const routeComponents = async (token) => {
     const decryptedData = await response.json();
   const data = await decryptionresponse(decryptedData);
     if(data.payload.status=='ok' && data.payload.metaData.token){
-        localStorage.setItem('userkey',data.payload.metaData.token)
+        sessionStorage.setItem('userkey',data.payload.metaData.token)
         if(data.payload.metaData.token){
             window.location.href=domainurl.value
           //  const page=await pagestatus('takephoto') 

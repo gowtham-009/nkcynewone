@@ -29,17 +29,17 @@ const handleUpdateDiv = (value, newData = {}) => {
 };
 
 onMounted(async () => { 
-  
+ 
 if(route.query.RefCode){
-   localStorage.setItem('RefCode', route.query.RefCode);
+   sessionStorage.setItem('RefCode', route.query.RefCode);
    const { RefCode, ...rest } = route.query;
   router.replace({ query: rest });
   }
   else{
-   localStorage.removeItem('RefCode');
+   sessionStorage.removeItem('RefCode');
   }
 
-  const userkey = localStorage.getItem('userkey');
+  const userkey = sessionStorage.getItem('userkey');
   const allowedPages = ['pan'];
 
   if (userkey) {

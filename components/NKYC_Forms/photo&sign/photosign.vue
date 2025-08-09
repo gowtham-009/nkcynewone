@@ -135,7 +135,7 @@ const getsegmentdata = async () => {
 }
 onMounted(async() => {
      const unixTimestamp = Math.floor(Date.now() / 1000)
-     localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+     sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
     await getsegmentdata()
     deviceHeight.value = window.innerHeight;
@@ -190,9 +190,9 @@ const back = () => {
            
 
               const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "photosign1",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -207,9 +207,9 @@ const back = () => {
             
 
               const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "photosign1",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -224,9 +224,9 @@ const back = () => {
             
 
               const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "photosign1",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -241,9 +241,9 @@ const back = () => {
         
 
           const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "photosign1",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -258,9 +258,9 @@ const back = () => {
             
 
               const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "photosign1",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -281,7 +281,7 @@ const back = () => {
          else if (mydata.payload.status == 'error') {
         if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
              alert(mydata.payload.message);
-              localStorage.removeItem('userkey')
+              sessionStorage.removeItem('userkey')
               router.push('/')
         }
        
@@ -322,9 +322,9 @@ const handleButtonClick = () => {
 
 
                   const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "photosign1",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -338,9 +338,9 @@ const handleButtonClick = () => {
             
 
                   const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "photosign1",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -357,7 +357,7 @@ isStatusValid.value = false;
         else if (mydata.payload.status == 'error') {
         if (mydata.payload.code == '1002' || mydata.payload.code=='1004'){
              alert(mydata.payload.message);
-              localStorage.removeItem('userkey')
+              sessionStorage.removeItem('userkey')
               router.push('/')
         }
        

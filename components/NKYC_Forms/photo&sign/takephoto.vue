@@ -191,7 +191,7 @@ const isIOS = computed(() => {
 
 onMounted(() => {
   const unixTimestamp = Math.floor(Date.now() / 1000)
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
   locationLoading.value = true;
   setupResizeListener();
@@ -453,7 +453,7 @@ const ipvfunction = async () => {
     const headertoken = htoken
     // Encrypt metadata
     const user = await encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
+      userToken: sessionStorage.getItem('userkey'),
       pageCode: "photoproceed",
       location: `${location.latitute},${location.longitude}`,
       country: location.conuntryname
@@ -489,9 +489,9 @@ const ipvfunction = async () => {
       if (data.payload.metaData.is_real === 'true' && data.payload.metaData.realValue >= 0.6) {
        
          const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "takephoto",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -519,7 +519,7 @@ const ipvfunction = async () => {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         loadingprogress.value = false
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
 
@@ -560,7 +560,7 @@ const back = () => {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
     }
@@ -568,9 +568,9 @@ const back = () => {
       
 
        const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "takephoto",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 

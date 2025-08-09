@@ -114,7 +114,7 @@ const getsegmentdata = async () => {
     const headertoken = htoken
     const mydata = await getServerData();
     const imageauth = headertoken;
-    const userToken = localStorage.getItem('userkey');
+    const userToken = sessionStorage.getItem('userkey');
 
     const segments = mydata?.payload?.metaData?.proofs?.permanentAddress1 || '';
 
@@ -176,9 +176,9 @@ const back = async (event) => {
               
 
             const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "paddressproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -193,7 +193,7 @@ const back = async (event) => {
         else if (mydata.payload.status == 'error') {
             if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
                 alert(mydata.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
         }
@@ -270,7 +270,7 @@ const proofupload = async () => {
         formData.append('permanentAddress1', blob, 'image.jpg');
 
         const metadata = await encryptionrequestdata({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "paddressproof"
         });
         formData.append('payload', JSON.stringify({ payload: metadata }));
@@ -300,9 +300,9 @@ const proofupload = async () => {
                   
 
                      const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "paddressproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -318,9 +318,9 @@ const proofupload = async () => {
                     
 
             const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "paddressproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -333,9 +333,9 @@ const proofupload = async () => {
                 } else if (!statuscheck) {
                     
             const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "paddressproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -355,7 +355,7 @@ const proofupload = async () => {
         } else if (data.payload.status == 'error') {
             if (data.payload.code == '1002' || data.payload.code == '1004') {
                 alert(data.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
         } else {
@@ -398,9 +398,9 @@ const handleButtonClick = (event) => {
                
 
             const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "paddressproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -416,9 +416,9 @@ const handleButtonClick = (event) => {
                 
 
             const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "paddressproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -432,9 +432,9 @@ const handleButtonClick = (event) => {
             } else if (!statuscheck) {
                
             const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "paddressproof",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -450,7 +450,7 @@ const handleButtonClick = (event) => {
         else if (mydata.payload.status == 'error') {
             if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
                 alert(mydata.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
         }

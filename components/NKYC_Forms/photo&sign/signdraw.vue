@@ -209,7 +209,7 @@ const getsegmentdata = async () => {
        isSignatureUploaded.value = true;
        const headertoken=htoken
       const imageauth = headertoken;
-      const userToken = localStorage.getItem('userkey');
+      const userToken = sessionStorage.getItem('userkey');
       const imgSrc = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${segments}`;
       imageSrc.value = imgSrc;
 
@@ -406,7 +406,7 @@ const getMousePos = (event) => {
 onMounted(async () => {
    const unixTimestamp = Math.floor(Date.now() / 1000)
 
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
   await getsegmentdata()
  
@@ -485,7 +485,7 @@ const headertoken=htoken
 
     // Create encrypted metadata (excluding image)
     const user =await encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
+      userToken: sessionStorage.getItem('userkey'),
       pageCode: "additionalinformation"
     });
 
@@ -519,9 +519,9 @@ const headertoken=htoken
 
 
             const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "signdraw",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -538,7 +538,7 @@ const headertoken=htoken
        else if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code=='1004'){
              alert(data.payload.message);
-              localStorage.removeItem('userkey')
+              sessionStorage.removeItem('userkey')
               router.push('/')
         }
        
@@ -580,7 +580,7 @@ const back = () => {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code=='1004'){
     alert(data.payload.message);
-    localStorage.removeItem('userkey')
+    sessionStorage.removeItem('userkey')
     router.push('/')
   }
 }
@@ -588,9 +588,9 @@ const back = () => {
  
 
    const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "signdraw",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -690,9 +690,9 @@ const handleButtonClick = async () => {
         
 
          const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "signdraw",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -718,7 +718,7 @@ const documentsavebtn = async () => {
 
   const apiurl = `${baseurl.value}additional_docs`;
   const user =await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
     pageCode: "signdraw",
     documentConsentMode: question1.value || 'Electronic',
     contractNoteMode: question2.value || 'Electronic',
@@ -757,7 +757,7 @@ const headertoken=htoken
   else if (data.payload.status == 'error') {
         if (data.payload.code == '1002' || data.payload.code=='1004'){
              alert(data.payload.message);
-              localStorage.removeItem('userkey')
+              sessionStorage.removeItem('userkey')
               router.push('/')
         }
    }

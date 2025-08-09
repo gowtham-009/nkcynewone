@@ -140,7 +140,7 @@ const currtime = Math.floor(Date.now() / 1000)
 onMounted(() => {
      const unixTimestamp = Math.floor(Date.now() / 1000)
 
-  localStorage.setItem('componentLoadTime', unixTimestamp - 3600);
+  sessionStorage.setItem('componentLoadTime', unixTimestamp - 3600);
 
     deviceHeight.value = window.innerHeight;
     window.addEventListener('resize', () => {
@@ -164,7 +164,7 @@ const digilocker_create = async () => {
     const headertoken = htoken
     const authorization = headertoken;
     const user = await encryptionrequestdata({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         digilockerAction: "createUrl",
         redirecUrl: domainurl.value + 'main'
     });
@@ -189,9 +189,9 @@ const digilocker_create = async () => {
         const data = await decryptionresponse(decryptedData);
         if (data.payload.status == 'ok') {
              const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "ekyc",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 
@@ -207,7 +207,7 @@ const digilocker_create = async () => {
         else if (data.payload.status == 'error') {
             if (data.payload.code == '1002' || data.payload.code == '1004') {
                 alert(data.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
 
@@ -235,7 +235,7 @@ const digilocker_request = async () => {
     const headertoken = htoken
     const authorization = headertoken;
     const user = await encryptionrequestdata({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         digilockerAction: "getDetails",
         digilockerReqId: route.query.requestId
     });
@@ -265,7 +265,7 @@ const digilocker_request = async () => {
         else if (data.payload.status == 'error') {
             if (data.payload.code == '1002' || data.payload.code == '1004') {
                 alert(data.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
 
@@ -297,7 +297,7 @@ const digilocker_getfiles = async (requestid) => {
 
 
     const user = await encryptionrequestdata({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         digilockerAction: "getFiles",
         digilockerReqId: requestid.payload.metaData.requestId,
         filesIds: files
@@ -329,7 +329,7 @@ const digilocker_getfiles = async (requestid) => {
         else if (data.payload.status == 'error') {
             if (data.payload.code == '1002' || data.payload.code == '1004') {
                 alert(data.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
 
@@ -354,7 +354,7 @@ const digilocker_getaadhardoc = async (requestid) => {
     const authorization = headertoken;
 
     const user = await encryptionrequestdata({
-        userToken: localStorage.getItem('userkey'),
+        userToken: sessionStorage.getItem('userkey'),
         digilockerAction: "createAadhaar",
         digilockerReqId: requestid,
 
@@ -381,9 +381,9 @@ const digilocker_getaadhardoc = async (requestid) => {
         if (data.payload.status == 'ok') {
 
              const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "ekyc",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 
@@ -399,7 +399,7 @@ const digilocker_getaadhardoc = async (requestid) => {
         else if (data.payload.status == 'error') {
             if (data.payload.code == '1002' || data.payload.code == '1004') {
                 alert(data.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
 
@@ -457,7 +457,7 @@ const handleButtonClick = () => {
         else if (mydata.payload.status == 'error') {
             if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
                 alert(mydata.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
 
@@ -495,15 +495,15 @@ const back = () => {
         if (data.payload.status == 'error') {
             if (data.payload.code == '1002' || data.payload.code == '1004') {
                 alert(data.payload.message);
-                localStorage.removeItem('userkey')
+                sessionStorage.removeItem('userkey')
                 router.push('/')
             }
         }
         else if (data.payload.status == 'ok') {
             const heartbeatdata = await heartbeat_timestamp({
-            userToken: localStorage.getItem('userkey'),
+            userToken: sessionStorage.getItem('userkey'),
             pageCode: "ekyc",
-            startTime: localStorage.getItem('componentLoadTime'),
+            startTime: sessionStorage.getItem('componentLoadTime'),
             endTime: currtime.toString()
           });
 

@@ -7,13 +7,13 @@ export function useDarkMode() {
     isDark.value = !isDark.value;
     document.documentElement.classList.toggle('dark', isDark.value);
     if (process.client) {
-      localStorage.setItem('theme', isDark.value ? 'dark' : 'light');
+      sessionStorage.setItem('theme', isDark.value ? 'dark' : 'light');
     }
   };
 
   onMounted(() => {
     if (process.client) {
-      const savedTheme = localStorage.getItem('theme');
+      const savedTheme = sessionStorage.getItem('theme');
       isDark.value = savedTheme === 'dark';
       document.documentElement.classList.toggle('dark', isDark.value);
     }

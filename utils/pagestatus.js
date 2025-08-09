@@ -2,7 +2,7 @@ import { encryptionrequestdata } from '~/utils/globaldata.js';
 
 export async function pagestatus(pagecode) {
   const apiUrl = "https://nnkyc.w3webtechnologies.co.in/api/v1/update_pagestatus";
-  const userkey = localStorage.getItem('userkey');
+  const userkey = sessionStorage.getItem('userkey');
 
   const profileCodeMap = {
    mobile:3,

@@ -136,7 +136,7 @@ const getdatapdf = async () => {
   if (bankpdf) {
     const headertoken = htoken;
     const imageauth = headertoken;
-    const userToken = localStorage.getItem('userkey');
+    const userToken = sessionStorage.getItem('userkey');
     const bankstatementpdffile = `${baseurl.value}/view/uploads/${imageauth}/${userToken}/${bankpdf}`;
     uploadedPDF.value = bankstatementpdffile;
   }
@@ -166,7 +166,7 @@ const toggleSelection = async (value) => {
     else if (mydata.payload.status == 'error') {
       if (mydata.payload.code == '1002' || mydata.payload.code == '1004') {
         alert(mydata.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
 
@@ -250,7 +250,7 @@ const camsbankdatacheck = async () => {
   const headertoken = htoken
   const apiurl = `${baseurl.value}cams`;
   const user = await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
     pageCode: 'thankyou',
     camsAction: 'checkCamsStatus',
   });
@@ -287,9 +287,9 @@ const camsbankdatacheck = async () => {
         const mydata = await pagestatus('thankyou');
         if (mydata.payload.status === 'ok') {
             const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "bankfile",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -318,7 +318,7 @@ const camsbankdatacheck = async () => {
     else if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
 
@@ -342,7 +342,7 @@ const camsbankdata = async () => {
 
   const apiurl = `${baseurl.value}cams`;
   const user = await encryptionrequestdata({
-    userToken: localStorage.getItem('userkey'),
+    userToken: sessionStorage.getItem('userkey'),
     pageCode: 'csmspdf',
     camsAction: 'createCams',
     bankIfsc: ifscvalue,
@@ -371,7 +371,7 @@ const camsbankdata = async () => {
     else if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
 
@@ -445,7 +445,7 @@ const bankstatement = async (pdfval) => {
     const blob = await response.blob();
 
     const user = await encryptionrequestdata({
-      userToken: localStorage.getItem('userkey'),
+      userToken: sessionStorage.getItem('userkey'),
       pageCode: 'thankyou'
     });
 
@@ -469,9 +469,9 @@ const bankstatement = async (pdfval) => {
       if (pageroute.payload.status === 'ok') {
            
            const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "bankfile",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -486,7 +486,7 @@ const bankstatement = async (pdfval) => {
     else if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
 
@@ -525,9 +525,9 @@ const handleButtonClick = async (event) => {
      
 
          const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "bankfile",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
@@ -541,7 +541,7 @@ const handleButtonClick = async (event) => {
       else if (pageroute.payload.status == 'error') {
         if (pageroute.payload.code == '1002' || pageroute.payload.code == '1004') {
           alert(pageroute.payload.message);
-          localStorage.removeItem('userkey')
+          sessionStorage.removeItem('userkey')
           router.push('/')
         }
       }
@@ -579,7 +579,7 @@ const back = async () => {
     if (data.payload.status == 'error') {
       if (data.payload.code == '1002' || data.payload.code == '1004') {
         alert(data.payload.message);
-        localStorage.removeItem('userkey')
+        sessionStorage.removeItem('userkey')
         router.push('/')
       }
     }
@@ -587,9 +587,9 @@ const back = async () => {
     
 
        const heartbeatdata = await heartbeat_timestamp({
-              userToken: localStorage.getItem('userkey'),
+              userToken: sessionStorage.getItem('userkey'),
               pageCode: "bankfile",
-              startTime: localStorage.getItem('componentLoadTime'),
+              startTime: sessionStorage.getItem('componentLoadTime'),
               endTime: currtime.toString()
             });
 
